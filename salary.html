@@ -42,7 +42,7 @@ h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #0f172a; }
 table {
   border-collapse: separate; border-spacing: 0; font-size: 0.82rem;
   table-layout: fixed;              /* ★ 固定列宽，行高自由 */
-  width: 2110px; min-width: 2110px;
+  width: 2255px; min-width: 2255px;
 }
 th {
   position: sticky; top: 0; z-index: 10;
@@ -67,6 +67,13 @@ tr:hover td { background: #fafbfc; }
   overflow-wrap: anywhere;
   color: #0f172a;
 }
+
+/* ★ Situation 状态颜色 */
+.sit-pending { background: #F5F5DC !important; }
+.sit-pending .text-cell { color: #78350F; font-weight: 700; }
+.sit-active  { background: #DCFCE7 !important; }
+.sit-active .text-cell { color: #166534; font-weight: 700; }
+.sit-default { background: #ffffff !important; }
 
 .input {
   width: 100%; min-width: 0; border: 1px solid #e2e8f0;
@@ -103,7 +110,7 @@ tr:hover td { background: #fafbfc; }
 
 .legend { font-size: 0.75rem; color: #64748b; margin-top: 0.5rem; padding-left: 0.25rem; }
 
-/* ========== 粮单打印 ========== */
+/* ========== 打印（粮单 + 导出表格） ========== */
 #printArea { display: none; }
 @media print {
   body { background: #fff; padding: 0; }
@@ -125,6 +132,14 @@ tr:hover td { background: #fafbfc; }
   .ps-cols > div { flex: 1; }
   .ps-sign { margin-top: 8mm; display: flex; justify-content: space-between; font-size: 9pt; }
   .ps-sign div { border-top: 1px solid #000; padding-top: 1mm; width: 45%; text-align: center; }
+
+  /* 导出表格打印 */
+  .export-print { padding: 6mm; font-family: Arial, sans-serif; color: #000; }
+  .export-table { border-collapse: collapse; width: 100%; font-size: 8.5pt; }
+  .export-table th, .export-table td { border: 1px solid #999; padding: 3px 4px; }
+  .export-table th { background: #eef2ff; text-align: left; }
+  .export-table td.num { text-align: right; }
+  .export-table tr { page-break-inside: avoid; }
 }
 </style>
 </head>
@@ -132,8 +147,15 @@ tr:hover td { background: #fafbfc; }
 
 <!-- ============ 顶部 Sticky 按钮栏 ============ -->
 <div class="topbar">
-  <button class="btn btn-primary" onclick="saveToSheet()">💾 Simpan ke Sheet</button>
-  <button class="btn" onclick="window.print()">🖨️ Cetak</button>
+  <!-- ★ 导出菜单（替代原本的“保存到 Sheet”） -->
+  <select id="exportMenu" class="btn" onchange="handleExport(this.value)">
+    <option value="">💾 Eksport / 导出…</option>
+    <option value="pdf">📄 PDF (.pdf)</option>
+    <option value="xlsx">📊 Excel (.xlsx)</option>
+    <option value="txt">📝 Text (.txt)</option>
+    <option value="doc">📘 Word (.doc)</option>
+  </select>
+
   <button class="btn" onclick="showAllPayslips()">📄 Semua Slip Gaji</button>
   <button class="btn" onclick="checkAll()">✅ Semak Semua</button>
   <span style="width:1px;height:24px;background:#e2e8f0;margin:0 4px;"></span>
@@ -159,32 +181,33 @@ tr:hover td { background: #fafbfc; }
   <h1 id="pageTitle">Sistem Penggajian</h1>
   <div class="table-wrap">
     <table id="mainTable">
-      <!-- ★ 固定列宽：Code/Name/Group/Bank 留宽给文字换行 -->
+      <!-- ★ 固定列宽（共 25 列，Bank 已加宽） -->
       <colgroup>
-        <col style="width:75px">   <!-- 0 Code -->
-        <col style="width:160px">  <!-- 1 Name -->
-        <col style="width:110px">  <!-- 2 Group -->
-        <col style="width:110px">  <!-- 3 Bank -->
-        <col style="width:85px">   <!-- 4 Basic -->
-        <col style="width:85px">   <!-- 5 Allowance -->
-        <col style="width:85px">   <!-- 6 Deduction -->
-        <col style="width:70px">   <!-- 7 NormalOT -->
-        <col style="width:70px">   <!-- 8 RestOT -->
-        <col style="width:70px">   <!-- 9 PublicOT -->
-        <col style="width:70px">   <!-- 10 OtherOT -->
-        <col style="width:85px">   <!-- 11 Pinjaman -->
-        <col style="width:85px">   <!-- 12 Others -->
-        <col style="width:85px">   <!-- 13 EPF_E -->
-        <col style="width:85px">   <!-- 14 EPF_R -->
-        <col style="width:85px">   <!-- 15 SOCSO_E -->
-        <col style="width:85px">   <!-- 16 SOCSO_R -->
-        <col style="width:80px">   <!-- 17 EIS_E -->
-        <col style="width:80px">   <!-- 18 EIS_R -->
-        <col style="width:85px">   <!-- 19 Lindung -->
-        <col style="width:95px">   <!-- 20 Gross -->
-        <col style="width:95px">   <!-- 21 TotalDed -->
-        <col style="width:95px">   <!-- 22 Net -->
-        <col style="width:80px">   <!-- 23 Action -->
+        <col style="width:90px">   <!-- 0  Situation -->
+        <col style="width:75px">   <!-- 1  Code -->
+        <col style="width:160px">  <!-- 2  Name -->
+        <col style="width:110px">  <!-- 3  Group -->
+        <col style="width:140px">  <!-- 4  Bank (加宽) -->
+        <col style="width:85px">   <!-- 5  Basic -->
+        <col style="width:85px">   <!-- 6  Allowance -->
+        <col style="width:85px">   <!-- 7  Deduction -->
+        <col style="width:70px">   <!-- 8  NormalOT -->
+        <col style="width:70px">   <!-- 9  RestOT -->
+        <col style="width:70px">   <!-- 10 PublicOT -->
+        <col style="width:70px">   <!-- 11 OtherOT -->
+        <col style="width:85px">   <!-- 12 Pinjaman -->
+        <col style="width:85px">   <!-- 13 Others -->
+        <col style="width:85px">   <!-- 14 EPF_E -->
+        <col style="width:85px">   <!-- 15 EPF_R -->
+        <col style="width:85px">   <!-- 16 SOCSO_E -->
+        <col style="width:85px">   <!-- 17 SOCSO_R -->
+        <col style="width:80px">   <!-- 18 EIS_E -->
+        <col style="width:80px">   <!-- 19 EIS_R -->
+        <col style="width:85px">   <!-- 20 Lindung -->
+        <col style="width:95px">   <!-- 21 Gross -->
+        <col style="width:95px">   <!-- 22 TotalDed -->
+        <col style="width:95px">   <!-- 23 Net -->
+        <col style="width:80px">   <!-- 24 Action -->
       </colgroup>
       <thead>
         <tr id="headRow1"></tr>
@@ -199,9 +222,14 @@ tr:hover td { background: #fafbfc; }
 <div id="printArea"></div>
 <div id="toast" class="toast"></div>
 
+<!-- ★ SheetJS 用于导出 .xlsx -->
+<script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
 <script>
 // =====================================================
 // ⚠️ 把下面这行换成你的 Apps Script Web App URL
+// ⚠️ Apps Script 需要额外返回 Situation 字段
+//    （取自 STAFF LOGIN RECORD 工作表 B 列，表头 Situation）
 // =====================================================
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJQe5hNv7sC_Rmig6xZ0NP4nP_PqXQmgTHbG7Ou6_9JtWadETnVmVfFr7b3Cu5qidZ/exec';
 
@@ -209,7 +237,7 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJQe5hNv7sC_Rm
 const I18N = {
   ms: {
     title: 'Sistem Penggajian',
-    save: 'Simpan ke Sheet', print: 'Cetak', allSlip: 'Semua Slip Gaji',
+    exportMenu: 'Eksport', allSlip: 'Semua Slip Gaji',
     checkAll: 'Semak Semua',
     code: 'Kod', name: 'Nama', group: 'Kumpulan', ic: 'No. KP', jawatan: 'Jawatan',
     bank: 'Bank', basic: 'Gaji Asas', allowance: 'Elaun', deduction: 'Potongan',
@@ -221,14 +249,15 @@ const I18N = {
     lindung: '24JAM Lindungan',
     gross: 'Gaji Kasar', totalDed: 'Jumlah Potongan', net: 'Gaji Bersih',
     action: 'Tindakan', slip: 'Slip Gaji',
-    legend: 'Nota: EPF 11%/13%, SOCSO & EIS had RM6,000, 24JAM Lindungan 100% pekerja. Taip di bawah tajuk untuk tapis.',
+    legend: 'Nota: EPF 11%/13%, SOCSO & EIS had RM6,000, 24JAM Lindungan 100% pekerja. Taip di bawah tajuk untuk tapis. Pekerja UNACTIVE tidak dipaparkan.',
     saved: 'Berjaya disimpan', failed: 'Gagal simpan',
     loading: 'Memuatkan data...',
-    lang: 'Bahasa'
+    lang: 'Bahasa',
+    exporting: 'Mengeksport...', noData: 'Tiada data untuk dieksport'
   },
   en: {
     title: 'Payroll System',
-    save: 'Save to Sheet', print: 'Print', allSlip: 'All Payslips',
+    exportMenu: 'Export', allSlip: 'All Payslips',
     checkAll: 'Check All',
     code: 'Code', name: 'Name', group: 'Group', ic: 'IC No.', jawatan: 'Position',
     bank: 'Bank', basic: 'Basic Salary', allowance: 'Allowance', deduction: 'Deduction',
@@ -240,14 +269,15 @@ const I18N = {
     lindung: '24JAM Lindungan',
     gross: 'Gross Pay', totalDed: 'Total Deduction', net: 'Net Salary',
     action: 'Action', slip: 'Payslip',
-    legend: 'Note: EPF 11%/13%, SOCSO & EIS capped at RM6,000, 24JAM Lindungan 100% employee. Type under the header to filter.',
+    legend: 'Note: EPF 11%/13%, SOCSO & EIS capped at RM6,000, 24JAM Lindungan 100% employee. Type under the header to filter. UNACTIVE staff are hidden.',
     saved: 'Saved successfully', failed: 'Save failed',
     loading: 'Loading data...',
-    lang: 'Language'
+    lang: 'Language',
+    exporting: 'Exporting...', noData: 'No data to export'
   },
   zh: {
     title: '薪资系统',
-    save: '保存到 Sheet', print: '打印', allSlip: '全部粮单',
+    exportMenu: '导出', allSlip: '全部粮单',
     checkAll: '检查全部',
     code: '编号', name: '姓名', group: '分店', ic: '身份证', jawatan: '职位',
     bank: '银行', basic: '基本薪资', allowance: '津贴', deduction: '扣款',
@@ -259,10 +289,11 @@ const I18N = {
     lindung: '24JAM 保险',
     gross: '总薪资', totalDed: '总扣款', net: '净薪资',
     action: '操作', slip: '粮单',
-    legend: '备注：EPF 11%/13%，SOCSO 和 EIS 上限 RM6,000，24JAM 保险 100% 员工付。表头下方输入关键词即可筛选。',
+    legend: '备注：EPF 11%/13%，SOCSO 和 EIS 上限 RM6,000，24JAM 保险 100% 员工付。表头下方输入关键词即可筛选。UNACTIVE 员工不显示。',
     saved: '保存成功', failed: '保存失败',
     loading: '加载数据中...',
-    lang: '语言'
+    lang: '语言',
+    exporting: '导出中...', noData: '没有可导出的数据'
   }
 };
 let currentLang = 'ms';
@@ -270,7 +301,6 @@ function t(key) { return I18N[currentLang][key] || key; }
 
 // ================= 状态 =================
 let employees = [];
-let calcCache = {};
 
 // ================= 工具 =================
 function toast(msg, ok = true) {
@@ -285,6 +315,13 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[c]));
+}
+function num(v) { return Number(v || 0); }
+function fmt2(v) { return Number(v || 0).toFixed(2); }
+function todayStr() {
+  const d = new Date();
+  const p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
 }
 
 // ================= 计算（前端） =================
@@ -347,7 +384,7 @@ function isExempt(staff) {
 
 // ================= 重算一行 =================
 function recalcRow(emp) {
-  const basic = Number(emp.Basic) || 0;
+  const basic = num(emp.Basic);
   const exempt = isExempt(emp);
 
   const epf = exempt.epf ? { employee: 0, employer: 0 } : calcEPF(basic, emp.Age || 30);
@@ -355,11 +392,9 @@ function recalcRow(emp) {
   const eis = exempt.eis ? { employee: 0, employer: 0 } : calcEIS(basic);
   const lindung = exempt.lindung ? 0 : calcLindung(basic);
 
-  const ot = (Number(emp.NormalOT)||0) + (Number(emp.RestOT)||0)
-           + (Number(emp.PublicOT)||0) + (Number(emp.OtherOT)||0);
-  const gross = basic + (Number(emp.Allowance)||0) + ot;
-  const totalDed = (Number(emp.Deduction)||0) + (Number(emp.Pinjaman)||0)
-                 + (Number(emp.Others)||0)
+  const ot = num(emp.NormalOT) + num(emp.RestOT) + num(emp.PublicOT) + num(emp.OtherOT);
+  const gross = basic + num(emp.Allowance) + ot;
+  const totalDed = num(emp.Deduction) + num(emp.Pinjaman) + num(emp.Others)
                  + epf.employee + socso.employee + eis.employee + lindung;
   const net = gross - totalDed;
 
@@ -380,48 +415,52 @@ function recalcRow(emp) {
 function renderHeaders() {
   document.getElementById('pageTitle').textContent = t('title');
   document.getElementById('legend').textContent = t('legend');
-  document.querySelector('button[onclick="saveToSheet()"]').innerHTML = '💾 ' + t('save');
-  document.querySelector('button[onclick="window.print()"]').innerHTML = '🖨️ ' + t('print');
   document.querySelector('button[onclick="showAllPayslips()"]').innerHTML = '📄 ' + t('allSlip');
   document.querySelector('button[onclick="checkAll()"]').innerHTML = '✅ ' + t('checkAll');
+  const exportMenu = document.getElementById('exportMenu');
+  exportMenu.options[0].textContent = '💾 ' + t('exportMenu') + ' / 导出…';
 
   const h1 = document.getElementById('headRow1');
   const h2 = document.getElementById('headRow2');
   const f = (col) => `<input class="th-filter" data-col="${col}" placeholder="🔍 tapis">`;
 
+  // 列索引：0 Situation, 1 Code, 2 Name, 3 Group, 4 Bank, 5 Basic, 6 Allowance, 7 Deduction,
+  // 8 NormalOT, 9 RestOT, 10 PublicOT, 11 OtherOT, 12 Pinjaman, 13 Others,
+  // 14 EPF_E, 15 EPF_R, 16 SOCSO_E, 17 SOCSO_R, 18 EIS_E, 19 EIS_R,
+  // 20 Lindung, 21 Gross, 22 TotalDed, 23 Net, 24 Action
   h1.innerHTML = `
-    <th rowspan="2"><div>${t('code')}</div>${f(0)}</th>
-    <th rowspan="2"><div>${t('name')}</div>${f(1)}</th>
-    <th rowspan="2"><div>${t('group')}</div>${f(2)}</th>
-    <th rowspan="2"><div>${t('bank')}</div>${f(3)}</th>
-    <th rowspan="2"><div>${t('basic')}</div>${f(4)}</th>
-    <th rowspan="2"><div>${t('allowance')}</div>${f(5)}</th>
-    <th rowspan="2"><div>${t('deduction')}</div>${f(6)}</th>
-    <th rowspan="2"><div>${t('normalOT')}</div>${f(7)}</th>
-    <th rowspan="2"><div>${t('restOT')}</div>${f(8)}</th>
-    <th rowspan="2"><div>${t('publicOT')}</div>${f(9)}</th>
-    <th rowspan="2"><div>${t('otherOT')}</div>${f(10)}</th>
-    <th rowspan="2"><div>${t('pinjaman')}</div>${f(11)}</th>
-    <th rowspan="2"><div>${t('others')}</div>${f(12)}</th>
+    <th rowspan="2" style="background:#fef3c7;"><div>Situation</div>${f(0)}</th>
+    <th rowspan="2"><div>${t('code')}</div>${f(1)}</th>
+    <th rowspan="2"><div>${t('name')}</div>${f(2)}</th>
+    <th rowspan="2"><div>${t('group')}</div>${f(3)}</th>
+    <th rowspan="2"><div>${t('bank')}</div>${f(4)}</th>
+    <th rowspan="2"><div>${t('basic')}</div>${f(5)}</th>
+    <th rowspan="2"><div>${t('allowance')}</div>${f(6)}</th>
+    <th rowspan="2"><div>${t('deduction')}</div>${f(7)}</th>
+    <th rowspan="2"><div>${t('normalOT')}</div>${f(8)}</th>
+    <th rowspan="2"><div>${t('restOT')}</div>${f(9)}</th>
+    <th rowspan="2"><div>${t('publicOT')}</div>${f(10)}</th>
+    <th rowspan="2"><div>${t('otherOT')}</div>${f(11)}</th>
+    <th rowspan="2"><div>${t('pinjaman')}</div>${f(12)}</th>
+    <th rowspan="2"><div>${t('others')}</div>${f(13)}</th>
     <th class="grp" colspan="2">EPF</th>
     <th class="grp" colspan="2">SOCSO</th>
     <th class="grp" colspan="2">EIS</th>
-    <th class="grp" rowspan="2"><div>24JAM</div>${f(19)}</th>
-    <th rowspan="2"><div>${t('gross')}</div>${f(20)}</th>
-    <th rowspan="2"><div>${t('totalDed')}</div>${f(21)}</th>
-    <th rowspan="2"><div>${t('net')}</div>${f(22)}</th>
+    <th class="grp" rowspan="2"><div>24JAM</div>${f(20)}</th>
+    <th rowspan="2"><div>${t('gross')}</div>${f(21)}</th>
+    <th rowspan="2"><div>${t('totalDed')}</div>${f(22)}</th>
+    <th rowspan="2"><div>${t('net')}</div>${f(23)}</th>
     <th rowspan="2">${t('action')}</th>
   `;
   h2.innerHTML = `
-    <th class="grp"><div>${t('epfE')}</div>${f(13)}</th>
-    <th class="grp"><div>${t('epfR')}</div>${f(14)}</th>
-    <th class="grp"><div>${t('socsoE')}</div>${f(15)}</th>
-    <th class="grp"><div>${t('socsoR')}</div>${f(16)}</th>
-    <th class="grp"><div>${t('eisE')}</div>${f(17)}</th>
-    <th class="grp"><div>${t('eisR')}</div>${f(18)}</th>
+    <th class="grp"><div>${t('epfE')}</div>${f(14)}</th>
+    <th class="grp"><div>${t('epfR')}</div>${f(15)}</th>
+    <th class="grp"><div>${t('socsoE')}</div>${f(16)}</th>
+    <th class="grp"><div>${t('socsoR')}</div>${f(17)}</th>
+    <th class="grp"><div>${t('eisE')}</div>${f(18)}</th>
+    <th class="grp"><div>${t('eisR')}</div>${f(19)}</th>
   `;
 
-  // 动态计算第二行 sticky 的 top 偏移（避免与第一行重叠）
   requestAnimationFrame(fixStickyHeader);
 }
 
@@ -435,6 +474,14 @@ function fixStickyHeader() {
 }
 window.addEventListener('resize', fixStickyHeader);
 
+// ================= Situation 样式类 =================
+function situationClass(sit) {
+  const s = String(sit || '').trim().toUpperCase();
+  if (s === 'PENDING') return 'sit-pending';
+  if (s === 'ACTIVE')  return 'sit-active';
+  return 'sit-default';
+}
+
 // ================= 渲染表格 =================
 function renderTable() {
   renderHeaders();
@@ -442,7 +489,7 @@ function renderTable() {
   tbody.innerHTML = '';
 
   if (!employees.length) {
-    tbody.innerHTML = `<tr><td colspan="24" style="text-align:center;padding:2rem;color:#64748b;">${t('loading')}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="25" style="text-align:center;padding:2rem;color:#64748b;">${t('loading')}</td></tr>`;
     return;
   }
 
@@ -450,14 +497,16 @@ function renderTable() {
     emp = recalcRow(emp);
     const tr = document.createElement('tr');
 
-    // ★ 只读文字 → 可换行的文本单元格（宽度固定，行高自适应）
     const textTd = (field) =>
       `<td class="td-text"><div class="text-cell">${escapeHtml(emp[field] ?? '')}</div></td>`;
 
     const num = (field, readonly = false, cls = '') =>
       `<input type="number" step="0.01" class="input num ${cls}" ${readonly?'readonly':''} data-idx="${idx}" data-field="${field}" value="${emp[field] ?? 0}">`;
 
+    const sitCls = situationClass(emp.Situation);
+
     tr.innerHTML = `
+      <td class="td-text ${sitCls}"><div class="text-cell">${escapeHtml(emp.Situation || '')}</div></td>
       ${textTd('Code')}
       ${textTd('Name')}
       ${textTd('GroupName')}
@@ -503,7 +552,6 @@ function renderTable() {
     });
   });
 
-  // 重新应用当前筛选（例如切换语言后）
   applyFilters();
 }
 
@@ -516,7 +564,6 @@ function applyFilters() {
   });
 
   document.querySelectorAll('#tbody tr').forEach(row => {
-    // 跳过“加载中”占位行
     const firstCell = row.querySelector('td');
     if (!firstCell || firstCell.hasAttribute('colspan')) return;
 
@@ -529,16 +576,12 @@ function applyFilters() {
       const inp = cell.querySelector('input');
       if (inp) text = inp.value;
       else text = cell.textContent;
-      if (!String(text).toLowerCase().includes(flt.val)) {
-        show = false;
-        break;
-      }
+      if (!String(text).toLowerCase().includes(flt.val)) { show = false; break; }
     }
     row.style.display = show ? '' : 'none';
   });
 }
 
-// 事件委托：任何 th-filter 输入时触发筛选
 document.addEventListener('input', e => {
   if (e.target && e.target.classList && e.target.classList.contains('th-filter')) {
     applyFilters();
@@ -549,10 +592,11 @@ document.addEventListener('input', e => {
 function checkOne(type) {
   const rows = document.querySelectorAll('#tbody tr');
   rows.forEach((row, idx) => {
-    if (row.style.display === 'none') return; // 跳过被筛选隐藏的行
+    if (row.style.display === 'none') return;
     const emp = recalcRow(employees[idx]);
+    if (!emp) return;
     const exempt = isExempt(emp);
-    const basic = Number(emp.Basic) || 0;
+    const basic = num(emp.Basic);
     let correctValue, actualField;
     if (type === 'epf') {
       correctValue = exempt.epf ? 0 : calcEPF(basic, emp.Age||30).employee;
@@ -589,43 +633,266 @@ function jumpToCheckPage(url) {
   document.getElementById('checkMenu').value = '';
 }
 
-// ================= 保存 =================
-async function saveToSheet() {
-  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
-    toast('Sila tetapkan APPS_SCRIPT_URL dahulu!', false);
-    return;
-  }
-  const payload = employees.map(emp => {
-    recalcRow(emp);
-    const out = {};
-    Object.keys(emp).forEach(k => { if (typeof emp[k] !== 'object') out[k] = emp[k]; });
-    out.Timestamp = new Date().toISOString();
-    return out;
-  });
+// =====================================================
+// ★ 导出功能
+// =====================================================
+function handleExport(val) {
+  if (!val) return;
   try {
-    await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ payroll: payload })
-    });
-    toast(t('saved'));
+    if (val === 'pdf')  exportToPDF();
+    else if (val === 'xlsx') exportToXLSX();
+    else if (val === 'txt')  exportToTXT();
+    else if (val === 'doc')  exportToDOC();
   } catch (err) {
     console.error(err);
-    toast(t('failed'), false);
+    toast('Export error: ' + err.message, false);
+  } finally {
+    document.getElementById('exportMenu').value = '';
   }
+}
+
+// 导出表头
+function getExportHeaders() {
+  return [
+    'Situation', 'Code', 'Name', 'Group', 'Bank',
+    'Basic', 'Allowance', 'Deduction',
+    'Normal OT', 'Rest OT', 'Public OT', 'Other OT',
+    'Pinjaman', 'Others',
+    'EPF (Employee)', 'EPF (Employer)',
+    'SOCSO (Employee)', 'SOCSO (Employer)',
+    'EIS (Employee)', 'EIS (Employer)',
+    '24JAM', 'Gross Pay', 'Total Deduction', 'Net Salary'
+  ];
+}
+
+// 只导出「当前可见」的行（自动跳过 UNACTIVE 与筛选掉的行）
+function getExportRows() {
+  const rows = [];
+  const trs = document.querySelectorAll('#tbody tr');
+  trs.forEach((tr, idx) => {
+    if (tr.style.display === 'none') return;
+    const firstCell = tr.querySelector('td');
+    if (!firstCell || firstCell.hasAttribute('colspan')) return;
+    const emp = employees[idx];
+    if (!emp) return;
+    const e = recalcRow({ ...emp });
+    rows.push([
+      emp.Situation || '',
+      emp.Code || '',
+      emp.Name || '',
+      emp.GroupName || '',
+      emp.BankNama || '',
+      num(e.Basic), num(e.Allowance), num(e.Deduction),
+      num(e.NormalOT), num(e.RestOT), num(e.PublicOT), num(e.OtherOT),
+      num(e.Pinjaman), num(e.Others),
+      num(e.EPF_Employee), num(e.EPF_Employer),
+      num(e.SOCSO_Employee), num(e.SOCSO_Employer),
+      num(e.EIS_Employee), num(e.EIS_Employer),
+      num(e.Lindung24Jam), num(e.GrossPay), num(e.TotalDeduction), num(e.NetSalary)
+    ]);
+  });
+  return rows;
+}
+
+// ---------- 通用下载 ----------
+function downloadBlob(content, filename, mime) {
+  const blob = new Blob(['\ufeff', content], { type: mime + ';charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// ---------- 构建导出 HTML 表格 ----------
+function buildExportTableHTML() {
+  const headers = getExportHeaders();
+  const rows = getExportRows();
+  let html = '<table class="export-table">';
+  html += '<thead><tr>';
+  headers.forEach(h => { html += `<th>${escapeHtml(h)}</th>`; });
+  html += '</tr></thead><tbody>';
+  rows.forEach(r => {
+    html += '<tr>';
+    r.forEach((c, i) => {
+      const cls = i >= 5 ? ' class="num"' : '';
+      html += `<td${cls}>${escapeHtml(c)}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  return html;
+}
+
+// ---------- PDF（调用浏览器打印，另存为 PDF） ----------
+let exportPrintCleanup = null;
+window.addEventListener('afterprint', () => {
+  if (exportPrintCleanup) {
+    exportPrintCleanup();
+    exportPrintCleanup = null;
+  }
+});
+
+function exportToPDF() {
+  const rows = getExportRows();
+  if (!rows.length) { toast(t('noData'), false); return; }
+
+  const printArea = document.getElementById('printArea');
+  printArea.innerHTML = `
+    <div class="export-print">
+      <h2 style="margin-bottom:6mm;font-size:14pt;">Payroll Report — ${new Date().toLocaleDateString('ms-MY')}</h2>
+      ${buildExportTableHTML()}
+    </div>`;
+
+  const style = document.createElement('style');
+  style.textContent = '@page { size: A4 landscape; margin: 8mm; }';
+  document.head.appendChild(style);
+
+  exportPrintCleanup = () => {
+    printArea.innerHTML = '';
+    style.remove();
+  };
+
+  toast('Sedia untuk cetak / simpan PDF');
+  setTimeout(() => window.print(), 100);
+}
+
+// ---------- XLSX ----------
+function exportToXLSX() {
+  const rows = getExportRows();
+  if (!rows.length) { toast(t('noData'), false); return; }
+
+  if (typeof XLSX === 'undefined') {
+    // 回退：导出 CSV
+    exportToCSV();
+    toast('SheetJS tidak dimuat, dieksport sebagai CSV', false);
+    return;
+  }
+
+  const aoa = [getExportHeaders(), ...rows];
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+
+  // 数字列右对齐
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let R = 1; R <= range.e.r; R++) {
+    for (let C = 5; C <= 23; C++) {
+      const addr = XLSX.utils.encode_cell({ r: R, c: C });
+      if (ws[addr] && ws[addr].t === 'n') ws[addr].z = '#,##0.00';
+    }
+  }
+  // 简单列宽
+  ws['!cols'] = [
+    { wch: 10 }, { wch: 10 }, { wch: 22 }, { wch: 14 }, { wch: 18 },
+    { wch: 11 }, { wch: 11 }, { wch: 11 }, { wch: 10 }, { wch: 10 },
+    { wch: 10 }, { wch: 10 }, { wch: 11 }, { wch: 11 },
+    { wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 14 },
+    { wch: 12 }, { wch: 12 }, { wch: 11 }, { wch: 12 }, { wch: 13 }, { wch: 12 }
+  ];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Payroll');
+  XLSX.writeFile(wb, 'payroll_' + todayStr() + '.xlsx');
+  toast('Excel berjaya dieksport');
+}
+
+// CSV 回退
+function exportToCSV() {
+  const headers = getExportHeaders();
+  const rows = getExportRows();
+  const esc = v => {
+    const s = String(v ?? '');
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  };
+  let out = headers.map(esc).join(',') + '\n';
+  rows.forEach(r => { out += r.map(esc).join(',') + '\n'; });
+  downloadBlob(out, 'payroll_' + todayStr() + '.csv', 'text/csv');
+}
+
+// ---------- TXT ----------
+function exportToTXT() {
+  const headers = getExportHeaders();
+  const rows = getExportRows();
+  if (!rows.length) { toast(t('noData'), false); return; }
+
+  // 计算每列宽度使输出对齐
+  const widths = headers.map((h, i) => {
+    let w = String(h).length;
+    rows.forEach(r => {
+      const len = String(r[i] ?? '').length;
+      if (len > w) w = len;
+    });
+    return Math.min(w, 28);
+  });
+
+  const pad = (v, w) => {
+    let s = String(v ?? '');
+    if (s.length > w) s = s.slice(0, w - 1) + '…';
+    return s + ' '.repeat(Math.max(0, w - s.length));
+  };
+
+  let out = 'PAYROLL REPORT — ' + new Date().toLocaleString('ms-MY') + '\n';
+  out += '='.repeat(widths.reduce((a, b) => a + b + 3, 0)) + '\n';
+  out += headers.map((h, i) => pad(h, widths[i])).join(' | ') + '\n';
+  out += widths.map(w => '-'.repeat(w)).join('-+-') + '\n';
+  rows.forEach(r => {
+    out += r.map((c, i) => pad(c, widths[i])).join(' | ') + '\n';
+  });
+  out += '\nTotal rows: ' + rows.length + '\n';
+
+  downloadBlob(out, 'payroll_' + todayStr() + '.txt', 'text/plain');
+  toast('Text berjaya dieksport');
+}
+
+// ---------- DOC ----------
+function exportToDOC() {
+  const rows = getExportRows();
+  if (!rows.length) { toast(t('noData'), false); return; }
+  const headers = getExportHeaders();
+
+  let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ';
+  html += 'xmlns:w="urn:schemas-microsoft-com:office:word" ';
+  html += 'xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8">';
+  html += '<title>Payroll Report</title>';
+  html += '<style>body{font-family:Arial,sans-serif;font-size:9pt;}';
+  html += 'table{border-collapse:collapse;width:100%;}';
+  html += 'th,td{border:1px solid #999;padding:3px 5px;}';
+  html += 'th{background:#eef2ff;text-align:left;}';
+  html += 'td.num{text-align:right;}</style></head><body>';
+  html += '<h2>Payroll Report — ' + new Date().toLocaleDateString('ms-MY') + '</h2>';
+  html += '<table><thead><tr>';
+  headers.forEach(h => { html += `<th>${escapeHtml(h)}</th>`; });
+  html += '</tr></thead><tbody>';
+  rows.forEach(r => {
+    html += '<tr>';
+    r.forEach((c, i) => {
+      const cls = i >= 5 ? ' class="num"' : '';
+      html += `<td${cls}>${escapeHtml(c)}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table></body></html>';
+
+  downloadBlob(html, 'payroll_' + todayStr() + '.doc', 'application/msword');
+  toast('Word berjaya dieksport');
 }
 
 // ================= 加载员工 =================
 async function loadEmployees() {
   if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
+    // 演示数据
     employees = [
-      { Code:'EMP001', Name:'Ahmad bin Ali', GroupName:'YZ UFO', BankNama:'Maybank',
+      { Situation:'ACTIVE',  Code:'EMP001', Name:'Ahmad bin Ali', GroupName:'YZ UFO', BankNama:'Maybank',
         Basic:4500, Allowance:600, Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
         OtherOT:0, Pinjaman:0, Others:0, Age:30, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES' },
-      { Code:'EMP002', Name:'Siti Nurhaliza', GroupName:'YZ CYBER', BankNama:'CIMB',
+      { Situation:'PENDING', Code:'EMP002', Name:'Siti Nurhaliza', GroupName:'YZ CYBER', BankNama:'CIMB',
         Basic:3800, Allowance:450, Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
-        OtherOT:0, Pinjaman:0, Others:0, Age:28, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES' }
+        OtherOT:0, Pinjaman:0, Others:0, Age:28, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES' },
+      { Situation:'UNACTIVE', Code:'EMP003', Name:'Ali Bakar', GroupName:'YZ UFO', BankNama:'Maybank',
+        Basic:3000, Allowance:0, Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
+        OtherOT:0, Pinjaman:0, Others:0, Age:30, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES' }
     ];
     renderTable();
     return;
@@ -635,6 +902,8 @@ async function loadEmployees() {
     const json = await res.json();
     if (json.status === 'success') {
       employees = json.data.map(row => ({
+        // ★ 从 STAFF LOGIN RECORD 表 B 列提取，Apps Script 需返回 row.Situation
+        Situation: String(row.Situation || 'ACTIVE').trim().toUpperCase(),
         Code: row.Code,
         Name: row.Name,
         GroupName: row.GroupName || '',
@@ -646,7 +915,10 @@ async function loadEmployees() {
         Age: 30,
         EPF: row.EPF, PERKESO: row.PERKESO,
         EIS: row.EIS, Lindungan: row.Lindungan
-      }));
+      }))
+      // ★ 过滤掉 UNACTIVE / INACTIVE
+      .filter(e => e.Situation !== 'UNACTIVE' && e.Situation !== 'INACTIVE');
+
       renderTable();
     } else {
       toast('Load error: ' + json.message, false);
@@ -669,7 +941,7 @@ function showPayslip(code) {
 
 function showAllPayslips() {
   const groupFilter = prompt('Masukkan GroupName untuk cetak semua (kosongkan untuk semua):', '');
-  let list = employees.map(e => recalcRow(e));
+  let list = employees.map(e => recalcRow({ ...e }));
   if (groupFilter && groupFilter.trim()) {
     list = list.filter(e => String(e.GroupName).toLowerCase().includes(groupFilter.trim().toLowerCase()));
   }
@@ -681,7 +953,7 @@ function showAllPayslips() {
 
 function buildPayslip(emp) {
   const fmt = n => Number(n || 0).toFixed(2);
-  const ot = (Number(emp.NormalOT)||0) + (Number(emp.RestOT)||0) + (Number(emp.PublicOT)||0) + (Number(emp.OtherOT)||0);
+  const ot = num(emp.NormalOT) + num(emp.RestOT) + num(emp.PublicOT) + num(emp.OtherOT);
   const L = I18N[currentLang];
   return `
   <div class="payslip">
