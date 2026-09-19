@@ -28,6 +28,8 @@ body {
 .btn:hover { background: #f1f5f9; border-color: #94a3b8; }
 .btn-primary { background: #2563eb; border-color: #2563eb; color: #fff; }
 .btn-primary:hover { background: #1d4ed8; }
+.btn-success { background: #059669; border-color: #059669; color: #fff; }
+.btn-success:hover { background: #047857; }
 .btn-danger { background: #fee2e2; border-color: #fecaca; color: #b91c1c; }
 .btn-sm { padding: 0.3rem 0.6rem; font-size: 0.75rem; }
 .btn.active { background: #dbeafe; border-color: #2563eb; color: #1d4ed8; }
@@ -41,15 +43,18 @@ h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #0f172a; }
 }
 table {
   border-collapse: separate; border-spacing: 0; font-size: 0.82rem;
-  table-layout: fixed;              /* ★ 固定列宽，行高自由 */
-  width: 2255px; min-width: 2255px;
+  table-layout: fixed;
+  width: 2390px; min-width: 2390px;
 }
+/* ★ 表头允许换行，完整容纳文字 */
 th {
   position: sticky; top: 0; z-index: 10;
   background: #f8fafc; padding: 0.5rem 0.45rem; text-align: left;
   font-weight: 600; color: #334155; border-bottom: 1px solid #e2e8f0;
-  white-space: nowrap; font-size: 0.75rem; vertical-align: top;
+  white-space: normal; font-size: 0.75rem; vertical-align: top;
+  word-break: break-word; overflow-wrap: anywhere;
 }
+th > div { word-break: break-word; overflow-wrap: anywhere; }
 th.grp { background: #eef2ff; }
 td {
   padding: 0.35rem 0.4rem; border-bottom: 1px solid #f1f5f9;
@@ -57,7 +62,17 @@ td {
 }
 tr:hover td { background: #fafbfc; }
 
-/* ★ 只读文字单元格：允许自动换行，行高自由增长 */
+/* ★ 分割线 */
+.divider-left  { border-left: 3px solid #94a3b8 !important; }
+.divider-right { border-right: 3px solid #94a3b8 !important; }
+
+/* ★ 复选框单元格 */
+.td-chk { text-align: center; vertical-align: middle; padding: 0.4rem 0.15rem !important; }
+.td-chk input[type="checkbox"] {
+  width: 18px; height: 18px; cursor: pointer; accent-color: #2563eb;
+}
+
+/* ★ 只读文字单元格 */
 .td-text { vertical-align: top !important; padding: 0.4rem 0.4rem !important; }
 .text-cell {
   font-size: 0.82rem;
@@ -83,6 +98,7 @@ tr:hover td { background: #fafbfc; }
 .input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
 .input[readonly] { background: #f8fafc; color: #475569; }
 .input.num { text-align: right; }
+.input[readonly].num { background: #f1f5f9; }
 .cell-bad { background: #fee2e2 !important; border-color: #fca5a5 !important; }
 .cell-ok  { background: #dcfce7 !important; }
 
@@ -110,11 +126,51 @@ tr:hover td { background: #fafbfc; }
 
 .legend { font-size: 0.75rem; color: #64748b; margin-top: 0.5rem; padding-left: 0.25rem; }
 
+/* ========== 导入弹窗 ========== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(15,23,42,0.55);
+  z-index: 9998; display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+}
+.modal-box {
+  background: #fff; border-radius: 14px; padding: 1.4rem;
+  width: 100%; max-width: 560px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.modal-header { display: flex; justify-content: space-between; align-items: center; }
+.modal-header h3 { font-size: 1.05rem; font-weight: 600; color: #0f172a; }
+.modal-close {
+  background: none; border: none; font-size: 1.2rem; cursor: pointer;
+  color: #64748b; padding: 0.2rem 0.55rem; border-radius: 6px; line-height: 1;
+}
+.modal-close:hover { background: #f1f5f9; color: #0f172a; }
+.modal-dropzone {
+  border: 2px dashed #cbd5e1; border-radius: 10px; padding: 2.2rem 1rem;
+  text-align: center; cursor: pointer; transition: 0.15s;
+  background: #f8fafc;
+}
+.modal-dropzone:hover, .modal-dropzone.drag-over {
+  border-color: #2563eb; background: #eff6ff;
+}
+.modal-dropzone p { font-size: 0.9rem; color: #475569; margin: 0.25rem 0; }
+.modal-dropzone .hint { font-size: 0.75rem; color: #94a3b8; }
+.modal-dropzone .icon { font-size: 2rem; }
+.modal-footer {
+  display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;
+  flex-wrap: wrap;
+  padding-top: 0.8rem; border-top: 1px solid #e2e8f0;
+}
+.template-download {
+  display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;
+  font-size: 0.78rem; color: #64748b;
+}
+
 /* ========== 打印（粮单 + 导出表格） ========== */
 #printArea { display: none; }
 @media print {
   body { background: #fff; padding: 0; }
-  .topbar, .container, .toast { display: none !important; }
+  .topbar, .container, .toast, .modal-overlay { display: none !important; }
   #printArea { display: block !important; }
   .payslip {
     page-break-after: always; padding: 12mm; font-size: 10pt;
@@ -133,7 +189,6 @@ tr:hover td { background: #fafbfc; }
   .ps-sign { margin-top: 8mm; display: flex; justify-content: space-between; font-size: 9pt; }
   .ps-sign div { border-top: 1px solid #000; padding-top: 1mm; width: 45%; text-align: center; }
 
-  /* 导出表格打印 */
   .export-print { padding: 6mm; font-family: Arial, sans-serif; color: #000; }
   .export-table { border-collapse: collapse; width: 100%; font-size: 8.5pt; }
   .export-table th, .export-table td { border: 1px solid #999; padding: 3px 4px; }
@@ -145,9 +200,15 @@ tr:hover td { background: #fafbfc; }
 </head>
 <body>
 
-<!-- ============ 顶部 Sticky 按钮栏 ============ -->
+<!-- ============ 顶部按钮栏 ============ -->
 <div class="topbar">
-  <!-- ★ 导出菜单（替代原本的“保存到 Sheet”） -->
+  <!-- ★ 保存到 Google Sheet -->
+  <button class="btn btn-success" onclick="saveToSheet()" id="btnSaveSheet">💾 Simpan ke Sheet</button>
+
+  <!-- ★ 导入按钮 -->
+  <button class="btn" onclick="openImportModal()">📥 Import / 导入</button>
+
+  <!-- 导出下拉 -->
   <select id="exportMenu" class="btn" onchange="handleExport(this.value)">
     <option value="">💾 Eksport / 导出…</option>
     <option value="pdf">📄 PDF (.pdf)</option>
@@ -160,7 +221,6 @@ tr:hover td { background: #fafbfc; }
   <button class="btn" onclick="checkAll()">✅ Semak Semua</button>
   <span style="width:1px;height:24px;background:#e2e8f0;margin:0 4px;"></span>
 
-  <!-- 🔽 检查菜单（下拉跳转） -->
   <select id="checkMenu" class="btn" onchange="jumpToCheckPage(this.value)">
     <option value="">🔍 Semak / 检查…</option>
     <option value="https://yzcorpsdk2-ctrl.github.io/salarysystem/epf.html">🔍 EPF</option>
@@ -181,13 +241,13 @@ tr:hover td { background: #fafbfc; }
   <h1 id="pageTitle">Sistem Penggajian</h1>
   <div class="table-wrap">
     <table id="mainTable">
-      <!-- ★ 固定列宽（共 25 列，Bank 已加宽） -->
+      <!-- ★ 29 列 -->
       <colgroup>
         <col style="width:90px">   <!-- 0  Situation -->
         <col style="width:75px">   <!-- 1  Code -->
         <col style="width:160px">  <!-- 2  Name -->
         <col style="width:110px">  <!-- 3  Group -->
-        <col style="width:140px">  <!-- 4  Bank (加宽) -->
+        <col style="width:140px">  <!-- 4  Bank -->
         <col style="width:85px">   <!-- 5  Basic -->
         <col style="width:85px">   <!-- 6  Allowance -->
         <col style="width:85px">   <!-- 7  Deduction -->
@@ -197,17 +257,21 @@ tr:hover td { background: #fafbfc; }
         <col style="width:70px">   <!-- 11 OtherOT -->
         <col style="width:85px">   <!-- 12 Pinjaman -->
         <col style="width:85px">   <!-- 13 Others -->
-        <col style="width:85px">   <!-- 14 EPF_E -->
-        <col style="width:85px">   <!-- 15 EPF_R -->
-        <col style="width:85px">   <!-- 16 SOCSO_E -->
-        <col style="width:85px">   <!-- 17 SOCSO_R -->
-        <col style="width:80px">   <!-- 18 EIS_E -->
-        <col style="width:80px">   <!-- 19 EIS_R -->
-        <col style="width:85px">   <!-- 20 Lindung -->
-        <col style="width:95px">   <!-- 21 Gross -->
-        <col style="width:95px">   <!-- 22 TotalDed -->
-        <col style="width:95px">   <!-- 23 Net -->
-        <col style="width:80px">   <!-- 24 Action -->
+        <col style="width:40px">   <!-- 14 EPF chk -->
+        <col style="width:85px">   <!-- 15 EPF_E -->
+        <col style="width:85px">   <!-- 16 EPF_R -->
+        <col style="width:40px">   <!-- 17 SOCSO chk -->
+        <col style="width:85px">   <!-- 18 SOCSO_E -->
+        <col style="width:85px">   <!-- 19 SOCSO_R -->
+        <col style="width:40px">   <!-- 20 EIS chk -->
+        <col style="width:80px">   <!-- 21 EIS_E -->
+        <col style="width:80px">   <!-- 22 EIS_R -->
+        <col style="width:40px">   <!-- 23 24JAM chk -->
+        <col style="width:85px">   <!-- 24 Lindung -->
+        <col style="width:95px">   <!-- 25 Gross -->
+        <col style="width:95px">   <!-- 26 TotalDed -->
+        <col style="width:95px">   <!-- 27 Net -->
+        <col style="width:80px">   <!-- 28 Action -->
       </colgroup>
       <thead>
         <tr id="headRow1"></tr>
@@ -222,21 +286,54 @@ tr:hover td { background: #fafbfc; }
 <div id="printArea"></div>
 <div id="toast" class="toast"></div>
 
-<!-- ★ SheetJS 用于导出 .xlsx -->
+<!-- ============ 导入弹窗 ============ -->
+<div id="importModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>📥 Import Data / 导入资料</h3>
+      <button class="modal-close" onclick="closeImportModal()">✕</button>
+    </div>
+
+    <div class="modal-dropzone" id="dropzone">
+      <div class="icon">📁</div>
+      <p><strong>拖入文件或点击选择</strong></p>
+      <p class="hint">Drag & drop file here, or click to browse</p>
+      <p class="hint">格式：.xlsx / .csv / .txt</p>
+    </div>
+
+    <div class="modal-footer">
+      <div class="template-download">
+        <span>📥 Template:</span>
+        <button class="btn btn-sm" onclick="downloadTemplate('xlsx')">Excel (.xlsx)</button>
+        <button class="btn btn-sm" onclick="downloadTemplate('doc')">Word (.doc)</button>
+      </div>
+      <button class="btn" onclick="closeImportModal()">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- SheetJS 用于 XLSX -->
 <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <script>
 // =====================================================
 // ⚠️ 把下面这行换成你的 Apps Script Web App URL
-// ⚠️ Apps Script 需要额外返回 Situation 字段
-//    （取自 STAFF LOGIN RECORD 工作表 B 列，表头 Situation）
 // =====================================================
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJQe5hNv7sC_Rmig6xZ0NP4nP_PqXQmgTHbG7Ou6_9JtWadETnVmVfFr7b3Cu5qidZ/exec';
+
+// 分组字段映射（勾选后手动，未勾选自动）
+const GROUP_FIELDS = {
+  EPF:   ['EPF_Employee', 'EPF_Employer'],
+  SOCSO: ['SOCSO_Employee', 'SOCSO_Employer'],
+  EIS:   ['EIS_Employee', 'EIS_Employer'],
+  '24JAM': ['Lindung24Jam']
+};
 
 // ================= 语言包 =================
 const I18N = {
   ms: {
     title: 'Sistem Penggajian',
+    save: 'Simpan ke Sheet', importBtn: 'Import / 导入',
     exportMenu: 'Eksport', allSlip: 'Semua Slip Gaji',
     checkAll: 'Semak Semua',
     code: 'Kod', name: 'Nama', group: 'Kumpulan', ic: 'No. KP', jawatan: 'Jawatan',
@@ -249,14 +346,19 @@ const I18N = {
     lindung: '24JAM Lindungan',
     gross: 'Gaji Kasar', totalDed: 'Jumlah Potongan', net: 'Gaji Bersih',
     action: 'Tindakan', slip: 'Slip Gaji',
-    legend: 'Nota: EPF 11%/13%, SOCSO & EIS had RM6,000, 24JAM Lindungan 100% pekerja. Taip di bawah tajuk untuk tapis. Pekerja UNACTIVE tidak dipaparkan.',
-    saved: 'Berjaya disimpan', failed: 'Gagal simpan',
+    manual: 'Manual',
+    legend: 'Nota: Tandakan ✔ di hadapan EPF/SOCSO/EIS/24JAM untuk isi manual. Tidak ditanda = auto kira. Situation UNACTIVE tidak dipaparkan.',
+    saved: 'Berjaya disimpan ke Sheet', failed: 'Gagal simpan',
     loading: 'Memuatkan data...',
     lang: 'Bahasa',
-    exporting: 'Mengeksport...', noData: 'Tiada data untuk dieksport'
+    exporting: 'Mengeksport...', noData: 'Tiada data untuk dieksport',
+    importSuccess: 'Berjaya import {n} pekerja',
+    importFail: 'Fail tidak sah atau kosong',
+    importFormat: 'Format fail tidak disokong'
   },
   en: {
     title: 'Payroll System',
+    save: 'Save to Sheet', importBtn: 'Import',
     exportMenu: 'Export', allSlip: 'All Payslips',
     checkAll: 'Check All',
     code: 'Code', name: 'Name', group: 'Group', ic: 'IC No.', jawatan: 'Position',
@@ -269,14 +371,19 @@ const I18N = {
     lindung: '24JAM Lindungan',
     gross: 'Gross Pay', totalDed: 'Total Deduction', net: 'Net Salary',
     action: 'Action', slip: 'Payslip',
-    legend: 'Note: EPF 11%/13%, SOCSO & EIS capped at RM6,000, 24JAM Lindungan 100% employee. Type under the header to filter. UNACTIVE staff are hidden.',
-    saved: 'Saved successfully', failed: 'Save failed',
+    manual: 'Manual',
+    legend: 'Note: Tick ✔ before EPF/SOCSO/EIS/24JAM to enter manually. Unticked = auto calc. UNACTIVE staff are hidden.',
+    saved: 'Saved to Sheet successfully', failed: 'Save failed',
     loading: 'Loading data...',
     lang: 'Language',
-    exporting: 'Exporting...', noData: 'No data to export'
+    exporting: 'Exporting...', noData: 'No data to export',
+    importSuccess: 'Imported {n} employees',
+    importFail: 'Invalid or empty file',
+    importFormat: 'Unsupported file format'
   },
   zh: {
     title: '薪资系统',
+    save: '保存到 Sheet', importBtn: 'Import / 导入',
     exportMenu: '导出', allSlip: '全部粮单',
     checkAll: '检查全部',
     code: '编号', name: '姓名', group: '分店', ic: '身份证', jawatan: '职位',
@@ -289,11 +396,15 @@ const I18N = {
     lindung: '24JAM 保险',
     gross: '总薪资', totalDed: '总扣款', net: '净薪资',
     action: '操作', slip: '粮单',
-    legend: '备注：EPF 11%/13%，SOCSO 和 EIS 上限 RM6,000，24JAM 保险 100% 员工付。表头下方输入关键词即可筛选。UNACTIVE 员工不显示。',
-    saved: '保存成功', failed: '保存失败',
+    manual: '手动',
+    legend: '备注：勾选 EPF/SOCSO/EIS/24JAM 前的 ✔ 表示手动填写，不勾选则系统自动计算。UNACTIVE 员工不显示。',
+    saved: '已成功保存到 Sheet', failed: '保存失败',
     loading: '加载数据中...',
     lang: '语言',
-    exporting: '导出中...', noData: '没有可导出的数据'
+    exporting: '导出中...', noData: '没有可导出的数据',
+    importSuccess: '成功导入 {n} 位员工',
+    importFail: '文件无效或为空',
+    importFormat: '不支持的文件格式'
   }
 };
 let currentLang = 'ms';
@@ -317,14 +428,13 @@ function escapeHtml(s) {
   }[c]));
 }
 function num(v) { return Number(v || 0); }
-function fmt2(v) { return Number(v || 0).toFixed(2); }
 function todayStr() {
   const d = new Date();
   const p = n => String(n).padStart(2, '0');
   return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
 }
 
-// ================= 计算（前端） =================
+// ================= 计算 =================
 const SOCSO_TABLE = [
   [30,0.10,0.40],[50,0.20,0.70],[70,0.30,1.10],[100,0.40,1.50],
   [140,0.60,2.10],[200,0.85,2.95],[300,1.25,4.35],[400,1.75,6.15],
@@ -382,59 +492,71 @@ function isExempt(staff) {
   };
 }
 
-// ================= 重算一行 =================
+// ================= 重算一行（尊重手动标记） =================
 function recalcRow(emp) {
   const basic = num(emp.Basic);
   const exempt = isExempt(emp);
 
-  const epf = exempt.epf ? { employee: 0, employer: 0 } : calcEPF(basic, emp.Age || 30);
-  const socso = exempt.socso ? { employee: 0, employer: 0 } : calcSOCSO(basic);
-  const eis = exempt.eis ? { employee: 0, employer: 0 } : calcEIS(basic);
-  const lindung = exempt.lindung ? 0 : calcLindung(basic);
+  // 未勾选手动 → 自动计算；勾选 → 保留用户输入
+  if (!emp.manualEPF) {
+    const epf = exempt.epf ? { employee: 0, employer: 0 } : calcEPF(basic, emp.Age || 30);
+    emp.EPF_Employee = epf.employee;
+    emp.EPF_Employer = epf.employer;
+  }
+  if (!emp.manualSOCSO) {
+    const socso = exempt.socso ? { employee: 0, employer: 0 } : calcSOCSO(basic);
+    emp.SOCSO_Employee = socso.employee;
+    emp.SOCSO_Employer = socso.employer;
+  }
+  if (!emp.manualEIS) {
+    const eis = exempt.eis ? { employee: 0, employer: 0 } : calcEIS(basic);
+    emp.EIS_Employee = eis.employee;
+    emp.EIS_Employer = eis.employer;
+  }
+  if (!emp.manual24JAM) {
+    emp.Lindung24Jam = exempt.lindung ? 0 : calcLindung(basic);
+  }
 
   const ot = num(emp.NormalOT) + num(emp.RestOT) + num(emp.PublicOT) + num(emp.OtherOT);
   const gross = basic + num(emp.Allowance) + ot;
   const totalDed = num(emp.Deduction) + num(emp.Pinjaman) + num(emp.Others)
-                 + epf.employee + socso.employee + eis.employee + lindung;
+                 + num(emp.EPF_Employee) + num(emp.SOCSO_Employee) + num(emp.EIS_Employee)
+                 + num(emp.Lindung24Jam);
   const net = gross - totalDed;
 
-  emp.EPF_Employee = epf.employee;
-  emp.EPF_Employer = epf.employer;
-  emp.SOCSO_Employee = socso.employee;
-  emp.SOCSO_Employer = socso.employer;
-  emp.EIS_Employee = eis.employee;
-  emp.EIS_Employer = eis.employer;
-  emp.Lindung24Jam = lindung;
   emp.GrossPay = gross;
   emp.TotalDeduction = totalDed;
   emp.NetSalary = net;
   return emp;
 }
 
-// ================= 渲染表头（含筛选框） =================
+// ================= 渲染表头 =================
 function renderHeaders() {
   document.getElementById('pageTitle').textContent = t('title');
   document.getElementById('legend').textContent = t('legend');
   document.querySelector('button[onclick="showAllPayslips()"]').innerHTML = '📄 ' + t('allSlip');
   document.querySelector('button[onclick="checkAll()"]').innerHTML = '✅ ' + t('checkAll');
-  const exportMenu = document.getElementById('exportMenu');
-  exportMenu.options[0].textContent = '💾 ' + t('exportMenu') + ' / 导出…';
+  document.getElementById('btnSaveSheet').innerHTML = '💾 ' + t('save');
+  document.querySelector('button[onclick="openImportModal()"]').innerHTML = '📥 ' + t('importBtn');
+  document.getElementById('exportMenu').options[0].textContent = '💾 ' + t('exportMenu') + ' / 导出…';
 
   const h1 = document.getElementById('headRow1');
   const h2 = document.getElementById('headRow2');
   const f = (col) => `<input class="th-filter" data-col="${col}" placeholder="🔍 tapis">`;
 
-  // 列索引：0 Situation, 1 Code, 2 Name, 3 Group, 4 Bank, 5 Basic, 6 Allowance, 7 Deduction,
+  // 列索引：
+  // 0 Situation, 1 Code, 2 Name, 3 Group, 4 Bank, 5 Basic, 6 Allowance, 7 Deduction,
   // 8 NormalOT, 9 RestOT, 10 PublicOT, 11 OtherOT, 12 Pinjaman, 13 Others,
-  // 14 EPF_E, 15 EPF_R, 16 SOCSO_E, 17 SOCSO_R, 18 EIS_E, 19 EIS_R,
-  // 20 Lindung, 21 Gross, 22 TotalDed, 23 Net, 24 Action
+  // 14 EPF chk, 15 EPF_E, 16 EPF_R, 17 SOCSO chk, 18 SOCSO_E, 19 SOCSO_R,
+  // 20 EIS chk, 21 EIS_E, 22 EIS_R, 23 24JAM chk, 24 Lindung,
+  // 25 Gross, 26 TotalDed, 27 Net, 28 Action
   h1.innerHTML = `
     <th rowspan="2" style="background:#fef3c7;"><div>Situation</div>${f(0)}</th>
     <th rowspan="2"><div>${t('code')}</div>${f(1)}</th>
     <th rowspan="2"><div>${t('name')}</div>${f(2)}</th>
     <th rowspan="2"><div>${t('group')}</div>${f(3)}</th>
-    <th rowspan="2"><div>${t('bank')}</div>${f(4)}</th>
-    <th rowspan="2"><div>${t('basic')}</div>${f(5)}</th>
+    <th rowspan="2" class="divider-right"><div>${t('bank')}</div>${f(4)}</th>
+    <th rowspan="2" class="divider-left divider-right"><div>${t('basic')}</div>${f(5)}</th>
     <th rowspan="2"><div>${t('allowance')}</div>${f(6)}</th>
     <th rowspan="2"><div>${t('deduction')}</div>${f(7)}</th>
     <th rowspan="2"><div>${t('normalOT')}</div>${f(8)}</th>
@@ -443,22 +565,26 @@ function renderHeaders() {
     <th rowspan="2"><div>${t('otherOT')}</div>${f(11)}</th>
     <th rowspan="2"><div>${t('pinjaman')}</div>${f(12)}</th>
     <th rowspan="2"><div>${t('others')}</div>${f(13)}</th>
+    <th rowspan="2" class="grp divider-left" style="text-align:center;font-size:0.9rem;">✎</th>
     <th class="grp" colspan="2">EPF</th>
+    <th rowspan="2" class="grp divider-left" style="text-align:center;font-size:0.9rem;">✎</th>
     <th class="grp" colspan="2">SOCSO</th>
+    <th rowspan="2" class="grp divider-left" style="text-align:center;font-size:0.9rem;">✎</th>
     <th class="grp" colspan="2">EIS</th>
-    <th class="grp" rowspan="2"><div>24JAM</div>${f(20)}</th>
-    <th rowspan="2"><div>${t('gross')}</div>${f(21)}</th>
-    <th rowspan="2"><div>${t('totalDed')}</div>${f(22)}</th>
-    <th rowspan="2"><div>${t('net')}</div>${f(23)}</th>
+    <th rowspan="2" class="grp divider-left" style="text-align:center;font-size:0.9rem;">✎</th>
+    <th class="grp" rowspan="2"><div>24JAM</div>${f(24)}</th>
+    <th rowspan="2"><div>${t('gross')}</div>${f(25)}</th>
+    <th rowspan="2"><div>${t('totalDed')}</div>${f(26)}</th>
+    <th rowspan="2"><div>${t('net')}</div>${f(27)}</th>
     <th rowspan="2">${t('action')}</th>
   `;
   h2.innerHTML = `
-    <th class="grp"><div>${t('epfE')}</div>${f(14)}</th>
-    <th class="grp"><div>${t('epfR')}</div>${f(15)}</th>
-    <th class="grp"><div>${t('socsoE')}</div>${f(16)}</th>
-    <th class="grp"><div>${t('socsoR')}</div>${f(17)}</th>
-    <th class="grp"><div>${t('eisE')}</div>${f(18)}</th>
-    <th class="grp"><div>${t('eisR')}</div>${f(19)}</th>
+    <th class="grp"><div>${t('epfE')}</div>${f(15)}</th>
+    <th class="grp"><div>${t('epfR')}</div>${f(16)}</th>
+    <th class="grp"><div>${t('socsoE')}</div>${f(18)}</th>
+    <th class="grp"><div>${t('socsoR')}</div>${f(19)}</th>
+    <th class="grp"><div>${t('eisE')}</div>${f(21)}</th>
+    <th class="grp"><div>${t('eisR')}</div>${f(22)}</th>
   `;
 
   requestAnimationFrame(fixStickyHeader);
@@ -467,14 +593,14 @@ function renderHeaders() {
 function fixStickyHeader() {
   const row1 = document.getElementById('headRow1');
   if (!row1) return;
-  const h = row1.offsetHeight;
+  const h = row1.getBoundingClientRect().height;
   document.querySelectorAll('#headRow2 th').forEach(th => {
-    th.style.top = h + 'px';
+    th.style.top = Math.round(h) + 'px';
   });
 }
 window.addEventListener('resize', fixStickyHeader);
 
-// ================= Situation 样式类 =================
+// ================= Situation 样式 =================
 function situationClass(sit) {
   const s = String(sit || '').trim().toUpperCase();
   if (s === 'PENDING') return 'sit-pending';
@@ -489,7 +615,7 @@ function renderTable() {
   tbody.innerHTML = '';
 
   if (!employees.length) {
-    tbody.innerHTML = `<tr><td colspan="25" style="text-align:center;padding:2rem;color:#64748b;">${t('loading')}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="29" style="text-align:center;padding:2rem;color:#64748b;">${t('loading')}</td></tr>`;
     return;
   }
 
@@ -497,11 +623,17 @@ function renderTable() {
     emp = recalcRow(emp);
     const tr = document.createElement('tr');
 
-    const textTd = (field) =>
-      `<td class="td-text"><div class="text-cell">${escapeHtml(emp[field] ?? '')}</div></td>`;
+    const textTd = (field, extraCls = '') =>
+      `<td class="td-text ${extraCls}"><div class="text-cell">${escapeHtml(emp[field] ?? '')}</div></td>`;
 
-    const num = (field, readonly = false, cls = '') =>
-      `<input type="number" step="0.01" class="input num ${cls}" ${readonly?'readonly':''} data-idx="${idx}" data-field="${field}" value="${emp[field] ?? 0}">`;
+    const numInput = (field, readonly, extraCls = '') =>
+      `<input type="number" step="0.01" class="input num ${extraCls}" ${readonly ? 'readonly' : ''} data-idx="${idx}" data-field="${field}" value="${emp[field] ?? 0}">`;
+
+    const chkTd = (group) => {
+      const key = 'manual' + group;
+      const checked = !!emp[key];
+      return `<td class="td-chk divider-left"><input type="checkbox" class="manual-chk" data-idx="${idx}" data-group="${group}" ${checked ? 'checked' : ''}></td>`;
+    };
 
     const sitCls = situationClass(emp.Situation);
 
@@ -510,33 +642,37 @@ function renderTable() {
       ${textTd('Code')}
       ${textTd('Name')}
       ${textTd('GroupName')}
-      ${textTd('BankNama')}
-      <td>${num('Basic')}</td>
-      <td>${num('Allowance')}</td>
-      <td>${num('Deduction')}</td>
-      <td>${num('NormalOT')}</td>
-      <td>${num('RestOT')}</td>
-      <td>${num('PublicOT')}</td>
-      <td>${num('OtherOT')}</td>
-      <td>${num('Pinjaman')}</td>
-      <td>${num('Others')}</td>
-      <td>${num('EPF_Employee', true)}</td>
-      <td>${num('EPF_Employer', true)}</td>
-      <td>${num('SOCSO_Employee', true)}</td>
-      <td>${num('SOCSO_Employer', true)}</td>
-      <td>${num('EIS_Employee', true)}</td>
-      <td>${num('EIS_Employer', true)}</td>
-      <td>${num('Lindung24Jam', true)}</td>
-      <td>${num('GrossPay', true)}</td>
-      <td>${num('TotalDeduction', true)}</td>
-      <td>${num('NetSalary', true)}</td>
-      <td><button class="btn btn-sm" onclick="showPayslip('${emp.Code}')">${t('slip')}</button></td>
+      ${textTd('BankNama', 'divider-right')}
+      <td class="divider-left divider-right">${numInput('Basic', false)}</td>
+      <td>${numInput('Allowance', false)}</td>
+      <td>${numInput('Deduction', false)}</td>
+      <td>${numInput('NormalOT', false)}</td>
+      <td>${numInput('RestOT', false)}</td>
+      <td>${numInput('PublicOT', false)}</td>
+      <td>${numInput('OtherOT', false)}</td>
+      <td>${numInput('Pinjaman', false)}</td>
+      <td>${numInput('Others', false)}</td>
+      ${chkTd('EPF')}
+      <td>${numInput('EPF_Employee', !emp.manualEPF)}</td>
+      <td>${numInput('EPF_Employer', !emp.manualEPF)}</td>
+      ${chkTd('SOCSO')}
+      <td>${numInput('SOCSO_Employee', !emp.manualSOCSO)}</td>
+      <td>${numInput('SOCSO_Employer', !emp.manualSOCSO)}</td>
+      ${chkTd('EIS')}
+      <td>${numInput('EIS_Employee', !emp.manualEIS)}</td>
+      <td>${numInput('EIS_Employer', !emp.manualEIS)}</td>
+      ${chkTd('24JAM')}
+      <td>${numInput('Lindung24Jam', !emp.manual24JAM)}</td>
+      <td>${numInput('GrossPay', true)}</td>
+      <td>${numInput('TotalDeduction', true)}</td>
+      <td>${numInput('NetSalary', true)}</td>
+      <td><button class="btn btn-sm" onclick="showPayslip('${escapeHtml(emp.Code)}')">${t('slip')}</button></td>
     `;
     tbody.appendChild(tr);
   });
 
-  // 绑定输入事件
-  tbody.querySelectorAll('input:not([readonly])').forEach(inp => {
+  // 绑定数字输入事件
+  tbody.querySelectorAll('input.input:not([readonly])').forEach(inp => {
     inp.addEventListener('input', e => {
       const idx = Number(e.target.dataset.idx);
       const field = e.target.dataset.field;
@@ -546,8 +682,35 @@ function renderTable() {
       ['EPF_Employee','EPF_Employer','SOCSO_Employee','SOCSO_Employer',
        'EIS_Employee','EIS_Employer','Lindung24Jam','GrossPay','TotalDeduction','NetSalary'
       ].forEach(f => {
+        if (f === field) return;
         const cell = row.querySelector(`input[data-field="${f}"]`);
         if (cell) cell.value = updated[f];
+      });
+    });
+  });
+
+  // 绑定手动勾选事件
+  tbody.querySelectorAll('.manual-chk').forEach(chk => {
+    chk.addEventListener('change', e => {
+      const idx = Number(e.target.dataset.idx);
+      const group = e.target.dataset.group;
+      const manualKey = 'manual' + group;
+      employees[idx][manualKey] = e.target.checked;
+
+      const updated = recalcRow(employees[idx]);
+      const row = e.target.closest('tr');
+      const fields = GROUP_FIELDS[group];
+      fields.forEach(f => {
+        const inp = row.querySelector(`input[data-field="${f}"]`);
+        if (inp) {
+          inp.readOnly = !e.target.checked;
+          inp.value = updated[f];
+        }
+      });
+      // 更新总计
+      ['GrossPay','TotalDeduction','NetSalary'].forEach(f => {
+        const inp = row.querySelector(`input[data-field="${f}"]`);
+        if (inp) inp.value = updated[f];
       });
     });
   });
@@ -626,11 +789,293 @@ function checkAll() {
   toast('Semakan selesai');
 }
 
-// ================= 🔽 下拉跳转检查页 =================
+// ================= 下拉跳转 =================
 function jumpToCheckPage(url) {
   if (!url) return;
   window.open(url, '_blank');
   document.getElementById('checkMenu').value = '';
+}
+
+// =====================================================
+// ★ 保存到 Google Sheet
+// =====================================================
+async function saveToSheet() {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
+    toast('Sila tetapkan APPS_SCRIPT_URL dahulu!', false);
+    return;
+  }
+  const payload = employees.map(emp => {
+    recalcRow(emp);
+    const out = {};
+    Object.keys(emp).forEach(k => {
+      if (typeof emp[k] !== 'object' && typeof emp[k] !== 'function') out[k] = emp[k];
+    });
+    out.Timestamp = new Date().toISOString();
+    return out;
+  });
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ payroll: payload })
+    });
+    toast(t('saved'));
+  } catch (err) {
+    console.error(err);
+    toast(t('failed'), false);
+  }
+}
+
+// =====================================================
+// ★ 导入功能
+// =====================================================
+function openImportModal() {
+  document.getElementById('importModal').style.display = 'flex';
+}
+function closeImportModal() {
+  document.getElementById('importModal').style.display = 'none';
+  document.getElementById('importFile').value = '';
+}
+
+// 绑定拖放 + 点击
+window.addEventListener('DOMContentLoaded', () => {
+  const dz = document.getElementById('dropzone');
+  const fi = document.getElementById('importFile');
+
+  dz.addEventListener('click', () => fi.click());
+  fi.addEventListener('change', e => {
+    if (e.target.files && e.target.files[0]) handleImportFile(e.target.files[0]);
+  });
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault();
+    dz.classList.remove('drag-over');
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) handleImportFile(e.dataTransfer.files[0]);
+  });
+
+  // 点击遮罩关闭
+  document.getElementById('importModal').addEventListener('click', e => {
+    if (e.target.id === 'importModal') closeImportModal();
+  });
+});
+
+// 解析 CSV 行（支持引号）
+function parseCSVLine(line) {
+  const cells = [];
+  let cur = '';
+  let inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQ) {
+      if (ch === '"') {
+        if (line[i+1] === '"') { cur += '"'; i++; }
+        else inQ = false;
+      } else cur += ch;
+    } else {
+      if (ch === ',') { cells.push(cur); cur = ''; }
+      else if (ch === '"') inQ = true;
+      else cur += ch;
+    }
+  }
+  cells.push(cur);
+  return cells;
+}
+
+function parseTextFile(text) {
+  const rows = [];
+  const lines = text.split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    // 跳过纯分隔线
+    if (/^[=\-+\s]+$/.test(trimmed)) continue;
+    if (trimmed.startsWith('PAYROLL REPORT')) continue;
+    if (trimmed.startsWith('Total rows')) continue;
+    // TXT 格式使用 | 分隔
+    if (trimmed.includes('|')) {
+      rows.push(trimmed.split('|').map(s => s.trim()));
+    } else {
+      rows.push(parseCSVLine(trimmed));
+    }
+  }
+  return rows;
+}
+
+async function handleImportFile(file) {
+  const name = file.name.toLowerCase();
+  let rows = [];
+
+  try {
+    if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
+      if (typeof XLSX === 'undefined') {
+        toast('SheetJS tidak dimuat, sila guna .csv atau .txt', false);
+        return;
+      }
+      const data = await file.arrayBuffer();
+      const wb = XLSX.read(data);
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+    } else if (name.endsWith('.csv') || name.endsWith('.txt')) {
+      const text = await file.text();
+      rows = parseTextFile(text);
+    } else {
+      toast(t('importFormat'), false);
+      return;
+    }
+
+    if (!rows || rows.length < 2) {
+      toast(t('importFail'), false);
+      return;
+    }
+
+    // 查找表头列索引
+    const headers = rows[0].map(h => String(h).trim());
+    const idx = {};
+    const WANTED = [
+      'Situation','Code','Name','Group','Bank',
+      'Basic','Allowance','Deduction',
+      'Normal OT','Rest OT','Public OT','Other OT',
+      'Pinjaman','Others',
+      'EPF (Employee)','EPF (Employer)',
+      'SOCSO (Employee)','SOCSO (Employer)',
+      'EIS (Employee)','EIS (Employer)',
+      '24JAM'
+    ];
+    headers.forEach((h, i) => {
+      const lh = h.toLowerCase();
+      for (const w of WANTED) {
+        if (lh === w.toLowerCase()) { idx[w] = i; break; }
+      }
+    });
+
+    // 至少要包含 Code
+    if (idx['Code'] === undefined) {
+      toast('Fail mesti ada lajur "Code"', false);
+      return;
+    }
+
+    const get = (row, key) => idx[key] !== undefined ? row[idx[key]] : '';
+
+    const imported = [];
+    for (let r = 1; r < rows.length; r++) {
+      const row = rows[r];
+      if (!row || row.length === 0) continue;
+      const code = String(get(row, 'Code') || '').trim();
+      if (!code) continue;
+
+      const sit = String(get(row, 'Situation') || 'ACTIVE').trim().toUpperCase();
+      if (sit === 'UNACTIVE' || sit === 'INACTIVE') continue;
+
+      const basic = parseFloat(get(row, 'Basic')) || 0;
+      const autoEPF = calcEPF(basic, 30);
+      const autoSOCSO = calcSOCSO(basic);
+      const autoEIS = calcEIS(basic);
+      const autoLindung = calcLindung(basic);
+
+      const impEPFE = parseFloat(get(row, 'EPF (Employee)')) || 0;
+      const impEPFR = parseFloat(get(row, 'EPF (Employer)')) || 0;
+      const impSOCSOE = parseFloat(get(row, 'SOCSO (Employee)')) || 0;
+      const impSOCSOR = parseFloat(get(row, 'SOCSO (Employer)')) || 0;
+      const impEISE = parseFloat(get(row, 'EIS (Employee)')) || 0;
+      const impEISR = parseFloat(get(row, 'EIS (Employer)')) || 0;
+      const impLindung = parseFloat(get(row, '24JAM')) || 0;
+
+      imported.push({
+        Situation: sit,
+        Code: code,
+        Name: String(get(row, 'Name') || ''),
+        GroupName: String(get(row, 'Group') || ''),
+        BankNama: String(get(row, 'Bank') || ''),
+        Basic: basic,
+        Allowance: parseFloat(get(row, 'Allowance')) || 0,
+        Deduction: parseFloat(get(row, 'Deduction')) || 0,
+        NormalOT: parseFloat(get(row, 'Normal OT')) || 0,
+        RestOT: parseFloat(get(row, 'Rest OT')) || 0,
+        PublicOT: parseFloat(get(row, 'Public OT')) || 0,
+        OtherOT: parseFloat(get(row, 'Other OT')) || 0,
+        Pinjaman: parseFloat(get(row, 'Pinjaman')) || 0,
+        Others: parseFloat(get(row, 'Others')) || 0,
+        Age: 30,
+        EPF: 'YES', PERKESO: 'YES', EIS: 'YES', Lindungan: 'YES',
+        EPF_Employee: impEPFE,
+        EPF_Employer: impEPFR,
+        SOCSO_Employee: impSOCSOE,
+        SOCSO_Employer: impSOCSOR,
+        EIS_Employee: impEISE,
+        EIS_Employer: impEISR,
+        Lindung24Jam: impLindung,
+        // 智能识别：与自动计算结果一致 → 自动；否则 → 手动
+        manualEPF:   Math.abs(impEPFE - autoEPF.employee) > 0.01 || Math.abs(impEPFR - autoEPF.employer) > 0.01,
+        manualSOCSO: Math.abs(impSOCSOE - autoSOCSO.employee) > 0.01 || Math.abs(impSOCSOR - autoSOCSO.employer) > 0.01,
+        manualEIS:   Math.abs(impEISE - autoEIS.employee) > 0.01 || Math.abs(impEISR - autoEIS.employer) > 0.01,
+        manual24JAM: Math.abs(impLindung - autoLindung) > 0.01
+      });
+    }
+
+    if (!imported.length) {
+      toast(t('importFail'), false);
+      return;
+    }
+
+    employees = imported;
+    renderTable();
+    toast(t('importSuccess').replace('{n}', imported.length));
+    closeImportModal();
+
+  } catch (err) {
+    console.error(err);
+    toast('Import error: ' + err.message, false);
+  }
+}
+
+// =====================================================
+// ★ 下载导入模板
+// =====================================================
+function downloadTemplate(format) {
+  const headers = getExportHeaders();
+  const sample = [
+    ['ACTIVE','EMP001','Ahmad bin Ali','YZ UFO','Maybank',
+     4500, 600, 0, 0, 0, 0, 0, 0, 0,
+     495, 585, 22.25, 77.85, 9, 9, 32.96, 5100, 1125.06, 3974.94],
+    ['PENDING','EMP002','Siti Nurhaliza','YZ CYBER','CIMB',
+     3800, 450, 0, 0, 0, 0, 0, 0, 0,
+     418, 494, 19.75, 69.15, 7.6, 7.6, 27.83, 4250, 930.93, 3319.07]
+  ];
+
+  if (format === 'xlsx') {
+    if (typeof XLSX === 'undefined') { toast('SheetJS tidak dimuat', false); return; }
+    const aoa = [headers, ...sample];
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols'] = headers.map(() => ({ wch: 14 }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Payroll');
+    XLSX.writeFile(wb, 'payroll_template.xlsx');
+    toast('Template Excel dimuat turun');
+  } else if (format === 'doc') {
+    let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ';
+    html += 'xmlns:w="urn:schemas-microsoft-com:office:word" ';
+    html += 'xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8">';
+    html += '<title>Payroll Template</title>';
+    html += '<style>body{font-family:Arial;font-size:9pt;}';
+    html += 'table{border-collapse:collapse;}';
+    html += 'th,td{border:1px solid #999;padding:3px 5px;}';
+    html += 'th{background:#eef2ff;}</style></head><body>';
+    html += '<h2>Payroll Import Template</h2>';
+    html += '<p style="font-size:9pt;color:#555;">Fill in the rows below and import back into the payroll system.</p>';
+    html += '<table><thead><tr>';
+    headers.forEach(h => { html += '<th>' + escapeHtml(h) + '</th>'; });
+    html += '</tr></thead><tbody>';
+    sample.forEach(r => {
+      html += '<tr>';
+      r.forEach(c => { html += '<td>' + escapeHtml(c) + '</td>'; });
+      html += '</tr>';
+    });
+    html += '</tbody></table></body></html>';
+    downloadBlob(html, 'payroll_template.doc', 'application/msword');
+    toast('Template Word dimuat turun');
+  }
 }
 
 // =====================================================
@@ -651,7 +1096,6 @@ function handleExport(val) {
   }
 }
 
-// 导出表头
 function getExportHeaders() {
   return [
     'Situation', 'Code', 'Name', 'Group', 'Bank',
@@ -665,7 +1109,6 @@ function getExportHeaders() {
   ];
 }
 
-// 只导出「当前可见」的行（自动跳过 UNACTIVE 与筛选掉的行）
 function getExportRows() {
   const rows = [];
   const trs = document.querySelectorAll('#tbody tr');
@@ -694,7 +1137,6 @@ function getExportRows() {
   return rows;
 }
 
-// ---------- 通用下载 ----------
 function downloadBlob(content, filename, mime) {
   const blob = new Blob(['\ufeff', content], { type: mime + ';charset=utf-8' });
   const url = URL.createObjectURL(blob);
@@ -707,7 +1149,6 @@ function downloadBlob(content, filename, mime) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-// ---------- 构建导出 HTML 表格 ----------
 function buildExportTableHTML() {
   const headers = getExportHeaders();
   const rows = getExportRows();
@@ -727,7 +1168,7 @@ function buildExportTableHTML() {
   return html;
 }
 
-// ---------- PDF（调用浏览器打印，另存为 PDF） ----------
+// ---------- PDF ----------
 let exportPrintCleanup = null;
 window.addEventListener('afterprint', () => {
   if (exportPrintCleanup) {
@@ -766,7 +1207,6 @@ function exportToXLSX() {
   if (!rows.length) { toast(t('noData'), false); return; }
 
   if (typeof XLSX === 'undefined') {
-    // 回退：导出 CSV
     exportToCSV();
     toast('SheetJS tidak dimuat, dieksport sebagai CSV', false);
     return;
@@ -775,7 +1215,6 @@ function exportToXLSX() {
   const aoa = [getExportHeaders(), ...rows];
   const ws = XLSX.utils.aoa_to_sheet(aoa);
 
-  // 数字列右对齐
   const range = XLSX.utils.decode_range(ws['!ref']);
   for (let R = 1; R <= range.e.r; R++) {
     for (let C = 5; C <= 23; C++) {
@@ -783,7 +1222,6 @@ function exportToXLSX() {
       if (ws[addr] && ws[addr].t === 'n') ws[addr].z = '#,##0.00';
     }
   }
-  // 简单列宽
   ws['!cols'] = [
     { wch: 10 }, { wch: 10 }, { wch: 22 }, { wch: 14 }, { wch: 18 },
     { wch: 11 }, { wch: 11 }, { wch: 11 }, { wch: 10 }, { wch: 10 },
@@ -798,7 +1236,6 @@ function exportToXLSX() {
   toast('Excel berjaya dieksport');
 }
 
-// CSV 回退
 function exportToCSV() {
   const headers = getExportHeaders();
   const rows = getExportRows();
@@ -817,7 +1254,6 @@ function exportToTXT() {
   const rows = getExportRows();
   if (!rows.length) { toast(t('noData'), false); return; }
 
-  // 计算每列宽度使输出对齐
   const widths = headers.map((h, i) => {
     let w = String(h).length;
     rows.forEach(r => {
@@ -882,7 +1318,6 @@ function exportToDOC() {
 // ================= 加载员工 =================
 async function loadEmployees() {
   if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
-    // 演示数据
     employees = [
       { Situation:'ACTIVE',  Code:'EMP001', Name:'Ahmad bin Ali', GroupName:'YZ UFO', BankNama:'Maybank',
         Basic:4500, Allowance:600, Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
@@ -902,7 +1337,6 @@ async function loadEmployees() {
     const json = await res.json();
     if (json.status === 'success') {
       employees = json.data.map(row => ({
-        // ★ 从 STAFF LOGIN RECORD 表 B 列提取，Apps Script 需返回 row.Situation
         Situation: String(row.Situation || 'ACTIVE').trim().toUpperCase(),
         Code: row.Code,
         Name: row.Name,
@@ -916,7 +1350,6 @@ async function loadEmployees() {
         EPF: row.EPF, PERKESO: row.PERKESO,
         EIS: row.EIS, Lindungan: row.Lindungan
       }))
-      // ★ 过滤掉 UNACTIVE / INACTIVE
       .filter(e => e.Situation !== 'UNACTIVE' && e.Situation !== 'INACTIVE');
 
       renderTable();
