@@ -1,1 +1,628 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payroll System</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f5f7fc; color: #1e293b; padding: 0 0 3rem 0;
+}
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: #ffffff; border-bottom: 1px solid #e2e8f0;
+  padding: 0.75rem 1.5rem; display: flex; flex-wrap: wrap;
+  gap: 0.5rem; align-items: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+.topbar .spacer { flex: 1; }
+.btn {
+  background: #fff; border: 1px solid #cbd5e1;
+  padding: 0.45rem 0.9rem; border-radius: 8px;
+  font-size: 0.82rem; font-weight: 500; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  transition: all 0.15s; color: #1e293b;
+}
+.btn:hover { background: #f1f5f9; border-color: #94a3b8; }
+.btn-primary { background: #2563eb; border-color: #2563eb; color: #fff; }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-danger { background: #fee2e2; border-color: #fecaca; color: #b91c1c; }
+.btn-sm { padding: 0.3rem 0.6rem; font-size: 0.75rem; }
+.btn.active { background: #dbeafe; border-color: #2563eb; color: #1d4ed8; }
 
+.container { max-width: 1600px; margin: 0 auto; padding: 1.5rem; }
+h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #0f172a; }
+
+.table-wrap {
+  overflow: auto; max-height: calc(100vh - 140px);
+  border-radius: 12px; border: 1px solid #e2e8f0; background: #fff;
+}
+table { border-collapse: separate; border-spacing: 0; font-size: 0.82rem; min-width: 1800px; }
+th {
+  position: sticky; top: 0; z-index: 10;
+  background: #f8fafc; padding: 0.6rem 0.5rem; text-align: left;
+  font-weight: 600; color: #334155; border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap; font-size: 0.75rem;
+}
+th.grp { background: #eef2ff; }
+td {
+  padding: 0.35rem 0.4rem; border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle; background: #fff;
+}
+tr:hover td { background: #fafbfc; }
+.input {
+  width: 100%; min-width: 70px; border: 1px solid #e2e8f0;
+  border-radius: 6px; padding: 0.35rem 0.45rem; font-size: 0.82rem;
+  background: #fff; transition: 0.15s; font-family: inherit;
+}
+.input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
+.input[readonly] { background: #f8fafc; color: #475569; }
+.input.num { text-align: right; }
+.cell-bad { background: #fee2e2 !important; border-color: #fca5a5 !important; }
+.cell-ok  { background: #dcfce7 !important; }
+
+.toast {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; background: #1e293b; color: #fff;
+  padding: 0.8rem 1.3rem; border-radius: 40px; font-size: 0.85rem; font-weight: 500;
+  z-index: 9999; opacity: 0; transform: translateY(10px);
+  transition: 0.2s; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+.legend { font-size: 0.75rem; color: #64748b; margin-top: 0.5rem; padding-left: 0.25rem; }
+
+/* ========== 粮单打印 ========== */
+#printArea { display: none; }
+@media print {
+  body { background: #fff; padding: 0; }
+  .topbar, .container, .toast { display: none !important; }
+  #printArea { display: block !important; }
+  .payslip {
+    page-break-after: always; padding: 12mm; font-size: 10pt;
+    font-family: 'Arial', sans-serif; color: #000;
+  }
+  .payslip:last-child { page-break-after: auto; }
+  .ps-header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 4mm; margin-bottom: 4mm; }
+  .ps-title { font-size: 14pt; font-weight: bold; }
+  .ps-info { font-size: 9pt; line-height: 1.5; }
+  .ps-section { margin-bottom: 4mm; }
+  .ps-section h4 { font-size: 10pt; margin-bottom: 1.5mm; border-bottom: 1px solid #999; padding-bottom: 1mm; }
+  .ps-row { display: flex; justify-content: space-between; padding: 0.8mm 0; }
+  .ps-row.total { font-weight: bold; border-top: 1px solid #000; padding-top: 1.5mm; margin-top: 1.5mm; }
+  .ps-cols { display: flex; gap: 6mm; }
+  .ps-cols > div { flex: 1; }
+  .ps-sign { margin-top: 8mm; display: flex; justify-content: space-between; font-size: 9pt; }
+  .ps-sign div { border-top: 1px solid #000; padding-top: 1mm; width: 45%; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ 顶部 Sticky 按钮栏 ============ -->
+<div class="topbar">
+  <button class="btn btn-primary" onclick="saveToSheet()">💾 Simpan ke Sheet</button>
+  <button class="btn" onclick="window.print()">🖨️ Cetak</button>
+  <button class="btn" onclick="showAllPayslips()">📄 Semua Slip Gaji</button>
+  <button class="btn" onclick="checkAll()">✅ Semak Semua</button>
+  <span style="width:1px;height:24px;background:#e2e8f0;margin:0 4px;"></span>
+  <button class="btn" onclick="checkOne('epf')">🔍 EPF</button>
+  <button class="btn" onclick="checkOne('socso')">🔍 SOCSO</button>
+  <button class="btn" onclick="checkOne('eis')">🔍 EIS</button>
+  <button class="btn" onclick="checkOne('lindung')">🔍 24JAM</button>
+  <span class="spacer"></span>
+  <select id="langSelect" class="btn" onchange="switchLang(this.value)">
+    <option value="ms">🇲🇾 Bahasa Melayu</option>
+    <option value="en">🇬🇧 English</option>
+    <option value="zh">🇨🇳 中文</option>
+  </select>
+</div>
+
+<div class="container">
+  <h1 id="pageTitle">Sistem Penggajian</h1>
+  <div class="table-wrap">
+    <table id="mainTable">
+      <thead>
+        <tr id="headRow1"></tr>
+        <tr id="headRow2"></tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <div class="legend" id="legend"></div>
+</div>
+
+<div id="printArea"></div>
+<div id="toast" class="toast"></div>
+
+<script>
+// =====================================================
+// ⚠️ 把下面这行换成你的 Apps Script Web App URL
+// =====================================================
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJQe5hNv7sC_Rmig6xZ0NP4nP_PqXQmgTHbG7Ou6_9JtWadETnVmVfFr7b3Cu5qidZ/exec';
+
+// ================= 语言包 =================
+const I18N = {
+  ms: {
+    title: 'Sistem Penggajian',
+    save: 'Simpan ke Sheet', print: 'Cetak', allSlip: 'Semua Slip Gaji',
+    checkAll: 'Semak Semua',
+    code: 'Kod', name: 'Nama', group: 'Kumpulan', ic: 'No. KP', jawatan: 'Jawatan',
+    bank: 'Bank', basic: 'Gaji Asas', allowance: 'Elaun', deduction: 'Potongan',
+    normalOT: 'OT Biasa', restOT: 'OT Rehat', publicOT: 'OT Awam', otherOT: 'OT Lain',
+    pinjaman: 'Pinjaman', others: 'Lain-lain',
+    epfE: 'EPF (Pekerja)', epfR: 'EPF (Majikan)',
+    socsoE: 'SOCSO (Pekerja)', socsoR: 'SOCSO (Majikan)',
+    eisE: 'EIS (Pekerja)', eisR: 'EIS (Majikan)',
+    lindung: '24JAM Lindungan',
+    gross: 'Gaji Kasar', totalDed: 'Jumlah Potongan', net: 'Gaji Bersih',
+    action: 'Tindakan', slip: 'Slip Gaji',
+    legend: 'Nota: EPF 11%/13%, SOCSO & EIS had RM6,000, 24JAM Lindungan 100% pekerja. Klik butang semak untuk highlight perbezaan.',
+    saved: 'Berjaya disimpan', failed: 'Gagal simpan',
+    loading: 'Memuatkan data...',
+    lang: 'Bahasa'
+  },
+  en: {
+    title: 'Payroll System',
+    save: 'Save to Sheet', print: 'Print', allSlip: 'All Payslips',
+    checkAll: 'Check All',
+    code: 'Code', name: 'Name', group: 'Group', ic: 'IC No.', jawatan: 'Position',
+    bank: 'Bank', basic: 'Basic Salary', allowance: 'Allowance', deduction: 'Deduction',
+    normalOT: 'Normal OT', restOT: 'Rest Day OT', publicOT: 'Public OT', otherOT: 'Other OT',
+    pinjaman: 'Loan', others: 'Others',
+    epfE: 'EPF (Employee)', epfR: 'EPF (Employer)',
+    socsoE: 'SOCSO (Employee)', socsoR: 'SOCSO (Employer)',
+    eisE: 'EIS (Employee)', eisR: 'EIS (Employer)',
+    lindung: '24JAM Lindungan',
+    gross: 'Gross Pay', totalDed: 'Total Deduction', net: 'Net Salary',
+    action: 'Action', slip: 'Payslip',
+    legend: 'Note: EPF 11%/13%, SOCSO & EIS capped at RM6,000, 24JAM Lindungan 100% employee. Click check buttons to highlight differences.',
+    saved: 'Saved successfully', failed: 'Save failed',
+    loading: 'Loading data...',
+    lang: 'Language'
+  },
+  zh: {
+    title: '薪资系统',
+    save: '保存到 Sheet', print: '打印', allSlip: '全部粮单',
+    checkAll: '检查全部',
+    code: '编号', name: '姓名', group: '分店', ic: '身份证', jawatan: '职位',
+    bank: '银行', basic: '基本薪资', allowance: '津贴', deduction: '扣款',
+    normalOT: '普通加班', restOT: '休息日加班', publicOT: '公假加班', otherOT: '其他加班',
+    pinjaman: '借粮', others: '其他',
+    epfE: 'EPF (员工)', epfR: 'EPF (雇主)',
+    socsoE: 'SOCSO (员工)', socsoR: 'SOCSO (雇主)',
+    eisE: 'EIS (员工)', eisR: 'EIS (雇主)',
+    lindung: '24JAM 保险',
+    gross: '总薪资', totalDed: '总扣款', net: '净薪资',
+    action: '操作', slip: '粮单',
+    legend: '备注：EPF 11%/13%，SOCSO 和 EIS 上限 RM6,000，24JAM 保险 100% 员工付。点击检查按钮高亮差异。',
+    saved: '保存成功', failed: '保存失败',
+    loading: '加载数据中...',
+    lang: '语言'
+  }
+};
+let currentLang = 'ms';
+function t(key) { return I18N[currentLang][key] || key; }
+
+// ================= 状态 =================
+let employees = [];
+let calcCache = {};
+
+// ================= 工具 =================
+function toast(msg, ok = true) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.background = ok ? '#1e293b' : '#b91c1c';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ================= 计算（前端） =================
+const SOCSO_TABLE = [
+  [30,0.10,0.40],[50,0.20,0.70],[70,0.30,1.10],[100,0.40,1.50],
+  [140,0.60,2.10],[200,0.85,2.95],[300,1.25,4.35],[400,1.75,6.15],
+  [500,2.25,7.85],[600,2.75,9.65],[700,3.25,11.45],[800,3.75,13.15],
+  [900,4.25,14.95],[1000,4.75,16.65],[1100,5.25,18.45],[1200,5.75,20.15],
+  [1300,6.25,21.95],[1400,6.75,23.65],[1500,7.25,25.45],[1600,7.75,27.15],
+  [1700,8.25,28.95],[1800,8.75,30.65],[1900,9.25,32.45],[2000,9.75,34.15],
+  [2100,10.25,35.85],[2200,10.75,37.65],[2300,11.25,39.35],[2400,11.75,41.15],
+  [2500,12.25,42.85],[2600,12.75,44.65],[2700,13.25,46.35],[2800,13.75,48.15],
+  [2900,14.25,49.85],[3000,14.75,51.65],[3100,15.25,53.45],[3200,15.75,55.15],
+  [3300,16.25,56.95],[3400,16.75,58.65],[3500,17.25,60.45],[3600,17.75,62.15],
+  [3700,18.25,63.95],[3800,18.75,65.65],[3900,19.25,67.45],[4000,19.75,69.15],
+  [4100,20.25,70.85],[4200,20.75,72.65],[4300,21.25,74.35],[4400,21.75,76.15],
+  [4500,22.25,77.85],[4600,22.75,79.65],[4700,23.25,81.35],[4800,23.75,83.15],
+  [4900,24.25,84.85],[5000,24.75,86.65],[5100,25.25,88.35],[5200,25.75,90.15],
+  [5300,26.25,91.85],[5400,26.75,93.65],[5500,27.25,95.35],[5600,27.75,97.15],
+  [5700,28.25,98.85],[5800,28.75,100.65],[5900,29.25,102.35],[6000,29.75,104.15]
+];
+function calcEPF(salary, age) {
+  if (!salary || salary <= 0) return { employee: 0, employer: 0 };
+  age = age || 30;
+  if (age >= 60) return { employee: 0, employer: Math.ceil(salary * 0.04) };
+  const erRate = salary <= 5000 ? 0.13 : 0.12;
+  return { employee: Math.ceil(salary * 0.11), employer: Math.ceil(salary * erRate) };
+}
+function calcSOCSO(salary) {
+  if (!salary || salary <= 0) return { employee: 0, employer: 0 };
+  if (salary > 6000) salary = 6000;
+  for (const row of SOCSO_TABLE) if (salary <= row[0]) return { employee: row[1], employer: row[2] };
+  return { employee: 29.75, employer: 104.15 };
+}
+function calcEIS(salary) {
+  if (!salary || salary <= 0) return { employee: 0, employer: 0 };
+  if (salary > 6000) salary = 6000;
+  let e = Math.round(salary * 0.002 * 100) / 100;
+  if (e > 11.90) e = 11.90;
+  return { employee: e, employer: e };
+}
+function calcLindung(salary) {
+  if (!salary || salary <= 0) return 0;
+  if (salary > 6000) salary = 6000;
+  return Math.round(salary * 0.007325 * 100) / 100;
+}
+function isExempt(staff) {
+  const bank = String(staff.BankNama || '').toLowerCase();
+  if (bank.includes('cash') || bank.includes('merchantrade')) {
+    return { epf: true, socso: true, eis: true, lindung: true };
+  }
+  const isNo = v => String(v || '').trim().toUpperCase() === 'NO';
+  return {
+    epf: isNo(staff.EPF),
+    socso: isNo(staff.PERKESO),
+    eis: isNo(staff.EIS),
+    lindung: isNo(staff.Lindungan)
+  };
+}
+
+// ================= 重算一行 =================
+function recalcRow(emp) {
+  const basic = Number(emp.Basic) || 0;
+  const exempt = isExempt(emp);
+
+  const epf = exempt.epf ? { employee: 0, employer: 0 } : calcEPF(basic, emp.Age || 30);
+  const socso = exempt.socso ? { employee: 0, employer: 0 } : calcSOCSO(basic);
+  const eis = exempt.eis ? { employee: 0, employer: 0 } : calcEIS(basic);
+  const lindung = exempt.lindung ? 0 : calcLindung(basic);
+
+  const ot = (Number(emp.NormalOT)||0) + (Number(emp.RestOT)||0)
+           + (Number(emp.PublicOT)||0) + (Number(emp.OtherOT)||0);
+  const gross = basic + (Number(emp.Allowance)||0) + ot;
+  const totalDed = (Number(emp.Deduction)||0) + (Number(emp.Pinjaman)||0)
+                 + (Number(emp.Others)||0)
+                 + epf.employee + socso.employee + eis.employee + lindung;
+  const net = gross - totalDed;
+
+  emp.EPF_Employee = epf.employee;
+  emp.EPF_Employer = epf.employer;
+  emp.SOCSO_Employee = socso.employee;
+  emp.SOCSO_Employer = socso.employer;
+  emp.EIS_Employee = eis.employee;
+  emp.EIS_Employer = eis.employer;
+  emp.Lindung24Jam = lindung;
+  emp.GrossPay = gross;
+  emp.TotalDeduction = totalDed;
+  emp.NetSalary = net;
+  return emp;
+}
+
+// ================= 渲染表格 =================
+function renderHeaders() {
+  document.getElementById('pageTitle').textContent = t('title');
+  document.getElementById('legend').textContent = t('legend');
+  document.querySelector('button[onclick="saveToSheet()"]').innerHTML = '💾 ' + t('save');
+  document.querySelector('button[onclick="window.print()"]').innerHTML = '🖨️ ' + t('print');
+  document.querySelector('button[onclick="showAllPayslips()"]').innerHTML = '📄 ' + t('allSlip');
+  document.querySelector('button[onclick="checkAll()"]').innerHTML = '✅ ' + t('checkAll');
+
+  const h1 = document.getElementById('headRow1');
+  const h2 = document.getElementById('headRow2');
+  h1.innerHTML = `
+    <th rowspan="2">${t('code')}</th>
+    <th rowspan="2">${t('name')}</th>
+    <th rowspan="2">${t('group')}</th>
+    <th rowspan="2">${t('bank')}</th>
+    <th rowspan="2">${t('basic')}</th>
+    <th rowspan="2">${t('allowance')}</th>
+    <th rowspan="2">${t('deduction')}</th>
+    <th rowspan="2">${t('normalOT')}</th>
+    <th rowspan="2">${t('restOT')}</th>
+    <th rowspan="2">${t('publicOT')}</th>
+    <th rowspan="2">${t('otherOT')}</th>
+    <th rowspan="2">${t('pinjaman')}</th>
+    <th rowspan="2">${t('others')}</th>
+    <th class="grp" colspan="2">EPF</th>
+    <th class="grp" colspan="2">SOCSO</th>
+    <th class="grp" colspan="2">EIS</th>
+    <th class="grp">24JAM</th>
+    <th rowspan="2">${t('gross')}</th>
+    <th rowspan="2">${t('totalDed')}</th>
+    <th rowspan="2">${t('net')}</th>
+    <th rowspan="2">${t('action')}</th>
+  `;
+  h2.innerHTML = `
+    <th class="grp">${t('epfE')}</th><th class="grp">${t('epfR')}</th>
+    <th class="grp">${t('socsoE')}</th><th class="grp">${t('socsoR')}</th>
+    <th class="grp">${t('eisE')}</th><th class="grp">${t('eisR')}</th>
+    <th class="grp">${t('lindung')}</th>
+  `;
+}
+
+function renderTable() {
+  renderHeaders();
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+
+  if (!employees.length) {
+    tbody.innerHTML = `<tr><td colspan="24" style="text-align:center;padding:2rem;color:#64748b;">${t('loading')}</td></tr>`;
+    return;
+  }
+
+  employees.forEach((emp, idx) => {
+    emp = recalcRow(emp);
+    const tr = document.createElement('tr');
+
+    const txt = (field, readonly = false) =>
+      `<input class="input" ${readonly?'readonly':''} data-idx="${idx}" data-field="${field}" value="${emp[field] ?? ''}">`;
+    const num = (field, readonly = false, cls = '') =>
+      `<input type="number" step="0.01" class="input num ${cls}" ${readonly?'readonly':''} data-idx="${idx}" data-field="${field}" value="${emp[field] ?? 0}">`;
+
+    tr.innerHTML = `
+      <td>${txt('Code', true)}</td>
+      <td>${txt('Name', true)}</td>
+      <td>${txt('GroupName', true)}</td>
+      <td>${txt('BankNama', true)}</td>
+      <td>${num('Basic')}</td>
+      <td>${num('Allowance')}</td>
+      <td>${num('Deduction')}</td>
+      <td>${num('NormalOT')}</td>
+      <td>${num('RestOT')}</td>
+      <td>${num('PublicOT')}</td>
+      <td>${num('OtherOT')}</td>
+      <td>${num('Pinjaman')}</td>
+      <td>${num('Others')}</td>
+      <td>${num('EPF_Employee', true)}</td>
+      <td>${num('EPF_Employer', true)}</td>
+      <td>${num('SOCSO_Employee', true)}</td>
+      <td>${num('SOCSO_Employer', true)}</td>
+      <td>${num('EIS_Employee', true)}</td>
+      <td>${num('EIS_Employer', true)}</td>
+      <td>${num('Lindung24Jam', true)}</td>
+      <td>${num('GrossPay', true)}</td>
+      <td>${num('TotalDeduction', true)}</td>
+      <td>${num('NetSalary', true)}</td>
+      <td><button class="btn btn-sm" onclick="showPayslip('${emp.Code}')">${t('slip')}</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // 绑定输入事件
+  tbody.querySelectorAll('input:not([readonly])').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const idx = Number(e.target.dataset.idx);
+      const field = e.target.dataset.field;
+      employees[idx][field] = e.target.value;
+      const updated = recalcRow(employees[idx]);
+      // 只更新该行所有只读单元格
+      const row = e.target.closest('tr');
+      ['EPF_Employee','EPF_Employer','SOCSO_Employee','SOCSO_Employer',
+       'EIS_Employee','EIS_Employer','Lindung24Jam','GrossPay','TotalDeduction','NetSalary'
+      ].forEach(f => {
+        const cell = row.querySelector(`input[data-field="${f}"]`);
+        if (cell) cell.value = updated[f];
+      });
+    });
+  });
+}
+
+// ================= 检查 =================
+function checkOne(type) {
+  const rows = document.querySelectorAll('#tbody tr');
+  rows.forEach((row, idx) => {
+    const emp = recalcRow(employees[idx]);
+    const exempt = isExempt(emp);
+    const basic = Number(emp.Basic) || 0;
+    let targetField, correctValue, actualField;
+    if (type === 'epf') {
+      targetField = 'EPF_Employee';
+      correctValue = exempt.epf ? 0 : calcEPF(basic, emp.Age||30).employee;
+      actualField = 'EPF_Employee';
+    } else if (type === 'socso') {
+      targetField = 'SOCSO_Employee';
+      correctValue = exempt.socso ? 0 : calcSOCSO(basic).employee;
+      actualField = 'SOCSO_Employee';
+    } else if (type === 'eis') {
+      targetField = 'EIS_Employee';
+      correctValue = exempt.eis ? 0 : calcEIS(basic).employee;
+      actualField = 'EIS_Employee';
+    } else {
+      targetField = 'Lindung24Jam';
+      correctValue = exempt.lindung ? 0 : calcLindung(basic);
+      actualField = 'Lindung24Jam';
+    }
+    const cell = row.querySelector(`input[data-field="${actualField}"]`);
+    if (!cell) return;
+    const diff = Math.abs(Number(cell.value) - correctValue) > 0.01;
+    cell.classList.toggle('cell-bad', diff);
+    cell.classList.toggle('cell-ok', !diff);
+    if (diff) cell.title = `Sepatutnya: ${correctValue.toFixed(2)}`;
+  });
+  toast('Semakan ' + type.toUpperCase() + ' selesai');
+}
+
+function checkAll() {
+  ['epf','socso','eis','lindung'].forEach(checkOne);
+  toast('Semakan selesai');
+}
+
+// ================= 保存 =================
+async function saveToSheet() {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
+    toast('Sila tetapkan APPS_SCRIPT_URL dahulu!', false);
+    return;
+  }
+  const payload = employees.map(emp => {
+    recalcRow(emp);
+    const out = {};
+    Object.keys(emp).forEach(k => { if (typeof emp[k] !== 'object') out[k] = emp[k]; });
+    out.Timestamp = new Date().toISOString();
+    return out;
+  });
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ payroll: payload })
+    });
+    toast(t('saved'));
+  } catch (err) {
+    console.error(err);
+    toast(t('failed'), false);
+  }
+}
+
+// ================= 加载员工 =================
+async function loadEmployees() {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
+    employees = [
+      { Code:'EMP001', Name:'Ahmad bin Ali', GroupName:'YZ UFO', BankNama:'Maybank',
+        Basic:4500, Allowance:600, Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
+        OtherOT:0, Pinjaman:0, Others:0, Age:30, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES' },
+      { Code:'EMP002', Name:'Siti Nurhaliza', GroupName:'YZ CYBER', BankNama:'CIMB',
+        Basic:3800, Allowance:450, Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
+        OtherOT:0, Pinjaman:0, Others:0, Age:28, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES' }
+    ];
+    renderTable();
+    return;
+  }
+  try {
+    const res = await fetch(APPS_SCRIPT_URL);
+    const json = await res.json();
+    if (json.status === 'success') {
+      employees = json.data.map(row => ({
+        Code: row.Code,
+        Name: row.Name,
+        GroupName: row.GroupName || '',
+        BankNama: row.BankNama || '',
+        Basic: Number(row.Salary) || 0,
+        Allowance: 0, Deduction: 0,
+        NormalOT: 0, RestOT: 0, PublicOT: 0, OtherOT: 0,
+        Pinjaman: 0, Others: 0,
+        Age: 30,
+        EPF: row.EPF, PERKESO: row.PERKESO,
+        EIS: row.EIS, Lindungan: row.Lindungan
+      }));
+      renderTable();
+    } else {
+      toast('Load error: ' + json.message, false);
+    }
+  } catch (err) {
+    console.error(err);
+    toast('Gagal muat data', false);
+  }
+}
+
+// ================= 粮单 =================
+function showPayslip(code) {
+  const emp = employees.find(e => e.Code === code);
+  if (!emp) return;
+  recalcRow(emp);
+  const printArea = document.getElementById('printArea');
+  printArea.innerHTML = buildPayslip(emp);
+  window.print();
+}
+
+function showAllPayslips() {
+  const groupFilter = prompt('Masukkan GroupName untuk cetak semua (kosongkan untuk semua):', '');
+  let list = employees.map(e => recalcRow(e));
+  if (groupFilter && groupFilter.trim()) {
+    list = list.filter(e => String(e.GroupName).toLowerCase().includes(groupFilter.trim().toLowerCase()));
+  }
+  if (!list.length) { toast('Tiada pekerja', false); return; }
+  const printArea = document.getElementById('printArea');
+  printArea.innerHTML = list.map(buildPayslip).join('');
+  window.print();
+}
+
+function buildPayslip(emp) {
+  const fmt = n => Number(n || 0).toFixed(2);
+  const ot = (Number(emp.NormalOT)||0) + (Number(emp.RestOT)||0) + (Number(emp.PublicOT)||0) + (Number(emp.OtherOT)||0);
+  const L = I18N[currentLang];
+  return `
+  <div class="payslip">
+    <div class="ps-header">
+      <div>
+        <div class="ps-title">SLIP GAJI</div>
+        <div class="ps-info">
+          ${emp.GroupName || ''}<br>
+          ${emp.Name || ''}<br>
+          ${emp.IC || ''} &nbsp;|&nbsp; ${emp.Jawatan || ''}<br>
+          ${emp.BankNama || ''}
+        </div>
+      </div>
+      <div class="ps-info" style="text-align:right;">
+        <strong>${emp.Code}</strong><br>
+        ${new Date().toLocaleDateString('ms-MY')}
+      </div>
+    </div>
+
+    <div class="ps-cols">
+      <div class="ps-section">
+        <h4>PENDAPATAN</h4>
+        <div class="ps-row"><span>${L.basic}</span><span>${fmt(emp.Basic)}</span></div>
+        <div class="ps-row"><span>${L.allowance}</span><span>${fmt(emp.Allowance)}</span></div>
+        <div class="ps-row"><span>OT</span><span>${fmt(ot)}</span></div>
+        <div class="ps-row total"><span>${L.gross}</span><span>${fmt(emp.GrossPay)}</span></div>
+      </div>
+
+      <div class="ps-section">
+        <h4>POTONGAN</h4>
+        <div class="ps-row"><span>${L.epfE}</span><span>${fmt(emp.EPF_Employee)}</span></div>
+        <div class="ps-row"><span>${L.socsoE}</span><span>${fmt(emp.SOCSO_Employee)}</span></div>
+        <div class="ps-row"><span>${L.eisE}</span><span>${fmt(emp.EIS_Employee)}</span></div>
+        <div class="ps-row"><span>${L.lindung}</span><span>${fmt(emp.Lindung24Jam)}</span></div>
+        <div class="ps-row"><span>${L.deduction}</span><span>${fmt(emp.Deduction)}</span></div>
+        <div class="ps-row"><span>${L.pinjaman}</span><span>${fmt(emp.Pinjaman)}</span></div>
+        <div class="ps-row"><span>${L.others}</span><span>${fmt(emp.Others)}</span></div>
+        <div class="ps-row total"><span>${L.totalDed}</span><span>${fmt(emp.TotalDeduction)}</span></div>
+      </div>
+    </div>
+
+    <div class="ps-section" style="margin-top:5mm;">
+      <div class="ps-row total" style="font-size:12pt;">
+        <span>${L.net}</span><span>RM ${fmt(emp.NetSalary)}</span>
+      </div>
+    </div>
+
+    <div class="ps-section">
+      <h4>SUMBANGAN MAJIKAN (tidak ditolak)</h4>
+      <div class="ps-cols">
+        <div>
+          <div class="ps-row"><span>${L.epfR}</span><span>${fmt(emp.EPF_Employer)}</span></div>
+          <div class="ps-row"><span>${L.socsoR}</span><span>${fmt(emp.SOCSO_Employer)}</span></div>
+          <div class="ps-row"><span>${L.eisR}</span><span>${fmt(emp.EIS_Employer)}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ps-sign">
+      <div>Pekerja</div>
+      <div>Majikan</div>
+    </div>
+  </div>`;
+}
+
+// ================= 语言切换 =================
+function switchLang(lang) {
+  currentLang = lang;
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
+  renderTable();
+}
+
+// ================= 启动 =================
+window.addEventListener('DOMContentLoaded', loadEmployees);
+</script>
+</body>
+</html>
