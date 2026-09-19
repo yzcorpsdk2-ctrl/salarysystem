@@ -56,6 +56,28 @@ th {
 }
 th > div { word-break: break-word; overflow-wrap: anywhere; }
 th.grp { background: #eef2ff; }
+
+/* ★ 筛选行（单独一行，与表头一起冻结） */
+#headRow3 th {
+  background: #f1f5f9;
+  padding: 0.3rem 0.3rem;
+  border-bottom: 2px solid #cbd5e1;
+  vertical-align: middle;
+}
+#headRow3 .th-filter {
+  display: block; width: 100%;
+  padding: 3px 6px; font-size: 0.7rem; font-weight: 400;
+  border: 1px solid #cbd5e1; border-radius: 5px;
+  background: #fff; color: #1e293b; font-family: inherit;
+  transition: 0.15s; margin: 0;
+}
+#headRow3 .th-filter:focus {
+  outline: none; border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+}
+#headRow3 .th-filter::placeholder { color: #94a3b8; font-weight: 400; }
+#headRow3 th.no-filter { background: #e2e8f0; }
+
 td {
   padding: 0.35rem 0.4rem; border-bottom: 1px solid #f1f5f9;
   vertical-align: middle; background: #fff;
@@ -101,20 +123,6 @@ tr:hover td { background: #fafbfc; }
 .input[readonly].num { background: #f1f5f9; }
 .cell-bad { background: #fee2e2 !important; border-color: #fca5a5 !important; }
 .cell-ok  { background: #dcfce7 !important; }
-
-/* ★ 表头筛选输入框 */
-.th-filter {
-  display: block; width: 100%; margin-top: 4px;
-  padding: 3px 6px; font-size: 0.7rem; font-weight: 400;
-  border: 1px solid #cbd5e1; border-radius: 5px;
-  background: #fff; color: #1e293b; font-family: inherit;
-  transition: 0.15s;
-}
-.th-filter:focus {
-  outline: none; border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
-}
-.th-filter::placeholder { color: #94a3b8; font-weight: 400; }
 
 .toast {
   position: fixed; bottom: 1.5rem; right: 1.5rem; background: #1e293b; color: #fff;
@@ -202,13 +210,9 @@ tr:hover td { background: #fafbfc; }
 
 <!-- ============ 顶部按钮栏 ============ -->
 <div class="topbar">
-  <!-- ★ 保存到 Google Sheet -->
   <button class="btn btn-success" onclick="saveToSheet()" id="btnSaveSheet">💾 Simpan ke Sheet</button>
-
-  <!-- ★ 导入按钮 -->
   <button class="btn" onclick="openImportModal()">📥 Import / 导入</button>
 
-  <!-- 导出下拉 -->
   <select id="exportMenu" class="btn" onchange="handleExport(this.value)">
     <option value="">💾 Eksport / 导出…</option>
     <option value="pdf">📄 PDF (.pdf)</option>
@@ -276,6 +280,7 @@ tr:hover td { background: #fafbfc; }
       <thead>
         <tr id="headRow1"></tr>
         <tr id="headRow2"></tr>
+        <tr id="headRow3"></tr>
       </thead>
       <tbody id="tbody"></tbody>
     </table>
@@ -299,6 +304,8 @@ tr:hover td { background: #fafbfc; }
       <p><strong>拖入文件或点击选择</strong></p>
       <p class="hint">Drag & drop file here, or click to browse</p>
       <p class="hint">格式：.xlsx / .csv / .txt</p>
+      <!-- ★ 隐藏的文件输入（修复原本未定义问题） -->
+      <input type="file" id="importFile" accept=".xlsx,.xls,.csv,.txt" style="display:none;">
     </div>
 
     <div class="modal-footer">
@@ -312,7 +319,6 @@ tr:hover td { background: #fafbfc; }
   </div>
 </div>
 
-<!-- SheetJS 用于 XLSX -->
 <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <script>
@@ -321,7 +327,6 @@ tr:hover td { background: #fafbfc; }
 // =====================================================
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJQe5hNv7sC_Rmig6xZ0NP4nP_PqXQmgTHbG7Ou6_9JtWadETnVmVfFr7b3Cu5qidZ/exec';
 
-// 分组字段映射（勾选后手动，未勾选自动）
 const GROUP_FIELDS = {
   EPF:   ['EPF_Employee', 'EPF_Employer'],
   SOCSO: ['SOCSO_Employee', 'SOCSO_Employer'],
@@ -346,15 +351,13 @@ const I18N = {
     lindung: '24JAM Lindungan',
     gross: 'Gaji Kasar', totalDed: 'Jumlah Potongan', net: 'Gaji Bersih',
     action: 'Tindakan', slip: 'Slip Gaji',
-    manual: 'Manual',
     legend: 'Nota: Tandakan ✔ di hadapan EPF/SOCSO/EIS/24JAM untuk isi manual. Tidak ditanda = auto kira. Situation UNACTIVE tidak dipaparkan.',
     saved: 'Berjaya disimpan ke Sheet', failed: 'Gagal simpan',
     loading: 'Memuatkan data...',
-    lang: 'Bahasa',
-    exporting: 'Mengeksport...', noData: 'Tiada data untuk dieksport',
     importSuccess: 'Berjaya import {n} pekerja',
     importFail: 'Fail tidak sah atau kosong',
-    importFormat: 'Format fail tidak disokong'
+    importFormat: 'Format fail tidak disokong',
+    noData: 'Tiada data untuk dieksport'
   },
   en: {
     title: 'Payroll System',
@@ -371,15 +374,13 @@ const I18N = {
     lindung: '24JAM Lindungan',
     gross: 'Gross Pay', totalDed: 'Total Deduction', net: 'Net Salary',
     action: 'Action', slip: 'Payslip',
-    manual: 'Manual',
     legend: 'Note: Tick ✔ before EPF/SOCSO/EIS/24JAM to enter manually. Unticked = auto calc. UNACTIVE staff are hidden.',
     saved: 'Saved to Sheet successfully', failed: 'Save failed',
     loading: 'Loading data...',
-    lang: 'Language',
-    exporting: 'Exporting...', noData: 'No data to export',
     importSuccess: 'Imported {n} employees',
     importFail: 'Invalid or empty file',
-    importFormat: 'Unsupported file format'
+    importFormat: 'Unsupported file format',
+    noData: 'No data to export'
   },
   zh: {
     title: '薪资系统',
@@ -396,21 +397,18 @@ const I18N = {
     lindung: '24JAM 保险',
     gross: '总薪资', totalDed: '总扣款', net: '净薪资',
     action: '操作', slip: '粮单',
-    manual: '手动',
     legend: '备注：勾选 EPF/SOCSO/EIS/24JAM 前的 ✔ 表示手动填写，不勾选则系统自动计算。UNACTIVE 员工不显示。',
     saved: '已成功保存到 Sheet', failed: '保存失败',
     loading: '加载数据中...',
-    lang: '语言',
-    exporting: '导出中...', noData: '没有可导出的数据',
     importSuccess: '成功导入 {n} 位员工',
     importFail: '文件无效或为空',
-    importFormat: '不支持的文件格式'
+    importFormat: '不支持的文件格式',
+    noData: '没有可导出的数据'
   }
 };
 let currentLang = 'ms';
 function t(key) { return I18N[currentLang][key] || key; }
 
-// ================= 状态 =================
 let employees = [];
 
 // ================= 工具 =================
@@ -492,12 +490,10 @@ function isExempt(staff) {
   };
 }
 
-// ================= 重算一行（尊重手动标记） =================
 function recalcRow(emp) {
   const basic = num(emp.Basic);
   const exempt = isExempt(emp);
 
-  // 未勾选手动 → 自动计算；勾选 → 保留用户输入
   if (!emp.manualEPF) {
     const epf = exempt.epf ? { employee: 0, employer: 0 } : calcEPF(basic, emp.Age || 30);
     emp.EPF_Employee = epf.employee;
@@ -530,7 +526,7 @@ function recalcRow(emp) {
   return emp;
 }
 
-// ================= 渲染表头 =================
+// ================= 渲染表头（3 行：主 + 子 + 筛选） =================
 function renderHeaders() {
   document.getElementById('pageTitle').textContent = t('title');
   document.getElementById('legend').textContent = t('legend');
@@ -542,29 +538,24 @@ function renderHeaders() {
 
   const h1 = document.getElementById('headRow1');
   const h2 = document.getElementById('headRow2');
-  const f = (col) => `<input class="th-filter" data-col="${col}" placeholder="🔍 tapis">`;
+  const h3 = document.getElementById('headRow3');
 
-  // 列索引：
-  // 0 Situation, 1 Code, 2 Name, 3 Group, 4 Bank, 5 Basic, 6 Allowance, 7 Deduction,
-  // 8 NormalOT, 9 RestOT, 10 PublicOT, 11 OtherOT, 12 Pinjaman, 13 Others,
-  // 14 EPF chk, 15 EPF_E, 16 EPF_R, 17 SOCSO chk, 18 SOCSO_E, 19 SOCSO_R,
-  // 20 EIS chk, 21 EIS_E, 22 EIS_R, 23 24JAM chk, 24 Lindung,
-  // 25 Gross, 26 TotalDed, 27 Net, 28 Action
+  // ---------- Row 1: 主表头 ----------
   h1.innerHTML = `
-    <th rowspan="2" style="background:#fef3c7;"><div>Situation</div>${f(0)}</th>
-    <th rowspan="2"><div>${t('code')}</div>${f(1)}</th>
-    <th rowspan="2"><div>${t('name')}</div>${f(2)}</th>
-    <th rowspan="2"><div>${t('group')}</div>${f(3)}</th>
-    <th rowspan="2" class="divider-right"><div>${t('bank')}</div>${f(4)}</th>
-    <th rowspan="2" class="divider-left divider-right"><div>${t('basic')}</div>${f(5)}</th>
-    <th rowspan="2"><div>${t('allowance')}</div>${f(6)}</th>
-    <th rowspan="2"><div>${t('deduction')}</div>${f(7)}</th>
-    <th rowspan="2"><div>${t('normalOT')}</div>${f(8)}</th>
-    <th rowspan="2"><div>${t('restOT')}</div>${f(9)}</th>
-    <th rowspan="2"><div>${t('publicOT')}</div>${f(10)}</th>
-    <th rowspan="2"><div>${t('otherOT')}</div>${f(11)}</th>
-    <th rowspan="2"><div>${t('pinjaman')}</div>${f(12)}</th>
-    <th rowspan="2"><div>${t('others')}</div>${f(13)}</th>
+    <th rowspan="2" style="background:#fef3c7;"><div>Situation</div></th>
+    <th rowspan="2"><div>${t('code')}</div></th>
+    <th rowspan="2"><div>${t('name')}</div></th>
+    <th rowspan="2"><div>${t('group')}</div></th>
+    <th rowspan="2" class="divider-right"><div>${t('bank')}</div></th>
+    <th rowspan="2" class="divider-left divider-right"><div>${t('basic')}</div></th>
+    <th rowspan="2"><div>${t('allowance')}</div></th>
+    <th rowspan="2"><div>${t('deduction')}</div></th>
+    <th rowspan="2"><div>${t('normalOT')}</div></th>
+    <th rowspan="2"><div>${t('restOT')}</div></th>
+    <th rowspan="2"><div>${t('publicOT')}</div></th>
+    <th rowspan="2"><div>${t('otherOT')}</div></th>
+    <th rowspan="2"><div>${t('pinjaman')}</div></th>
+    <th rowspan="2"><div>${t('others')}</div></th>
     <th rowspan="2" class="grp divider-left" style="text-align:center;font-size:0.9rem;">✎</th>
     <th class="grp" colspan="2">EPF</th>
     <th rowspan="2" class="grp divider-left" style="text-align:center;font-size:0.9rem;">✎</th>
@@ -572,19 +563,56 @@ function renderHeaders() {
     <th rowspan="2" class="grp divider-left" style="text-align:center;font-size:0.9rem;">✎</th>
     <th class="grp" colspan="2">EIS</th>
     <th rowspan="2" class="grp divider-left" style="text-align:center;font-size:0.9rem;">✎</th>
-    <th class="grp" rowspan="2"><div>24JAM</div>${f(24)}</th>
-    <th rowspan="2"><div>${t('gross')}</div>${f(25)}</th>
-    <th rowspan="2"><div>${t('totalDed')}</div>${f(26)}</th>
-    <th rowspan="2"><div>${t('net')}</div>${f(27)}</th>
+    <th class="grp" rowspan="2"><div>24JAM</div></th>
+    <th rowspan="2"><div>${t('gross')}</div></th>
+    <th rowspan="2"><div>${t('totalDed')}</div></th>
+    <th rowspan="2"><div>${t('net')}</div></th>
     <th rowspan="2">${t('action')}</th>
   `;
+
+  // ---------- Row 2: 子表头 ----------
   h2.innerHTML = `
-    <th class="grp"><div>${t('epfE')}</div>${f(15)}</th>
-    <th class="grp"><div>${t('epfR')}</div>${f(16)}</th>
-    <th class="grp"><div>${t('socsoE')}</div>${f(18)}</th>
-    <th class="grp"><div>${t('socsoR')}</div>${f(19)}</th>
-    <th class="grp"><div>${t('eisE')}</div>${f(21)}</th>
-    <th class="grp"><div>${t('eisR')}</div>${f(22)}</th>
+    <th class="grp"><div>${t('epfE')}</div></th>
+    <th class="grp"><div>${t('epfR')}</div></th>
+    <th class="grp"><div>${t('socsoE')}</div></th>
+    <th class="grp"><div>${t('socsoR')}</div></th>
+    <th class="grp"><div>${t('eisE')}</div></th>
+    <th class="grp"><div>${t('eisR')}</div></th>
+  `;
+
+  // ---------- Row 3: 筛选行 ----------
+  const f = (col) => `<input class="th-filter" data-col="${col}" placeholder="🔍">`;
+  const empty = `<th class="no-filter"></th>`;
+  h3.innerHTML = `
+    <th>${f(0)}</th>
+    <th>${f(1)}</th>
+    <th>${f(2)}</th>
+    <th>${f(3)}</th>
+    <th class="divider-right">${f(4)}</th>
+    <th class="divider-left divider-right">${f(5)}</th>
+    <th>${f(6)}</th>
+    <th>${f(7)}</th>
+    <th>${f(8)}</th>
+    <th>${f(9)}</th>
+    <th>${f(10)}</th>
+    <th>${f(11)}</th>
+    <th>${f(12)}</th>
+    <th>${f(13)}</th>
+    ${empty.replace('class="no-filter"', 'class="no-filter divider-left"')}
+    <th>${f(15)}</th>
+    <th>${f(16)}</th>
+    ${empty.replace('class="no-filter"', 'class="no-filter divider-left"')}
+    <th>${f(18)}</th>
+    <th>${f(19)}</th>
+    ${empty.replace('class="no-filter"', 'class="no-filter divider-left"')}
+    <th>${f(21)}</th>
+    <th>${f(22)}</th>
+    ${empty.replace('class="no-filter"', 'class="no-filter divider-left"')}
+    <th>${f(24)}</th>
+    <th>${f(25)}</th>
+    <th>${f(26)}</th>
+    <th>${f(27)}</th>
+    ${empty}
   `;
 
   requestAnimationFrame(fixStickyHeader);
@@ -592,10 +620,18 @@ function renderHeaders() {
 
 function fixStickyHeader() {
   const row1 = document.getElementById('headRow1');
-  if (!row1) return;
-  const h = row1.getBoundingClientRect().height;
+  const row2 = document.getElementById('headRow2');
+  const row3 = document.getElementById('headRow3');
+  if (!row1 || !row2 || !row3) return;
+
+  const h1 = row1.getBoundingClientRect().height;
+  const h2 = row2.getBoundingClientRect().height;
+
   document.querySelectorAll('#headRow2 th').forEach(th => {
-    th.style.top = Math.round(h) + 'px';
+    th.style.top = Math.round(h1) + 'px';
+  });
+  document.querySelectorAll('#headRow3 th').forEach(th => {
+    th.style.top = Math.round(h1 + h2) + 'px';
   });
 }
 window.addEventListener('resize', fixStickyHeader);
@@ -671,7 +707,6 @@ function renderTable() {
     tbody.appendChild(tr);
   });
 
-  // 绑定数字输入事件
   tbody.querySelectorAll('input.input:not([readonly])').forEach(inp => {
     inp.addEventListener('input', e => {
       const idx = Number(e.target.dataset.idx);
@@ -689,7 +724,6 @@ function renderTable() {
     });
   });
 
-  // 绑定手动勾选事件
   tbody.querySelectorAll('.manual-chk').forEach(chk => {
     chk.addEventListener('change', e => {
       const idx = Number(e.target.dataset.idx);
@@ -707,7 +741,6 @@ function renderTable() {
           inp.value = updated[f];
         }
       });
-      // 更新总计
       ['GrossPay','TotalDeduction','NetSalary'].forEach(f => {
         const inp = row.querySelector(`input[data-field="${f}"]`);
         if (inp) inp.value = updated[f];
@@ -789,16 +822,13 @@ function checkAll() {
   toast('Semakan selesai');
 }
 
-// ================= 下拉跳转 =================
 function jumpToCheckPage(url) {
   if (!url) return;
   window.open(url, '_blank');
   document.getElementById('checkMenu').value = '';
 }
 
-// =====================================================
-// ★ 保存到 Google Sheet
-// =====================================================
+// ================= 保存到 Google Sheet =================
 async function saveToSheet() {
   if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
     toast('Sila tetapkan APPS_SCRIPT_URL dahulu!', false);
@@ -827,41 +857,40 @@ async function saveToSheet() {
   }
 }
 
-// =====================================================
-// ★ 导入功能
-// =====================================================
+// ================= 导入 =================
 function openImportModal() {
   document.getElementById('importModal').style.display = 'flex';
 }
 function closeImportModal() {
   document.getElementById('importModal').style.display = 'none';
-  document.getElementById('importFile').value = '';
+  const fi = document.getElementById('importFile');
+  if (fi) fi.value = '';
 }
 
-// 绑定拖放 + 点击
 window.addEventListener('DOMContentLoaded', () => {
   const dz = document.getElementById('dropzone');
   const fi = document.getElementById('importFile');
-
-  dz.addEventListener('click', () => fi.click());
-  fi.addEventListener('change', e => {
-    if (e.target.files && e.target.files[0]) handleImportFile(e.target.files[0]);
-  });
-  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
-  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
-  dz.addEventListener('drop', e => {
-    e.preventDefault();
-    dz.classList.remove('drag-over');
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) handleImportFile(e.dataTransfer.files[0]);
-  });
-
-  // 点击遮罩关闭
-  document.getElementById('importModal').addEventListener('click', e => {
+  if (dz && fi) {
+    dz.addEventListener('click', e => {
+      if (e.target !== fi) fi.click();
+    });
+    fi.addEventListener('change', e => {
+      if (e.target.files && e.target.files[0]) handleImportFile(e.target.files[0]);
+    });
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault();
+      dz.classList.remove('drag-over');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) handleImportFile(e.dataTransfer.files[0]);
+    });
+  }
+  const modal = document.getElementById('importModal');
+  if (modal) modal.addEventListener('click', e => {
     if (e.target.id === 'importModal') closeImportModal();
   });
 });
 
-// 解析 CSV 行（支持引号）
 function parseCSVLine(line) {
   const cells = [];
   let cur = '';
@@ -889,11 +918,9 @@ function parseTextFile(text) {
   for (const line of lines) {
     const trimmed = line.trim();
     if (!trimmed) continue;
-    // 跳过纯分隔线
     if (/^[=\-+\s]+$/.test(trimmed)) continue;
     if (trimmed.startsWith('PAYROLL REPORT')) continue;
     if (trimmed.startsWith('Total rows')) continue;
-    // TXT 格式使用 | 分隔
     if (trimmed.includes('|')) {
       rows.push(trimmed.split('|').map(s => s.trim()));
     } else {
@@ -925,12 +952,8 @@ async function handleImportFile(file) {
       return;
     }
 
-    if (!rows || rows.length < 2) {
-      toast(t('importFail'), false);
-      return;
-    }
+    if (!rows || rows.length < 2) { toast(t('importFail'), false); return; }
 
-    // 查找表头列索引
     const headers = rows[0].map(h => String(h).trim());
     const idx = {};
     const WANTED = [
@@ -950,7 +973,6 @@ async function handleImportFile(file) {
       }
     });
 
-    // 至少要包含 Code
     if (idx['Code'] === undefined) {
       toast('Fail mesti ada lajur "Code"', false);
       return;
@@ -1006,7 +1028,6 @@ async function handleImportFile(file) {
         EIS_Employee: impEISE,
         EIS_Employer: impEISR,
         Lindung24Jam: impLindung,
-        // 智能识别：与自动计算结果一致 → 自动；否则 → 手动
         manualEPF:   Math.abs(impEPFE - autoEPF.employee) > 0.01 || Math.abs(impEPFR - autoEPF.employer) > 0.01,
         manualSOCSO: Math.abs(impSOCSOE - autoSOCSO.employee) > 0.01 || Math.abs(impSOCSOR - autoSOCSO.employer) > 0.01,
         manualEIS:   Math.abs(impEISE - autoEIS.employee) > 0.01 || Math.abs(impEISR - autoEIS.employer) > 0.01,
@@ -1014,10 +1035,7 @@ async function handleImportFile(file) {
       });
     }
 
-    if (!imported.length) {
-      toast(t('importFail'), false);
-      return;
-    }
+    if (!imported.length) { toast(t('importFail'), false); return; }
 
     employees = imported;
     renderTable();
@@ -1030,9 +1048,7 @@ async function handleImportFile(file) {
   }
 }
 
-// =====================================================
-// ★ 下载导入模板
-// =====================================================
+// ================= 下载模板 =================
 function downloadTemplate(format) {
   const headers = getExportHeaders();
   const sample = [
@@ -1078,9 +1094,7 @@ function downloadTemplate(format) {
   }
 }
 
-// =====================================================
-// ★ 导出功能
-// =====================================================
+// ================= 导出 =================
 function handleExport(val) {
   if (!val) return;
   try {
@@ -1168,7 +1182,6 @@ function buildExportTableHTML() {
   return html;
 }
 
-// ---------- PDF ----------
 let exportPrintCleanup = null;
 window.addEventListener('afterprint', () => {
   if (exportPrintCleanup) {
@@ -1201,7 +1214,6 @@ function exportToPDF() {
   setTimeout(() => window.print(), 100);
 }
 
-// ---------- XLSX ----------
 function exportToXLSX() {
   const rows = getExportRows();
   if (!rows.length) { toast(t('noData'), false); return; }
@@ -1248,7 +1260,6 @@ function exportToCSV() {
   downloadBlob(out, 'payroll_' + todayStr() + '.csv', 'text/csv');
 }
 
-// ---------- TXT ----------
 function exportToTXT() {
   const headers = getExportHeaders();
   const rows = getExportRows();
@@ -1282,7 +1293,6 @@ function exportToTXT() {
   toast('Text berjaya dieksport');
 }
 
-// ---------- DOC ----------
 function exportToDOC() {
   const rows = getExportRows();
   if (!rows.length) { toast(t('noData'), false); return; }
