@@ -39,7 +39,15 @@ h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #0f172a; }
   overflow: auto; max-height: calc(100vh - 140px);
   border-radius: 12px; border: 1px solid #e2e8f0; background: #fff;
 }
-table { border-collapse: separate; border-spacing: 0; font-size: 0.82rem; min-width: 1800px; }
+
+/* ⭐ 表格改为按内容自适应宽度，不再固定 1800px */
+table {
+  border-collapse: separate; border-spacing: 0;
+  font-size: 0.82rem;
+  width: max-content;      /* 让表格随内容增长 */
+  min-width: 100%;         /* 内容较少时也撑满容器 */
+  table-layout: auto;      /* 列宽由内容决定 */
+}
 th {
   position: sticky; top: 0; z-index: 10;
   background: #f8fafc; padding: 0.6rem 0.5rem; text-align: left;
@@ -50,16 +58,22 @@ th.grp { background: #eef2ff; }
 td {
   padding: 0.35rem 0.4rem; border-bottom: 1px solid #f1f5f9;
   vertical-align: middle; background: #fff;
+  white-space: nowrap;     /* 单元格内容不折行 */
 }
 tr:hover td { background: #fafbfc; }
+
+/* ⭐ input 宽度不再强占 100%，改用内联宽度控制 */
 .input {
-  width: 100%; min-width: 70px; border: 1px solid #e2e8f0;
+  border: 1px solid #e2e8f0;
   border-radius: 6px; padding: 0.35rem 0.45rem; font-size: 0.82rem;
   background: #fff; transition: 0.15s; font-family: inherit;
+  min-width: 60px;
 }
 .input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
 .input[readonly] { background: #f8fafc; color: #475569; }
-.input.num { text-align: right; }
+/* 数字列固定窄宽，保证对齐整齐 */
+.input.num { width: 85px; text-align: right; }
+
 .cell-bad { background: #fee2e2 !important; border-color: #fca5a5 !important; }
 .cell-ok  { background: #dcfce7 !important; }
 
@@ -224,6 +238,25 @@ function toast(msg, ok = true) {
   setTimeout(() => el.classList.remove('show'), 2500);
 }
 
+// ⭐ 根据内容计算 input 宽度（单位：ch）
+// 中文/全角字符按 2ch 计算，英数按 1ch
+function calcInputWidth(str, minCh = 6) {
+  let w = 0;
+  for (const c of String(str ?? '')) {
+    const cp = c.codePointAt(0);
+    // 常见 CJK / 全角字符范围
+    const isWide = (cp >= 0x1100 && cp <= 0x115F) ||
+                   (cp >= 0x2E80 && cp <= 0xA4CF) ||
+                   (cp >= 0xAC00 && cp <= 0xD7A3) ||
+                   (cp >= 0xF900 && cp <= 0xFAFF) ||
+                   (cp >= 0xFE30 && cp <= 0xFE4F) ||
+                   (cp >= 0xFF00 && cp <= 0xFF60) ||
+                   (cp >= 0xFFE0 && cp <= 0xFFE6);
+    w += isWide ? 2 : 1;
+  }
+  return Math.max(minCh, w + 4);  // +4 预留内边距 + 边框
+}
+
 // ================= 计算（前端） =================
 const SOCSO_TABLE = [
   [30,0.10,0.40],[50,0.20,0.70],[70,0.30,1.10],[100,0.40,1.50],
@@ -369,16 +402,21 @@ function renderTable() {
     emp = recalcRow(emp);
     const tr = document.createElement('tr');
 
-    const txt = (field, readonly = false) =>
-      `<input class="input" ${readonly?'readonly':''} data-idx="${idx}" data-field="${field}" value="${emp[field] ?? ''}">`;
+    // ⭐ 文本输入框：宽度按内容自适应（minCh 为该列最小宽度）
+    const txt = (field, readonly = false, minCh = 6) => {
+      const val = emp[field] ?? '';
+      const w = calcInputWidth(val, minCh);
+      return `<input class="input" style="width:${w}ch" ${readonly?'readonly':''} data-idx="${idx}" data-field="${field}" value="${val}">`;
+    };
+    // 数字输入框：固定窄宽
     const num = (field, readonly = false, cls = '') =>
       `<input type="number" step="0.01" class="input num ${cls}" ${readonly?'readonly':''} data-idx="${idx}" data-field="${field}" value="${emp[field] ?? 0}">`;
 
     tr.innerHTML = `
-      <td>${txt('Code', true)}</td>
-      <td>${txt('Name', true)}</td>
-      <td>${txt('GroupName', true)}</td>
-      <td>${txt('BankNama', true)}</td>
+      <td>${txt('Code', true, 8)}</td>
+      <td>${txt('Name', true, 12)}</td>
+      <td>${txt('GroupName', true, 10)}</td>
+      <td>${txt('BankNama', true, 8)}</td>
       <td>${num('Basic')}</td>
       <td>${num('Allowance')}</td>
       <td>${num('Deduction')}</td>
@@ -429,21 +467,17 @@ function checkOne(type) {
     const emp = recalcRow(employees[idx]);
     const exempt = isExempt(emp);
     const basic = Number(emp.Basic) || 0;
-    let targetField, correctValue, actualField;
+    let correctValue, actualField;
     if (type === 'epf') {
-      targetField = 'EPF_Employee';
       correctValue = exempt.epf ? 0 : calcEPF(basic, emp.Age||30).employee;
       actualField = 'EPF_Employee';
     } else if (type === 'socso') {
-      targetField = 'SOCSO_Employee';
       correctValue = exempt.socso ? 0 : calcSOCSO(basic).employee;
       actualField = 'SOCSO_Employee';
     } else if (type === 'eis') {
-      targetField = 'EIS_Employee';
       correctValue = exempt.eis ? 0 : calcEIS(basic).employee;
       actualField = 'EIS_Employee';
     } else {
-      targetField = 'Lindung24Jam';
       correctValue = exempt.lindung ? 0 : calcLindung(basic);
       actualField = 'Lindung24Jam';
     }
