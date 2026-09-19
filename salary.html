@@ -107,10 +107,16 @@ tr:hover td { background: #fafbfc; }
   <button class="btn" onclick="showAllPayslips()">📄 Semua Slip Gaji</button>
   <button class="btn" onclick="checkAll()">✅ Semak Semua</button>
   <span style="width:1px;height:24px;background:#e2e8f0;margin:0 4px;"></span>
-  <button class="btn" onclick="checkOne('epf')">🔍 EPF</button>
-  <button class="btn" onclick="checkOne('socso')">🔍 SOCSO</button>
-  <button class="btn" onclick="checkOne('eis')">🔍 EIS</button>
-  <button class="btn" onclick="checkOne('lindung')">🔍 24JAM</button>
+
+  <!-- 🔽 检查菜单（下拉跳转） -->
+  <select id="checkMenu" class="btn" onchange="jumpToCheckPage(this.value)">
+    <option value="">🔍 Semak / 检查…</option>
+    <option value="https://yzcorpsdk2-ctrl.github.io/salarysystem/epf.html">🔍 EPF</option>
+    <option value="https://yzcorpsdk2-ctrl.github.io/salarysystem/socso.html">🔍 SOCSO</option>
+    <option value="https://yzcorpsdk2-ctrl.github.io/salarysystem/eis.html">🔍 EIS</option>
+    <option value="https://yzcorpsdk2-ctrl.github.io/salarysystem/24jamlindungan.html">🔍 24 JAM Lindungan</option>
+  </select>
+
   <span class="spacer"></span>
   <select id="langSelect" class="btn" onchange="switchLang(this.value)">
     <option value="ms">🇲🇾 Bahasa Melayu</option>
@@ -454,6 +460,14 @@ function checkOne(type) {
 function checkAll() {
   ['epf','socso','eis','lindung'].forEach(checkOne);
   toast('Semakan selesai');
+}
+
+// ================= 🔽 下拉跳转检查页 =================
+function jumpToCheckPage(url) {
+  if (!url) return;
+  window.open(url, '_blank');          // 新标签页打开（保留未保存的薪资数据）
+  // 若想在同一页跳转，改用：window.location.href = url;
+  document.getElementById('checkMenu').value = '';   // 重置回占位文字
 }
 
 // ================= 保存 =================
