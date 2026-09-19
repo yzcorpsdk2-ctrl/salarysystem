@@ -39,43 +39,59 @@ h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #0f172a; }
   overflow: auto; max-height: calc(100vh - 140px);
   border-radius: 12px; border: 1px solid #e2e8f0; background: #fff;
 }
-
-/* ⭐ 表格改为按内容自适应宽度，不再固定 1800px */
 table {
-  border-collapse: separate; border-spacing: 0;
-  font-size: 0.82rem;
-  width: max-content;      /* 让表格随内容增长 */
-  min-width: 100%;         /* 内容较少时也撑满容器 */
-  table-layout: auto;      /* 列宽由内容决定 */
+  border-collapse: separate; border-spacing: 0; font-size: 0.82rem;
+  table-layout: fixed;              /* ★ 固定列宽，行高自由 */
+  width: 2110px; min-width: 2110px;
 }
 th {
   position: sticky; top: 0; z-index: 10;
-  background: #f8fafc; padding: 0.6rem 0.5rem; text-align: left;
+  background: #f8fafc; padding: 0.5rem 0.45rem; text-align: left;
   font-weight: 600; color: #334155; border-bottom: 1px solid #e2e8f0;
-  white-space: nowrap; font-size: 0.75rem;
+  white-space: nowrap; font-size: 0.75rem; vertical-align: top;
 }
 th.grp { background: #eef2ff; }
 td {
   padding: 0.35rem 0.4rem; border-bottom: 1px solid #f1f5f9;
   vertical-align: middle; background: #fff;
-  white-space: nowrap;     /* 单元格内容不折行 */
 }
 tr:hover td { background: #fafbfc; }
 
-/* ⭐ input 宽度不再强占 100%，改用内联宽度控制 */
+/* ★ 只读文字单元格：允许自动换行，行高自由增长 */
+.td-text { vertical-align: top !important; padding: 0.4rem 0.4rem !important; }
+.text-cell {
+  font-size: 0.82rem;
+  line-height: 1.35;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  color: #0f172a;
+}
+
 .input {
-  border: 1px solid #e2e8f0;
+  width: 100%; min-width: 0; border: 1px solid #e2e8f0;
   border-radius: 6px; padding: 0.35rem 0.45rem; font-size: 0.82rem;
   background: #fff; transition: 0.15s; font-family: inherit;
-  min-width: 60px;
 }
 .input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
 .input[readonly] { background: #f8fafc; color: #475569; }
-/* 数字列固定窄宽，保证对齐整齐 */
-.input.num { width: 85px; text-align: right; }
-
+.input.num { text-align: right; }
 .cell-bad { background: #fee2e2 !important; border-color: #fca5a5 !important; }
 .cell-ok  { background: #dcfce7 !important; }
+
+/* ★ 表头筛选输入框 */
+.th-filter {
+  display: block; width: 100%; margin-top: 4px;
+  padding: 3px 6px; font-size: 0.7rem; font-weight: 400;
+  border: 1px solid #cbd5e1; border-radius: 5px;
+  background: #fff; color: #1e293b; font-family: inherit;
+  transition: 0.15s;
+}
+.th-filter:focus {
+  outline: none; border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+}
+.th-filter::placeholder { color: #94a3b8; font-weight: 400; }
 
 .toast {
   position: fixed; bottom: 1.5rem; right: 1.5rem; background: #1e293b; color: #fff;
@@ -143,6 +159,33 @@ tr:hover td { background: #fafbfc; }
   <h1 id="pageTitle">Sistem Penggajian</h1>
   <div class="table-wrap">
     <table id="mainTable">
+      <!-- ★ 固定列宽：Code/Name/Group/Bank 留宽给文字换行 -->
+      <colgroup>
+        <col style="width:75px">   <!-- 0 Code -->
+        <col style="width:160px">  <!-- 1 Name -->
+        <col style="width:110px">  <!-- 2 Group -->
+        <col style="width:110px">  <!-- 3 Bank -->
+        <col style="width:85px">   <!-- 4 Basic -->
+        <col style="width:85px">   <!-- 5 Allowance -->
+        <col style="width:85px">   <!-- 6 Deduction -->
+        <col style="width:70px">   <!-- 7 NormalOT -->
+        <col style="width:70px">   <!-- 8 RestOT -->
+        <col style="width:70px">   <!-- 9 PublicOT -->
+        <col style="width:70px">   <!-- 10 OtherOT -->
+        <col style="width:85px">   <!-- 11 Pinjaman -->
+        <col style="width:85px">   <!-- 12 Others -->
+        <col style="width:85px">   <!-- 13 EPF_E -->
+        <col style="width:85px">   <!-- 14 EPF_R -->
+        <col style="width:85px">   <!-- 15 SOCSO_E -->
+        <col style="width:85px">   <!-- 16 SOCSO_R -->
+        <col style="width:80px">   <!-- 17 EIS_E -->
+        <col style="width:80px">   <!-- 18 EIS_R -->
+        <col style="width:85px">   <!-- 19 Lindung -->
+        <col style="width:95px">   <!-- 20 Gross -->
+        <col style="width:95px">   <!-- 21 TotalDed -->
+        <col style="width:95px">   <!-- 22 Net -->
+        <col style="width:80px">   <!-- 23 Action -->
+      </colgroup>
       <thead>
         <tr id="headRow1"></tr>
         <tr id="headRow2"></tr>
@@ -178,7 +221,7 @@ const I18N = {
     lindung: '24JAM Lindungan',
     gross: 'Gaji Kasar', totalDed: 'Jumlah Potongan', net: 'Gaji Bersih',
     action: 'Tindakan', slip: 'Slip Gaji',
-    legend: 'Nota: EPF 11%/13%, SOCSO & EIS had RM6,000, 24JAM Lindungan 100% pekerja. Klik butang semak untuk highlight perbezaan.',
+    legend: 'Nota: EPF 11%/13%, SOCSO & EIS had RM6,000, 24JAM Lindungan 100% pekerja. Taip di bawah tajuk untuk tapis.',
     saved: 'Berjaya disimpan', failed: 'Gagal simpan',
     loading: 'Memuatkan data...',
     lang: 'Bahasa'
@@ -197,7 +240,7 @@ const I18N = {
     lindung: '24JAM Lindungan',
     gross: 'Gross Pay', totalDed: 'Total Deduction', net: 'Net Salary',
     action: 'Action', slip: 'Payslip',
-    legend: 'Note: EPF 11%/13%, SOCSO & EIS capped at RM6,000, 24JAM Lindungan 100% employee. Click check buttons to highlight differences.',
+    legend: 'Note: EPF 11%/13%, SOCSO & EIS capped at RM6,000, 24JAM Lindungan 100% employee. Type under the header to filter.',
     saved: 'Saved successfully', failed: 'Save failed',
     loading: 'Loading data...',
     lang: 'Language'
@@ -216,7 +259,7 @@ const I18N = {
     lindung: '24JAM 保险',
     gross: '总薪资', totalDed: '总扣款', net: '净薪资',
     action: '操作', slip: '粮单',
-    legend: '备注：EPF 11%/13%，SOCSO 和 EIS 上限 RM6,000，24JAM 保险 100% 员工付。点击检查按钮高亮差异。',
+    legend: '备注：EPF 11%/13%，SOCSO 和 EIS 上限 RM6,000，24JAM 保险 100% 员工付。表头下方输入关键词即可筛选。',
     saved: '保存成功', failed: '保存失败',
     loading: '加载数据中...',
     lang: '语言'
@@ -237,24 +280,11 @@ function toast(msg, ok = true) {
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 2500);
 }
-
-// ⭐ 根据内容计算 input 宽度（单位：ch）
-// 中文/全角字符按 2ch 计算，英数按 1ch
-function calcInputWidth(str, minCh = 6) {
-  let w = 0;
-  for (const c of String(str ?? '')) {
-    const cp = c.codePointAt(0);
-    // 常见 CJK / 全角字符范围
-    const isWide = (cp >= 0x1100 && cp <= 0x115F) ||
-                   (cp >= 0x2E80 && cp <= 0xA4CF) ||
-                   (cp >= 0xAC00 && cp <= 0xD7A3) ||
-                   (cp >= 0xF900 && cp <= 0xFAFF) ||
-                   (cp >= 0xFE30 && cp <= 0xFE4F) ||
-                   (cp >= 0xFF00 && cp <= 0xFF60) ||
-                   (cp >= 0xFFE0 && cp <= 0xFFE6);
-    w += isWide ? 2 : 1;
-  }
-  return Math.max(minCh, w + 4);  // +4 预留内边距 + 边框
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
 }
 
 // ================= 计算（前端） =================
@@ -346,7 +376,7 @@ function recalcRow(emp) {
   return emp;
 }
 
-// ================= 渲染表格 =================
+// ================= 渲染表头（含筛选框） =================
 function renderHeaders() {
   document.getElementById('pageTitle').textContent = t('title');
   document.getElementById('legend').textContent = t('legend');
@@ -357,37 +387,55 @@ function renderHeaders() {
 
   const h1 = document.getElementById('headRow1');
   const h2 = document.getElementById('headRow2');
+  const f = (col) => `<input class="th-filter" data-col="${col}" placeholder="🔍 tapis">`;
+
   h1.innerHTML = `
-    <th rowspan="2">${t('code')}</th>
-    <th rowspan="2">${t('name')}</th>
-    <th rowspan="2">${t('group')}</th>
-    <th rowspan="2">${t('bank')}</th>
-    <th rowspan="2">${t('basic')}</th>
-    <th rowspan="2">${t('allowance')}</th>
-    <th rowspan="2">${t('deduction')}</th>
-    <th rowspan="2">${t('normalOT')}</th>
-    <th rowspan="2">${t('restOT')}</th>
-    <th rowspan="2">${t('publicOT')}</th>
-    <th rowspan="2">${t('otherOT')}</th>
-    <th rowspan="2">${t('pinjaman')}</th>
-    <th rowspan="2">${t('others')}</th>
+    <th rowspan="2"><div>${t('code')}</div>${f(0)}</th>
+    <th rowspan="2"><div>${t('name')}</div>${f(1)}</th>
+    <th rowspan="2"><div>${t('group')}</div>${f(2)}</th>
+    <th rowspan="2"><div>${t('bank')}</div>${f(3)}</th>
+    <th rowspan="2"><div>${t('basic')}</div>${f(4)}</th>
+    <th rowspan="2"><div>${t('allowance')}</div>${f(5)}</th>
+    <th rowspan="2"><div>${t('deduction')}</div>${f(6)}</th>
+    <th rowspan="2"><div>${t('normalOT')}</div>${f(7)}</th>
+    <th rowspan="2"><div>${t('restOT')}</div>${f(8)}</th>
+    <th rowspan="2"><div>${t('publicOT')}</div>${f(9)}</th>
+    <th rowspan="2"><div>${t('otherOT')}</div>${f(10)}</th>
+    <th rowspan="2"><div>${t('pinjaman')}</div>${f(11)}</th>
+    <th rowspan="2"><div>${t('others')}</div>${f(12)}</th>
     <th class="grp" colspan="2">EPF</th>
     <th class="grp" colspan="2">SOCSO</th>
     <th class="grp" colspan="2">EIS</th>
-    <th class="grp">24JAM</th>
-    <th rowspan="2">${t('gross')}</th>
-    <th rowspan="2">${t('totalDed')}</th>
-    <th rowspan="2">${t('net')}</th>
+    <th class="grp" rowspan="2"><div>24JAM</div>${f(19)}</th>
+    <th rowspan="2"><div>${t('gross')}</div>${f(20)}</th>
+    <th rowspan="2"><div>${t('totalDed')}</div>${f(21)}</th>
+    <th rowspan="2"><div>${t('net')}</div>${f(22)}</th>
     <th rowspan="2">${t('action')}</th>
   `;
   h2.innerHTML = `
-    <th class="grp">${t('epfE')}</th><th class="grp">${t('epfR')}</th>
-    <th class="grp">${t('socsoE')}</th><th class="grp">${t('socsoR')}</th>
-    <th class="grp">${t('eisE')}</th><th class="grp">${t('eisR')}</th>
-    <th class="grp">${t('lindung')}</th>
+    <th class="grp"><div>${t('epfE')}</div>${f(13)}</th>
+    <th class="grp"><div>${t('epfR')}</div>${f(14)}</th>
+    <th class="grp"><div>${t('socsoE')}</div>${f(15)}</th>
+    <th class="grp"><div>${t('socsoR')}</div>${f(16)}</th>
+    <th class="grp"><div>${t('eisE')}</div>${f(17)}</th>
+    <th class="grp"><div>${t('eisR')}</div>${f(18)}</th>
   `;
+
+  // 动态计算第二行 sticky 的 top 偏移（避免与第一行重叠）
+  requestAnimationFrame(fixStickyHeader);
 }
 
+function fixStickyHeader() {
+  const row1 = document.getElementById('headRow1');
+  if (!row1) return;
+  const h = row1.offsetHeight;
+  document.querySelectorAll('#headRow2 th').forEach(th => {
+    th.style.top = h + 'px';
+  });
+}
+window.addEventListener('resize', fixStickyHeader);
+
+// ================= 渲染表格 =================
 function renderTable() {
   renderHeaders();
   const tbody = document.getElementById('tbody');
@@ -402,21 +450,18 @@ function renderTable() {
     emp = recalcRow(emp);
     const tr = document.createElement('tr');
 
-    // ⭐ 文本输入框：宽度按内容自适应（minCh 为该列最小宽度）
-    const txt = (field, readonly = false, minCh = 6) => {
-      const val = emp[field] ?? '';
-      const w = calcInputWidth(val, minCh);
-      return `<input class="input" style="width:${w}ch" ${readonly?'readonly':''} data-idx="${idx}" data-field="${field}" value="${val}">`;
-    };
-    // 数字输入框：固定窄宽
+    // ★ 只读文字 → 可换行的文本单元格（宽度固定，行高自适应）
+    const textTd = (field) =>
+      `<td class="td-text"><div class="text-cell">${escapeHtml(emp[field] ?? '')}</div></td>`;
+
     const num = (field, readonly = false, cls = '') =>
       `<input type="number" step="0.01" class="input num ${cls}" ${readonly?'readonly':''} data-idx="${idx}" data-field="${field}" value="${emp[field] ?? 0}">`;
 
     tr.innerHTML = `
-      <td>${txt('Code', true, 8)}</td>
-      <td>${txt('Name', true, 12)}</td>
-      <td>${txt('GroupName', true, 10)}</td>
-      <td>${txt('BankNama', true, 8)}</td>
+      ${textTd('Code')}
+      ${textTd('Name')}
+      ${textTd('GroupName')}
+      ${textTd('BankNama')}
       <td>${num('Basic')}</td>
       <td>${num('Allowance')}</td>
       <td>${num('Deduction')}</td>
@@ -448,7 +493,6 @@ function renderTable() {
       const field = e.target.dataset.field;
       employees[idx][field] = e.target.value;
       const updated = recalcRow(employees[idx]);
-      // 只更新该行所有只读单元格
       const row = e.target.closest('tr');
       ['EPF_Employee','EPF_Employer','SOCSO_Employee','SOCSO_Employer',
        'EIS_Employee','EIS_Employer','Lindung24Jam','GrossPay','TotalDeduction','NetSalary'
@@ -458,12 +502,54 @@ function renderTable() {
       });
     });
   });
+
+  // 重新应用当前筛选（例如切换语言后）
+  applyFilters();
 }
+
+// ================= 表头筛选 =================
+function applyFilters() {
+  const filters = [];
+  document.querySelectorAll('.th-filter').forEach(inp => {
+    const val = inp.value.trim().toLowerCase();
+    if (val) filters.push({ col: Number(inp.dataset.col), val });
+  });
+
+  document.querySelectorAll('#tbody tr').forEach(row => {
+    // 跳过“加载中”占位行
+    const firstCell = row.querySelector('td');
+    if (!firstCell || firstCell.hasAttribute('colspan')) return;
+
+    const cells = row.querySelectorAll('td');
+    let show = true;
+    for (const flt of filters) {
+      const cell = cells[flt.col];
+      if (!cell) continue;
+      let text;
+      const inp = cell.querySelector('input');
+      if (inp) text = inp.value;
+      else text = cell.textContent;
+      if (!String(text).toLowerCase().includes(flt.val)) {
+        show = false;
+        break;
+      }
+    }
+    row.style.display = show ? '' : 'none';
+  });
+}
+
+// 事件委托：任何 th-filter 输入时触发筛选
+document.addEventListener('input', e => {
+  if (e.target && e.target.classList && e.target.classList.contains('th-filter')) {
+    applyFilters();
+  }
+});
 
 // ================= 检查 =================
 function checkOne(type) {
   const rows = document.querySelectorAll('#tbody tr');
   rows.forEach((row, idx) => {
+    if (row.style.display === 'none') return; // 跳过被筛选隐藏的行
     const emp = recalcRow(employees[idx]);
     const exempt = isExempt(emp);
     const basic = Number(emp.Basic) || 0;
@@ -499,9 +585,8 @@ function checkAll() {
 // ================= 🔽 下拉跳转检查页 =================
 function jumpToCheckPage(url) {
   if (!url) return;
-  window.open(url, '_blank');          // 新标签页打开（保留未保存的薪资数据）
-  // 若想在同一页跳转，改用：window.location.href = url;
-  document.getElementById('checkMenu').value = '';   // 重置回占位文字
+  window.open(url, '_blank');
+  document.getElementById('checkMenu').value = '';
 }
 
 // ================= 保存 =================
