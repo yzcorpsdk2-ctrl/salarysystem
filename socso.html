@@ -3,299 +3,474 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SOCSO Contribution Table 2025</title>
+<title>Jadual Caruman SOCSO | PERKESO</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f5f7fc; color: #1e293b; padding: 0 0 3rem 0;
+  background: #f0f4f8;
+  color: #1e293b;
+  padding: 0 0 3rem 0;
+  min-height: 100vh;
 }
-/* ===== 顶部导航栏（菜单风格） ===== */
+
+/* ===== 顶部导航栏 ===== */
 .topbar {
   position: sticky; top: 0; z-index: 100;
-  background: #ffffff; border-bottom: 1px solid #e2e8f0;
-  padding: 0.75rem 1.5rem; display: flex; flex-wrap: wrap;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.75rem 1.5rem;
+  display: flex; flex-wrap: wrap;
   gap: 0.5rem; align-items: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 .topbar .spacer { flex: 1; }
-.topbar .logo {
-  font-size: 1rem; font-weight: 700; color: #0f172a;
-  display: flex; align-items: center; gap: 0.4rem;
-  margin-right: 1rem;
+.topbar .brand {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #0f172a;
+  display: flex; align-items: center; gap: 0.5rem;
+  margin-right: 0.5rem;
 }
-.topbar .logo span { color: #2563eb; }
+.topbar .brand .logo {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 0.85rem; font-weight: 800;
+}
 .btn {
-  background: #fff; border: 1px solid #cbd5e1;
-  padding: 0.45rem 0.9rem; border-radius: 8px;
-  font-size: 0.82rem; font-weight: 500; cursor: pointer;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
   display: inline-flex; align-items: center; gap: 0.35rem;
-  transition: all 0.15s; color: #1e293b;
+  transition: all 0.15s;
+  color: #1e293b;
 }
 .btn:hover { background: #f1f5f9; border-color: #94a3b8; }
 .btn-primary { background: #2563eb; border-color: #2563eb; color: #fff; }
 .btn-primary:hover { background: #1d4ed8; }
 .btn-success { background: #059669; border-color: #059669; color: #fff; }
 .btn-success:hover { background: #047857; }
-.btn-sm { padding: 0.3rem 0.6rem; font-size: 0.75rem; }
 .btn-danger { background: #fee2e2; border-color: #fecaca; color: #b91c1c; }
+.btn-sm { padding: 0.3rem 0.6rem; font-size: 0.75rem; }
 
-.container { max-width: 1600px; margin: 0 auto; padding: 1.5rem; }
-h1 { font-size: 1.4rem; font-weight: 600; margin-bottom: 0.3rem; color: #0f172a; }
-.subtitle { font-size: 0.82rem; color: #64748b; margin-bottom: 1.2rem; }
-
-/* ===== 信息卡片 ===== */
-.info-card {
-  background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
-  padding: 1rem 1.2rem; margin-bottom: 1.2rem;
-  display: flex; flex-wrap: wrap; gap: 1.5rem;
+/* ===== 主容器 ===== */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem;
 }
-.info-item { display: flex; align-items: center; gap: 0.5rem; }
-.info-item .label { font-size: 0.75rem; color: #64748b; }
-.info-item .value { font-size: 0.85rem; font-weight: 600; color: #0f172a; }
-.info-item .badge {
-  font-size: 0.7rem; font-weight: 600; padding: 0.15rem 0.5rem;
+
+/* ===== 页面标题卡片 ===== */
+.page-header {
+  background: linear-gradient(135deg, #1e40af, #2563eb);
+  color: #fff;
+  border-radius: 14px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 16px rgba(37,99,235,0.25);
+}
+.page-header h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.01em;
+}
+.page-header p {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  line-height: 1.5;
+}
+.page-header .badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  padding: 0.2rem 0.7rem;
   border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-top: 0.6rem;
+  backdrop-filter: blur(4px);
 }
-.badge-blue { background: #dbeafe; color: #1d4ed8; }
-.badge-green { background: #dcfce7; color: #166534; }
-.badge-amber { background: #fef3c7; color: #92400e; }
 
-/* ===== 表格 ===== */
+/* ===== 统计卡片 ===== */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.stat-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.stat-card .label {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.3rem;
+}
+.stat-card .value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+.stat-card .value.green { color: #059669; }
+.stat-card .value.blue { color: #2563eb; }
+
+/* ===== 表格容器 ===== */
 .table-wrap {
-  overflow: auto; max-height: calc(100vh - 280px);
-  border-radius: 12px; border: 1px solid #e2e8f0; background: #fff;
+  overflow: auto;
+  max-height: calc(100vh - 340px);
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 table {
-  border-collapse: separate; border-spacing: 0;
-  font-size: 0.82rem; table-layout: fixed;
-  width: 100%; min-width: 1100px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.82rem;
+  width: 100%;
+  min-width: 900px;
+  table-layout: fixed;
 }
 th {
   position: sticky; top: 0; z-index: 10;
-  background: #f8fafc; padding: 0.6rem 0.5rem; text-align: left;
-  font-weight: 600; color: #334155; border-bottom: 1px solid #e2e8f0;
-  white-space: normal; font-size: 0.72rem; vertical-align: middle;
-  word-break: break-word; overflow-wrap: anywhere;
+  background: #f8fafc;
+  padding: 0.6rem 0.6rem;
+  text-align: left;
+  font-weight: 600;
+  color: #334155;
+  border-bottom: 2px solid #e2e8f0;
+  white-space: normal;
+  font-size: 0.75rem;
+  vertical-align: top;
+  word-break: break-word;
+  line-height: 1.35;
 }
-th.grp { background: #eef2ff; text-align: center; }
-th.grp-sub { background: #eef2ff; text-align: center; font-size: 0.68rem; }
-th.sub { background: #f1f5f9; text-align: center; font-size: 0.68rem; }
-th.chk-col { width: 40px; text-align: center; }
-th.num-col { text-align: right; }
+th.th-chk { width: 50px; text-align: center; }
+th.th-no { width: 50px; text-align: center; }
+th.th-wage { width: 260px; }
+th.th-emp { width: 110px; text-align: right; }
+th.th-ee { width: 110px; text-align: right; }
+th.th-total { width: 120px; text-align: right; }
+th.th-2nd { width: 130px; text-align: right; }
+th.th-action { width: 90px; text-align: center; }
+th.grp-hd {
+  background: #eef2ff;
+  text-align: center;
+  font-size: 0.72rem;
+  color: #4338ca;
+  border-bottom: 1px solid #c7d2fe;
+}
+
 td {
-  padding: 0.4rem 0.5rem; border-bottom: 1px solid #f1f5f9;
-  vertical-align: middle; background: #fff;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+  background: #fff;
+  font-size: 0.82rem;
 }
 tr:hover td { background: #fafbfc; }
-tr.disabled td { opacity: 0.55; }
-td.num { text-align: right; font-variant-numeric: tabular-nums; }
-td.center { text-align: center; }
+tr.row-edit td { background: #fefce8; }
+tr.row-edit:hover td { background: #fef9c3; }
 
-/* 工资范围列 */
-td.wage-range { font-weight: 500; color: #0f172a; }
-td.wage-range .range-sub { font-size: 0.7rem; color: #64748b; font-weight: 400; }
-
-/* 输入框（可编辑状态） */
-.input {
-  width: 100%; min-width: 0; border: 1px solid #e2e8f0;
-  border-radius: 6px; padding: 0.3rem 0.4rem; font-size: 0.82rem;
-  background: #fff; transition: 0.15s; font-family: inherit;
-  text-align: right;
-}
-.input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
-.input[readonly] { background: transparent; border-color: transparent; color: #334155; }
-.input[readonly]:hover { background: #f8fafc; }
-
-/* 勾选框 */
 .td-chk { text-align: center; }
 .td-chk input[type="checkbox"] {
-  width: 17px; height: 17px; cursor: pointer; accent-color: #2563eb;
+  width: 18px; height: 18px;
+  cursor: pointer;
+  accent-color: #2563eb;
 }
+.td-no { text-align: center; color: #64748b; font-weight: 500; }
+.td-wage { color: #0f172a; }
+.td-num { text-align: right; font-variant-numeric: tabular-nums; }
+.td-num strong { color: #0f172a; }
+.td-2nd { text-align: right; color: #475569; font-variant-numeric: tabular-nums; }
+.td-action { text-align: center; }
 
-/* 分割线 */
-.divider-left { border-left: 3px solid #94a3b8 !important; }
+/* ===== 可编辑输入框 ===== */
+.cell-input {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.82rem;
+  font-family: inherit;
+  background: #fff;
+  text-align: right;
+  transition: 0.15s;
+}
+.cell-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+}
+.cell-input[readonly] {
+  background: transparent;
+  border-color: transparent;
+  color: #0f172a;
+  cursor: default;
+  padding-right: 0;
+}
+.cell-input[readonly]:focus { box-shadow: none; border-color: transparent; }
+
+/* ===== 徽章 ===== */
+.badge-readonly {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+  background: #f1f5f9;
+  color: #64748b;
+}
+.badge-edit {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+  background: #fef3c7;
+  color: #92400e;
+}
 
 /* ===== Toast ===== */
 .toast {
-  position: fixed; bottom: 1.5rem; right: 1.5rem; background: #1e293b; color: #fff;
-  padding: 0.8rem 1.3rem; border-radius: 40px; font-size: 0.85rem; font-weight: 500;
-  z-index: 9999; opacity: 0; transform: translateY(10px);
-  transition: 0.2s; pointer-events: none;
+  position: fixed;
+  bottom: 1.5rem; right: 1.5rem;
+  background: #1e293b;
+  color: #fff;
+  padding: 0.8rem 1.3rem;
+  border-radius: 40px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: 0.2s;
+  pointer-events: none;
+  max-width: 360px;
 }
 .toast.show { opacity: 1; transform: translateY(0); }
+.toast.error { background: #b91c1c; }
 
-/* ===== 模态框 ===== */
+/* ===== 密码弹窗 ===== */
 .modal-overlay {
-  position: fixed; inset: 0; background: rgba(15,23,42,0.55);
-  z-index: 9998; display: flex; align-items: center; justify-content: center;
+  position: fixed; inset: 0;
+  background: rgba(15,23,42,0.55);
+  z-index: 9998;
+  display: flex; align-items: center; justify-content: center;
   padding: 1rem;
 }
 .modal-box {
-  background: #fff; border-radius: 14px; padding: 1.4rem;
-  width: 100%; max-width: 420px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.5rem;
+  width: 100%; max-width: 380px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.25);
   display: flex; flex-direction: column; gap: 1rem;
 }
-.modal-box h3 { font-size: 1.05rem; font-weight: 600; color: #0f172a; }
-.modal-box .hint { font-size: 0.78rem; color: #64748b; }
+.modal-box h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.modal-box p {
+  font-size: 0.82rem;
+  color: #64748b;
+  line-height: 1.5;
+}
 .modal-box input[type="password"] {
-  width: 100%; padding: 0.6rem 0.8rem; font-size: 0.95rem;
-  border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit;
-  letter-spacing: 2px; text-align: center;
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  letter-spacing: 0.2em;
+  text-align: center;
+  transition: 0.15s;
 }
 .modal-box input[type="password"]:focus {
-  outline: none; border-color: #2563eb;
+  outline: none;
+  border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
 }
-.modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
+.modal-actions {
+  display: flex; gap: 0.5rem;
+  justify-content: flex-end;
+}
 
 /* ===== 导入弹窗 ===== */
-.import-modal { max-width: 560px; }
+.import-box {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.5rem;
+  width: 100%; max-width: 520px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.import-box h3 {
+  font-size: 1rem; font-weight: 700; color: #0f172a;
+}
 .dropzone {
-  border: 2px dashed #cbd5e1; border-radius: 10px; padding: 2rem 1rem;
-  text-align: center; cursor: pointer; transition: 0.15s;
+  border: 2px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 2rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.15s;
   background: #f8fafc;
 }
 .dropzone:hover, .dropzone.drag-over {
-  border-color: #2563eb; background: #eff6ff;
+  border-color: #2563eb;
+  background: #eff6ff;
 }
 .dropzone .icon { font-size: 2rem; margin-bottom: 0.5rem; }
 .dropzone p { font-size: 0.85rem; color: #475569; margin: 0.2rem 0; }
 .dropzone .hint { font-size: 0.72rem; color: #94a3b8; }
-.import-footer {
-  display: flex; justify-content: space-between; align-items: center;
-  gap: 0.5rem; flex-wrap: wrap;
-  padding-top: 0.8rem; border-top: 1px solid #e2e8f0;
+
+/* ===== 图例 ===== */
+.legend {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.75rem;
+  padding-left: 0.25rem;
+  line-height: 1.6;
 }
-.template-links { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: #64748b; }
+.legend strong { color: #334155; }
 
 /* ===== 打印 ===== */
 @media print {
-  .topbar, .info-card, .toast, .modal-overlay, .btn { display: none !important; }
-  body { background: #fff; padding: 0; }
-  .table-wrap { border: none; max-height: none; overflow: visible; }
-  th { position: static; }
-  table { font-size: 8pt; }
+  .topbar, .stats-row, .page-header, .legend, .toast, .modal-overlay { display: none !important; }
+  .table-wrap { max-height: none; border: none; box-shadow: none; }
+  body { background: #fff; }
 }
 </style>
 </head>
 <body>
 
-<!-- ============ 顶部导航栏 ============ -->
+<!-- ===== 顶部导航 ===== -->
 <div class="topbar">
-  <div class="logo">🛡️ <span>PERKESO</span> Contribution Table</div>
-  <span style="width:1px;height:24px;background:#e2e8f0;"></span>
-  <button class="btn btn-success" onclick="saveToStorage()">💾 Simpan</button>
-  <button class="btn" onclick="openImportModal()">📥 Import</button>
+  <div class="brand">
+    <div class="logo">S</div>
+    Jadual Caruman SOCSO
+  </div>
+  <span style="width:1px;height:24px;background:#e2e8f0;margin:0 4px;"></span>
+
+  <button class="btn" onclick="openImport()">📥 Import</button>
   <select id="exportMenu" class="btn" onchange="handleExport(this.value)">
-    <option value="">💾 Export…</option>
+    <option value="">📤 Export…</option>
     <option value="xlsx">📊 Excel (.xlsx)</option>
     <option value="txt">📝 Text (.txt)</option>
     <option value="doc">📘 Word (.doc)</option>
   </select>
+
   <span class="spacer"></span>
-  <span style="font-size:0.75rem;color:#64748b;">Password edit: <strong>0000</strong></span>
+  <span style="font-size:0.72rem;color:#94a3b8;">Kadar Caruman PERKESO · Akta 4</span>
 </div>
 
 <div class="container">
-  <h1>Jadual Kadar Caruman SOCSO & EIS</h1>
-  <p class="subtitle">Rate of contribution for Employees' Social Security Act 1969 (Act 4) & Employment Insurance System Act 2017 (Act 800) — Effective 1 October 2024</p>
+  <!-- ===== 页面标题 ===== -->
+  <div class="page-header">
+    <h1>Jadual Kadar Caruman PERKESO (SOCSO)</h1>
+    <p>Kadar caruman di bawah Akta Keselamatan Sosial Pekerja 1969 (Akta 4) — Kategori Pertama (Skim Bencana Pekerjaan &amp; Skim Keilatan).</p>
+    <span class="badge">Berkuatkuasa mulai 1 Oktober 2024 · Siling gaji RM6,000</span>
+  </div>
 
-  <!-- 信息卡片 -->
-  <div class="info-card">
-    <div class="info-item">
-      <span class="label">Wage Ceiling:</span>
-      <span class="badge badge-blue">RM6,000</span>
+  <!-- ===== 统计卡片 ===== -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="label">Bilangan Baris</div>
+      <div class="value blue" id="statRows">65</div>
     </div>
-    <div class="info-item">
-      <span class="label">SOCSO Employer:</span>
-      <span class="badge badge-green">1.75%</span>
+    <div class="stat-card">
+      <div class="label">Siling Gaji</div>
+      <div class="value">RM6,000</div>
     </div>
-    <div class="info-item">
-      <span class="label">SOCSO Employee:</span>
-      <span class="badge badge-green">0.50%</span>
+    <div class="stat-card">
+      <div class="label">Syarikat (1.75%)</div>
+      <div class="value">RM104.15</div>
     </div>
-    <div class="info-item">
-      <span class="label">EIS Employer:</span>
-      <span class="badge badge-amber">0.20%</span>
-    </div>
-    <div class="info-item">
-      <span class="label">EIS Employee:</span>
-      <span class="badge badge-amber">0.20%</span>
+    <div class="stat-card">
+      <div class="label">Pekerja (0.5%)</div>
+      <div class="value green">RM29.75</div>
     </div>
   </div>
 
+  <!-- ===== 表格 ===== -->
   <div class="table-wrap">
     <table id="socsoTable">
       <colgroup>
-        <col style="width:44px">   <!-- 勾选 -->
-        <col style="width:50px">   <!-- No. -->
-        <col style="width:230px">  <!-- 工资范围 -->
-        <col style="width:85px">   <!-- SOCSO Employer -->
-        <col style="width:85px">   <!-- SOCSO Employee -->
-        <col style="width:85px">   <!-- SOCSO Total -->
-        <col style="width:85px">   <!-- EIS Employer -->
-        <col style="width:85px">   <!-- EIS Employee -->
-        <col style="width:85px">   <!-- EIS Total -->
-        <col style="width:85px">   <!-- Cat2 Employer -->
-        <col style="width:85px">   <!-- Cat2 Employee -->
+        <col style="width:50px">   <!-- 0 Chk -->
+        <col style="width:50px">   <!-- 1 No -->
+        <col style="width:260px">  <!-- 2 Wages -->
+        <col style="width:110px">  <!-- 3 Employer -->
+        <col style="width:110px">  <!-- 4 Employee -->
+        <col style="width:120px">  <!-- 5 Total -->
+        <col style="width:130px">  <!-- 6 2nd Category -->
+        <col style="width:90px">   <!-- 7 Action -->
       </colgroup>
       <thead>
         <tr>
-          <th class="chk-col" rowspan="2">✎</th>
-          <th rowspan="2" style="text-align:center;">No.</th>
-          <th rowspan="2">Actual Monthly Wages</th>
-          <th class="grp" colspan="3">First Category (Act 4)</th>
-          <th class="grp" colspan="3">EIS (Act 800)</th>
-          <th class="grp" colspan="2">Second Category (Act 4)</th>
+          <th class="th-chk" rowspan="2">✎</th>
+          <th class="th-no" rowspan="2">No.</th>
+          <th class="th-wage" rowspan="2">Gaji Bulanan Sebenar (RM)</th>
+          <th class="grp-hd" colspan="3">Kategori Pertama<br><span style="font-weight:400;font-size:0.65rem;">Skim Bencana Pekerjaan &amp; Skim Keilatan</span></th>
+          <th class="grp-hd" rowspan="2">Kategori Kedua<br><span style="font-weight:400;font-size:0.65rem;">Skim Bencana Pekerjaan Sahaja</span></th>
+          <th class="th-action" rowspan="2">Status</th>
         </tr>
         <tr>
-          <th class="grp-sub">Employer<br>(RM)</th>
-          <th class="grp-sub">Employee<br>(RM)</th>
-          <th class="grp-sub">Total<br>(RM)</th>
-          <th class="grp-sub">Employer<br>(RM)</th>
-          <th class="grp-sub">Employee<br>(RM)</th>
-          <th class="grp-sub">Total<br>(RM)</th>
-          <th class="grp-sub">Employer<br>(RM)</th>
-          <th class="grp-sub">Employee<br>(RM)</th>
+          <th class="th-emp grp-hd">Majikan (RM)</th>
+          <th class="th-ee grp-hd">Pekerja (RM)</th>
+          <th class="th-total grp-hd">Jumlah (RM)</th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
     </table>
   </div>
+
+  <div class="legend">
+    <strong>Nota:</strong> Kadar caruman mengikut Jadual Kedua Akta 4. Baris boleh diedit selepas menandakan ✔ dan memasukkan kata laluan. Kategori Pertama: Majikan 1.75%, Pekerja 0.5%. Kategori Kedua: Majikan 1.25% sahaja (untuk pekerja berumur 60 tahun ke atas).
+  </div>
 </div>
 
-<!-- ===== 密码模态框 ===== -->
+<!-- ===== 密码弹窗 ===== -->
 <div id="pwdModal" class="modal-overlay" style="display:none;">
   <div class="modal-box">
-    <h3>🔐 Masukkan Password</h3>
-    <p class="hint">Password diperlukan untuk membenarkan pengeditan baris ini.</p>
+    <h3>🔒 Sahkan Kata Laluan</h3>
+    <p>Masukkan kata laluan untuk membenarkan pengeditan baris ini.</p>
     <input type="password" id="pwdInput" maxlength="4" placeholder="••••" autocomplete="off">
     <div class="modal-actions">
-      <button class="btn" onclick="closePwdModal()">Batal</button>
+      <button class="btn" onclick="closePwd()">Batal</button>
       <button class="btn btn-primary" onclick="confirmPwd()">Sahkan</button>
     </div>
   </div>
 </div>
 
-<!-- ===== 导入模态框 ===== -->
+<!-- ===== 导入弹窗 ===== -->
 <div id="importModal" class="modal-overlay" style="display:none;">
-  <div class="modal-box import-modal">
-    <h3>📥 Import Data</h3>
+  <div class="import-box">
+    <h3>📥 Import Data SOCSO</h3>
     <div class="dropzone" id="dropzone">
       <div class="icon">📁</div>
-      <p><strong>拖入文件或点击选择</strong></p>
-      <p class="hint">Format: .xlsx / .csv / .txt</p>
+      <p><strong>Klik atau seret fail ke sini</strong></p>
+      <p class="hint">Format: .xlsx / .txt / .csv</p>
       <input type="file" id="importFile" accept=".xlsx,.xls,.csv,.txt" style="display:none;">
     </div>
-    <div class="import-footer">
-      <div class="template-links">
-        <span>📄 Template:</span>
-        <button class="btn btn-sm" onclick="downloadTemplate('xlsx')">Excel</button>
-        <button class="btn btn-sm" onclick="downloadTemplate('doc')">Word</button>
-      </div>
-      <button class="btn" onclick="closeImportModal()">Tutup</button>
+    <div style="display:flex;justify-content:flex-end;gap:0.5rem;">
+      <button class="btn" onclick="closeImport()">Tutup</button>
     </div>
   </div>
 </div>
@@ -303,433 +478,355 @@ td.wage-range .range-sub { font-size: 0.7rem; color: #64748b; font-weight: 400; 
 <div id="toast" class="toast"></div>
 
 <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
 <script>
-// =====================================================
-// ★ SOCSO 数据（马来西亚官方 2025 年费率）
-// 来源：PERKESO Act 4 (SOCSO) & Act 800 (EIS)
-// 生效日期：2024 年 10 月 1 日
-// =====================================================
+// ============================================================
+// SOCSO 官方数据（来源：PERKESO Jadual Kedua Akta 4）
+// 格式：[No, 工资描述, 工资下限, 工资上限, 雇主, 员工, 合计, 第二类]
+// ============================================================
 const SOCSO_DATA = [
-  // [No, 工资下限, 工资上限, SOCSO雇主, SOCSO员工, EIS雇主, EIS员工, Cat2雇主, Cat2员工]
-  [1,  0.01,   30.00,   0.40,  0.10,   0.05,  0.05,   0.30,  0.20],
-  [2,  30.01,  50.00,   0.70,  0.20,   0.10,  0.10,   0.50,  0.30],
-  [3,  50.01,  70.00,   1.10,  0.30,   0.15,  0.15,   0.80,  0.50],
-  [4,  70.01,  100.00,  1.50,  0.40,   0.20,  0.20,   1.10,  0.65],
-  [5,  100.01, 140.00,  2.10,  0.60,   0.25,  0.25,   1.15,  0.90],
-  [6,  140.01, 200.00,  2.95,  0.85,   0.35,  0.35,   2.10,  1.25],
-  [7,  200.01, 300.00,  4.35,  1.25,   0.50,  0.50,   3.10,  1.85],
-  [8,  300.01, 400.00,  6.15,  1.75,   0.70,  0.70,   4.40,  2.65],
-  [9,  400.01, 500.00,  7.85,  2.25,   0.90,  0.90,   5.60,  3.35],
-  [10, 500.01, 600.00,  9.65,  2.75,   1.10,  1.10,   6.90,  4.15],
-  [11, 600.01, 700.00,  11.35, 3.25,   1.30,  1.30,   8.10,  4.85],
-  [12, 700.01, 800.00,  13.15, 3.75,   1.50,  1.50,   9.40,  5.65],
-  [13, 800.01, 900.00,  14.85, 4.25,   1.70,  1.70,   10.60, 6.35],
-  [14, 900.01, 1000.00, 16.65, 4.75,   1.90,  1.90,   11.90, 7.15],
-  [15, 1000.01,1100.00, 18.35, 5.25,   2.10,  2.10,   13.10, 7.85],
-  [16, 1100.01,1200.00, 20.15, 5.75,   2.30,  2.30,   14.40, 8.65],
-  [17, 1200.01,1300.00, 21.85, 6.25,   2.50,  2.50,   15.60, 9.35],
-  [18, 1300.01,1400.00, 23.65, 6.75,   2.70,  2.70,   16.90, 10.15],
-  [19, 1400.01,1500.00, 25.35, 7.25,   2.90,  2.90,   18.10, 10.85],
-  [20, 1500.01,1600.00, 27.15, 7.75,   3.10,  3.10,   19.40, 11.65],
-  [21, 1600.01,1700.00, 28.85, 8.25,   3.30,  3.30,   20.60, 12.35],
-  [22, 1700.01,1800.00, 30.65, 8.75,   3.50,  3.50,   21.90, 13.15],
-  [23, 1800.01,1900.00, 32.35, 9.25,   3.70,  3.70,   23.10, 13.85],
-  [24, 1900.01,2000.00, 34.15, 9.75,   3.90,  3.90,   24.40, 14.65],
-  [25, 2000.01,2100.00, 35.85, 10.25,  4.10,  4.10,   25.60, 15.35],
-  [26, 2100.01,2200.00, 37.65, 10.75,  4.30,  4.30,   26.90, 16.15],
-  [27, 2200.01,2300.00, 39.35, 11.25,  4.50,  4.50,   28.10, 16.85],
-  [28, 2300.01,2400.00, 41.15, 11.75,  4.70,  4.70,   29.40, 17.65],
-  [29, 2400.01,2500.00, 42.85, 12.25,  4.90,  4.90,   30.60, 18.35],
-  [30, 2500.01,2600.00, 44.65, 12.75,  5.10,  5.10,   31.90, 19.15],
-  [31, 2600.01,2700.00, 46.35, 13.25,  5.30,  5.30,   33.10, 19.85],
-  [32, 2700.01,2800.00, 48.15, 13.75,  5.50,  5.50,   34.40, 20.65],
-  [33, 2800.01,2900.00, 49.85, 14.25,  5.70,  5.70,   35.60, 21.35],
-  [34, 2900.01,3000.00, 51.65, 14.75,  5.90,  5.90,   36.90, 22.15],
-  [35, 3000.01,3100.00, 53.35, 15.25,  6.10,  6.10,   38.10, 22.85],
-  [36, 3100.01,3200.00, 55.15, 15.75,  6.30,  6.30,   39.40, 23.65],
-  [37, 3200.01,3300.00, 56.85, 16.25,  6.50,  6.50,   40.60, 24.35],
-  [38, 3300.01,3400.00, 58.65, 16.75,  6.70,  6.70,   41.90, 25.15],
-  [39, 3400.01,3500.00, 60.35, 17.25,  6.90,  6.90,   43.10, 25.85],
-  [40, 3500.01,3600.00, 62.15, 17.75,  7.10,  7.10,   44.40, 26.65],
-  [41, 3600.01,3700.00, 63.85, 18.25,  7.30,  7.30,   45.60, 27.35],
-  [42, 3700.01,3800.00, 65.65, 18.75,  7.50,  7.50,   46.90, 28.15],
-  [43, 3800.01,3900.00, 67.35, 19.25,  7.70,  7.70,   48.10, 28.85],
-  [44, 3900.01,4000.00, 69.15, 19.75,  7.90,  7.90,   49.40, 29.65],
-  [45, 4000.01,4100.00, 70.85, 20.25,  8.10,  8.10,   50.60, 30.35],
-  [46, 4100.01,4200.00, 72.65, 20.75,  8.30,  8.30,   51.90, 31.15],
-  [47, 4200.01,4300.00, 74.35, 21.25,  8.50,  8.50,   53.10, 31.85],
-  [48, 4300.01,4400.00, 76.15, 21.75,  8.70,  8.70,   54.40, 32.65],
-  [49, 4400.01,4500.00, 77.85, 22.25,  8.90,  8.90,   55.60, 33.35],
-  [50, 4500.01,4600.00, 79.65, 22.75,  9.10,  9.10,   56.90, 34.15],
-  [51, 4600.01,4700.00, 81.35, 23.25,  9.30,  9.30,   58.10, 34.85],
-  [52, 4700.01,4800.00, 83.15, 23.75,  9.50,  9.50,   59.40, 35.65],
-  [53, 4800.01,4900.00, 84.85, 24.25,  9.70,  9.70,   60.60, 36.35],
-  [54, 4900.01,5000.00, 86.65, 24.75,  9.90,  9.90,   61.90, 37.15],
-  [55, 5000.01,5100.00, 88.35, 25.25,  10.10, 10.10,  63.10, 37.85],
-  [56, 5100.01,5200.00, 90.15, 25.75,  10.30, 10.30,  64.40, 38.65],
-  [57, 5200.01,5300.00, 91.85, 26.25,  10.50, 10.50,  65.60, 39.35],
-  [58, 5300.01,5400.00, 93.65, 26.75,  10.70, 10.70,  66.90, 40.15],
-  [59, 5400.01,5500.00, 95.35, 27.25,  10.90, 10.90,  68.10, 40.85],
-  [60, 5500.01,5600.00, 97.15, 27.75,  11.10, 11.10,  69.40, 41.65],
-  [61, 5600.01,5700.00, 98.85, 28.25,  11.30, 11.30,  70.60, 42.35],
-  [62, 5700.01,5800.00, 100.65,28.75,  11.50, 11.50,  71.90, 43.15],
-  [63, 5800.01,5900.00, 102.35,29.25,  11.70, 11.70,  73.10, 43.85],
-  [64, 5900.01,6000.00, 104.15,29.75,  11.90, 11.90,  74.40, 44.65],
-  [65, 6000.01, Infinity,104.15,29.75,  11.90, 11.90,  74.40, 44.65]
+  [1,  "Gaji hingga RM30",                         0,       30,      0.40,  0.10,  0.50,  0.30],
+  [2,  "Gaji melebihi RM30 tetapi tidak RM50",      30.01,   50,      0.70,  0.20,  0.90,  0.50],
+  [3,  "Gaji melebihi RM50 tetapi tidak RM70",      50.01,   70,      1.10,  0.30,  1.40,  0.80],
+  [4,  "Gaji melebihi RM70 tetapi tidak RM100",     70.01,   100,     1.50,  0.40,  1.90,  1.10],
+  [5,  "Gaji melebihi RM100 tetapi tidak RM140",    100.01,  140,     2.10,  0.60,  2.70,  1.15],
+  [6,  "Gaji melebihi RM140 tetapi tidak RM200",    140.01,  200,     2.95,  0.85,  3.80,  2.10],
+  [7,  "Gaji melebihi RM200 tetapi tidak RM300",    200.01,  300,     4.35,  1.25,  5.60,  3.10],
+  [8,  "Gaji melebihi RM300 tetapi tidak RM400",    300.01,  400,     6.15,  1.75,  7.90,  4.40],
+  [9,  "Gaji melebihi RM400 tetapi tidak RM500",    400.01,  500,     7.85,  2.25,  10.10, 5.60],
+  [10, "Gaji melebihi RM500 tetapi tidak RM600",    500.01,  600,     9.65,  2.75,  12.40, 6.90],
+  [11, "Gaji melebihi RM600 tetapi tidak RM700",    600.01,  700,     11.35, 3.25,  14.60, 8.10],
+  [12, "Gaji melebihi RM700 tetapi tidak RM800",    700.01,  800,     13.15, 3.75,  16.90, 9.40],
+  [13, "Gaji melebihi RM800 tetapi tidak RM900",    800.01,  900,     14.85, 4.25,  19.10, 10.60],
+  [14, "Gaji melebihi RM900 tetapi tidak RM1,000",  900.01,  1000,    16.65, 4.75,  21.40, 11.90],
+  [15, "Gaji melebihi RM1,000 tetapi tidak RM1,100", 1000.01, 1100,    18.35, 5.25,  23.60, 13.10],
+  [16, "Gaji melebihi RM1,100 tetapi tidak RM1,200", 1100.01, 1200,    20.15, 5.75,  25.90, 14.40],
+  [17, "Gaji melebihi RM1,200 tetapi tidak RM1,300", 1200.01, 1300,    21.85, 6.25,  28.10, 15.60],
+  [18, "Gaji melebihi RM1,300 tetapi tidak RM1,400", 1300.01, 1400,    23.65, 6.75,  30.40, 16.90],
+  [19, "Gaji melebihi RM1,400 tetapi tidak RM1,500", 1400.01, 1500,    25.35, 7.25,  32.60, 18.10],
+  [20, "Gaji melebihi RM1,500 tetapi tidak RM1,600", 1500.01, 1600,    27.15, 7.75,  34.90, 19.40],
+  [21, "Gaji melebihi RM1,600 tetapi tidak RM1,700", 1600.01, 1700,    28.85, 8.25,  37.10, 20.60],
+  [22, "Gaji melebihi RM1,700 tetapi tidak RM1,800", 1700.01, 1800,    30.65, 8.75,  39.40, 21.90],
+  [23, "Gaji melebihi RM1,800 tetapi tidak RM1,900", 1800.01, 1900,    32.35, 9.25,  41.60, 23.10],
+  [24, "Gaji melebihi RM1,900 tetapi tidak RM2,000", 1900.01, 2000,    34.15, 9.75,  43.90, 24.40],
+  [25, "Gaji melebihi RM2,000 tetapi tidak RM2,100", 2000.01, 2100,    35.85, 10.25, 46.10, 25.60],
+  [26, "Gaji melebihi RM2,100 tetapi tidak RM2,200", 2100.01, 2200,    37.65, 10.75, 48.40, 26.90],
+  [27, "Gaji melebihi RM2,200 tetapi tidak RM2,300", 2200.01, 2300,    39.35, 11.25, 50.60, 28.10],
+  [28, "Gaji melebihi RM2,300 tetapi tidak RM2,400", 2300.01, 2400,    41.15, 11.75, 52.90, 29.40],
+  [29, "Gaji melebihi RM2,400 tetapi tidak RM2,500", 2400.01, 2500,    42.85, 12.25, 55.10, 30.60],
+  [30, "Gaji melebihi RM2,500 tetapi tidak RM2,600", 2500.01, 2600,    44.65, 12.75, 57.40, 31.90],
+  [31, "Gaji melebihi RM2,600 tetapi tidak RM2,700", 2600.01, 2700,    46.35, 13.25, 59.60, 33.10],
+  [32, "Gaji melebihi RM2,700 tetapi tidak RM2,800", 2700.01, 2800,    48.15, 13.75, 61.90, 34.40],
+  [33, "Gaji melebihi RM2,800 tetapi tidak RM2,900", 2800.01, 2900,    49.85, 14.25, 64.10, 35.60],
+  [34, "Gaji melebihi RM2,900 tetapi tidak RM3,000", 2900.01, 3000,    51.65, 14.75, 66.40, 36.90],
+  [35, "Gaji melebihi RM3,000 tetapi tidak RM3,100", 3000.01, 3100,    53.35, 15.25, 68.60, 38.10],
+  [36, "Gaji melebihi RM3,100 tetapi tidak RM3,200", 3100.01, 3200,    55.15, 15.75, 70.90, 39.40],
+  [37, "Gaji melebihi RM3,200 tetapi tidak RM3,300", 3200.01, 3300,    56.85, 16.25, 73.10, 40.60],
+  [38, "Gaji melebihi RM3,300 tetapi tidak RM3,400", 3300.01, 3400,    58.65, 16.75, 75.40, 41.90],
+  [39, "Gaji melebihi RM3,400 tetapi tidak RM3,500", 3400.01, 3500,    60.35, 17.25, 77.60, 43.10],
+  [40, "Gaji melebihi RM3,500 tetapi tidak RM3,600", 3500.01, 3600,    62.15, 17.75, 79.90, 44.40],
+  [41, "Gaji melebihi RM3,600 tetapi tidak RM3,700", 3600.01, 3700,    63.85, 18.25, 82.10, 45.60],
+  [42, "Gaji melebihi RM3,700 tetapi tidak RM3,800", 3700.01, 3800,    65.65, 18.75, 84.40, 46.90],
+  [43, "Gaji melebihi RM3,800 tetapi tidak RM3,900", 3800.01, 3900,    67.35, 19.25, 86.60, 48.10],
+  [44, "Gaji melebihi RM3,900 tetapi tidak RM4,000", 3900.01, 4000,    69.15, 19.75, 88.90, 49.40],
+  [45, "Gaji melebihi RM4,000 tetapi tidak RM4,100", 4000.01, 4100,    70.85, 20.25, 91.10, 50.60],
+  [46, "Gaji melebihi RM4,100 tetapi tidak RM4,200", 4100.01, 4200,    72.65, 20.75, 93.40, 51.90],
+  [47, "Gaji melebihi RM4,200 tetapi tidak RM4,300", 4200.01, 4300,    74.35, 21.25, 95.60, 53.10],
+  [48, "Gaji melebihi RM4,300 tetapi tidak RM4,400", 4300.01, 4400,    76.15, 21.75, 97.90, 54.40],
+  [49, "Gaji melebihi RM4,400 tetapi tidak RM4,500", 4400.01, 4500,    77.85, 22.25, 100.10, 55.60],
+  [50, "Gaji melebihi RM4,500 tetapi tidak RM4,600", 4500.01, 4600,    79.65, 22.75, 102.40, 56.90],
+  [51, "Gaji melebihi RM4,600 tetapi tidak RM4,700", 4600.01, 4700,    81.35, 23.25, 104.60, 58.10],
+  [52, "Gaji melebihi RM4,700 tetapi tidak RM4,800", 4700.01, 4800,    83.15, 23.75, 106.90, 59.40],
+  [53, "Gaji melebihi RM4,800 tetapi tidak RM4,900", 4800.01, 4900,    84.85, 24.25, 109.10, 60.60],
+  [54, "Gaji melebihi RM4,900 tetapi tidak RM5,000", 4900.01, 5000,    86.65, 24.75, 111.40, 61.90],
+  [55, "Gaji melebihi RM5,000 tetapi tidak RM5,100", 5000.01, 5100,    88.35, 25.25, 113.60, 63.10],
+  [56, "Gaji melebihi RM5,100 tetapi tidak RM5,200", 5100.01, 5200,    90.15, 25.75, 115.90, 64.40],
+  [57, "Gaji melebihi RM5,200 tetapi tidak RM5,300", 5200.01, 5300,    91.85, 26.25, 118.10, 65.60],
+  [58, "Gaji melebihi RM5,300 tetapi tidak RM5,400", 5300.01, 5400,    93.65, 26.75, 120.40, 66.90],
+  [59, "Gaji melebihi RM5,400 tetapi tidak RM5,500", 5400.01, 5500,    95.35, 27.25, 122.60, 68.10],
+  [60, "Gaji melebihi RM5,500 tetapi tidak RM5,600", 5500.01, 5600,    97.15, 27.75, 124.90, 69.40],
+  [61, "Gaji melebihi RM5,600 tetapi tidak RM5,700", 5600.01, 5700,    98.85, 28.25, 127.10, 70.60],
+  [62, "Gaji melebihi RM5,700 tetapi tidak RM5,800", 5700.01, 5800,    100.65, 28.75, 129.40, 71.90],
+  [63, "Gaji melebihi RM5,800 tetapi tidak RM5,900", 5800.01, 5900,    102.35, 29.25, 131.60, 73.10],
+  [64, "Gaji melebihi RM5,900 tetapi tidak RM6,000", 5900.01, 6000,    104.15, 29.75, 133.90, 74.40],
+  [65, "Gaji melebihi RM6,000",                       6000.01, Infinity, 104.15, 29.75, 133.90, 74.40]
 ];
 
-// ================= 状态 =================
+// ============================================================
+// 状态
+// ============================================================
+let rows = SOCSO_DATA.map(r => ({
+  no: r[0],
+  wage: r[1],
+  min: r[2],
+  max: r[3],
+  employer: r[4],
+  employee: r[5],
+  total: r[6],
+  second: r[7],
+  editable: false
+}));
+
 const PASSWORD = '0000';
-let unlockedRows = new Set();   // 已解锁的行号
-let pendingUnlockRow = null;    // 待解锁的行号
+let pendingCheckbox = null;
 
-// ================= 工具 =================
-function toast(msg, ok = true) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.style.background = ok ? '#1e293b' : '#b91c1c';
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2500);
-}
-
-function fmtRange(lower, upper) {
-  if (upper === Infinity) return '> RM6,000.00';
-  return `${lower.toFixed(2)} – ${upper.toFixed(2)}`;
-}
-
-function fmtNum(v) {
-  return Number(v || 0).toFixed(2);
-}
-
-// ================= 渲染表格 =================
-function renderTable() {
+// ============================================================
+// 渲染
+// ============================================================
+function render() {
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
+  document.getElementById('statRows').textContent = rows.length;
 
-  SOCSO_DATA.forEach((row, idx) => {
-    const [no, lower, upper, epfEmp, epfEe, eisEmp, eisEe, cat2Emp, cat2Ee] = row;
-    const isUnlocked = unlockedRows.has(idx);
-    const socsoTotal = epfEmp + epfEe;
-    const eisTotal = eisEmp + eisEe;
-
+  rows.forEach((r, i) => {
     const tr = document.createElement('tr');
-    tr.dataset.idx = idx;
-    if (!isUnlocked) tr.classList.add('disabled');
+    if (r.editable) tr.classList.add('row-edit');
 
-    const ro = isUnlocked ? '' : 'readonly';
+    const fmt = v => (v === Infinity || v > 100000) ? '—' : Number(v).toFixed(2);
 
     tr.innerHTML = `
       <td class="td-chk">
-        <input type="checkbox" class="row-chk" data-idx="${idx}" ${isUnlocked ? 'checked' : ''}>
+        <input type="checkbox" ${r.editable ? 'checked' : ''}
+               onchange="toggleEdit(${i}, this)">
       </td>
-      <td class="center" style="font-size:0.78rem;color:#64748b;">${no}</td>
-      <td class="wage-range">
-        <div>${lower === 0.01 ? 'Up to ' + upper.toFixed(2) : (upper === Infinity ? '> ' + lower.toFixed(2) : lower.toFixed(2) + ' – ' + upper.toFixed(2))}</div>
+      <td class="td-no">${r.no}</td>
+      <td class="td-wage">${escapeHtml(r.wage)}</td>
+      <td class="td-num">
+        ${r.editable
+          ? `<input class="cell-input" type="number" step="0.01" value="${r.employer}" onchange="updateField(${i}, 'employer', this.value)">`
+          : `<strong>RM ${fmt(r.employer)}</strong>`}
       </td>
-      <td class="num"><input type="number" step="0.01" class="input" data-idx="${idx}" data-field="0" value="${fmtNum(epfEmp)}" ${ro}></td>
-      <td class="num"><input type="number" step="0.01" class="input" data-idx="${idx}" data-field="1" value="${fmtNum(epfEe)}" ${ro}></td>
-      <td class="num"><input type="number" step="0.01" class="input" data-idx="${idx}" data-field="total1" value="${fmtNum(socsoTotal)}" readonly></td>
-      <td class="num"><input type="number" step="0.01" class="input" data-idx="${idx}" data-field="2" value="${fmtNum(eisEmp)}" ${ro}></td>
-      <td class="num"><input type="number" step="0.01" class="input" data-idx="${idx}" data-field="3" value="${fmtNum(eisEe)}" ${ro}></td>
-      <td class="num"><input type="number" step="0.01" class="input" data-idx="${idx}" data-field="total2" value="${fmtNum(eisTotal)}" readonly></td>
-      <td class="num"><input type="number" step="0.01" class="input" data-idx="${idx}" data-field="4" value="${fmtNum(cat2Emp)}" ${ro}></td>
-      <td class="num"><input type="number" step="0.01" class="input" data-idx="${idx}" data-field="5" value="${fmtNum(cat2Ee)}" ${ro}></td>
+      <td class="td-num">
+        ${r.editable
+          ? `<input class="cell-input" type="number" step="0.01" value="${r.employee}" onchange="updateField(${i}, 'employee', this.value)">`
+          : `<strong>RM ${fmt(r.employee)}</strong>`}
+      </td>
+      <td class="td-num">
+        ${r.editable
+          ? `<input class="cell-input" type="number" step="0.01" value="${r.total}" onchange="updateField(${i}, 'total', this.value)">`
+          : `<strong>RM ${fmt(r.total)}</strong>`}
+      </td>
+      <td class="td-2nd">
+        ${r.editable
+          ? `<input class="cell-input" type="number" step="0.01" value="${r.second}" onchange="updateField(${i}, 'second', this.value)">`
+          : `RM ${fmt(r.second)}`}
+      </td>
+      <td class="td-action">
+        <span class="${r.editable ? 'badge-edit' : 'badge-readonly'}">
+          ${r.editable ? '✎ Edit' : '🔒 Kunci'}
+        </span>
+      </td>
     `;
     tbody.appendChild(tr);
   });
-
-  // 绑定勾选事件
-  tbody.querySelectorAll('.row-chk').forEach(chk => {
-    chk.addEventListener('change', e => {
-      const idx = Number(e.target.dataset.idx);
-      if (e.target.checked) {
-        // 需要密码
-        pendingUnlockRow = idx;
-        e.target.checked = false;   // 暂时取消
-        openPwdModal();
-      } else {
-        // 锁定该行
-        unlockedRows.delete(idx);
-        renderTable();
-        toast('Baris ' + (idx + 1) + ' dikunci semula');
-      }
-    });
-  });
-
-  // 绑定输入事件（仅解锁行可编辑）
-  tbody.querySelectorAll('input.input:not([readonly])').forEach(inp => {
-    inp.addEventListener('input', e => {
-      const idx = Number(e.target.dataset.idx);
-      const field = e.target.dataset.field;
-      if (field === 'total1' || field === 'total2') return;
-
-      // 更新数据
-      const map = { '0': 3, '1': 4, '2': 5, '3': 6, '4': 7, '5': 8 };
-      const colIdx = map[field];
-      if (colIdx !== undefined) {
-        SOCSO_DATA[idx][colIdx] = parseFloat(e.target.value) || 0;
-      }
-
-      // 更新合计
-      const row = e.target.closest('tr');
-      const total1 = SOCSO_DATA[idx][3] + SOCSO_DATA[idx][4];
-      const total2 = SOCSO_DATA[idx][5] + SOCSO_DATA[idx][6];
-      const t1 = row.querySelector('input[data-field="total1"]');
-      const t2 = row.querySelector('input[data-field="total2"]');
-      if (t1) t1.value = fmtNum(total1);
-      if (t2) t2.value = fmtNum(total2);
-    });
-  });
 }
 
-// ================= 密码验证 =================
-function openPwdModal() {
-  document.getElementById('pwdModal').style.display = 'flex';
-  document.getElementById('pwdInput').value = '';
-  document.getElementById('pwdInput').focus();
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
 }
 
-function closePwdModal() {
-  document.getElementById('pwdModal').style.display = 'none';
-  pendingUnlockRow = null;
+// ============================================================
+// 编辑切换（带密码）
+// ============================================================
+function toggleEdit(idx, checkbox) {
+  if (checkbox.checked) {
+    // 请求解锁
+    pendingCheckbox = checkbox;
+    document.getElementById('pwdModal').style.display = 'flex';
+    document.getElementById('pwdInput').value = '';
+    setTimeout(() => document.getElementById('pwdInput').focus(), 100);
+  } else {
+    // 直接锁定
+    rows[idx].editable = false;
+    render();
+    toast(`Baris ${rows[idx].no} dikunci`);
+  }
 }
 
 function confirmPwd() {
-  const input = document.getElementById('pwdInput').value.trim();
-  if (input === PASSWORD) {
-    if (pendingUnlockRow !== null) {
-      unlockedRows.add(pendingUnlockRow);
-      renderTable();
-      toast('Baris ' + (pendingUnlockRow + 1) + ' dibuka untuk editan');
-    }
-    closePwdModal();
+  const val = document.getElementById('pwdInput').value;
+  if (val === PASSWORD) {
+    const cb = pendingCheckbox;
+    const idx = Number(cb.closest('tr').querySelector('.td-no').textContent) - 1;
+    rows[idx].editable = true;
+    closePwd();
+    render();
+    toast(`Baris ${rows[idx].no} boleh diedit`);
   } else {
-    toast('Password salah!', false);
+    toast('Kata laluan salah!', true);
     document.getElementById('pwdInput').value = '';
     document.getElementById('pwdInput').focus();
   }
 }
 
-// 密码输入框回车
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && document.getElementById('pwdModal').style.display === 'flex') {
-    confirmPwd();
-  }
-  if (e.key === 'Escape' && document.getElementById('pwdModal').style.display === 'flex') {
-    closePwdModal();
-  }
-});
-
-// ================= 保存到 localStorage =================
-function saveToStorage() {
-  try {
-    localStorage.setItem('socso_data_2025', JSON.stringify(SOCSO_DATA));
-    toast('Data berjaya disimpan');
-  } catch (err) {
-    toast('Gagal simpan: ' + err.message, false);
+function closePwd() {
+  document.getElementById('pwdModal').style.display = 'none';
+  if (pendingCheckbox) {
+    pendingCheckbox.checked = false;
+    pendingCheckbox = null;
   }
 }
 
-function loadFromStorage() {
-  try {
-    const saved = localStorage.getItem('socso_data_2025');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length === SOCSO_DATA.length) {
-        for (let i = 0; i < parsed.length; i++) {
-          SOCSO_DATA[i] = parsed[i];
-        }
-      }
-    }
-  } catch (err) {
-    console.warn('Load error:', err);
+function updateField(idx, field, value) {
+  const v = parseFloat(value);
+  if (isNaN(v) || v < 0) { render(); return; }
+  rows[idx][field] = v;
+  // 自动重算总数
+  if (field === 'employer' || field === 'employee') {
+    rows[idx].total = Math.round((rows[idx].employer + rows[idx].employee) * 100) / 100;
   }
+  render();
 }
 
-// ================= 导出 =================
+// ============================================================
+// 导出
+// ============================================================
 function handleExport(val) {
   if (!val) return;
   try {
-    if (val === 'xlsx') exportToXLSX();
-    else if (val === 'txt') exportToTXT();
-    else if (val === 'doc') exportToDOC();
-  } catch (err) {
-    toast('Export error: ' + err.message, false);
+    if (val === 'xlsx') exportXLSX();
+    else if (val === 'txt') exportTXT();
+    else if (val === 'doc') exportDOC();
+  } catch(e) {
+    console.error(e);
+    toast('Export error: ' + e.message, true);
   } finally {
     document.getElementById('exportMenu').value = '';
   }
 }
 
 function getExportHeaders() {
-  return [
-    'No.', 'Wage Range (RM)',
-    'SOCSO Employer (RM)', 'SOCSO Employee (RM)', 'SOCSO Total (RM)',
-    'EIS Employer (RM)', 'EIS Employee (RM)', 'EIS Total (RM)',
-    'Cat2 Employer (RM)', 'Cat2 Employee (RM)'
-  ];
+  return ['No.', 'Gaji Bulanan', 'Majikan (RM)', 'Pekerja (RM)', 'Jumlah (RM)', 'Kategori Kedua (RM)'];
 }
 
 function getExportRows() {
-  return SOCSO_DATA.map(row => {
-    const [no, lower, upper, epfEmp, epfEe, eisEmp, eisEe, cat2Emp, cat2Ee] = row;
-    const range = upper === Infinity ? '> ' + lower.toFixed(2) : lower.toFixed(2) + ' – ' + upper.toFixed(2);
-    return [
-      no, range,
-      epfEmp, epfEe, epfEmp + epfEe,
-      eisEmp, eisEe, eisEmp + eisEe,
-      cat2Emp, cat2Ee
-    ];
-  });
+  return rows.map(r => [
+    r.no, r.wage,
+    r.employer, r.employee, r.total, r.second
+  ]);
+}
+
+function todayStr() {
+  const d = new Date();
+  const p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
 }
 
 function downloadBlob(content, filename, mime) {
   const blob = new Blob(['\ufeff', content], { type: mime + ';charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
+  a.href = url; a.download = filename;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-function exportToXLSX() {
-  if (typeof XLSX === 'undefined') {
-    toast('SheetJS tidak dimuat', false);
-    return;
-  }
-  const headers = getExportHeaders();
-  const rows = getExportRows();
-  const aoa = [headers, ...rows];
+function exportXLSX() {
+  if (typeof XLSX === 'undefined') { exportCSV(); return; }
+  const aoa = [getExportHeaders(), ...getExportRows()];
   const ws = XLSX.utils.aoa_to_sheet(aoa);
-
   ws['!cols'] = [
-    { wch: 6 }, { wch: 24 },
-    { wch: 14 }, { wch: 14 }, { wch: 12 },
-    { wch: 14 }, { wch: 14 }, { wch: 12 },
-    { wch: 14 }, { wch: 14 }
+    {wch:6},{wch:38},{wch:14},{wch:14},{wch:14},{wch:18}
   ];
-
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let R = 1; R <= range.e.r; R++) {
+    for (let C = 2; C <= 5; C++) {
+      const addr = XLSX.utils.encode_cell({r:R, c:C});
+      if (ws[addr] && ws[addr].t === 'n') ws[addr].z = '#,##0.00';
+    }
+  }
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'SOCSO');
-  XLSX.writeFile(wb, 'socso_table_2025.xlsx');
+  XLSX.writeFile(wb, 'jadual_socso_' + todayStr() + '.xlsx');
   toast('Excel berjaya dieksport');
 }
 
-function exportToTXT() {
+function exportCSV() {
+  const esc = v => {
+    const s = String(v ?? '');
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  };
+  let out = getExportHeaders().map(esc).join(',') + '\n';
+  getExportRows().forEach(r => { out += r.map(esc).join(',') + '\n'; });
+  downloadBlob(out, 'jadual_socso_' + todayStr() + '.csv', 'text/csv');
+  toast('CSV berjaya dieksport');
+}
+
+function exportTXT() {
   const headers = getExportHeaders();
-  const rows = getExportRows();
-
+  const data = getExportRows();
   const widths = headers.map((h, i) => {
-    let w = String(h).length;
-    rows.forEach(r => {
-      const len = String(r[i] ?? '').length;
-      if (len > w) w = len;
-    });
-    return Math.min(w, 22);
+    let w = h.length;
+    data.forEach(r => { const l = String(r[i] ?? '').length; if (l > w) w = l; });
+    return Math.min(w, 40);
   });
-
   const pad = (v, w) => {
     let s = String(v ?? '');
-    if (s.length > w) s = s.slice(0, w - 1) + '…';
+    if (s.length > w) s = s.slice(0, w-1) + '…';
     return s + ' '.repeat(Math.max(0, w - s.length));
   };
-
-  let out = 'SOCSO & EIS CONTRIBUTION TABLE 2025\n';
-  out += 'Effective 1 October 2024 | PERKESO Act 4 & Act 800\n';
-  out += '='.repeat(widths.reduce((a, b) => a + b + 3, 0)) + '\n';
-  out += headers.map((h, i) => pad(h, widths[i])).join(' | ') + '\n';
+  let out = 'JADUAL CARUMAN SOCSO (AKTA 4)\n';
+  out += 'Dijana: ' + new Date().toLocaleString('ms-MY') + '\n';
+  out += '='.repeat(widths.reduce((a,b) => a+b+3, 0)) + '\n';
+  out += headers.map((h,i) => pad(h, widths[i])).join(' | ') + '\n';
   out += widths.map(w => '-'.repeat(w)).join('-+-') + '\n';
-  rows.forEach(r => {
-    out += r.map((c, i) => pad(c, widths[i])).join(' | ') + '\n';
-  });
-
-  downloadBlob(out, 'socso_table_2025.txt', 'text/plain');
+  data.forEach(r => { out += r.map((c,i) => pad(c, widths[i])).join(' | ') + '\n'; });
+  out += '\nJumlah baris: ' + data.length + '\n';
+  downloadBlob(out, 'jadual_socso_' + todayStr() + '.txt', 'text/plain');
   toast('Text berjaya dieksport');
 }
 
-function exportToDOC() {
+function exportDOC() {
   const headers = getExportHeaders();
-  const rows = getExportRows();
-
+  const data = getExportRows();
   let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ';
   html += 'xmlns:w="urn:schemas-microsoft-com:office:word" ';
   html += 'xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8">';
-  html += '<title>SOCSO Contribution Table 2025</title>';
-  html += '<style>body{font-family:Arial,sans-serif;font-size:9pt;}';
+  html += '<title>Jadual Caruman SOCSO</title>';
+  html += '<style>body{font-family:Arial;font-size:9pt;}';
   html += 'table{border-collapse:collapse;width:100%;}';
   html += 'th,td{border:1px solid #999;padding:3px 5px;}';
-  html += 'th{background:#eef2ff;text-align:center;}';
+  html += 'th{background:#eef2ff;text-align:left;}';
   html += 'td.num{text-align:right;}</style></head><body>';
-  html += '<h2>SOCSO & EIS Contribution Table 2025</h2>';
-  html += '<p style="font-size:9pt;color:#555;">Effective 1 October 2024 | PERKESO Act 4 & Act 800</p>';
+  html += '<h2>Jadual Caruman SOCSO (Akta 4)</h2>';
+  html += '<p>Dijana: ' + new Date().toLocaleDateString('ms-MY') + '</p>';
   html += '<table><thead><tr>';
-  headers.forEach(h => { html += '<th>' + h + '</th>'; });
+  headers.forEach(h => { html += '<th>' + escapeHtml(h) + '</th>'; });
   html += '</tr></thead><tbody>';
-  rows.forEach(r => {
+  data.forEach(r => {
     html += '<tr>';
     r.forEach((c, i) => {
-      const cls = i >= 2 ? ' class="num"' : '';
-      html += '<td' + cls + '>' + c + '</td>';
+      html += `<td class="${i >= 2 ? 'num' : ''}">${escapeHtml(c)}</td>`;
     });
     html += '</tr>';
   });
   html += '</tbody></table></body></html>';
-
-  downloadBlob(html, 'socso_table_2025.doc', 'application/msword');
+  downloadBlob(html, 'jadual_socso_' + todayStr() + '.doc', 'application/msword');
   toast('Word berjaya dieksport');
 }
 
-// ================= 导入 =================
-function openImportModal() {
+// ============================================================
+// 导入
+// ============================================================
+function openImport() {
   document.getElementById('importModal').style.display = 'flex';
 }
-function closeImportModal() {
+function closeImport() {
   document.getElementById('importModal').style.display = 'none';
   const fi = document.getElementById('importFile');
   if (fi) fi.value = '';
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  loadFromStorage();
-  renderTable();
-
-  const dz = document.getElementById('dropzone');
-  const fi = document.getElementById('importFile');
-
-  if (dz && fi) {
-    dz.addEventListener('click', e => { if (e.target !== fi) fi.click(); });
-    fi.addEventListener('change', e => {
-      if (e.target.files && e.target.files[0]) handleImportFile(e.target.files[0]);
-    });
-    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
-    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
-    dz.addEventListener('drop', e => {
-      e.preventDefault();
-      dz.classList.remove('drag-over');
-      if (e.dataTransfer.files && e.dataTransfer.files[0]) handleImportFile(e.dataTransfer.files[0]);
-    });
-  }
-
-  const modal = document.getElementById('importModal');
-  if (modal) modal.addEventListener('click', e => {
-    if (e.target.id === 'importModal') closeImportModal();
-  });
-});
-
 function parseCSVLine(line) {
-  const cells = [];
-  let cur = '';
-  let inQ = false;
+  const cells = []; let cur = ''; let inQ = false;
   for (let i = 0; i < line.length; i++) {
     const ch = line[i];
     if (inQ) {
-      if (ch === '"') {
-        if (line[i + 1] === '"') { cur += '"'; i++; }
-        else inQ = false;
-      } else cur += ch;
+      if (ch === '"') { if (line[i+1] === '"') { cur += '"'; i++; } else inQ = false; }
+      else cur += ch;
     } else {
       if (ch === ',') { cells.push(cur); cur = ''; }
       else if (ch === '"') inQ = true;
@@ -740,138 +837,110 @@ function parseCSVLine(line) {
   return cells;
 }
 
-async function handleImportFile(file) {
-  const name = file.name.toLowerCase();
-  let rows = [];
+function parseTXT(text) {
+  const out = [];
+  text.split(/\r?\n/).forEach(line => {
+    const t = line.trim();
+    if (!t || /^[=\-+\s]+$/.test(t)) return;
+    if (t.startsWith('JADUAL') || t.startsWith('Dijana') || t.startsWith('Jumlah')) return;
+    if (t.includes('|')) out.push(t.split('|').map(s => s.trim()));
+    else out.push(parseCSVLine(t));
+  });
+  return out;
+}
 
+async function handleImport(file) {
+  const name = file.name.toLowerCase();
+  let raw = [];
   try {
     if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
-      if (typeof XLSX === 'undefined') {
-        toast('SheetJS tidak dimuat', false);
-        return;
-      }
-      const data = await file.arrayBuffer();
-      const wb = XLSX.read(data);
+      if (typeof XLSX === 'undefined') { toast('SheetJS tidak dimuat', true); return; }
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf);
       const ws = wb.Sheets[wb.SheetNames[0]];
-      rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+      raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
     } else if (name.endsWith('.csv') || name.endsWith('.txt')) {
-      const text = await file.text();
-      const lines = text.split(/\r?\n/);
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed) continue;
-        if (/^[=\-+\s]+$/.test(trimmed)) continue;
-        if (trimmed.startsWith('SOCSO')) continue;
-        if (trimmed.startsWith('Effective')) continue;
-        if (trimmed.includes('|')) {
-          rows.push(trimmed.split('|').map(s => s.trim()));
-        } else {
-          rows.push(parseCSVLine(trimmed));
-        }
-      }
+      raw = parseTXT(await file.text());
     } else {
-      toast('Format fail tidak disokong', false);
-      return;
+      toast('Format fail tidak disokong', true); return;
     }
 
-    if (!rows || rows.length < 2) {
-      toast('Fail tidak sah atau kosong', false);
-      return;
-    }
+    if (!raw || raw.length < 2) { toast('Fail kosong atau tidak sah', true); return; }
 
-    // 查找表头索引
-    const headers = rows[0].map(h => String(h).trim());
-    const idx = {};
-    const WANTED = [
-      'SOCSO Employer (RM)', 'SOCSO Employee (RM)',
-      'EIS Employer (RM)', 'EIS Employee (RM)',
-      'Cat2 Employer (RM)', 'Cat2 Employee (RM)'
-    ];
-    headers.forEach((h, i) => {
-      const lh = h.toLowerCase();
-      for (const w of WANTED) {
-        if (lh === w.toLowerCase()) { idx[w] = i; break; }
-      }
+    // 跳过表头
+    const dataRows = raw.slice(1).filter(r => r && r.length >= 3);
+    if (!dataRows.length) { toast('Tiada data dijumpai', true); return; }
+
+    const imported = [];
+    dataRows.forEach(r => {
+      const no = parseInt(r[0]) || (imported.length + 1);
+      const wage = String(r[1] || '');
+      const employer = parseFloat(r[2]) || 0;
+      const employee = parseFloat(r[3]) || 0;
+      const total = parseFloat(r[4]) || Math.round((employer + employee) * 100) / 100;
+      const second = parseFloat(r[5]) || 0;
+      imported.push({
+        no, wage,
+        min: 0, max: Infinity,
+        employer, employee, total, second,
+        editable: false
+      });
     });
 
-    if (Object.keys(idx).length < 4) {
-      toast('Format fail tidak sah. Sila guna template.', false);
-      return;
-    }
-
-    const get = (row, key) => idx[key] !== undefined ? row[idx[key]] : '';
-
-    let updated = 0;
-    for (let r = 1; r < rows.length; r++) {
-      const row = rows[r];
-      if (!row || row.length < 2) continue;
-
-      const rowIdx = r - 1;
-      if (rowIdx >= SOCSO_DATA.length) break;
-
-      const epfEmp = parseFloat(get(row, 'SOCSO Employer (RM)'));
-      const epfEe = parseFloat(get(row, 'SOCSO Employee (RM)'));
-      const eisEmp = parseFloat(get(row, 'EIS Employer (RM)'));
-      const eisEe = parseFloat(get(row, 'EIS Employee (RM)'));
-      const cat2Emp = parseFloat(get(row, 'Cat2 Employer (RM)'));
-      const cat2Ee = parseFloat(get(row, 'Cat2 Employee (RM)'));
-
-      if (!isNaN(epfEmp)) SOCSO_DATA[rowIdx][3] = epfEmp;
-      if (!isNaN(epfEe)) SOCSO_DATA[rowIdx][4] = epfEe;
-      if (!isNaN(eisEmp)) SOCSO_DATA[rowIdx][5] = eisEmp;
-      if (!isNaN(eisEe)) SOCSO_DATA[rowIdx][6] = eisEe;
-      if (!isNaN(cat2Emp)) SOCSO_DATA[rowIdx][7] = cat2Emp;
-      if (!isNaN(cat2Ee)) SOCSO_DATA[rowIdx][8] = cat2Ee;
-      updated++;
-    }
-
-    renderTable();
-    toast('Berjaya import ' + updated + ' baris');
-    closeImportModal();
-
-  } catch (err) {
-    console.error(err);
-    toast('Import error: ' + err.message, false);
+    if (!imported.length) { toast('Tiada baris sah', true); return; }
+    rows = imported;
+    render();
+    toast(`Berjaya import ${imported.length} baris`);
+    closeImport();
+  } catch(e) {
+    console.error(e);
+    toast('Import error: ' + e.message, true);
   }
 }
 
-// ================= 模板下载 =================
-function downloadTemplate(format) {
-  const headers = getExportHeaders();
-  const sample = getExportRows().slice(0, 3);
-
-  if (format === 'xlsx') {
-    if (typeof XLSX === 'undefined') { toast('SheetJS tidak dimuat', false); return; }
-    const aoa = [headers, ...sample];
-    const ws = XLSX.utils.aoa_to_sheet(aoa);
-    ws['!cols'] = headers.map(() => ({ wch: 16 }));
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'SOCSO');
-    XLSX.writeFile(wb, 'socso_template.xlsx');
-    toast('Template Excel dimuat turun');
-  } else if (format === 'doc') {
-    let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ';
-    html += 'xmlns:w="urn:schemas-microsoft-com:office:word" ';
-    html += 'xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8">';
-    html += '<title>SOCSO Template</title>';
-    html += '<style>body{font-family:Arial;font-size:9pt;}';
-    html += 'table{border-collapse:collapse;}';
-    html += 'th,td{border:1px solid #999;padding:3px 5px;}';
-    html += 'th{background:#eef2ff;}</style></head><body>';
-    html += '<h2>SOCSO Import Template</h2>';
-    html += '<p style="font-size:9pt;color:#555;">Fill in the rows below and import back.</p>';
-    html += '<table><thead><tr>';
-    headers.forEach(h => { html += '<th>' + h + '</th>'; });
-    html += '</tr></thead><tbody>';
-    sample.forEach(r => {
-      html += '<tr>';
-      r.forEach(c => { html += '<td>' + c + '</td>'; });
-      html += '</tr>';
+// ============================================================
+// 绑定导入事件
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+  const dz = document.getElementById('dropzone');
+  const fi = document.getElementById('importFile');
+  if (dz && fi) {
+    dz.addEventListener('click', e => { if (e.target !== fi) fi.click(); });
+    fi.addEventListener('change', e => {
+      if (e.target.files && e.target.files[0]) handleImport(e.target.files[0]);
     });
-    html += '</tbody></table></body></html>';
-    downloadBlob(html, 'socso_template.doc', 'application/msword');
-    toast('Template Word dimuat turun');
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault(); dz.classList.remove('drag-over');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) handleImport(e.dataTransfer.files[0]);
+    });
   }
+  const modal = document.getElementById('importModal');
+  if (modal) modal.addEventListener('click', e => { if (e.target.id === 'importModal') closeImport(); });
+  const pwd = document.getElementById('pwdModal');
+  if (pwd) pwd.addEventListener('click', e => { if (e.target.id === 'pwdModal') closePwd(); });
+
+  render();
+});
+
+// 密码输入回车确认
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('pwdModal').style.display === 'flex') {
+    confirmPwd();
+  }
+});
+
+// ============================================================
+// Toast
+// ============================================================
+function toast(msg, isError) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast' + (isError ? ' error' : '');
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 2600);
 }
 </script>
 </body>
