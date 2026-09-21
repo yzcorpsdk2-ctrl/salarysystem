@@ -8,16 +8,32 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f5f7fc; color: #1e293b; padding: 0 0 3rem 0;
+  background: #f0f4f8; color: #1e293b; padding: 0 0 3rem 0;
+  min-height: 100vh;
 }
+
+/* ===== 顶部导航栏 ===== */
 .topbar {
   position: sticky; top: 0; z-index: 100;
   background: #ffffff; border-bottom: 1px solid #e2e8f0;
   padding: 0.75rem 1.5rem; display: flex; flex-wrap: wrap;
   gap: 0.5rem; align-items: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 .topbar .spacer { flex: 1; }
+.topbar .brand {
+  font-weight: 700; font-size: 1.05rem; color: #0f172a;
+  display: flex; align-items: center; gap: 0.5rem;
+  margin-right: 0.5rem;
+}
+.topbar .brand .logo {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, #1e40af, #2563eb);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 0.85rem; font-weight: 800;
+}
+
 .btn {
   background: #fff; border: 1px solid #cbd5e1;
   padding: 0.45rem 0.9rem; border-radius: 8px;
@@ -32,21 +48,89 @@ body {
 .btn-success:hover { background: #047857; }
 .btn-danger { background: #fee2e2; border-color: #fecaca; color: #b91c1c; }
 .btn-sm { padding: 0.3rem 0.6rem; font-size: 0.75rem; }
-.btn.active { background: #dbeafe; border-color: #2563eb; color: #1d4ed8; }
 
-.container { max-width: 1600px; margin: 0 auto; padding: 1.5rem; }
-h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #0f172a; }
+select.btn { cursor: pointer; }
 
+/* ===== 主容器 ===== */
+.container { max-width: 1700px; margin: 0 auto; padding: 1.5rem; }
+
+/* ===== 页面标题卡片 ===== */
+.page-header {
+  background: linear-gradient(135deg, #1e40af, #2563eb);
+  color: #fff; border-radius: 14px;
+  padding: 1.5rem 2rem; margin-bottom: 1.5rem;
+  box-shadow: 0 4px 16px rgba(37,99,235,0.25);
+  display: flex; flex-wrap: wrap; gap: 1rem;
+  align-items: center; justify-content: space-between;
+}
+.page-header .info { flex: 1; min-width: 260px; }
+.page-header h1 {
+  font-size: 1.35rem; font-weight: 700;
+  margin-bottom: 0.35rem; letter-spacing: -0.01em;
+  color: #fff;
+}
+.page-header p {
+  font-size: 0.85rem; opacity: 0.85; line-height: 1.5;
+}
+.page-header .badge {
+  display: inline-block; background: rgba(255,255,255,0.2);
+  padding: 0.2rem 0.7rem; border-radius: 20px;
+  font-size: 0.72rem; font-weight: 600; margin-top: 0.6rem;
+  backdrop-filter: blur(4px);
+}
+.page-header .stat-badges {
+  display: flex; gap: 0.6rem; flex-wrap: wrap;
+}
+.page-header .stat-pill {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 10px;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.78rem;
+  backdrop-filter: blur(4px);
+  min-width: 110px;
+}
+.page-header .stat-pill .label {
+  font-size: 0.65rem; opacity: 0.8;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  font-weight: 600; margin-bottom: 0.15rem;
+}
+.page-header .stat-pill .value {
+  font-size: 1.1rem; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== 卡片容器 ===== */
+.card {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+.card-header {
+  padding: 0.85rem 1.2rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.5rem; flex-wrap: wrap;
+}
+.card-header .title {
+  font-size: 0.9rem; font-weight: 700; color: #0f172a;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.card-body { padding: 0; }
+
+/* ===== 表格容器 ===== */
 .table-wrap {
-  overflow: auto; max-height: calc(100vh - 140px);
-  border-radius: 12px; border: 1px solid #e2e8f0; background: #fff;
+  overflow: auto; max-height: calc(100vh - 320px);
+  background: #fff;
 }
 table {
   border-collapse: separate; border-spacing: 0; font-size: 0.82rem;
   table-layout: fixed;
   width: 2390px; min-width: 2390px;
 }
-/* ★ 表头允许换行，完整容纳文字 */
 th {
   position: sticky; top: 0; z-index: 10;
   background: #f8fafc; padding: 0.5rem 0.45rem; text-align: left;
@@ -56,8 +140,12 @@ th {
 }
 th > div { word-break: break-word; overflow-wrap: anywhere; }
 th.grp { background: #eef2ff; }
+thead tr:nth-child(2) th {
+  background: #f1f5f9;
+  border-bottom: 1px solid #cbd5e1;
+}
 
-/* ★ 筛选行（单独一行，与表头一起冻结） */
+/* ★ 筛选行 */
 #headRow3 th {
   background: #f1f5f9;
   padding: 0.3rem 0.3rem;
@@ -97,12 +185,9 @@ tr:hover td { background: #fafbfc; }
 /* ★ 只读文字单元格 */
 .td-text { vertical-align: top !important; padding: 0.4rem 0.4rem !important; }
 .text-cell {
-  font-size: 0.82rem;
-  line-height: 1.35;
-  white-space: normal;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-  color: #0f172a;
+  font-size: 0.82rem; line-height: 1.35;
+  white-space: normal; word-break: break-word;
+  overflow-wrap: anywhere; color: #0f172a;
 }
 
 /* ★ Situation 状态颜色 */
@@ -124,15 +209,22 @@ tr:hover td { background: #fafbfc; }
 .cell-bad { background: #fee2e2 !important; border-color: #fca5a5 !important; }
 .cell-ok  { background: #dcfce7 !important; }
 
+.legend {
+  font-size: 0.75rem; color: #64748b;
+  margin-top: 0.75rem; padding-left: 0.25rem;
+  line-height: 1.6;
+}
+.legend strong { color: #334155; }
+
+/* ===== Toast ===== */
 .toast {
   position: fixed; bottom: 1.5rem; right: 1.5rem; background: #1e293b; color: #fff;
   padding: 0.8rem 1.3rem; border-radius: 40px; font-size: 0.85rem; font-weight: 500;
   z-index: 9999; opacity: 0; transform: translateY(10px);
-  transition: 0.2s; pointer-events: none;
+  transition: 0.2s; pointer-events: none; max-width: 360px;
 }
 .toast.show { opacity: 1; transform: translateY(0); }
-
-.legend { font-size: 0.75rem; color: #64748b; margin-top: 0.5rem; padding-left: 0.25rem; }
+.toast.error { background: #b91c1c; }
 
 /* ========== 导入弹窗 ========== */
 .modal-overlay {
@@ -163,7 +255,7 @@ tr:hover td { background: #fafbfc; }
 }
 .modal-dropzone p { font-size: 0.9rem; color: #475569; margin: 0.25rem 0; }
 .modal-dropzone .hint { font-size: 0.75rem; color: #94a3b8; }
-.modal-dropzone .icon { font-size: 2rem; }
+.modal-dropzone .icon { font-size: 2rem; margin-bottom: 0.4rem; }
 .modal-footer {
   display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;
   flex-wrap: wrap;
@@ -208,8 +300,14 @@ tr:hover td { background: #fafbfc; }
 </head>
 <body>
 
-<!-- ============ 顶部按钮栏 ============ -->
+<!-- ============ 顶部导航栏 ============ -->
 <div class="topbar">
+  <div class="brand">
+    <div class="logo">P</div>
+    Payroll System
+  </div>
+  <span style="width:1px;height:24px;background:#e2e8f0;margin:0 4px;"></span>
+
   <button class="btn btn-success" onclick="saveToSheet()" id="btnSaveSheet">💾 Simpan ke Sheet</button>
   <button class="btn" onclick="openImportModal()">📥 Import / 导入</button>
 
@@ -242,49 +340,76 @@ tr:hover td { background: #fafbfc; }
 </div>
 
 <div class="container">
-  <h1 id="pageTitle">Sistem Penggajian</h1>
-  <div class="table-wrap">
-    <table id="mainTable">
-      <!-- ★ 29 列 -->
-      <colgroup>
-        <col style="width:90px">   <!-- 0  Situation -->
-        <col style="width:75px">   <!-- 1  Code -->
-        <col style="width:160px">  <!-- 2  Name -->
-        <col style="width:110px">  <!-- 3  Group -->
-        <col style="width:140px">  <!-- 4  Bank -->
-        <col style="width:85px">   <!-- 5  Basic -->
-        <col style="width:85px">   <!-- 6  Allowance -->
-        <col style="width:85px">   <!-- 7  Deduction -->
-        <col style="width:70px">   <!-- 8  NormalOT -->
-        <col style="width:70px">   <!-- 9  RestOT -->
-        <col style="width:70px">   <!-- 10 PublicOT -->
-        <col style="width:70px">   <!-- 11 OtherOT -->
-        <col style="width:85px">   <!-- 12 Pinjaman -->
-        <col style="width:85px">   <!-- 13 Others -->
-        <col style="width:40px">   <!-- 14 EPF chk -->
-        <col style="width:85px">   <!-- 15 EPF_E -->
-        <col style="width:85px">   <!-- 16 EPF_R -->
-        <col style="width:40px">   <!-- 17 SOCSO chk -->
-        <col style="width:85px">   <!-- 18 SOCSO_E -->
-        <col style="width:85px">   <!-- 19 SOCSO_R -->
-        <col style="width:40px">   <!-- 20 EIS chk -->
-        <col style="width:80px">   <!-- 21 EIS_E -->
-        <col style="width:80px">   <!-- 22 EIS_R -->
-        <col style="width:40px">   <!-- 23 24JAM chk -->
-        <col style="width:85px">   <!-- 24 Lindung -->
-        <col style="width:95px">   <!-- 25 Gross -->
-        <col style="width:95px">   <!-- 26 TotalDed -->
-        <col style="width:95px">   <!-- 27 Net -->
-        <col style="width:80px">   <!-- 28 Action -->
-      </colgroup>
-      <thead>
-        <tr id="headRow1"></tr>
-        <tr id="headRow2"></tr>
-        <tr id="headRow3"></tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
+  <!-- ===== 页面标题卡片 ===== -->
+  <div class="page-header">
+    <div class="info">
+      <h1 id="pageTitle">Sistem Penggajian</h1>
+      <p>Pengurusan gaji pekerja dengan pengiraan automatik EPF, SOCSO, EIS &amp; 24JAM Lindungan.</p>
+      <span class="badge">Auto kira caruman statutori · Manual override dengan kotak semak</span>
+    </div>
+    <div class="stat-badges">
+      <div class="stat-pill">
+        <div class="label">Jumlah Pekerja</div>
+        <div class="value" id="statCount">0</div>
+      </div>
+      <div class="stat-pill">
+        <div class="label">Aktif</div>
+        <div class="value" id="statActive">0</div>
+      </div>
+      <div class="stat-pill">
+        <div class="label">Pending</div>
+        <div class="value" id="statPending">0</div>
+      </div>
+    </div>
   </div>
+
+  <!-- ===== 表格卡片 ===== -->
+  <div class="card">
+    <div class="card-body">
+      <div class="table-wrap">
+        <table id="mainTable">
+          <colgroup>
+            <col style="width:90px">   <!-- 0  Situation -->
+            <col style="width:75px">   <!-- 1  Code -->
+            <col style="width:160px">  <!-- 2  Name -->
+            <col style="width:110px">  <!-- 3  Group -->
+            <col style="width:140px">  <!-- 4  Bank -->
+            <col style="width:85px">   <!-- 5  Basic -->
+            <col style="width:85px">   <!-- 6  Allowance -->
+            <col style="width:85px">   <!-- 7  Deduction -->
+            <col style="width:70px">   <!-- 8  NormalOT -->
+            <col style="width:70px">   <!-- 9  RestOT -->
+            <col style="width:70px">   <!-- 10 PublicOT -->
+            <col style="width:70px">   <!-- 11 OtherOT -->
+            <col style="width:85px">   <!-- 12 Pinjaman -->
+            <col style="width:85px">   <!-- 13 Others -->
+            <col style="width:40px">   <!-- 14 EPF chk -->
+            <col style="width:85px">   <!-- 15 EPF_E -->
+            <col style="width:85px">   <!-- 16 EPF_R -->
+            <col style="width:40px">   <!-- 17 SOCSO chk -->
+            <col style="width:85px">   <!-- 18 SOCSO_E -->
+            <col style="width:85px">   <!-- 19 SOCSO_R -->
+            <col style="width:40px">   <!-- 20 EIS chk -->
+            <col style="width:80px">   <!-- 21 EIS_E -->
+            <col style="width:80px">   <!-- 22 EIS_R -->
+            <col style="width:40px">   <!-- 23 24JAM chk -->
+            <col style="width:85px">   <!-- 24 Lindung -->
+            <col style="width:95px">   <!-- 25 Gross -->
+            <col style="width:95px">   <!-- 26 TotalDed -->
+            <col style="width:95px">   <!-- 27 Net -->
+            <col style="width:80px">   <!-- 28 Action -->
+          </colgroup>
+          <thead>
+            <tr id="headRow1"></tr>
+            <tr id="headRow2"></tr>
+            <tr id="headRow3"></tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <div class="legend" id="legend"></div>
 </div>
 
@@ -304,7 +429,6 @@ tr:hover td { background: #fafbfc; }
       <p><strong>拖入文件或点击选择</strong></p>
       <p class="hint">Drag & drop file here, or click to browse</p>
       <p class="hint">格式：.xlsx / .csv / .txt</p>
-      <!-- ★ 隐藏的文件输入（修复原本未定义问题） -->
       <input type="file" id="importFile" accept=".xlsx,.xls,.csv,.txt" style="display:none;">
     </div>
 
@@ -432,6 +556,19 @@ function todayStr() {
   return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
 }
 
+// ================= 统计卡片 =================
+function updateStats() {
+  const total = employees.length;
+  const active = employees.filter(e => String(e.Situation || '').trim().toUpperCase() === 'ACTIVE').length;
+  const pending = employees.filter(e => String(e.Situation || '').trim().toUpperCase() === 'PENDING').length;
+  const s1 = document.getElementById('statCount');
+  const s2 = document.getElementById('statActive');
+  const s3 = document.getElementById('statPending');
+  if (s1) s1.textContent = total;
+  if (s2) s2.textContent = active;
+  if (s3) s3.textContent = pending;
+}
+
 // ================= 计算 =================
 const SOCSO_TABLE = [
   [30,0.10,0.40],[50,0.20,0.70],[70,0.30,1.10],[100,0.40,1.50],
@@ -540,7 +677,6 @@ function renderHeaders() {
   const h2 = document.getElementById('headRow2');
   const h3 = document.getElementById('headRow3');
 
-  // ---------- Row 1: 主表头 ----------
   h1.innerHTML = `
     <th rowspan="2" style="background:#fef3c7;"><div>Situation</div></th>
     <th rowspan="2"><div>${t('code')}</div></th>
@@ -570,7 +706,6 @@ function renderHeaders() {
     <th rowspan="2">${t('action')}</th>
   `;
 
-  // ---------- Row 2: 子表头 ----------
   h2.innerHTML = `
     <th class="grp"><div>${t('epfE')}</div></th>
     <th class="grp"><div>${t('epfR')}</div></th>
@@ -580,7 +715,6 @@ function renderHeaders() {
     <th class="grp"><div>${t('eisR')}</div></th>
   `;
 
-  // ---------- Row 3: 筛选行 ----------
   const f = (col) => `<input class="th-filter" data-col="${col}" placeholder="🔍">`;
   const empty = `<th class="no-filter"></th>`;
   h3.innerHTML = `
@@ -652,6 +786,7 @@ function renderTable() {
 
   if (!employees.length) {
     tbody.innerHTML = `<tr><td colspan="29" style="text-align:center;padding:2rem;color:#64748b;">${t('loading')}</td></tr>`;
+    updateStats();
     return;
   }
 
@@ -749,6 +884,7 @@ function renderTable() {
   });
 
   applyFilters();
+  updateStats();
 }
 
 // ================= 表头筛选 =================
