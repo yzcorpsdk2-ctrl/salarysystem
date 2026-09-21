@@ -97,12 +97,15 @@ body {
   backdrop-filter: blur(4px);
 }
 
-/* ===== 统计卡片 ===== */
+/* ===== 计算卡片（输入 + 结果） ===== */
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
   gap: 1rem;
   margin-bottom: 1.5rem;
+}
+@media (max-width: 900px) {
+  .stats-row { grid-template-columns: 1fr 1fr; }
 }
 .stat-card {
   background: #fff;
@@ -110,22 +113,59 @@ body {
   padding: 1rem 1.2rem;
   border: 1px solid #e2e8f0;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  transition: 0.15s;
+}
+.stat-card.highlight {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
 }
 .stat-card .label {
   font-size: 0.72rem;
   color: #64748b;
-  font-weight: 500;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.4rem;
 }
 .stat-card .value {
   font-size: 1.3rem;
   font-weight: 700;
   color: #0f172a;
+  font-variant-numeric: tabular-nums;
 }
 .stat-card .value.green { color: #059669; }
 .stat-card .value.blue { color: #2563eb; }
+
+/* 输入框（在卡片内） */
+.stat-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #0f172a;
+  padding: 0 0 4px 0;
+  font-family: inherit;
+  border-bottom: 2px solid #e2e8f0;
+  transition: 0.15s;
+  font-variant-numeric: tabular-nums;
+}
+.stat-input:focus {
+  outline: none;
+  border-bottom-color: #2563eb;
+  box-shadow: 0 4px 6px -4px rgba(37,99,235,0.5);
+}
+.stat-input::placeholder { color: #cbd5e1; font-weight: 500; }
+/* 隐藏数字上下箭头 */
+.stat-input::-webkit-outer-spin-button,
+.stat-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.stat-input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+
+.stat-hint {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  margin-top: 0.3rem;
+}
 
 /* ===== 表格容器 ===== */
 .table-wrap {
@@ -141,9 +181,11 @@ table {
   border-spacing: 0;
   font-size: 0.82rem;
   width: 100%;
-  min-width: 900px;
+  min-width: 830px;
   table-layout: fixed;
 }
+
+/* 所有表头默认 sticky，第 2 行用 JS 动态设置 top */
 th {
   position: sticky; top: 0; z-index: 10;
   background: #f8fafc;
@@ -154,9 +196,14 @@ th {
   border-bottom: 2px solid #e2e8f0;
   white-space: normal;
   font-size: 0.75rem;
-  vertical-align: top;
+  vertical-align: middle;
   word-break: break-word;
   line-height: 1.35;
+}
+/* 第二行表头背景和边框单独调整 */
+thead tr:nth-child(2) th {
+  background: #f1f5f9;
+  border-bottom: 2px solid #cbd5e1;
 }
 th.th-chk { width: 50px; text-align: center; }
 th.th-no { width: 50px; text-align: center; }
@@ -165,13 +212,16 @@ th.th-emp { width: 110px; text-align: right; }
 th.th-ee { width: 110px; text-align: right; }
 th.th-total { width: 120px; text-align: right; }
 th.th-2nd { width: 130px; text-align: right; }
-th.th-action { width: 90px; text-align: center; }
 th.grp-hd {
   background: #eef2ff;
   text-align: center;
   font-size: 0.72rem;
   color: #4338ca;
   border-bottom: 1px solid #c7d2fe;
+}
+thead tr:nth-child(2) th.grp-hd {
+  background: #e0e7ff;
+  border-bottom: 2px solid #a5b4fc;
 }
 
 td {
@@ -184,6 +234,7 @@ td {
 tr:hover td { background: #fafbfc; }
 tr.row-edit td { background: #fefce8; }
 tr.row-edit:hover td { background: #fef9c3; }
+tr.row-highlight td { background: #dbeafe !important; }
 
 .td-chk { text-align: center; }
 .td-chk input[type="checkbox"] {
@@ -196,7 +247,6 @@ tr.row-edit:hover td { background: #fef9c3; }
 .td-num { text-align: right; font-variant-numeric: tabular-nums; }
 .td-num strong { color: #0f172a; }
 .td-2nd { text-align: right; color: #475569; font-variant-numeric: tabular-nums; }
-.td-action { text-align: center; }
 
 /* ===== 可编辑输入框 ===== */
 .cell-input {
@@ -214,34 +264,6 @@ tr.row-edit:hover td { background: #fef9c3; }
   outline: none;
   border-color: #2563eb;
   box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
-}
-.cell-input[readonly] {
-  background: transparent;
-  border-color: transparent;
-  color: #0f172a;
-  cursor: default;
-  padding-right: 0;
-}
-.cell-input[readonly]:focus { box-shadow: none; border-color: transparent; }
-
-/* ===== 徽章 ===== */
-.badge-readonly {
-  display: inline-block;
-  font-size: 0.65rem;
-  font-weight: 600;
-  padding: 0.15rem 0.5rem;
-  border-radius: 20px;
-  background: #f1f5f9;
-  color: #64748b;
-}
-.badge-edit {
-  display: inline-block;
-  font-size: 0.65rem;
-  font-weight: 600;
-  padding: 0.15rem 0.5rem;
-  border-radius: 20px;
-  background: #fef3c7;
-  color: #92400e;
 }
 
 /* ===== Toast ===== */
@@ -389,23 +411,26 @@ tr.row-edit:hover td { background: #fef9c3; }
     <span class="badge">Berkuatkuasa mulai 1 Oktober 2024 · Siling gaji RM6,000</span>
   </div>
 
-  <!-- ===== 统计卡片 ===== -->
+  <!-- ===== 薪资输入 + SOCSO 自动查询 ===== -->
   <div class="stats-row">
-    <div class="stat-card">
-      <div class="label">Bilangan Baris</div>
-      <div class="value blue" id="statRows">65</div>
+    <div class="stat-card highlight">
+      <div class="label">💰 Masukkan Gaji Bulanan</div>
+      <input type="number" id="wageInput" class="stat-input"
+             placeholder="0.00" step="0.01" min="0"
+             oninput="updateCalc()">
+      <div class="stat-hint">Taip gaji untuk cari caruman SOCSO</div>
     </div>
     <div class="stat-card">
-      <div class="label">Siling Gaji</div>
-      <div class="value">RM6,000</div>
+      <div class="label">Caruman Pekerja (0.5%)</div>
+      <div class="value green" id="resultEmployee">RM 0.00</div>
     </div>
     <div class="stat-card">
-      <div class="label">Syarikat (1.75%)</div>
-      <div class="value">RM104.15</div>
+      <div class="label">Caruman Majikan (1.75%)</div>
+      <div class="value blue" id="resultEmployer">RM 0.00</div>
     </div>
     <div class="stat-card">
-      <div class="label">Pekerja (0.5%)</div>
-      <div class="value green">RM29.75</div>
+      <div class="label">Jumlah Caruman</div>
+      <div class="value" id="resultTotal">RM 0.00</div>
     </div>
   </div>
 
@@ -413,25 +438,23 @@ tr.row-edit:hover td { background: #fef9c3; }
   <div class="table-wrap">
     <table id="socsoTable">
       <colgroup>
-        <col style="width:50px">   <!-- 0 Chk -->
-        <col style="width:50px">   <!-- 1 No -->
-        <col style="width:260px">  <!-- 2 Wages -->
-        <col style="width:110px">  <!-- 3 Employer -->
-        <col style="width:110px">  <!-- 4 Employee -->
-        <col style="width:120px">  <!-- 5 Total -->
-        <col style="width:130px">  <!-- 6 2nd Category -->
-        <col style="width:90px">   <!-- 7 Action -->
+        <col style="width:50px">   <!-- Chk -->
+        <col style="width:50px">   <!-- No -->
+        <col style="width:260px">  <!-- Wages -->
+        <col style="width:110px">  <!-- Employer -->
+        <col style="width:110px">  <!-- Employee -->
+        <col style="width:120px">  <!-- Total -->
+        <col style="width:130px">  <!-- 2nd Category -->
       </colgroup>
       <thead>
-        <tr>
+        <tr id="headRow1">
           <th class="th-chk" rowspan="2">✎</th>
           <th class="th-no" rowspan="2">No.</th>
           <th class="th-wage" rowspan="2">Gaji Bulanan Sebenar (RM)</th>
           <th class="grp-hd" colspan="3">Kategori Pertama<br><span style="font-weight:400;font-size:0.65rem;">Skim Bencana Pekerjaan &amp; Skim Keilatan</span></th>
           <th class="grp-hd" rowspan="2">Kategori Kedua<br><span style="font-weight:400;font-size:0.65rem;">Skim Bencana Pekerjaan Sahaja</span></th>
-          <th class="th-action" rowspan="2">Status</th>
         </tr>
-        <tr>
+        <tr id="headRow2">
           <th class="th-emp grp-hd">Majikan (RM)</th>
           <th class="th-ee grp-hd">Pekerja (RM)</th>
           <th class="th-total grp-hd">Jumlah (RM)</th>
@@ -480,7 +503,7 @@ tr.row-edit:hover td { background: #fef9c3; }
 <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 // ============================================================
-// SOCSO 官方数据（来源：PERKESO Jadual Kedua Akta 4）
+// SOCSO 官方数据（PERKESO Jadual Kedua Akta 4）
 // 格式：[No, 工资描述, 工资下限, 工资上限, 雇主, 员工, 合计, 第二类]
 // ============================================================
 const SOCSO_DATA = [
@@ -568,6 +591,22 @@ let rows = SOCSO_DATA.map(r => ({
 
 const PASSWORD = '0000';
 let pendingCheckbox = null;
+let highlightedRowIdx = -1;
+
+// ============================================================
+// 表头 sticky 对齐（关键修复：第 2 行表头）
+// ============================================================
+function fixStickyHeader() {
+  const row1 = document.getElementById('headRow1');
+  const row2 = document.getElementById('headRow2');
+  if (!row1 || !row2) return;
+  const r1 = row1.getBoundingClientRect();
+  const r2 = row2.getBoundingClientRect();
+  const offset = Math.max(0, Math.round(r2.top - r1.top));
+  Array.from(row2.cells).forEach(th => {
+    th.style.top = offset + 'px';
+  });
+}
 
 // ============================================================
 // 渲染
@@ -575,11 +614,11 @@ let pendingCheckbox = null;
 function render() {
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
-  document.getElementById('statRows').textContent = rows.length;
 
   rows.forEach((r, i) => {
     const tr = document.createElement('tr');
     if (r.editable) tr.classList.add('row-edit');
+    if (i === highlightedRowIdx) tr.classList.add('row-highlight');
 
     const fmt = v => (v === Infinity || v > 100000) ? '—' : Number(v).toFixed(2);
 
@@ -610,14 +649,12 @@ function render() {
           ? `<input class="cell-input" type="number" step="0.01" value="${r.second}" onchange="updateField(${i}, 'second', this.value)">`
           : `RM ${fmt(r.second)}`}
       </td>
-      <td class="td-action">
-        <span class="${r.editable ? 'badge-edit' : 'badge-readonly'}">
-          ${r.editable ? '✎ Edit' : '🔒 Kunci'}
-        </span>
-      </td>
     `;
     tbody.appendChild(tr);
   });
+
+  // 修复表头对齐
+  requestAnimationFrame(fixStickyHeader);
 }
 
 function escapeHtml(s) {
@@ -627,17 +664,72 @@ function escapeHtml(s) {
 }
 
 // ============================================================
+// 薪资 → SOCSO 自动查询
+// ============================================================
+function calcSOCSOByWage(wage) {
+  const w = Number(wage);
+  if (!w || w <= 0) return { employee: 0, employer: 0, total: 0, idx: -1 };
+  // 找到最后一行 min <= wage
+  let match = null;
+  for (let i = 0; i < rows.length; i++) {
+    if (w >= rows[i].min) {
+      match = rows[i];
+    } else {
+      break;
+    }
+  }
+  if (!match) match = rows[0];
+  return {
+    employee: match.employee,
+    employer: match.employer,
+    total: match.total,
+    idx: match.no - 1
+  };
+}
+
+function updateCalc() {
+  const wage = parseFloat(document.getElementById('wageInput').value) || 0;
+  const result = calcSOCSOByWage(wage);
+
+  document.getElementById('resultEmployee').textContent = 'RM ' + result.employee.toFixed(2);
+  document.getElementById('resultEmployer').textContent = 'RM ' + result.employer.toFixed(2);
+  document.getElementById('resultTotal').textContent = 'RM ' + result.total.toFixed(2);
+
+  // 高亮对应表格行
+  if (highlightedRowIdx !== result.idx) {
+    highlightedRowIdx = result.idx;
+    // 更新行高亮类
+    const trs = document.querySelectorAll('#tbody tr');
+    trs.forEach((tr, i) => {
+      tr.classList.toggle('row-highlight', i === result.idx && wage > 0);
+    });
+    // 平滑滚动到对应行（如果可见）
+    if (wage > 0 && result.idx >= 0 && trs[result.idx]) {
+      const row = trs[result.idx];
+      const wrap = document.querySelector('.table-wrap');
+      if (wrap) {
+        const rowTop = row.offsetTop;
+        const wrapTop = wrap.scrollTop;
+        const wrapH = wrap.clientHeight;
+        // 只在行不在视口内时滚动
+        if (rowTop < wrapTop + 60 || rowTop > wrapTop + wrapH - 60) {
+          wrap.scrollTo({ top: Math.max(0, rowTop - wrapH / 2), behavior: 'smooth' });
+        }
+      }
+    }
+  }
+}
+
+// ============================================================
 // 编辑切换（带密码）
 // ============================================================
 function toggleEdit(idx, checkbox) {
   if (checkbox.checked) {
-    // 请求解锁
     pendingCheckbox = checkbox;
     document.getElementById('pwdModal').style.display = 'flex';
     document.getElementById('pwdInput').value = '';
     setTimeout(() => document.getElementById('pwdInput').focus(), 100);
   } else {
-    // 直接锁定
     rows[idx].editable = false;
     render();
     toast(`Baris ${rows[idx].no} dikunci`);
@@ -672,7 +764,6 @@ function updateField(idx, field, value) {
   const v = parseFloat(value);
   if (isNaN(v) || v < 0) { render(); return; }
   rows[idx][field] = v;
-  // 自动重算总数
   if (field === 'employer' || field === 'employee') {
     rows[idx].total = Math.round((rows[idx].employer + rows[idx].employee) * 100) / 100;
   }
@@ -867,7 +958,6 @@ async function handleImport(file) {
 
     if (!raw || raw.length < 2) { toast('Fail kosong atau tidak sah', true); return; }
 
-    // 跳过表头
     const dataRows = raw.slice(1).filter(r => r && r.length >= 3);
     if (!dataRows.length) { toast('Tiada data dijumpai', true); return; }
 
@@ -879,17 +969,27 @@ async function handleImport(file) {
       const employee = parseFloat(r[3]) || 0;
       const total = parseFloat(r[4]) || Math.round((employer + employee) * 100) / 100;
       const second = parseFloat(r[5]) || 0;
+      // 反向推算 min/max（仅用于薪资计算器）
+      let min = 0, max = Infinity;
+      if (imported.length > 0) {
+        min = imported[imported.length - 1].max + 0.01;
+      }
+      if (no < 65) max = min + 19.99;
       imported.push({
-        no, wage,
-        min: 0, max: Infinity,
+        no, wage, min, max,
         employer, employee, total, second,
         editable: false
       });
     });
 
     if (!imported.length) { toast('Tiada baris sah', true); return; }
+    // 修正最后一行的 max
+    if (imported.length > 0) imported[imported.length - 1].max = Infinity;
+
     rows = imported;
+    highlightedRowIdx = -1;
     render();
+    updateCalc();
     toast(`Berjaya import ${imported.length} baris`);
     closeImport();
   } catch(e) {
@@ -899,7 +999,7 @@ async function handleImport(file) {
 }
 
 // ============================================================
-// 绑定导入事件
+// 初始化
 // ============================================================
 window.addEventListener('DOMContentLoaded', () => {
   const dz = document.getElementById('dropzone');
@@ -922,7 +1022,17 @@ window.addEventListener('DOMContentLoaded', () => {
   if (pwd) pwd.addEventListener('click', e => { if (e.target.id === 'pwdModal') closePwd(); });
 
   render();
+  updateCalc();
 });
+
+// 窗口尺寸变化时重新计算表头偏移
+window.addEventListener('resize', () => {
+  requestAnimationFrame(fixStickyHeader);
+});
+// 字体加载完成后重新测量
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => requestAnimationFrame(fixStickyHeader));
+}
 
 // 密码输入回车确认
 document.addEventListener('keydown', e => {
