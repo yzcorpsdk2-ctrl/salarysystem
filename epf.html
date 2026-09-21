@@ -3,286 +3,491 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EPF Contribution Table 2025</title>
+<title>Jadual Caruman EPF | KWSP</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f5f7fc; color: #1e293b; padding: 0 0 3rem 0;
+  background: #f0f4f8;
+  color: #1e293b;
+  padding: 0 0 3rem 0;
+  min-height: 100vh;
 }
+
 /* ===== 顶部导航栏 ===== */
 .topbar {
   position: sticky; top: 0; z-index: 100;
-  background: #ffffff; border-bottom: 1px solid #e2e8f0;
-  padding: 0.75rem 1.5rem; display: flex; flex-wrap: wrap;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.75rem 1.5rem;
+  display: flex; flex-wrap: wrap;
   gap: 0.5rem; align-items: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 .topbar .spacer { flex: 1; }
-.topbar .logo {
-  font-size: 1rem; font-weight: 700; color: #0f172a;
-  display: flex; align-items: center; gap: 0.4rem;
-  margin-right: 1rem;
+.topbar .brand {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #0f172a;
+  display: flex; align-items: center; gap: 0.5rem;
+  margin-right: 0.5rem;
 }
-.topbar .logo span { color: #2563eb; }
+.topbar .brand .logo {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, #0d9488, #0f766e);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 0.85rem; font-weight: 800;
+}
 .btn {
-  background: #fff; border: 1px solid #cbd5e1;
-  padding: 0.45rem 0.9rem; border-radius: 8px;
-  font-size: 0.82rem; font-weight: 500; cursor: pointer;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
   display: inline-flex; align-items: center; gap: 0.35rem;
-  transition: all 0.15s; color: #1e293b;
+  transition: all 0.15s;
+  color: #1e293b;
 }
 .btn:hover { background: #f1f5f9; border-color: #94a3b8; }
 .btn-primary { background: #2563eb; border-color: #2563eb; color: #fff; }
 .btn-primary:hover { background: #1d4ed8; }
 .btn-success { background: #059669; border-color: #059669; color: #fff; }
 .btn-success:hover { background: #047857; }
-.btn-sm { padding: 0.3rem 0.6rem; font-size: 0.75rem; }
 .btn-danger { background: #fee2e2; border-color: #fecaca; color: #b91c1c; }
+.btn-sm { padding: 0.3rem 0.6rem; font-size: 0.75rem; }
 
-.container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
-h1 { font-size: 1.4rem; font-weight: 600; margin-bottom: 0.3rem; color: #0f172a; }
-.subtitle { font-size: 0.82rem; color: #64748b; margin-bottom: 1.2rem; }
-
-/* ===== 信息卡片 ===== */
-.info-card {
-  background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
-  padding: 1rem 1.2rem; margin-bottom: 1.2rem;
-  display: flex; flex-wrap: wrap; gap: 1.5rem;
+/* ===== 主容器 ===== */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem;
 }
-.info-item { display: flex; align-items: center; gap: 0.5rem; }
-.info-item .label { font-size: 0.75rem; color: #64748b; }
-.info-item .value { font-size: 0.85rem; font-weight: 600; color: #0f172a; }
-.info-item .badge {
-  font-size: 0.7rem; font-weight: 600; padding: 0.15rem 0.5rem;
+
+/* ===== 页面标题卡片 ===== */
+.page-header {
+  background: linear-gradient(135deg, #0f766e, #0d9488);
+  color: #fff;
+  border-radius: 14px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 16px rgba(13,148,136,0.25);
+}
+.page-header h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.01em;
+}
+.page-header p {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  line-height: 1.5;
+}
+.page-header .badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  padding: 0.2rem 0.7rem;
   border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-top: 0.6rem;
+  backdrop-filter: blur(4px);
 }
-.badge-blue { background: #dbeafe; color: #1d4ed8; }
-.badge-green { background: #dcfce7; color: #166534; }
-.badge-amber { background: #fef3c7; color: #92400e; }
-.badge-purple { background: #ede9fe; color: #6d28d9; }
 
-/* ===== 表格 ===== */
+/* ===== 计算卡片（输入 + 结果） ===== */
+.stats-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+@media (max-width: 900px) {
+  .stats-row { grid-template-columns: 1fr 1fr; }
+}
+.stat-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  transition: 0.15s;
+}
+.stat-card.highlight {
+  border-color: #5eead4;
+  box-shadow: 0 0 0 3px rgba(13,148,136,0.08);
+}
+.stat-card .label {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.4rem;
+}
+.stat-card .value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+}
+.stat-card .value.green { color: #059669; }
+.stat-card .value.teal { color: #0d9488; }
+
+/* 输入框（在卡片内） */
+.stat-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #0f172a;
+  padding: 0 0 4px 0;
+  font-family: inherit;
+  border-bottom: 2px solid #e2e8f0;
+  transition: 0.15s;
+  font-variant-numeric: tabular-nums;
+}
+.stat-input:focus {
+  outline: none;
+  border-bottom-color: #0d9488;
+  box-shadow: 0 4px 6px -4px rgba(13,148,136,0.5);
+}
+.stat-input::placeholder { color: #cbd5e1; font-weight: 500; }
+.stat-input::-webkit-outer-spin-button,
+.stat-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.stat-input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+
+.stat-hint {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  margin-top: 0.3rem;
+}
+
+/* ===== 表格容器 ===== */
 .table-wrap {
-  overflow: auto; max-height: calc(100vh - 300px);
-  border-radius: 12px; border: 1px solid #e2e8f0; background: #fff;
+  overflow: auto;
+  max-height: calc(100vh - 340px);
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 table {
-  border-collapse: separate; border-spacing: 0;
-  font-size: 0.82rem; table-layout: fixed;
-  width: 100%; min-width: 900px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.82rem;
+  width: 100%;
+  min-width: 700px;
+  table-layout: fixed;
 }
+
 th {
   position: sticky; top: 0; z-index: 10;
-  background: #f8fafc; padding: 0.6rem 0.5rem; text-align: left;
-  font-weight: 600; color: #334155; border-bottom: 1px solid #e2e8f0;
-  white-space: normal; font-size: 0.72rem; vertical-align: middle;
-  word-break: break-word; overflow-wrap: anywhere;
+  background: #f8fafc;
+  padding: 0.6rem 0.6rem;
+  text-align: left;
+  font-weight: 600;
+  color: #334155;
+  border-bottom: 2px solid #e2e8f0;
+  white-space: normal;
+  font-size: 0.75rem;
+  vertical-align: middle;
+  word-break: break-word;
+  line-height: 1.35;
 }
-th.grp { background: #eef2ff; text-align: center; }
-th.grp-sub { background: #eef2ff; text-align: center; font-size: 0.68rem; }
-th.num-col { text-align: right; }
-th.chk-col { width: 44px; text-align: center; }
+thead tr:nth-child(2) th {
+  background: #f1f5f9;
+  border-bottom: 2px solid #cbd5e1;
+}
+th.th-chk { width: 50px; text-align: center; }
+th.th-no { width: 50px; text-align: center; }
+th.th-wage { width: 300px; }
+th.th-emp { width: 140px; text-align: right; }
+th.th-ee { width: 140px; text-align: right; }
+th.th-total { width: 140px; text-align: right; }
+th.grp-hd {
+  background: #ccfbf1;
+  text-align: center;
+  font-size: 0.72rem;
+  color: #0f766e;
+  border-bottom: 1px solid #99f6e4;
+}
+thead tr:nth-child(2) th.grp-hd {
+  background: #b2f5ea;
+  border-bottom: 2px solid #5eead4;
+}
+
 td {
-  padding: 0.4rem 0.5rem; border-bottom: 1px solid #f1f5f9;
-  vertical-align: middle; background: #fff;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+  background: #fff;
+  font-size: 0.82rem;
 }
 tr:hover td { background: #fafbfc; }
-tr.disabled td { opacity: 0.55; }
-td.num { text-align: right; font-variant-numeric: tabular-nums; }
-td.center { text-align: center; }
-td.wage-range { font-weight: 500; color: #0f172a; }
+tr.row-edit td { background: #fefce8; }
+tr.row-edit:hover td { background: #fef9c3; }
+tr.row-highlight td { background: #ccfbf1 !important; }
 
-/* 输入框 */
-.input {
-  width: 100%; min-width: 0; border: 1px solid #e2e8f0;
-  border-radius: 6px; padding: 0.3rem 0.4rem; font-size: 0.82rem;
-  background: #fff; transition: 0.15s; font-family: inherit;
-  text-align: right;
-}
-.input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
-.input[readonly] { background: transparent; border-color: transparent; color: #334155; }
-.input[readonly]:hover { background: #f8fafc; }
-
-/* 勾选框 */
 .td-chk { text-align: center; }
 .td-chk input[type="checkbox"] {
-  width: 17px; height: 17px; cursor: pointer; accent-color: #2563eb;
+  width: 18px; height: 18px;
+  cursor: pointer;
+  accent-color: #0d9488;
+}
+.td-no { text-align: center; color: #64748b; font-weight: 500; }
+.td-wage { color: #0f172a; }
+.td-num { text-align: right; font-variant-numeric: tabular-nums; }
+.td-num strong { color: #0f172a; }
+.td-total { text-align: right; font-variant-numeric: tabular-nums; color: #0d9488; font-weight: 600; }
+
+/* ===== 可编辑输入框 ===== */
+.cell-input {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.82rem;
+  font-family: inherit;
+  background: #fff;
+  text-align: right;
+  transition: 0.15s;
+}
+.cell-input:focus {
+  outline: none;
+  border-color: #0d9488;
+  box-shadow: 0 0 0 2px rgba(13,148,136,0.15);
 }
 
 /* ===== Toast ===== */
 .toast {
-  position: fixed; bottom: 1.5rem; right: 1.5rem; background: #1e293b; color: #fff;
-  padding: 0.8rem 1.3rem; border-radius: 40px; font-size: 0.85rem; font-weight: 500;
-  z-index: 9999; opacity: 0; transform: translateY(10px);
-  transition: 0.2s; pointer-events: none;
+  position: fixed;
+  bottom: 1.5rem; right: 1.5rem;
+  background: #1e293b;
+  color: #fff;
+  padding: 0.8rem 1.3rem;
+  border-radius: 40px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: 0.2s;
+  pointer-events: none;
+  max-width: 360px;
 }
 .toast.show { opacity: 1; transform: translateY(0); }
+.toast.error { background: #b91c1c; }
 
-/* ===== 模态框 ===== */
+/* ===== 密码弹窗 ===== */
 .modal-overlay {
-  position: fixed; inset: 0; background: rgba(15,23,42,0.55);
-  z-index: 9998; display: flex; align-items: center; justify-content: center;
+  position: fixed; inset: 0;
+  background: rgba(15,23,42,0.55);
+  z-index: 9998;
+  display: flex; align-items: center; justify-content: center;
   padding: 1rem;
 }
 .modal-box {
-  background: #fff; border-radius: 14px; padding: 1.4rem;
-  width: 100%; max-width: 420px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.5rem;
+  width: 100%; max-width: 380px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.25);
   display: flex; flex-direction: column; gap: 1rem;
 }
-.modal-box h3 { font-size: 1.05rem; font-weight: 600; color: #0f172a; }
-.modal-box .hint { font-size: 0.78rem; color: #64748b; }
+.modal-box h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.modal-box p {
+  font-size: 0.82rem;
+  color: #64748b;
+  line-height: 1.5;
+}
 .modal-box input[type="password"] {
-  width: 100%; padding: 0.6rem 0.8rem; font-size: 0.95rem;
-  border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit;
-  letter-spacing: 2px; text-align: center;
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  letter-spacing: 0.2em;
+  text-align: center;
+  transition: 0.15s;
 }
 .modal-box input[type="password"]:focus {
-  outline: none; border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+  outline: none;
+  border-color: #0d9488;
+  box-shadow: 0 0 0 3px rgba(13,148,136,0.15);
 }
-.modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
+.modal-actions {
+  display: flex; gap: 0.5rem;
+  justify-content: flex-end;
+}
 
 /* ===== 导入弹窗 ===== */
-.import-modal { max-width: 560px; }
+.import-box {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.5rem;
+  width: 100%; max-width: 520px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.import-box h3 {
+  font-size: 1rem; font-weight: 700; color: #0f172a;
+}
 .dropzone {
-  border: 2px dashed #cbd5e1; border-radius: 10px; padding: 2rem 1rem;
-  text-align: center; cursor: pointer; transition: 0.15s;
+  border: 2px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 2rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.15s;
   background: #f8fafc;
 }
 .dropzone:hover, .dropzone.drag-over {
-  border-color: #2563eb; background: #eff6ff;
+  border-color: #0d9488;
+  background: #f0fdfa;
 }
 .dropzone .icon { font-size: 2rem; margin-bottom: 0.5rem; }
 .dropzone p { font-size: 0.85rem; color: #475569; margin: 0.2rem 0; }
 .dropzone .hint { font-size: 0.72rem; color: #94a3b8; }
-.import-footer {
-  display: flex; justify-content: space-between; align-items: center;
-  gap: 0.5rem; flex-wrap: wrap;
-  padding-top: 0.8rem; border-top: 1px solid #e2e8f0;
+
+/* ===== 图例 ===== */
+.legend {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.75rem;
+  padding-left: 0.25rem;
+  line-height: 1.6;
 }
-.template-links { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: #64748b; }
+.legend strong { color: #334155; }
 
 /* ===== 打印 ===== */
 @media print {
-  .topbar, .info-card, .toast, .modal-overlay, .btn { display: none !important; }
-  body { background: #fff; padding: 0; }
-  .table-wrap { border: none; max-height: none; overflow: visible; }
-  th { position: static; }
-  table { font-size: 7pt; }
-  .input { border: none; padding: 0; }
+  .topbar, .stats-row, .page-header, .legend, .toast, .modal-overlay { display: none !important; }
+  .table-wrap { max-height: none; border: none; box-shadow: none; }
+  body { background: #fff; }
 }
 </style>
 </head>
 <body>
 
-<!-- ============ 顶部导航栏 ============ -->
+<!-- ===== 顶部导航 ===== -->
 <div class="topbar">
-  <div class="logo">🏦 <span>KWSP</span> EPF Contribution Table</div>
-  <span style="width:1px;height:24px;background:#e2e8f0;"></span>
-  <button class="btn btn-success" onclick="saveToStorage()">💾 Simpan</button>
-  <button class="btn" onclick="openImportModal()">📥 Import</button>
+  <div class="brand">
+    <div class="logo">P</div>
+    Jadual Caruman EPF
+  </div>
+  <span style="width:1px;height:24px;background:#e2e8f0;margin:0 4px;"></span>
+
+  <button class="btn" onclick="openImport()">📥 Import</button>
   <select id="exportMenu" class="btn" onchange="handleExport(this.value)">
-    <option value="">💾 Export…</option>
+    <option value="">📤 Export…</option>
     <option value="xlsx">📊 Excel (.xlsx)</option>
     <option value="txt">📝 Text (.txt)</option>
     <option value="doc">📘 Word (.doc)</option>
   </select>
+
   <span class="spacer"></span>
-  <span style="font-size:0.75rem;color:#64748b;">Password edit: <strong>0000</strong></span>
+  <span style="font-size:0.72rem;color:#94a3b8;">Kadar Caruman KWSP · Akta 1991</span>
 </div>
 
 <div class="container">
-  <h1>Jadual Kadar Caruman KWSP</h1>
-  <p class="subtitle">Monthly Contribution Rate (Third Schedule) — EPF Act 1991 | Part A: Malaysian Citizens & PR (Below 60 Years) | Effective October 2025</p>
+  <!-- ===== 页面标题 ===== -->
+  <div class="page-header">
+    <h1>Jadual Kadar Caruman KWSP (EPF)</h1>
+    <p>Kadar caruman di bawah Akta Kumpulan Wang Simpanan Pekerja 1991 (Akta 452) — Pekerja 11% &amp; Majikan 13%/12% daripada gaji bulanan.</p>
+    <span class="badge">Berkuatkuasa mulai 1 Oktober 2025 · Jadual Ketiga Akta 1991</span>
+  </div>
 
-  <!-- 信息卡片 -->
-  <div class="info-card">
-    <div class="info-item">
-      <span class="label">Employee Rate:</span>
-      <span class="badge badge-blue">11%</span>
+  <!-- ===== 薪资输入 + EPF 自动查询 ===== -->
+  <div class="stats-row">
+    <div class="stat-card highlight">
+      <div class="label">💰 Masukkan Gaji Bulanan</div>
+      <input type="number" id="wageInput" class="stat-input"
+             placeholder="0.00" step="0.01" min="0"
+             oninput="updateCalc()">
+      <div class="stat-hint">Taip gaji untuk cari caruman EPF</div>
     </div>
-    <div class="info-item">
-      <span class="label">Employer Rate (≤ RM5,000):</span>
-      <span class="badge badge-green">13%</span>
+    <div class="stat-card">
+      <div class="label">Caruman Pekerja (11%)</div>
+      <div class="value green" id="resultEmployee">RM 0.00</div>
     </div>
-    <div class="info-item">
-      <span class="label">Employer Rate (> RM5,000):</span>
-      <span class="badge badge-green">12%</span>
+    <div class="stat-card">
+      <div class="label">Caruman Majikan (13%/12%)</div>
+      <div class="value teal" id="resultEmployer">RM 0.00</div>
     </div>
-    <div class="info-item">
-      <span class="label">Age 60+ Employee:</span>
-      <span class="badge badge-amber">5.5%</span>
-    </div>
-    <div class="info-item">
-      <span class="label">Age 60+ Employer:</span>
-      <span class="badge badge-amber">6.5%</span>
-    </div>
-    <div class="info-item">
-      <span class="label">Foreign Workers (Oct 2025):</span>
-      <span class="badge badge-purple">2% + 2%</span>
+    <div class="stat-card">
+      <div class="label">Jumlah Caruman</div>
+      <div class="value" id="resultTotal">RM 0.00</div>
     </div>
   </div>
 
+  <!-- ===== 表格 ===== -->
   <div class="table-wrap">
     <table id="epfTable">
       <colgroup>
-        <col style="width:44px">   <!-- 勾选 -->
-        <col style="width:50px">   <!-- No. -->
-        <col style="width:220px">  <!-- 工资范围 -->
-        <col style="width:110px">  <!-- 雇主缴纳 -->
-        <col style="width:110px">  <!-- 员工缴纳 -->
-        <col style="width:110px">  <!-- 总缴纳 -->
+        <col style="width:50px">   <!-- Chk -->
+        <col style="width:50px">   <!-- No -->
+        <col style="width:300px">  <!-- Wages -->
+        <col style="width:140px">  <!-- Employer -->
+        <col style="width:140px">  <!-- Employee -->
+        <col style="width:140px">  <!-- Total -->
       </colgroup>
       <thead>
-        <tr>
-          <th class="chk-col" rowspan="2">✎</th>
-          <th rowspan="2" style="text-align:center;">No.</th>
-          <th rowspan="2">Amount of Wages for the Month (RM)</th>
-          <th class="grp" colspan="3">Rate of Contribution for the Month (RM)</th>
+        <tr id="headRow1">
+          <th class="th-chk" rowspan="2">✎</th>
+          <th class="th-no" rowspan="2">No.</th>
+          <th class="th-wage" rowspan="2">Gaji Bulanan Sebenar (RM)</th>
+          <th class="grp-hd" colspan="3">Caruman EPF<br><span style="font-weight:400;font-size:0.65rem;">Akta Kumpulan Wang Simpanan Pekerja 1991 (Akta 452)</span></th>
         </tr>
-        <tr>
-          <th class="grp-sub">By the Employer</th>
-          <th class="grp-sub">By the Employee</th>
-          <th class="grp-sub">Total Contribution</th>
+        <tr id="headRow2">
+          <th class="th-emp grp-hd">Majikan (RM)</th>
+          <th class="th-ee grp-hd">Pekerja (RM)</th>
+          <th class="th-total grp-hd">Jumlah (RM)</th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
     </table>
   </div>
+
+  <div class="legend">
+    <strong>Nota:</strong> Kadar caruman mengikut Jadual Ketiga Akta 452. Baris boleh diedit selepas menandakan ✔ dan memasukkan kata laluan. Pekerja 11%, Majikan 13% (gaji ≤ RM5,000) atau 12% (gaji &gt; RM5,000). Bagi gaji melebihi RM20,000, caruman dikira mengikut peratusan tepat. Gaji/upah Oktober 2025 (bulan caruman November 2025).
+  </div>
 </div>
 
-<!-- ===== 密码模态框 ===== -->
+<!-- ===== 密码弹窗 ===== -->
 <div id="pwdModal" class="modal-overlay" style="display:none;">
   <div class="modal-box">
-    <h3>🔐 Masukkan Password</h3>
-    <p class="hint">Password diperlukan untuk membenarkan pengeditan baris ini.</p>
+    <h3>🔒 Sahkan Kata Laluan</h3>
+    <p>Masukkan kata laluan untuk membenarkan pengeditan baris ini.</p>
     <input type="password" id="pwdInput" maxlength="4" placeholder="••••" autocomplete="off">
     <div class="modal-actions">
-      <button class="btn" onclick="closePwdModal()">Batal</button>
+      <button class="btn" onclick="closePwd()">Batal</button>
       <button class="btn btn-primary" onclick="confirmPwd()">Sahkan</button>
     </div>
   </div>
 </div>
 
-<!-- ===== 导入模态框 ===== -->
+<!-- ===== 导入弹窗 ===== -->
 <div id="importModal" class="modal-overlay" style="display:none;">
-  <div class="modal-box import-modal">
-    <h3>📥 Import Data</h3>
+  <div class="import-box">
+    <h3>📥 Import Data EPF</h3>
     <div class="dropzone" id="dropzone">
       <div class="icon">📁</div>
-      <p><strong>拖入文件或点击选择</strong></p>
-      <p class="hint">Format: .xlsx / .csv / .txt</p>
+      <p><strong>Klik atau seret fail ke sini</strong></p>
+      <p class="hint">Format: .xlsx / .txt / .csv</p>
       <input type="file" id="importFile" accept=".xlsx,.xls,.csv,.txt" style="display:none;">
     </div>
-    <div class="import-footer">
-      <div class="template-links">
-        <span>📄 Template:</span>
-        <button class="btn btn-sm" onclick="downloadTemplate('xlsx')">Excel</button>
-        <button class="btn btn-sm" onclick="downloadTemplate('doc')">Word</button>
-      </div>
-      <button class="btn" onclick="closeImportModal()">Tutup</button>
+    <div style="display:flex;justify-content:flex-end;gap:0.5rem;">
+      <button class="btn" onclick="closeImport()">Tutup</button>
     </div>
   </div>
 </div>
@@ -290,701 +495,750 @@ td.wage-range { font-weight: 500; color: #0f172a; }
 <div id="toast" class="toast"></div>
 
 <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
 <script>
-// =====================================================
-// ★ EPF 数据（马来西亚官方 Third Schedule 2025）
-// 来源：KWSP Act 1991 Third Schedule Part A
-// 生效日期：2025 年 10 月 1 日（Gaji/Upah Oktober 2025）
-// =====================================================
+// ============================================================
+// EPF 官方数据（KWSP Jadual Ketiga Akta 452）
+// 格式：[No, 工资描述, 工资下限, 工资上限, 雇主, 员工, 合计]
+// ============================================================
 const EPF_DATA = [
-  // [No, lower, upper, employer, employee, total]
-  [1,  0.01, 10.00, 0.00, 0.00, 0.00],
-  [2,  10.01, 20.00, 3.00, 3.00, 6.00],
-  [3,  20.01, 40.00, 6.00, 5.00, 11.00],
-  [4,  40.01, 60.00, 8.00, 7.00, 15.00],
-  [5,  60.01, 80.00, 11.00, 9.00, 20.00],
-  [6,  80.01, 100.00, 13.00, 11.00, 24.00],
-  [7,  100.01, 120.00, 16.00, 14.00, 30.00],
-  [8,  120.01, 140.00, 19.00, 16.00, 35.00],
-  [9,  140.01, 160.00, 21.00, 18.00, 39.00],
-  [10, 160.01, 180.00, 24.00, 20.00, 44.00],
-  [11, 180.01, 200.00, 26.00, 22.00, 48.00],
-  [12, 200.01, 220.00, 29.00, 25.00, 54.00],
-  [13, 220.01, 240.00, 32.00, 27.00, 59.00],
-  [14, 240.01, 260.00, 34.00, 29.00, 63.00],
-  [15, 260.01, 280.00, 37.00, 31.00, 68.00],
-  [16, 280.01, 300.00, 39.00, 33.00, 72.00],
-  [17, 300.01, 320.00, 42.00, 36.00, 78.00],
-  [18, 320.01, 340.00, 45.00, 38.00, 83.00],
-  [19, 340.01, 360.00, 47.00, 40.00, 87.00],
-  [20, 360.01, 380.00, 50.00, 42.00, 92.00],
-  [21, 380.01, 400.00, 52.00, 44.00, 96.00],
-  [22, 400.01, 420.00, 55.00, 47.00, 102.00],
-  [23, 420.01, 440.00, 58.00, 49.00, 107.00],
-  [24, 440.01, 460.00, 60.00, 51.00, 111.00],
-  [25, 460.01, 480.00, 63.00, 53.00, 116.00],
-  [26, 480.01, 500.00, 65.00, 55.00, 120.00],
-  [27, 500.01, 520.00, 68.00, 58.00, 126.00],
-  [28, 520.01, 540.00, 71.00, 60.00, 131.00],
-  [29, 540.01, 560.00, 73.00, 62.00, 135.00],
-  [30, 560.01, 580.00, 76.00, 64.00, 140.00],
-  [31, 580.01, 600.00, 78.00, 66.00, 144.00],
-  [32, 600.01, 620.00, 81.00, 69.00, 150.00],
-  [33, 620.01, 640.00, 84.00, 71.00, 155.00],
-  [34, 640.01, 660.00, 86.00, 73.00, 159.00],
-  [35, 660.01, 680.00, 89.00, 75.00, 164.00],
-  [36, 680.01, 700.00, 91.00, 77.00, 168.00],
-  [37, 700.01, 720.00, 94.00, 80.00, 174.00],
-  [38, 720.01, 740.00, 97.00, 82.00, 179.00],
-  [39, 740.01, 760.00, 99.00, 84.00, 183.00],
-  [40, 760.01, 780.00, 102.00, 86.00, 188.00],
-  [41, 780.01, 800.00, 104.00, 88.00, 192.00],
-  [42, 800.01, 820.00, 107.00, 91.00, 198.00],
-  [43, 820.01, 840.00, 110.00, 93.00, 203.00],
-  [44, 840.01, 860.00, 112.00, 95.00, 207.00],
-  [45, 860.01, 880.00, 115.00, 97.00, 212.00],
-  [46, 880.01, 900.00, 117.00, 99.00, 216.00],
-  [47, 900.01, 920.00, 120.00, 102.00, 222.00],
-  [48, 920.01, 940.00, 123.00, 104.00, 227.00],
-  [49, 940.01, 960.00, 125.00, 106.00, 231.00],
-  [50, 960.01, 980.00, 128.00, 108.00, 236.00],
-  [51, 980.01, 1000.00, 130.00, 110.00, 240.00],
-  [52, 1000.01, 1020.00, 133.00, 113.00, 246.00],
-  [53, 1020.01, 1040.00, 136.00, 115.00, 251.00],
-  [54, 1040.01, 1060.00, 138.00, 117.00, 255.00],
-  [55, 1060.01, 1080.00, 141.00, 119.00, 260.00],
-  [56, 1080.01, 1100.00, 143.00, 121.00, 264.00],
-  [57, 1100.01, 1120.00, 146.00, 124.00, 270.00],
-  [58, 1120.01, 1140.00, 149.00, 126.00, 275.00],
-  [59, 1140.01, 1160.00, 151.00, 128.00, 279.00],
-  [60, 1160.01, 1180.00, 154.00, 130.00, 284.00],
-  [61, 1180.01, 1200.00, 156.00, 132.00, 288.00],
-  [62, 1200.01, 1220.00, 159.00, 135.00, 294.00],
-  [63, 1220.01, 1240.00, 162.00, 137.00, 299.00],
-  [64, 1240.01, 1260.00, 164.00, 139.00, 303.00],
-  [65, 1260.01, 1280.00, 167.00, 141.00, 308.00],
-  [66, 1280.01, 1300.00, 169.00, 143.00, 312.00],
-  [67, 1300.01, 1320.00, 172.00, 146.00, 318.00],
-  [68, 1320.01, 1340.00, 175.00, 148.00, 323.00],
-  [69, 1340.01, 1360.00, 177.00, 150.00, 327.00],
-  [70, 1360.01, 1380.00, 180.00, 152.00, 332.00],
-  [71, 1380.01, 1400.00, 182.00, 154.00, 336.00],
-  [72, 1400.01, 1420.00, 185.00, 157.00, 342.00],
-  [73, 1420.01, 1440.00, 188.00, 159.00, 347.00],
-  [74, 1440.01, 1460.00, 190.00, 161.00, 351.00],
-  [75, 1460.01, 1480.00, 193.00, 163.00, 356.00],
-  [76, 1480.01, 1500.00, 195.00, 165.00, 360.00],
-  [77, 1500.01, 1520.00, 198.00, 168.00, 366.00],
-  [78, 1520.01, 1540.00, 201.00, 170.00, 371.00],
-  [79, 1540.01, 1560.00, 203.00, 172.00, 375.00],
-  [80, 1560.01, 1580.00, 206.00, 174.00, 380.00],
-  [81, 1580.01, 1600.00, 208.00, 176.00, 384.00],
-  [82, 1600.01, 1620.00, 211.00, 179.00, 390.00],
-  [83, 1620.01, 1640.00, 214.00, 181.00, 395.00],
-  [84, 1640.01, 1660.00, 216.00, 183.00, 399.00],
-  [85, 1660.01, 1680.00, 219.00, 185.00, 404.00],
-  [86, 1680.01, 1700.00, 221.00, 187.00, 408.00],
-  [87, 1700.01, 1720.00, 224.00, 190.00, 414.00],
-  [88, 1720.01, 1740.00, 227.00, 192.00, 419.00],
-  [89, 1740.01, 1760.00, 229.00, 194.00, 423.00],
-  [90, 1760.01, 1780.00, 232.00, 196.00, 428.00],
-  [91, 1780.01, 1800.00, 234.00, 198.00, 432.00],
-  [92, 1800.01, 1820.00, 237.00, 201.00, 438.00],
-  [93, 1820.01, 1840.00, 240.00, 203.00, 443.00],
-  [94, 1840.01, 1860.00, 242.00, 205.00, 447.00],
-  [95, 1860.01, 1880.00, 245.00, 207.00, 452.00],
-  [96, 1880.01, 1900.00, 247.00, 209.00, 456.00],
-  [97, 1900.01, 1920.00, 250.00, 212.00, 462.00],
-  [98, 1920.01, 1940.00, 253.00, 214.00, 467.00],
-  [99, 1940.01, 1960.00, 255.00, 216.00, 471.00],
-  [100, 1960.01, 1980.00, 258.00, 218.00, 476.00],
-  [101, 1980.01, 2000.00, 260.00, 220.00, 480.00],
-  [102, 2000.01, 2020.00, 263.00, 223.00, 486.00],
-  [103, 2020.01, 2040.00, 266.00, 225.00, 491.00],
-  [104, 2040.01, 2060.00, 268.00, 227.00, 495.00],
-  [105, 2060.01, 2080.00, 271.00, 229.00, 500.00],
-  [106, 2080.01, 2100.00, 273.00, 231.00, 504.00],
-  [107, 2100.01, 2120.00, 276.00, 234.00, 510.00],
-  [108, 2120.01, 2140.00, 279.00, 236.00, 515.00],
-  [109, 2140.01, 2160.00, 281.00, 238.00, 519.00],
-  [110, 2160.01, 2180.00, 284.00, 240.00, 524.00],
-  [111, 2180.01, 2200.00, 286.00, 242.00, 528.00],
-  [112, 2200.01, 2220.00, 289.00, 245.00, 534.00],
-  [113, 2220.01, 2240.00, 292.00, 247.00, 539.00],
-  [114, 2240.01, 2260.00, 294.00, 249.00, 543.00],
-  [115, 2260.01, 2280.00, 297.00, 251.00, 548.00],
-  [116, 2280.01, 2300.00, 299.00, 253.00, 552.00],
-  [117, 2300.01, 2320.00, 302.00, 256.00, 558.00],
-  [118, 2320.01, 2340.00, 305.00, 258.00, 563.00],
-  [119, 2340.01, 2360.00, 307.00, 260.00, 567.00],
-  [120, 2360.01, 2380.00, 310.00, 262.00, 572.00],
-  [121, 2380.01, 2400.00, 312.00, 264.00, 576.00],
-  [122, 2400.01, 2420.00, 315.00, 267.00, 582.00],
-  [123, 2420.01, 2440.00, 318.00, 269.00, 587.00],
-  [124, 2440.01, 2460.00, 320.00, 271.00, 591.00],
-  [125, 2460.01, 2480.00, 323.00, 273.00, 596.00],
-  [126, 2480.01, 2500.00, 325.00, 275.00, 600.00],
-  [127, 2500.01, 2520.00, 328.00, 278.00, 606.00],
-  [128, 2520.01, 2540.00, 331.00, 280.00, 611.00],
-  [129, 2540.01, 2560.00, 333.00, 282.00, 615.00],
-  [130, 2560.01, 2580.00, 336.00, 284.00, 620.00],
-  [131, 2580.01, 2600.00, 338.00, 286.00, 624.00],
-  [132, 2600.01, 2620.00, 341.00, 289.00, 630.00],
-  [133, 2620.01, 2640.00, 344.00, 291.00, 635.00],
-  [134, 2640.01, 2660.00, 346.00, 293.00, 639.00],
-  [135, 2660.01, 2680.00, 349.00, 295.00, 644.00],
-  [136, 2680.01, 2700.00, 351.00, 297.00, 648.00],
-  [137, 2700.01, 2720.00, 354.00, 300.00, 654.00],
-  [138, 2720.01, 2740.00, 357.00, 302.00, 659.00],
-  [139, 2740.01, 2760.00, 359.00, 304.00, 663.00],
-  [140, 2760.01, 2780.00, 362.00, 306.00, 668.00],
-  [141, 2780.01, 2800.00, 364.00, 308.00, 672.00],
-  [142, 2800.01, 2820.00, 367.00, 311.00, 678.00],
-  [143, 2820.01, 2840.00, 370.00, 313.00, 683.00],
-  [144, 2840.01, 2860.00, 372.00, 315.00, 687.00],
-  [145, 2860.01, 2880.00, 375.00, 317.00, 692.00],
-  [146, 2880.01, 2900.00, 377.00, 319.00, 696.00],
-  [147, 2900.01, 2920.00, 380.00, 322.00, 702.00],
-  [148, 2920.01, 2940.00, 383.00, 324.00, 707.00],
-  [149, 2940.01, 2960.00, 385.00, 326.00, 711.00],
-  [150, 2960.01, 2980.00, 388.00, 328.00, 716.00],
-  [151, 2980.01, 3000.00, 390.00, 330.00, 720.00],
-  [152, 3000.01, 3020.00, 393.00, 333.00, 726.00],
-  [153, 3020.01, 3040.00, 396.00, 335.00, 731.00],
-  [154, 3040.01, 3060.00, 398.00, 337.00, 735.00],
-  [155, 3060.01, 3080.00, 401.00, 339.00, 740.00],
-  [156, 3080.01, 3100.00, 403.00, 341.00, 744.00],
-  [157, 3100.01, 3120.00, 406.00, 344.00, 750.00],
-  [158, 3120.01, 3140.00, 409.00, 346.00, 755.00],
-  [159, 3140.01, 3160.00, 411.00, 348.00, 759.00],
-  [160, 3160.01, 3180.00, 414.00, 350.00, 764.00],
-  [161, 3180.01, 3200.00, 416.00, 352.00, 768.00],
-  [162, 3200.01, 3220.00, 419.00, 355.00, 774.00],
-  [163, 3220.01, 3240.00, 422.00, 357.00, 779.00],
-  [164, 3240.01, 3260.00, 424.00, 359.00, 783.00],
-  [165, 3260.01, 3280.00, 427.00, 361.00, 788.00],
-  [166, 3280.01, 3300.00, 429.00, 363.00, 792.00],
-  [167, 3300.01, 3320.00, 432.00, 366.00, 798.00],
-  [168, 3320.01, 3340.00, 435.00, 368.00, 803.00],
-  [169, 3340.01, 3360.00, 437.00, 370.00, 807.00],
-  [170, 3360.01, 3380.00, 440.00, 372.00, 812.00],
-  [171, 3380.01, 3400.00, 442.00, 374.00, 816.00],
-  [172, 3400.01, 3420.00, 445.00, 377.00, 822.00],
-  [173, 3420.01, 3440.00, 448.00, 379.00, 827.00],
-  [174, 3440.01, 3460.00, 450.00, 381.00, 831.00],
-  [175, 3460.01, 3480.00, 453.00, 383.00, 836.00],
-  [176, 3480.01, 3500.00, 455.00, 385.00, 840.00],
-  [177, 3500.01, 3520.00, 458.00, 388.00, 846.00],
-  [178, 3520.01, 3540.00, 461.00, 390.00, 851.00],
-  [179, 3540.01, 3560.00, 463.00, 392.00, 855.00],
-  [180, 3560.01, 3580.00, 466.00, 394.00, 860.00],
-  [181, 3580.01, 3600.00, 468.00, 396.00, 864.00],
-  [182, 3600.01, 3620.00, 471.00, 399.00, 870.00],
-  [183, 3620.01, 3640.00, 474.00, 401.00, 875.00],
-  [184, 3640.01, 3660.00, 476.00, 403.00, 879.00],
-  [185, 3660.01, 3680.00, 479.00, 405.00, 884.00],
-  [186, 3680.01, 3700.00, 481.00, 407.00, 888.00],
-  [187, 3700.01, 3720.00, 484.00, 410.00, 894.00],
-  [188, 3720.01, 3740.00, 487.00, 412.00, 899.00],
-  [189, 3740.01, 3760.00, 489.00, 414.00, 903.00],
-  [190, 3760.01, 3780.00, 492.00, 416.00, 908.00],
-  [191, 3780.01, 3800.00, 494.00, 418.00, 912.00],
-  [192, 3800.01, 3820.00, 497.00, 421.00, 918.00],
-  [193, 3820.01, 3840.00, 500.00, 423.00, 923.00],
-  [194, 3840.01, 3860.00, 502.00, 425.00, 927.00],
-  [195, 3860.01, 3880.00, 505.00, 427.00, 932.00],
-  [196, 3880.01, 3900.00, 507.00, 429.00, 936.00],
-  [197, 3900.01, 3920.00, 510.00, 432.00, 942.00],
-  [198, 3920.01, 3940.00, 513.00, 434.00, 947.00],
-  [199, 3940.01, 3960.00, 515.00, 436.00, 951.00],
-  [200, 3960.01, 3980.00, 518.00, 438.00, 956.00],
-  [201, 3980.01, 4000.00, 520.00, 440.00, 960.00],
-  [202, 4000.01, 4020.00, 523.00, 443.00, 966.00],
-  [203, 4020.01, 4040.00, 526.00, 445.00, 971.00],
-  [204, 4040.01, 4060.00, 528.00, 447.00, 975.00],
-  [205, 4060.01, 4080.00, 531.00, 449.00, 980.00],
-  [206, 4080.01, 4100.00, 533.00, 451.00, 984.00],
-  [207, 4100.01, 4120.00, 536.00, 454.00, 990.00],
-  [208, 4120.01, 4140.00, 539.00, 456.00, 995.00],
-  [209, 4140.01, 4160.00, 541.00, 458.00, 999.00],
-  [210, 4160.01, 4180.00, 544.00, 460.00, 1004.00],
-  [211, 4180.01, 4200.00, 546.00, 462.00, 1008.00],
-  [212, 4200.01, 4220.00, 549.00, 465.00, 1014.00],
-  [213, 4220.01, 4240.00, 552.00, 467.00, 1019.00],
-  [214, 4240.01, 4260.00, 554.00, 469.00, 1023.00],
-  [215, 4260.01, 4280.00, 557.00, 471.00, 1028.00],
-  [216, 4280.01, 4300.00, 559.00, 473.00, 1032.00],
-  [217, 4300.01, 4320.00, 562.00, 476.00, 1038.00],
-  [218, 4320.01, 4340.00, 565.00, 478.00, 1043.00],
-  [219, 4340.01, 4360.00, 567.00, 480.00, 1047.00],
-  [220, 4360.01, 4380.00, 570.00, 482.00, 1052.00],
-  [221, 4380.01, 4400.00, 572.00, 484.00, 1056.00],
-  [222, 4400.01, 4420.00, 575.00, 487.00, 1062.00],
-  [223, 4420.01, 4440.00, 578.00, 489.00, 1067.00],
-  [224, 4440.01, 4460.00, 580.00, 491.00, 1071.00],
-  [225, 4460.01, 4480.00, 583.00, 493.00, 1076.00],
-  [226, 4480.01, 4500.00, 585.00, 495.00, 1080.00],
-  [227, 4500.01, 4520.00, 588.00, 498.00, 1086.00],
-  [228, 4520.01, 4540.00, 591.00, 500.00, 1091.00],
-  [229, 4540.01, 4560.00, 593.00, 502.00, 1095.00],
-  [230, 4560.01, 4580.00, 596.00, 504.00, 1100.00],
-  [231, 4580.01, 4600.00, 598.00, 506.00, 1104.00],
-  [232, 4600.01, 4620.00, 601.00, 509.00, 1110.00],
-  [233, 4620.01, 4640.00, 604.00, 511.00, 1115.00],
-  [234, 4640.01, 4660.00, 606.00, 513.00, 1119.00],
-  [235, 4660.01, 4680.00, 609.00, 515.00, 1124.00],
-  [236, 4680.01, 4700.00, 611.00, 517.00, 1128.00],
-  [237, 4700.01, 4720.00, 614.00, 520.00, 1134.00],
-  [238, 4720.01, 4740.00, 617.00, 522.00, 1139.00],
-  [239, 4740.01, 4760.00, 619.00, 524.00, 1143.00],
-  [240, 4760.01, 4780.00, 622.00, 526.00, 1148.00],
-  [241, 4780.01, 4800.00, 624.00, 528.00, 1152.00],
-  [242, 4800.01, 4820.00, 627.00, 531.00, 1158.00],
-  [243, 4820.01, 4840.00, 630.00, 533.00, 1163.00],
-  [244, 4840.01, 4860.00, 632.00, 535.00, 1167.00],
-  [245, 4860.01, 4880.00, 635.00, 537.00, 1172.00],
-  [246, 4880.01, 4900.00, 637.00, 539.00, 1176.00],
-  [247, 4900.01, 4920.00, 640.00, 542.00, 1182.00],
-  [248, 4920.01, 4940.00, 643.00, 544.00, 1187.00],
-  [249, 4940.01, 4960.00, 645.00, 546.00, 1191.00],
-  [250, 4960.01, 4980.00, 648.00, 548.00, 1196.00],
-  [251, 4980.01, 5000.00, 650.00, 550.00, 1200.00],
-  [252, 5000.01, 5100.00, 612.00, 561.00, 1173.00],
-  [253, 5100.01, 5200.00, 624.00, 572.00, 1196.00],
-  [254, 5200.01, 5300.00, 636.00, 583.00, 1219.00],
-  [255, 5300.01, 5400.00, 648.00, 594.00, 1242.00],
-  [256, 5400.01, 5500.00, 660.00, 605.00, 1265.00],
-  [257, 5500.01, 5600.00, 672.00, 616.00, 1288.00],
-  [258, 5600.01, 5700.00, 684.00, 627.00, 1311.00],
-  [259, 5700.01, 5800.00, 696.00, 638.00, 1334.00],
-  [260, 5800.01, 5900.00, 708.00, 649.00, 1357.00],
-  [261, 5900.01, 6000.00, 720.00, 660.00, 1380.00],
-  [262, 6000.01, 6100.00, 732.00, 671.00, 1403.00],
-  [263, 6100.01, 6200.00, 744.00, 682.00, 1426.00],
-  [264, 6200.01, 6300.00, 756.00, 693.00, 1449.00],
-  [265, 6300.01, 6400.00, 768.00, 704.00, 1472.00],
-  [266, 6400.01, 6500.00, 780.00, 715.00, 1495.00],
-  [267, 6500.01, 6600.00, 792.00, 726.00, 1518.00],
-  [268, 6600.01, 6700.00, 804.00, 737.00, 1541.00],
-  [269, 6700.01, 6800.00, 816.00, 748.00, 1564.00],
-  [270, 6800.01, 6900.00, 828.00, 759.00, 1587.00],
-  [271, 6900.01, 7000.00, 840.00, 770.00, 1610.00],
-  [272, 7000.01, 7100.00, 852.00, 781.00, 1633.00],
-  [273, 7100.01, 7200.00, 864.00, 792.00, 1656.00],
-  [274, 7200.01, 7300.00, 876.00, 803.00, 1679.00],
-  [275, 7300.01, 7400.00, 888.00, 814.00, 1702.00],
-  [276, 7400.01, 7500.00, 900.00, 825.00, 1725.00],
-  [277, 7500.01, 7600.00, 912.00, 836.00, 1748.00],
-  [278, 7600.01, 7700.00, 924.00, 847.00, 1771.00],
-  [279, 7700.01, 7800.00, 936.00, 858.00, 1794.00],
-  [280, 7800.01, 7900.00, 948.00, 869.00, 1817.00],
-  [281, 7900.01, 8000.00, 960.00, 880.00, 1840.00],
-  [282, 8000.01, 8100.00, 972.00, 891.00, 1863.00],
-  [283, 8100.01, 8200.00, 984.00, 902.00, 1886.00],
-  [284, 8200.01, 8300.00, 996.00, 913.00, 1909.00],
-  [285, 8300.01, 8400.00, 1008.00, 924.00, 1932.00],
-  [286, 8400.01, 8500.00, 1020.00, 935.00, 1955.00],
-  [287, 8500.01, 8600.00, 1032.00, 946.00, 1978.00],
-  [288, 8600.01, 8700.00, 1044.00, 957.00, 2001.00],
-  [289, 8700.01, 8800.00, 1056.00, 968.00, 2024.00],
-  [290, 8800.01, 8900.00, 1068.00, 979.00, 2047.00],
-  [291, 8900.01, 9000.00, 1080.00, 990.00, 2070.00],
-  [292, 9000.01, 9100.00, 1092.00, 1001.00, 2093.00],
-  [293, 9100.01, 9200.00, 1104.00, 1012.00, 2116.00],
-  [294, 9200.01, 9300.00, 1116.00, 1023.00, 2139.00],
-  [295, 9300.01, 9400.00, 1128.00, 1034.00, 2162.00],
-  [296, 9400.01, 9500.00, 1140.00, 1045.00, 2185.00],
-  [297, 9500.01, 9600.00, 1152.00, 1056.00, 2208.00],
-  [298, 9600.01, 9700.00, 1164.00, 1067.00, 2231.00],
-  [299, 9700.01, 9800.00, 1176.00, 1078.00, 2254.00],
-  [300, 9800.01, 9900.00, 1188.00, 1089.00, 2277.00],
-  [301, 9900.01, 10000.00, 1200.00, 1100.00, 2300.00],
-  [302, 10000.01, 10100.00, 1212.00, 1111.00, 2323.00],
-  [303, 10100.01, 10200.00, 1224.00, 1122.00, 2346.00],
-  [304, 10200.01, 10300.00, 1236.00, 1133.00, 2369.00],
-  [305, 10300.01, 10400.00, 1248.00, 1144.00, 2392.00],
-  [306, 10400.01, 10500.00, 1260.00, 1155.00, 2415.00],
-  [307, 10500.01, 10600.00, 1272.00, 1166.00, 2438.00],
-  [308, 10600.01, 10700.00, 1284.00, 1177.00, 2461.00],
-  [309, 10700.01, 10800.00, 1296.00, 1188.00, 2484.00],
-  [310, 10800.01, 10900.00, 1308.00, 1199.00, 2507.00],
-  [311, 10900.01, 11000.00, 1320.00, 1210.00, 2530.00],
-  [312, 11000.01, 11100.00, 1332.00, 1221.00, 2553.00],
-  [313, 11100.01, 11200.00, 1344.00, 1232.00, 2576.00],
-  [314, 11200.01, 11300.00, 1356.00, 1243.00, 2599.00],
-  [315, 11300.01, 11400.00, 1368.00, 1254.00, 2622.00],
-  [316, 11400.01, 11500.00, 1380.00, 1265.00, 2645.00],
-  [317, 11500.01, 11600.00, 1392.00, 1276.00, 2668.00],
-  [318, 11600.01, 11700.00, 1404.00, 1287.00, 2691.00],
-  [319, 11700.01, 11800.00, 1416.00, 1298.00, 2714.00],
-  [320, 11800.01, 11900.00, 1428.00, 1309.00, 2737.00],
-  [321, 11900.01, 12000.00, 1440.00, 1320.00, 2760.00],
-  [322, 12000.01, 12100.00, 1452.00, 1331.00, 2783.00],
-  [323, 12100.01, 12200.00, 1464.00, 1342.00, 2806.00],
-  [324, 12200.01, 12300.00, 1476.00, 1353.00, 2829.00],
-  [325, 12300.01, 12400.00, 1488.00, 1364.00, 2852.00],
-  [326, 12400.01, 12500.00, 1500.00, 1375.00, 2875.00],
-  [327, 12500.01, 12600.00, 1512.00, 1386.00, 2898.00],
-  [328, 12600.01, 12700.00, 1524.00, 1397.00, 2921.00],
-  [329, 12700.01, 12800.00, 1536.00, 1408.00, 2944.00],
-  [330, 12800.01, 12900.00, 1548.00, 1419.00, 2967.00],
-  [331, 12900.01, 13000.00, 1560.00, 1430.00, 2990.00],
-  [332, 13000.01, 13100.00, 1572.00, 1441.00, 3013.00],
-  [333, 13100.01, 13200.00, 1584.00, 1452.00, 3036.00],
-  [334, 13200.01, 13300.00, 1596.00, 1463.00, 3059.00],
-  [335, 13300.01, 13400.00, 1608.00, 1474.00, 3082.00],
-  [336, 13400.01, 13500.00, 1620.00, 1485.00, 3105.00],
-  [337, 13500.01, 13600.00, 1632.00, 1496.00, 3128.00],
-  [338, 13600.01, 13700.00, 1644.00, 1507.00, 3151.00],
-  [339, 13700.01, 13800.00, 1656.00, 1518.00, 3174.00],
-  [340, 13800.01, 13900.00, 1668.00, 1529.00, 3197.00],
-  [341, 13900.01, 14000.00, 1680.00, 1540.00, 3220.00],
-  [342, 14000.01, 14100.00, 1692.00, 1551.00, 3243.00],
-  [343, 14100.01, 14200.00, 1704.00, 1562.00, 3266.00],
-  [344, 14200.01, 14300.00, 1716.00, 1573.00, 3289.00],
-  [345, 14300.01, 14400.00, 1728.00, 1584.00, 3312.00],
-  [346, 14400.01, 14500.00, 1740.00, 1595.00, 3335.00],
-  [347, 14500.01, 14600.00, 1752.00, 1606.00, 3358.00],
-  [348, 14600.01, 14700.00, 1764.00, 1617.00, 3381.00],
-  [349, 14700.01, 14800.00, 1776.00, 1628.00, 3404.00],
-  [350, 14800.01, 14900.00, 1788.00, 1639.00, 3427.00],
-  [351, 14900.01, 15000.00, 1800.00, 1650.00, 3450.00],
-  [352, 15000.01, 15100.00, 1812.00, 1661.00, 3473.00],
-  [353, 15100.01, 15200.00, 1824.00, 1672.00, 3496.00],
-  [354, 15200.01, 15300.00, 1836.00, 1683.00, 3519.00],
-  [355, 15300.01, 15400.00, 1848.00, 1694.00, 3542.00],
-  [356, 15400.01, 15500.00, 1860.00, 1705.00, 3565.00],
-  [357, 15500.01, 15600.00, 1872.00, 1716.00, 3588.00],
-  [358, 15600.01, 15700.00, 1884.00, 1727.00, 3611.00],
-  [359, 15700.01, 15800.00, 1896.00, 1738.00, 3634.00],
-  [360, 15800.01, 15900.00, 1908.00, 1749.00, 3657.00],
-  [361, 15900.01, 16000.00, 1920.00, 1760.00, 3680.00],
-  [362, 16000.01, 16100.00, 1932.00, 1771.00, 3703.00],
-  [363, 16100.01, 16200.00, 1944.00, 1782.00, 3726.00],
-  [364, 16200.01, 16300.00, 1956.00, 1793.00, 3749.00],
-  [365, 16300.01, 16400.00, 1968.00, 1804.00, 3772.00],
-  [366, 16400.01, 16500.00, 1980.00, 1815.00, 3795.00],
-  [367, 16500.01, 16600.00, 1992.00, 1826.00, 3818.00],
-  [368, 16600.01, 16700.00, 2004.00, 1837.00, 3841.00],
-  [369, 16700.01, 16800.00, 2016.00, 1848.00, 3864.00],
-  [370, 16800.01, 16900.00, 2028.00, 1859.00, 3887.00],
-  [371, 16900.01, 17000.00, 2040.00, 1870.00, 3910.00],
-  [372, 17000.01, 17100.00, 2052.00, 1881.00, 3933.00],
-  [373, 17100.01, 17200.00, 2064.00, 1892.00, 3956.00],
-  [374, 17200.01, 17300.00, 2076.00, 1903.00, 3979.00],
-  [375, 17300.01, 17400.00, 2088.00, 1914.00, 4002.00],
-  [376, 17400.01, 17500.00, 2100.00, 1925.00, 4025.00],
-  [377, 17500.01, 17600.00, 2112.00, 1936.00, 4048.00],
-  [378, 17600.01, 17700.00, 2124.00, 1947.00, 4071.00],
-  [379, 17700.01, 17800.00, 2136.00, 1958.00, 4094.00],
-  [380, 17800.01, 17900.00, 2148.00, 1969.00, 4117.00],
-  [381, 17900.01, 18000.00, 2160.00, 1980.00, 4140.00],
-  [382, 18000.01, 18100.00, 2172.00, 1991.00, 4163.00],
-  [383, 18100.01, 18200.00, 2184.00, 2002.00, 4186.00],
-  [384, 18200.01, 18300.00, 2196.00, 2013.00, 4209.00],
-  [385, 18300.01, 18400.00, 2208.00, 2024.00, 4232.00],
-  [386, 18400.01, 18500.00, 2220.00, 2035.00, 4255.00],
-  [387, 18500.01, 18600.00, 2232.00, 2046.00, 4278.00],
-  [388, 18600.01, 18700.00, 2244.00, 2057.00, 4301.00],
-  [389, 18700.01, 18800.00, 2256.00, 2068.00, 4324.00],
-  [390, 18800.01, 18900.00, 2268.00, 2079.00, 4347.00],
-  [391, 18900.01, 19000.00, 2280.00, 2090.00, 4370.00],
-  [392, 19000.01, 19100.00, 2292.00, 2101.00, 4393.00],
-  [393, 19100.01, 19200.00, 2304.00, 2112.00, 4416.00],
-  [394, 19200.01, 19300.00, 2316.00, 2123.00, 4439.00],
-  [395, 19300.01, 19400.00, 2328.00, 2134.00, 4462.00],
-  [396, 19400.01, 19500.00, 2340.00, 2145.00, 4485.00],
-  [397, 19500.01, 19600.00, 2352.00, 2156.00, 4508.00],
-  [398, 19600.01, 19700.00, 2364.00, 2167.00, 4531.00],
-  [399, 19700.01, 19800.00, 2376.00, 2178.00, 4554.00],
-  [400, 19800.01, 19900.00, 2388.00, 2189.00, 4577.00],
-  [401, 19900.01, 20000.00, 2400.00, 2200.00, 4600.00]
+  [1,  "Gaji hingga RM10",                          0,       10,      0.00,   0.00,   0.00],
+  [2,  "Gaji melebihi RM10 tetapi tidak RM20",      10.01,   20,      3.00,   3.00,   6.00],
+  [3,  "Gaji melebihi RM20 tetapi tidak RM40",      20.01,   40,      5.00,   5.00,   10.00],
+  [4,  "Gaji melebihi RM40 tetapi tidak RM60",      40.01,   60,      8.00,   7.00,   15.00],
+  [5,  "Gaji melebihi RM60 tetapi tidak RM80",      60.01,   80,      10.00,  9.00,   19.00],
+  [6,  "Gaji melebihi RM80 tetapi tidak RM100",     80.01,   100,     13.00,  11.00,  24.00],
+  [7,  "Gaji melebihi RM100 tetapi tidak RM120",    100.01,  120,     15.00,  13.00,  28.00],
+  [8,  "Gaji melebihi RM120 tetapi tidak RM140",    120.01,  140,     18.00,  15.00,  33.00],
+  [9,  "Gaji melebihi RM140 tetapi tidak RM160",    140.01,  160,     21.00,  18.00,  39.00],
+  [10, "Gaji melebihi RM160 tetapi tidak RM180",    160.01,  180,     23.00,  20.00,  43.00],
+  [11, "Gaji melebihi RM180 tetapi tidak RM200",    180.01,  200,     26.00,  22.00,  48.00],
+  [12, "Gaji melebihi RM200 tetapi tidak RM220",    200.01,  220,     29.00,  24.00,  53.00],
+  [13, "Gaji melebihi RM220 tetapi tidak RM240",    220.01,  240,     31.00,  26.00,  57.00],
+  [14, "Gaji melebihi RM240 tetapi tidak RM260",    240.01,  260,     34.00,  29.00,  63.00],
+  [15, "Gaji melebihi RM260 tetapi tidak RM280",    260.01,  280,     36.00,  31.00,  67.00],
+  [16, "Gaji melebihi RM280 tetapi tidak RM300",    280.01,  300,     39.00,  33.00,  72.00],
+  [17, "Gaji melebihi RM300 tetapi tidak RM320",    300.01,  320,     42.00,  35.00,  77.00],
+  [18, "Gaji melebihi RM320 tetapi tidak RM340",    320.01,  340,     44.00,  37.00,  81.00],
+  [19, "Gaji melebihi RM340 tetapi tidak RM360",    340.01,  360,     47.00,  40.00,  87.00],
+  [20, "Gaji melebihi RM360 tetapi tidak RM380",    360.01,  380,     49.00,  42.00,  91.00],
+  [21, "Gaji melebihi RM380 tetapi tidak RM400",    380.01,  400,     52.00,  44.00,  96.00],
+  [22, "Gaji melebihi RM400 tetapi tidak RM420",    400.01,  420,     55.00,  46.00,  101.00],
+  [23, "Gaji melebihi RM420 tetapi tidak RM440",    420.01,  440,     57.00,  48.00,  105.00],
+  [24, "Gaji melebihi RM440 tetapi tidak RM460",    440.01,  460,     60.00,  51.00,  111.00],
+  [25, "Gaji melebihi RM460 tetapi tidak RM480",    460.01,  480,     62.00,  53.00,  115.00],
+  [26, "Gaji melebihi RM480 tetapi tidak RM500",    480.01,  500,     65.00,  55.00,  120.00],
+  [27, "Gaji melebihi RM500 tetapi tidak RM520",    500.01,  520,     68.00,  57.00,  125.00],
+  [28, "Gaji melebihi RM520 tetapi tidak RM540",    520.01,  540,     70.00,  59.00,  129.00],
+  [29, "Gaji melebihi RM540 tetapi tidak RM560",    540.01,  560,     73.00,  62.00,  135.00],
+  [30, "Gaji melebihi RM560 tetapi tidak RM580",    560.01,  580,     75.00,  64.00,  139.00],
+  [31, "Gaji melebihi RM580 tetapi tidak RM600",    580.01,  600,     78.00,  66.00,  144.00],
+  [32, "Gaji melebihi RM600 tetapi tidak RM620",    600.01,  620,     81.00,  68.00,  149.00],
+  [33, "Gaji melebihi RM620 tetapi tidak RM640",    620.01,  640,     83.00,  70.00,  153.00],
+  [34, "Gaji melebihi RM640 tetapi tidak RM660",    640.01,  660,     86.00,  73.00,  159.00],
+  [35, "Gaji melebihi RM660 tetapi tidak RM680",    660.01,  680,     88.00,  75.00,  163.00],
+  [36, "Gaji melebihi RM680 tetapi tidak RM700",    680.01,  700,     91.00,  77.00,  168.00],
+  [37, "Gaji melebihi RM700 tetapi tidak RM720",    700.01,  720,     94.00,  79.00,  173.00],
+  [38, "Gaji melebihi RM720 tetapi tidak RM740",    720.01,  740,     96.00,  81.00,  177.00],
+  [39, "Gaji melebihi RM740 tetapi tidak RM760",    740.01,  760,     99.00,  84.00,  183.00],
+  [40, "Gaji melebihi RM760 tetapi tidak RM780",    760.01,  780,     101.00, 86.00,  187.00],
+  [41, "Gaji melebihi RM780 tetapi tidak RM800",    780.01,  800,     104.00, 88.00,  192.00],
+  [42, "Gaji melebihi RM800 tetapi tidak RM820",    800.01,  820,     107.00, 90.00,  197.00],
+  [43, "Gaji melebihi RM820 tetapi tidak RM840",    820.01,  840,     109.00, 92.00,  201.00],
+  [44, "Gaji melebihi RM840 tetapi tidak RM860",    840.01,  860,     112.00, 95.00,  207.00],
+  [45, "Gaji melebihi RM860 tetapi tidak RM880",    860.01,  880,     114.00, 97.00,  211.00],
+  [46, "Gaji melebihi RM880 tetapi tidak RM900",    880.01,  900,     117.00, 99.00,  216.00],
+  [47, "Gaji melebihi RM900 tetapi tidak RM920",    900.01,  920,     120.00, 101.00, 221.00],
+  [48, "Gaji melebihi RM920 tetapi tidak RM940",    920.01,  940,     122.00, 103.00, 225.00],
+  [49, "Gaji melebihi RM940 tetapi tidak RM960",    940.01,  960,     125.00, 106.00, 231.00],
+  [50, "Gaji melebihi RM960 tetapi tidak RM980",    960.01,  980,     127.00, 108.00, 235.00],
+  [51, "Gaji melebihi RM980 tetapi tidak RM1,000",  980.01,  1000,    130.00, 110.00, 240.00],
+  [52, "Gaji melebihi RM1,000 tetapi tidak RM1,020", 1000.01, 1020,    133.00, 112.00, 245.00],
+  [53, "Gaji melebihi RM1,020 tetapi tidak RM1,040", 1020.01, 1040,    135.00, 114.00, 249.00],
+  [54, "Gaji melebihi RM1,040 tetapi tidak RM1,060", 1040.01, 1060,    138.00, 117.00, 255.00],
+  [55, "Gaji melebihi RM1,060 tetapi tidak RM1,080", 1060.01, 1080,    140.00, 119.00, 259.00],
+  [56, "Gaji melebihi RM1,080 tetapi tidak RM1,100", 1080.01, 1100,    143.00, 121.00, 264.00],
+  [57, "Gaji melebihi RM1,100 tetapi tidak RM1,120", 1100.01, 1120,    146.00, 123.00, 269.00],
+  [58, "Gaji melebihi RM1,120 tetapi tidak RM1,140", 1120.01, 1140,    148.00, 125.00, 273.00],
+  [59, "Gaji melebihi RM1,140 tetapi tidak RM1,160", 1140.01, 1160,    151.00, 128.00, 279.00],
+  [60, "Gaji melebihi RM1,160 tetapi tidak RM1,180", 1160.01, 1180,    153.00, 130.00, 283.00],
+  [61, "Gaji melebihi RM1,180 tetapi tidak RM1,200", 1180.01, 1200,    156.00, 132.00, 288.00],
+  [62, "Gaji melebihi RM1,200 tetapi tidak RM1,220", 1200.01, 1220,    159.00, 134.00, 293.00],
+  [63, "Gaji melebihi RM1,220 tetapi tidak RM1,240", 1220.01, 1240,    161.00, 136.00, 297.00],
+  [64, "Gaji melebihi RM1,240 tetapi tidak RM1,260", 1240.01, 1260,    164.00, 139.00, 303.00],
+  [65, "Gaji melebihi RM1,260 tetapi tidak RM1,280", 1260.01, 1280,    166.00, 141.00, 307.00],
+  [66, "Gaji melebihi RM1,280 tetapi tidak RM1,300", 1280.01, 1300,    169.00, 143.00, 312.00],
+  [67, "Gaji melebihi RM1,300 tetapi tidak RM1,320", 1300.01, 1320,    172.00, 145.00, 317.00],
+  [68, "Gaji melebihi RM1,320 tetapi tidak RM1,340", 1320.01, 1340,    174.00, 147.00, 321.00],
+  [69, "Gaji melebihi RM1,340 tetapi tidak RM1,360", 1340.01, 1360,    177.00, 150.00, 327.00],
+  [70, "Gaji melebihi RM1,360 tetapi tidak RM1,380", 1360.01, 1380,    179.00, 152.00, 331.00],
+  [71, "Gaji melebihi RM1,380 tetapi tidak RM1,400", 1380.01, 1400,    182.00, 154.00, 336.00],
+  [72, "Gaji melebihi RM1,400 tetapi tidak RM1,420", 1400.01, 1420,    185.00, 156.00, 341.00],
+  [73, "Gaji melebihi RM1,420 tetapi tidak RM1,440", 1420.01, 1440,    187.00, 158.00, 345.00],
+  [74, "Gaji melebihi RM1,440 tetapi tidak RM1,460", 1440.01, 1460,    190.00, 161.00, 351.00],
+  [75, "Gaji melebihi RM1,460 tetapi tidak RM1,480", 1460.01, 1480,    192.00, 163.00, 355.00],
+  [76, "Gaji melebihi RM1,480 tetapi tidak RM1,500", 1480.01, 1500,    195.00, 165.00, 360.00],
+  [77, "Gaji melebihi RM1,500 tetapi tidak RM1,520", 1500.01, 1520,    198.00, 167.00, 365.00],
+  [78, "Gaji melebihi RM1,520 tetapi tidak RM1,540", 1520.01, 1540,    200.00, 169.00, 369.00],
+  [79, "Gaji melebihi RM1,540 tetapi tidak RM1,560", 1540.01, 1560,    203.00, 172.00, 375.00],
+  [80, "Gaji melebihi RM1,560 tetapi tidak RM1,580", 1560.01, 1580,    205.00, 174.00, 379.00],
+  [81, "Gaji melebihi RM1,580 tetapi tidak RM1,600", 1580.01, 1600,    208.00, 176.00, 384.00],
+  [82, "Gaji melebihi RM1,600 tetapi tidak RM1,620", 1600.01, 1620,    211.00, 178.00, 389.00],
+  [83, "Gaji melebihi RM1,620 tetapi tidak RM1,640", 1620.01, 1640,    213.00, 180.00, 393.00],
+  [84, "Gaji melebihi RM1,640 tetapi tidak RM1,660", 1640.01, 1660,    216.00, 183.00, 399.00],
+  [85, "Gaji melebihi RM1,660 tetapi tidak RM1,680", 1660.01, 1680,    218.00, 185.00, 403.00],
+  [86, "Gaji melebihi RM1,680 tetapi tidak RM1,700", 1680.01, 1700,    221.00, 187.00, 408.00],
+  [87, "Gaji melebihi RM1,700 tetapi tidak RM1,720", 1700.01, 1720,    224.00, 189.00, 413.00],
+  [88, "Gaji melebihi RM1,720 tetapi tidak RM1,740", 1720.01, 1740,    226.00, 191.00, 417.00],
+  [89, "Gaji melebihi RM1,740 tetapi tidak RM1,760", 1740.01, 1760,    229.00, 194.00, 423.00],
+  [90, "Gaji melebihi RM1,760 tetapi tidak RM1,780", 1760.01, 1780,    231.00, 196.00, 427.00],
+  [91, "Gaji melebihi RM1,780 tetapi tidak RM1,800", 1780.01, 1800,    234.00, 198.00, 432.00],
+  [92, "Gaji melebihi RM1,800 tetapi tidak RM1,820", 1800.01, 1820,    237.00, 200.00, 437.00],
+  [93, "Gaji melebihi RM1,820 tetapi tidak RM1,840", 1820.01, 1840,    239.00, 202.00, 441.00],
+  [94, "Gaji melebihi RM1,840 tetapi tidak RM1,860", 1840.01, 1860,    242.00, 205.00, 447.00],
+  [95, "Gaji melebihi RM1,860 tetapi tidak RM1,880", 1860.01, 1880,    244.00, 207.00, 451.00],
+  [96, "Gaji melebihi RM1,880 tetapi tidak RM1,900", 1880.01, 1900,    247.00, 209.00, 456.00],
+  [97, "Gaji melebihi RM1,900 tetapi tidak RM1,920", 1900.01, 1920,    250.00, 211.00, 461.00],
+  [98, "Gaji melebihi RM1,920 tetapi tidak RM1,940", 1920.01, 1940,    252.00, 213.00, 465.00],
+  [99, "Gaji melebihi RM1,940 tetapi tidak RM1,960", 1940.01, 1960,    255.00, 216.00, 471.00],
+  [100, "Gaji melebihi RM1,960 tetapi tidak RM1,980", 1960.01, 1980,    257.00, 218.00, 475.00],
+  [101, "Gaji melebihi RM1,980 tetapi tidak RM2,000", 1980.01, 2000,    260.00, 220.00, 480.00],
+  [102, "Gaji melebihi RM2,000 tetapi tidak RM2,020", 2000.01, 2020,    263.00, 222.00, 485.00],
+  [103, "Gaji melebihi RM2,020 tetapi tidak RM2,040", 2020.01, 2040,    265.00, 224.00, 489.00],
+  [104, "Gaji melebihi RM2,040 tetapi tidak RM2,060", 2040.01, 2060,    268.00, 227.00, 495.00],
+  [105, "Gaji melebihi RM2,060 tetapi tidak RM2,080", 2060.01, 2080,    270.00, 229.00, 499.00],
+  [106, "Gaji melebihi RM2,080 tetapi tidak RM2,100", 2080.01, 2100,    273.00, 231.00, 504.00],
+  [107, "Gaji melebihi RM2,100 tetapi tidak RM2,120", 2100.01, 2120,    276.00, 233.00, 509.00],
+  [108, "Gaji melebihi RM2,120 tetapi tidak RM2,140", 2120.01, 2140,    278.00, 235.00, 513.00],
+  [109, "Gaji melebihi RM2,140 tetapi tidak RM2,160", 2140.01, 2160,    281.00, 238.00, 519.00],
+  [110, "Gaji melebihi RM2,160 tetapi tidak RM2,180", 2160.01, 2180,    283.00, 240.00, 523.00],
+  [111, "Gaji melebihi RM2,180 tetapi tidak RM2,200", 2180.01, 2200,    286.00, 242.00, 528.00],
+  [112, "Gaji melebihi RM2,200 tetapi tidak RM2,220", 2200.01, 2220,    289.00, 244.00, 533.00],
+  [113, "Gaji melebihi RM2,220 tetapi tidak RM2,240", 2220.01, 2240,    291.00, 246.00, 537.00],
+  [114, "Gaji melebihi RM2,240 tetapi tidak RM2,260", 2240.01, 2260,    294.00, 249.00, 543.00],
+  [115, "Gaji melebihi RM2,260 tetapi tidak RM2,280", 2260.01, 2280,    296.00, 251.00, 547.00],
+  [116, "Gaji melebihi RM2,280 tetapi tidak RM2,300", 2280.01, 2300,    299.00, 253.00, 552.00],
+  [117, "Gaji melebihi RM2,300 tetapi tidak RM2,320", 2300.01, 2320,    302.00, 255.00, 557.00],
+  [118, "Gaji melebihi RM2,320 tetapi tidak RM2,340", 2320.01, 2340,    304.00, 257.00, 561.00],
+  [119, "Gaji melebihi RM2,340 tetapi tidak RM2,360", 2340.01, 2360,    307.00, 260.00, 567.00],
+  [120, "Gaji melebihi RM2,360 tetapi tidak RM2,380", 2360.01, 2380,    309.00, 262.00, 571.00],
+  [121, "Gaji melebihi RM2,380 tetapi tidak RM2,400", 2380.01, 2400,    312.00, 264.00, 576.00],
+  [122, "Gaji melebihi RM2,400 tetapi tidak RM2,420", 2400.01, 2420,    315.00, 266.00, 581.00],
+  [123, "Gaji melebihi RM2,420 tetapi tidak RM2,440", 2420.01, 2440,    317.00, 268.00, 585.00],
+  [124, "Gaji melebihi RM2,440 tetapi tidak RM2,460", 2440.01, 2460,    320.00, 271.00, 591.00],
+  [125, "Gaji melebihi RM2,460 tetapi tidak RM2,480", 2460.01, 2480,    322.00, 273.00, 595.00],
+  [126, "Gaji melebihi RM2,480 tetapi tidak RM2,500", 2480.01, 2500,    325.00, 275.00, 600.00],
+  [127, "Gaji melebihi RM2,500 tetapi tidak RM2,520", 2500.01, 2520,    328.00, 277.00, 605.00],
+  [128, "Gaji melebihi RM2,520 tetapi tidak RM2,540", 2520.01, 2540,    330.00, 279.00, 609.00],
+  [129, "Gaji melebihi RM2,540 tetapi tidak RM2,560", 2540.01, 2560,    333.00, 282.00, 615.00],
+  [130, "Gaji melebihi RM2,560 tetapi tidak RM2,580", 2560.01, 2580,    335.00, 284.00, 619.00],
+  [131, "Gaji melebihi RM2,580 tetapi tidak RM2,600", 2580.01, 2600,    338.00, 286.00, 624.00],
+  [132, "Gaji melebihi RM2,600 tetapi tidak RM2,620", 2600.01, 2620,    341.00, 288.00, 629.00],
+  [133, "Gaji melebihi RM2,620 tetapi tidak RM2,640", 2620.01, 2640,    343.00, 290.00, 633.00],
+  [134, "Gaji melebihi RM2,640 tetapi tidak RM2,660", 2640.01, 2660,    346.00, 293.00, 639.00],
+  [135, "Gaji melebihi RM2,660 tetapi tidak RM2,680", 2660.01, 2680,    348.00, 295.00, 643.00],
+  [136, "Gaji melebihi RM2,680 tetapi tidak RM2,700", 2680.01, 2700,    351.00, 297.00, 648.00],
+  [137, "Gaji melebihi RM2,700 tetapi tidak RM2,720", 2700.01, 2720,    354.00, 299.00, 653.00],
+  [138, "Gaji melebihi RM2,720 tetapi tidak RM2,740", 2720.01, 2740,    356.00, 301.00, 657.00],
+  [139, "Gaji melebihi RM2,740 tetapi tidak RM2,760", 2740.01, 2760,    359.00, 304.00, 663.00],
+  [140, "Gaji melebihi RM2,760 tetapi tidak RM2,780", 2760.01, 2780,    361.00, 306.00, 667.00],
+  [141, "Gaji melebihi RM2,780 tetapi tidak RM2,800", 2780.01, 2800,    364.00, 308.00, 672.00],
+  [142, "Gaji melebihi RM2,800 tetapi tidak RM2,820", 2800.01, 2820,    367.00, 310.00, 677.00],
+  [143, "Gaji melebihi RM2,820 tetapi tidak RM2,840", 2820.01, 2840,    369.00, 312.00, 681.00],
+  [144, "Gaji melebihi RM2,840 tetapi tidak RM2,860", 2840.01, 2860,    372.00, 315.00, 687.00],
+  [145, "Gaji melebihi RM2,860 tetapi tidak RM2,880", 2860.01, 2880,    374.00, 317.00, 691.00],
+  [146, "Gaji melebihi RM2,880 tetapi tidak RM2,900", 2880.01, 2900,    377.00, 319.00, 696.00],
+  [147, "Gaji melebihi RM2,900 tetapi tidak RM2,920", 2900.01, 2920,    380.00, 321.00, 701.00],
+  [148, "Gaji melebihi RM2,920 tetapi tidak RM2,940", 2920.01, 2940,    382.00, 323.00, 705.00],
+  [149, "Gaji melebihi RM2,940 tetapi tidak RM2,960", 2940.01, 2960,    385.00, 326.00, 711.00],
+  [150, "Gaji melebihi RM2,960 tetapi tidak RM2,980", 2960.01, 2980,    387.00, 328.00, 715.00],
+  [151, "Gaji melebihi RM2,980 tetapi tidak RM3,000", 2980.01, 3000,    390.00, 330.00, 720.00],
+  [152, "Gaji melebihi RM3,000 tetapi tidak RM3,020", 3000.01, 3020,    393.00, 332.00, 725.00],
+  [153, "Gaji melebihi RM3,020 tetapi tidak RM3,040", 3020.01, 3040,    395.00, 334.00, 729.00],
+  [154, "Gaji melebihi RM3,040 tetapi tidak RM3,060", 3040.01, 3060,    398.00, 337.00, 735.00],
+  [155, "Gaji melebihi RM3,060 tetapi tidak RM3,080", 3060.01, 3080,    400.00, 339.00, 739.00],
+  [156, "Gaji melebihi RM3,080 tetapi tidak RM3,100", 3080.01, 3100,    403.00, 341.00, 744.00],
+  [157, "Gaji melebihi RM3,100 tetapi tidak RM3,120", 3100.01, 3120,    406.00, 343.00, 749.00],
+  [158, "Gaji melebihi RM3,120 tetapi tidak RM3,140", 3120.01, 3140,    408.00, 345.00, 753.00],
+  [159, "Gaji melebihi RM3,140 tetapi tidak RM3,160", 3140.01, 3160,    411.00, 348.00, 759.00],
+  [160, "Gaji melebihi RM3,160 tetapi tidak RM3,180", 3160.01, 3180,    413.00, 350.00, 763.00],
+  [161, "Gaji melebihi RM3,180 tetapi tidak RM3,200", 3180.01, 3200,    416.00, 352.00, 768.00],
+  [162, "Gaji melebihi RM3,200 tetapi tidak RM3,220", 3200.01, 3220,    419.00, 354.00, 773.00],
+  [163, "Gaji melebihi RM3,220 tetapi tidak RM3,240", 3220.01, 3240,    421.00, 356.00, 777.00],
+  [164, "Gaji melebihi RM3,240 tetapi tidak RM3,260", 3240.01, 3260,    424.00, 359.00, 783.00],
+  [165, "Gaji melebihi RM3,260 tetapi tidak RM3,280", 3260.01, 3280,    426.00, 361.00, 787.00],
+  [166, "Gaji melebihi RM3,280 tetapi tidak RM3,300", 3280.01, 3300,    429.00, 363.00, 792.00],
+  [167, "Gaji melebihi RM3,300 tetapi tidak RM3,320", 3300.01, 3320,    432.00, 365.00, 797.00],
+  [168, "Gaji melebihi RM3,320 tetapi tidak RM3,340", 3320.01, 3340,    434.00, 367.00, 801.00],
+  [169, "Gaji melebihi RM3,340 tetapi tidak RM3,360", 3340.01, 3360,    437.00, 370.00, 807.00],
+  [170, "Gaji melebihi RM3,360 tetapi tidak RM3,380", 3360.01, 3380,    439.00, 372.00, 811.00],
+  [171, "Gaji melebihi RM3,380 tetapi tidak RM3,400", 3380.01, 3400,    442.00, 374.00, 816.00],
+  [172, "Gaji melebihi RM3,400 tetapi tidak RM3,420", 3400.01, 3420,    445.00, 376.00, 821.00],
+  [173, "Gaji melebihi RM3,420 tetapi tidak RM3,440", 3420.01, 3440,    447.00, 378.00, 825.00],
+  [174, "Gaji melebihi RM3,440 tetapi tidak RM3,460", 3440.01, 3460,    450.00, 381.00, 831.00],
+  [175, "Gaji melebihi RM3,460 tetapi tidak RM3,480", 3460.01, 3480,    452.00, 383.00, 835.00],
+  [176, "Gaji melebihi RM3,480 tetapi tidak RM3,500", 3480.01, 3500,    455.00, 385.00, 840.00],
+  [177, "Gaji melebihi RM3,500 tetapi tidak RM3,520", 3500.01, 3520,    458.00, 387.00, 845.00],
+  [178, "Gaji melebihi RM3,520 tetapi tidak RM3,540", 3520.01, 3540,    460.00, 389.00, 849.00],
+  [179, "Gaji melebihi RM3,540 tetapi tidak RM3,560", 3540.01, 3560,    463.00, 392.00, 855.00],
+  [180, "Gaji melebihi RM3,560 tetapi tidak RM3,580", 3560.01, 3580,    465.00, 394.00, 859.00],
+  [181, "Gaji melebihi RM3,580 tetapi tidak RM3,600", 3580.01, 3600,    468.00, 396.00, 864.00],
+  [182, "Gaji melebihi RM3,600 tetapi tidak RM3,620", 3600.01, 3620,    471.00, 398.00, 869.00],
+  [183, "Gaji melebihi RM3,620 tetapi tidak RM3,640", 3620.01, 3640,    473.00, 400.00, 873.00],
+  [184, "Gaji melebihi RM3,640 tetapi tidak RM3,660", 3640.01, 3660,    476.00, 403.00, 879.00],
+  [185, "Gaji melebihi RM3,660 tetapi tidak RM3,680", 3660.01, 3680,    478.00, 405.00, 883.00],
+  [186, "Gaji melebihi RM3,680 tetapi tidak RM3,700", 3680.01, 3700,    481.00, 407.00, 888.00],
+  [187, "Gaji melebihi RM3,700 tetapi tidak RM3,720", 3700.01, 3720,    484.00, 409.00, 893.00],
+  [188, "Gaji melebihi RM3,720 tetapi tidak RM3,740", 3720.01, 3740,    486.00, 411.00, 897.00],
+  [189, "Gaji melebihi RM3,740 tetapi tidak RM3,760", 3740.01, 3760,    489.00, 414.00, 903.00],
+  [190, "Gaji melebihi RM3,760 tetapi tidak RM3,780", 3760.01, 3780,    491.00, 416.00, 907.00],
+  [191, "Gaji melebihi RM3,780 tetapi tidak RM3,800", 3780.01, 3800,    494.00, 418.00, 912.00],
+  [192, "Gaji melebihi RM3,800 tetapi tidak RM3,820", 3800.01, 3820,    497.00, 420.00, 917.00],
+  [193, "Gaji melebihi RM3,820 tetapi tidak RM3,840", 3820.01, 3840,    499.00, 422.00, 921.00],
+  [194, "Gaji melebihi RM3,840 tetapi tidak RM3,860", 3840.01, 3860,    502.00, 425.00, 927.00],
+  [195, "Gaji melebihi RM3,860 tetapi tidak RM3,880", 3860.01, 3880,    504.00, 427.00, 931.00],
+  [196, "Gaji melebihi RM3,880 tetapi tidak RM3,900", 3880.01, 3900,    507.00, 429.00, 936.00],
+  [197, "Gaji melebihi RM3,900 tetapi tidak RM3,920", 3900.01, 3920,    510.00, 431.00, 941.00],
+  [198, "Gaji melebihi RM3,920 tetapi tidak RM3,940", 3920.01, 3940,    512.00, 433.00, 945.00],
+  [199, "Gaji melebihi RM3,940 tetapi tidak RM3,960", 3940.01, 3960,    515.00, 436.00, 951.00],
+  [200, "Gaji melebihi RM3,960 tetapi tidak RM3,980", 3960.01, 3980,    517.00, 438.00, 955.00],
+  [201, "Gaji melebihi RM3,980 tetapi tidak RM4,000", 3980.01, 4000,    520.00, 440.00, 960.00],
+  [202, "Gaji melebihi RM4,000 tetapi tidak RM4,020", 4000.01, 4020,    523.00, 442.00, 965.00],
+  [203, "Gaji melebihi RM4,020 tetapi tidak RM4,040", 4020.01, 4040,    525.00, 444.00, 969.00],
+  [204, "Gaji melebihi RM4,040 tetapi tidak RM4,060", 4040.01, 4060,    528.00, 447.00, 975.00],
+  [205, "Gaji melebihi RM4,060 tetapi tidak RM4,080", 4060.01, 4080,    530.00, 449.00, 979.00],
+  [206, "Gaji melebihi RM4,080 tetapi tidak RM4,100", 4080.01, 4100,    533.00, 451.00, 984.00],
+  [207, "Gaji melebihi RM4,100 tetapi tidak RM4,120", 4100.01, 4120,    536.00, 453.00, 989.00],
+  [208, "Gaji melebihi RM4,120 tetapi tidak RM4,140", 4120.01, 4140,    538.00, 455.00, 993.00],
+  [209, "Gaji melebihi RM4,140 tetapi tidak RM4,160", 4140.01, 4160,    541.00, 458.00, 999.00],
+  [210, "Gaji melebihi RM4,160 tetapi tidak RM4,180", 4160.01, 4180,    543.00, 460.00, 1003.00],
+  [211, "Gaji melebihi RM4,180 tetapi tidak RM4,200", 4180.01, 4200,    546.00, 462.00, 1008.00],
+  [212, "Gaji melebihi RM4,200 tetapi tidak RM4,220", 4200.01, 4220,    549.00, 464.00, 1013.00],
+  [213, "Gaji melebihi RM4,220 tetapi tidak RM4,240", 4220.01, 4240,    551.00, 466.00, 1017.00],
+  [214, "Gaji melebihi RM4,240 tetapi tidak RM4,260", 4240.01, 4260,    554.00, 469.00, 1023.00],
+  [215, "Gaji melebihi RM4,260 tetapi tidak RM4,280", 4260.01, 4280,    556.00, 471.00, 1027.00],
+  [216, "Gaji melebihi RM4,280 tetapi tidak RM4,300", 4280.01, 4300,    559.00, 473.00, 1032.00],
+  [217, "Gaji melebihi RM4,300 tetapi tidak RM4,320", 4300.01, 4320,    562.00, 475.00, 1037.00],
+  [218, "Gaji melebihi RM4,320 tetapi tidak RM4,340", 4320.01, 4340,    564.00, 477.00, 1041.00],
+  [219, "Gaji melebihi RM4,340 tetapi tidak RM4,360", 4340.01, 4360,    567.00, 480.00, 1047.00],
+  [220, "Gaji melebihi RM4,360 tetapi tidak RM4,380", 4360.01, 4380,    569.00, 482.00, 1051.00],
+  [221, "Gaji melebihi RM4,380 tetapi tidak RM4,400", 4380.01, 4400,    572.00, 484.00, 1056.00],
+  [222, "Gaji melebihi RM4,400 tetapi tidak RM4,420", 4400.01, 4420,    575.00, 486.00, 1061.00],
+  [223, "Gaji melebihi RM4,420 tetapi tidak RM4,440", 4420.01, 4440,    577.00, 488.00, 1065.00],
+  [224, "Gaji melebihi RM4,440 tetapi tidak RM4,460", 4440.01, 4460,    580.00, 491.00, 1071.00],
+  [225, "Gaji melebihi RM4,460 tetapi tidak RM4,480", 4460.01, 4480,    582.00, 493.00, 1075.00],
+  [226, "Gaji melebihi RM4,480 tetapi tidak RM4,500", 4480.01, 4500,    585.00, 495.00, 1080.00],
+  [227, "Gaji melebihi RM4,500 tetapi tidak RM4,520", 4500.01, 4520,    588.00, 497.00, 1085.00],
+  [228, "Gaji melebihi RM4,520 tetapi tidak RM4,540", 4520.01, 4540,    590.00, 499.00, 1089.00],
+  [229, "Gaji melebihi RM4,540 tetapi tidak RM4,560", 4540.01, 4560,    593.00, 502.00, 1095.00],
+  [230, "Gaji melebihi RM4,560 tetapi tidak RM4,580", 4560.01, 4580,    595.00, 504.00, 1099.00],
+  [231, "Gaji melebihi RM4,580 tetapi tidak RM4,600", 4580.01, 4600,    598.00, 506.00, 1104.00],
+  [232, "Gaji melebihi RM4,600 tetapi tidak RM4,620", 4600.01, 4620,    601.00, 508.00, 1109.00],
+  [233, "Gaji melebihi RM4,620 tetapi tidak RM4,640", 4620.01, 4640,    603.00, 510.00, 1113.00],
+  [234, "Gaji melebihi RM4,640 tetapi tidak RM4,660", 4640.01, 4660,    606.00, 513.00, 1119.00],
+  [235, "Gaji melebihi RM4,660 tetapi tidak RM4,680", 4660.01, 4680,    608.00, 515.00, 1123.00],
+  [236, "Gaji melebihi RM4,680 tetapi tidak RM4,700", 4680.01, 4700,    611.00, 517.00, 1128.00],
+  [237, "Gaji melebihi RM4,700 tetapi tidak RM4,720", 4700.01, 4720,    614.00, 519.00, 1133.00],
+  [238, "Gaji melebihi RM4,720 tetapi tidak RM4,740", 4720.01, 4740,    616.00, 521.00, 1137.00],
+  [239, "Gaji melebihi RM4,740 tetapi tidak RM4,760", 4740.01, 4760,    619.00, 524.00, 1143.00],
+  [240, "Gaji melebihi RM4,760 tetapi tidak RM4,780", 4760.01, 4780,    621.00, 526.00, 1147.00],
+  [241, "Gaji melebihi RM4,780 tetapi tidak RM4,800", 4780.01, 4800,    624.00, 528.00, 1152.00],
+  [242, "Gaji melebihi RM4,800 tetapi tidak RM4,820", 4800.01, 4820,    627.00, 530.00, 1157.00],
+  [243, "Gaji melebihi RM4,820 tetapi tidak RM4,840", 4820.01, 4840,    629.00, 532.00, 1161.00],
+  [244, "Gaji melebihi RM4,840 tetapi tidak RM4,860", 4840.01, 4860,    632.00, 535.00, 1167.00],
+  [245, "Gaji melebihi RM4,860 tetapi tidak RM4,880", 4860.01, 4880,    634.00, 537.00, 1171.00],
+  [246, "Gaji melebihi RM4,880 tetapi tidak RM4,900", 4880.01, 4900,    637.00, 539.00, 1176.00],
+  [247, "Gaji melebihi RM4,900 tetapi tidak RM4,920", 4900.01, 4920,    640.00, 541.00, 1181.00],
+  [248, "Gaji melebihi RM4,920 tetapi tidak RM4,940", 4920.01, 4940,    642.00, 543.00, 1185.00],
+  [249, "Gaji melebihi RM4,940 tetapi tidak RM4,960", 4940.01, 4960,    645.00, 546.00, 1191.00],
+  [250, "Gaji melebihi RM4,960 tetapi tidak RM4,980", 4960.01, 4980,    647.00, 548.00, 1195.00],
+  [251, "Gaji melebihi RM4,980 tetapi tidak RM5,000", 4980.01, 5000,    650.00, 550.00, 1200.00],
+  [252, "Gaji melebihi RM5,000 tetapi tidak RM5,100", 5000.01, 5100,    612.00, 561.00, 1173.00],
+  [253, "Gaji melebihi RM5,100 tetapi tidak RM5,200", 5100.01, 5200,    624.00, 572.00, 1196.00],
+  [254, "Gaji melebihi RM5,200 tetapi tidak RM5,300", 5200.01, 5300,    636.00, 583.00, 1219.00],
+  [255, "Gaji melebihi RM5,300 tetapi tidak RM5,400", 5300.01, 5400,    648.00, 594.00, 1242.00],
+  [256, "Gaji melebihi RM5,400 tetapi tidak RM5,500", 5400.01, 5500,    660.00, 605.00, 1265.00],
+  [257, "Gaji melebihi RM5,500 tetapi tidak RM5,600", 5500.01, 5600,    672.00, 616.00, 1288.00],
+  [258, "Gaji melebihi RM5,600 tetapi tidak RM5,700", 5600.01, 5700,    684.00, 627.00, 1311.00],
+  [259, "Gaji melebihi RM5,700 tetapi tidak RM5,800", 5700.01, 5800,    696.00, 638.00, 1334.00],
+  [260, "Gaji melebihi RM5,800 tetapi tidak RM5,900", 5800.01, 5900,    708.00, 649.00, 1357.00],
+  [261, "Gaji melebihi RM5,900 tetapi tidak RM6,000", 5900.01, 6000,    720.00, 660.00, 1380.00],
+  [262, "Gaji melebihi RM6,000 tetapi tidak RM6,100", 6000.01, 6100,    732.00, 671.00, 1403.00],
+  [263, "Gaji melebihi RM6,100 tetapi tidak RM6,200", 6100.01, 6200,    744.00, 682.00, 1426.00],
+  [264, "Gaji melebihi RM6,200 tetapi tidak RM6,300", 6200.01, 6300,    756.00, 693.00, 1449.00],
+  [265, "Gaji melebihi RM6,300 tetapi tidak RM6,400", 6300.01, 6400,    768.00, 704.00, 1472.00],
+  [266, "Gaji melebihi RM6,400 tetapi tidak RM6,500", 6400.01, 6500,    780.00, 715.00, 1495.00],
+  [267, "Gaji melebihi RM6,500 tetapi tidak RM6,600", 6500.01, 6600,    792.00, 726.00, 1518.00],
+  [268, "Gaji melebihi RM6,600 tetapi tidak RM6,700", 6600.01, 6700,    804.00, 737.00, 1541.00],
+  [269, "Gaji melebihi RM6,700 tetapi tidak RM6,800", 6700.01, 6800,    816.00, 748.00, 1564.00],
+  [270, "Gaji melebihi RM6,800 tetapi tidak RM6,900", 6800.01, 6900,    828.00, 759.00, 1587.00],
+  [271, "Gaji melebihi RM6,900 tetapi tidak RM7,000", 6900.01, 7000,    840.00, 770.00, 1610.00],
+  [272, "Gaji melebihi RM7,000 tetapi tidak RM7,100", 7000.01, 7100,    852.00, 781.00, 1633.00],
+  [273, "Gaji melebihi RM7,100 tetapi tidak RM7,200", 7100.01, 7200,    864.00, 792.00, 1656.00],
+  [274, "Gaji melebihi RM7,200 tetapi tidak RM7,300", 7200.01, 7300,    876.00, 803.00, 1679.00],
+  [275, "Gaji melebihi RM7,300 tetapi tidak RM7,400", 7300.01, 7400,    888.00, 814.00, 1702.00],
+  [276, "Gaji melebihi RM7,400 tetapi tidak RM7,500", 7400.01, 7500,    900.00, 825.00, 1725.00],
+  [277, "Gaji melebihi RM7,500 tetapi tidak RM7,600", 7500.01, 7600,    912.00, 836.00, 1748.00],
+  [278, "Gaji melebihi RM7,600 tetapi tidak RM7,700", 7600.01, 7700,    924.00, 847.00, 1771.00],
+  [279, "Gaji melebihi RM7,700 tetapi tidak RM7,800", 7700.01, 7800,    936.00, 858.00, 1794.00],
+  [280, "Gaji melebihi RM7,800 tetapi tidak RM7,900", 7800.01, 7900,    948.00, 869.00, 1817.00],
+  [281, "Gaji melebihi RM7,900 tetapi tidak RM8,000", 7900.01, 8000,    960.00, 880.00, 1840.00],
+  [282, "Gaji melebihi RM8,000 tetapi tidak RM8,100", 8000.01, 8100,    972.00, 891.00, 1863.00],
+  [283, "Gaji melebihi RM8,100 tetapi tidak RM8,200", 8100.01, 8200,    984.00, 902.00, 1886.00],
+  [284, "Gaji melebihi RM8,200 tetapi tidak RM8,300", 8200.01, 8300,    996.00, 913.00, 1909.00],
+  [285, "Gaji melebihi RM8,300 tetapi tidak RM8,400", 8300.01, 8400,    1008.00, 924.00, 1932.00],
+  [286, "Gaji melebihi RM8,400 tetapi tidak RM8,500", 8400.01, 8500,    1020.00, 935.00, 1955.00],
+  [287, "Gaji melebihi RM8,500 tetapi tidak RM8,600", 8500.01, 8600,    1032.00, 946.00, 1978.00],
+  [288, "Gaji melebihi RM8,600 tetapi tidak RM8,700", 8600.01, 8700,    1044.00, 957.00, 2001.00],
+  [289, "Gaji melebihi RM8,700 tetapi tidak RM8,800", 8700.01, 8800,    1056.00, 968.00, 2024.00],
+  [290, "Gaji melebihi RM8,800 tetapi tidak RM8,900", 8800.01, 8900,    1068.00, 979.00, 2047.00],
+  [291, "Gaji melebihi RM8,900 tetapi tidak RM9,000", 8900.01, 9000,    1080.00, 990.00, 2070.00],
+  [292, "Gaji melebihi RM9,000 tetapi tidak RM9,100", 9000.01, 9100,    1092.00, 1001.00, 2093.00],
+  [293, "Gaji melebihi RM9,100 tetapi tidak RM9,200", 9100.01, 9200,    1104.00, 1012.00, 2116.00],
+  [294, "Gaji melebihi RM9,200 tetapi tidak RM9,300", 9200.01, 9300,    1116.00, 1023.00, 2139.00],
+  [295, "Gaji melebihi RM9,300 tetapi tidak RM9,400", 9300.01, 9400,    1128.00, 1034.00, 2162.00],
+  [296, "Gaji melebihi RM9,400 tetapi tidak RM9,500", 9400.01, 9500,    1140.00, 1045.00, 2185.00],
+  [297, "Gaji melebihi RM9,500 tetapi tidak RM9,600", 9500.01, 9600,    1152.00, 1056.00, 2208.00],
+  [298, "Gaji melebihi RM9,600 tetapi tidak RM9,700", 9600.01, 9700,    1164.00, 1067.00, 2231.00],
+  [299, "Gaji melebihi RM9,700 tetapi tidak RM9,800", 9700.01, 9800,    1176.00, 1078.00, 2254.00],
+  [300, "Gaji melebihi RM9,800 tetapi tidak RM9,900", 9800.01, 9900,    1188.00, 1089.00, 2277.00],
+  [301, "Gaji melebihi RM9,900 tetapi tidak RM10,000", 9900.01, 10000,   1200.00, 1100.00, 2300.00],
+  [302, "Gaji melebihi RM10,000 tetapi tidak RM10,100", 10000.01, 10100,  1212.00, 1111.00, 2323.00],
+  [303, "Gaji melebihi RM10,100 tetapi tidak RM10,200", 10100.01, 10200,  1224.00, 1122.00, 2346.00],
+  [304, "Gaji melebihi RM10,200 tetapi tidak RM10,300", 10200.01, 10300,  1236.00, 1133.00, 2369.00],
+  [305, "Gaji melebihi RM10,300 tetapi tidak RM10,400", 10300.01, 10400,  1248.00, 1144.00, 2392.00],
+  [306, "Gaji melebihi RM10,400 tetapi tidak RM10,500", 10400.01, 10500,  1260.00, 1155.00, 2415.00],
+  [307, "Gaji melebihi RM10,500 tetapi tidak RM10,600", 10500.01, 10600,  1272.00, 1166.00, 2438.00],
+  [308, "Gaji melebihi RM10,600 tetapi tidak RM10,700", 10600.01, 10700,  1284.00, 1177.00, 2461.00],
+  [309, "Gaji melebihi RM10,700 tetapi tidak RM10,800", 10700.01, 10800,  1296.00, 1188.00, 2484.00],
+  [310, "Gaji melebihi RM10,800 tetapi tidak RM10,900", 10800.01, 10900,  1308.00, 1199.00, 2507.00],
+  [311, "Gaji melebihi RM10,900 tetapi tidak RM11,000", 10900.01, 11000,  1320.00, 1210.00, 2530.00],
+  [312, "Gaji melebihi RM11,000 tetapi tidak RM11,100", 11000.01, 11100,  1332.00, 1221.00, 2553.00],
+  [313, "Gaji melebihi RM11,100 tetapi tidak RM11,200", 11100.01, 11200,  1344.00, 1232.00, 2576.00],
+  [314, "Gaji melebihi RM11,200 tetapi tidak RM11,300", 11200.01, 11300,  1356.00, 1243.00, 2599.00],
+  [315, "Gaji melebihi RM11,300 tetapi tidak RM11,400", 11300.01, 11400,  1368.00, 1254.00, 2622.00],
+  [316, "Gaji melebihi RM11,400 tetapi tidak RM11,500", 11400.01, 11500,  1380.00, 1265.00, 2645.00],
+  [317, "Gaji melebihi RM11,500 tetapi tidak RM11,600", 11500.01, 11600,  1392.00, 1276.00, 2668.00],
+  [318, "Gaji melebihi RM11,600 tetapi tidak RM11,700", 11600.01, 11700,  1404.00, 1287.00, 2691.00],
+  [319, "Gaji melebihi RM11,700 tetapi tidak RM11,800", 11700.01, 11800,  1416.00, 1298.00, 2714.00],
+  [320, "Gaji melebihi RM11,800 tetapi tidak RM11,900", 11800.01, 11900,  1428.00, 1309.00, 2737.00],
+  [321, "Gaji melebihi RM11,900 tetapi tidak RM12,000", 11900.01, 12000,  1440.00, 1320.00, 2760.00],
+  [322, "Gaji melebihi RM12,000 tetapi tidak RM12,100", 12000.01, 12100,  1452.00, 1331.00, 2783.00],
+  [323, "Gaji melebihi RM12,100 tetapi tidak RM12,200", 12100.01, 12200,  1464.00, 1342.00, 2806.00],
+  [324, "Gaji melebihi RM12,200 tetapi tidak RM12,300", 12200.01, 12300,  1476.00, 1353.00, 2829.00],
+  [325, "Gaji melebihi RM12,300 tetapi tidak RM12,400", 12300.01, 12400,  1488.00, 1364.00, 2852.00],
+  [326, "Gaji melebihi RM12,400 tetapi tidak RM12,500", 12400.01, 12500,  1500.00, 1375.00, 2875.00],
+  [327, "Gaji melebihi RM12,500 tetapi tidak RM12,600", 12500.01, 12600,  1512.00, 1386.00, 2898.00],
+  [328, "Gaji melebihi RM12,600 tetapi tidak RM12,700", 12600.01, 12700,  1524.00, 1397.00, 2921.00],
+  [329, "Gaji melebihi RM12,700 tetapi tidak RM12,800", 12700.01, 12800,  1536.00, 1408.00, 2944.00],
+  [330, "Gaji melebihi RM12,800 tetapi tidak RM12,900", 12800.01, 12900,  1548.00, 1419.00, 2967.00],
+  [331, "Gaji melebihi RM12,900 tetapi tidak RM13,000", 12900.01, 13000,  1560.00, 1430.00, 2990.00],
+  [332, "Gaji melebihi RM13,000 tetapi tidak RM13,100", 13000.01, 13100,  1572.00, 1441.00, 3013.00],
+  [333, "Gaji melebihi RM13,100 tetapi tidak RM13,200", 13100.01, 13200,  1584.00, 1452.00, 3036.00],
+  [334, "Gaji melebihi RM13,200 tetapi tidak RM13,300", 13200.01, 13300,  1596.00, 1463.00, 3059.00],
+  [335, "Gaji melebihi RM13,300 tetapi tidak RM13,400", 13300.01, 13400,  1608.00, 1474.00, 3082.00],
+  [336, "Gaji melebihi RM13,400 tetapi tidak RM13,500", 13400.01, 13500,  1620.00, 1485.00, 3105.00],
+  [337, "Gaji melebihi RM13,500 tetapi tidak RM13,600", 13500.01, 13600,  1632.00, 1496.00, 3128.00],
+  [338, "Gaji melebihi RM13,600 tetapi tidak RM13,700", 13600.01, 13700,  1644.00, 1507.00, 3151.00],
+  [339, "Gaji melebihi RM13,700 tetapi tidak RM13,800", 13700.01, 13800,  1656.00, 1518.00, 3174.00],
+  [340, "Gaji melebihi RM13,800 tetapi tidak RM13,900", 13800.01, 13900,  1668.00, 1529.00, 3197.00],
+  [341, "Gaji melebihi RM13,900 tetapi tidak RM14,000", 13900.01, 14000,  1680.00, 1540.00, 3220.00],
+  [342, "Gaji melebihi RM14,000 tetapi tidak RM14,100", 14000.01, 14100,  1692.00, 1551.00, 3243.00],
+  [343, "Gaji melebihi RM14,100 tetapi tidak RM14,200", 14100.01, 14200,  1704.00, 1562.00, 3266.00],
+  [344, "Gaji melebihi RM14,200 tetapi tidak RM14,300", 14200.01, 14300,  1716.00, 1573.00, 3289.00],
+  [345, "Gaji melebihi RM14,300 tetapi tidak RM14,400", 14300.01, 14400,  1728.00, 1584.00, 3312.00],
+  [346, "Gaji melebihi RM14,400 tetapi tidak RM14,500", 14400.01, 14500,  1740.00, 1595.00, 3335.00],
+  [347, "Gaji melebihi RM14,500 tetapi tidak RM14,600", 14500.01, 14600,  1752.00, 1606.00, 3358.00],
+  [348, "Gaji melebihi RM14,600 tetapi tidak RM14,700", 14600.01, 14700,  1764.00, 1617.00, 3381.00],
+  [349, "Gaji melebihi RM14,700 tetapi tidak RM14,800", 14700.01, 14800,  1776.00, 1628.00, 3404.00],
+  [350, "Gaji melebihi RM14,800 tetapi tidak RM14,900", 14800.01, 14900,  1788.00, 1639.00, 3427.00],
+  [351, "Gaji melebihi RM14,900 tetapi tidak RM15,000", 14900.01, 15000,  1800.00, 1650.00, 3450.00],
+  [352, "Gaji melebihi RM15,000 tetapi tidak RM15,100", 15000.01, 15100,  1812.00, 1661.00, 3473.00],
+  [353, "Gaji melebihi RM15,100 tetapi tidak RM15,200", 15100.01, 15200,  1824.00, 1672.00, 3496.00],
+  [354, "Gaji melebihi RM15,200 tetapi tidak RM15,300", 15200.01, 15300,  1836.00, 1683.00, 3519.00],
+  [355, "Gaji melebihi RM15,300 tetapi tidak RM15,400", 15300.01, 15400,  1848.00, 1694.00, 3542.00],
+  [356, "Gaji melebihi RM15,400 tetapi tidak RM15,500", 15400.01, 15500,  1860.00, 1705.00, 3565.00],
+  [357, "Gaji melebihi RM15,500 tetapi tidak RM15,600", 15500.01, 15600,  1872.00, 1716.00, 3588.00],
+  [358, "Gaji melebihi RM15,600 tetapi tidak RM15,700", 15600.01, 15700,  1884.00, 1727.00, 3611.00],
+  [359, "Gaji melebihi RM15,700 tetapi tidak RM15,800", 15700.01, 15800,  1896.00, 1738.00, 3634.00],
+  [360, "Gaji melebihi RM15,800 tetapi tidak RM15,900", 15800.01, 15900,  1908.00, 1749.00, 3657.00],
+  [361, "Gaji melebihi RM15,900 tetapi tidak RM16,000", 15900.01, 16000,  1920.00, 1760.00, 3680.00],
+  [362, "Gaji melebihi RM16,000 tetapi tidak RM16,100", 16000.01, 16100,  1932.00, 1771.00, 3703.00],
+  [363, "Gaji melebihi RM16,100 tetapi tidak RM16,200", 16100.01, 16200,  1944.00, 1782.00, 3726.00],
+  [364, "Gaji melebihi RM16,200 tetapi tidak RM16,300", 16200.01, 16300,  1956.00, 1793.00, 3749.00],
+  [365, "Gaji melebihi RM16,300 tetapi tidak RM16,400", 16300.01, 16400,  1968.00, 1804.00, 3772.00],
+  [366, "Gaji melebihi RM16,400 tetapi tidak RM16,500", 16400.01, 16500,  1980.00, 1815.00, 3795.00],
+  [367, "Gaji melebihi RM16,500 tetapi tidak RM16,600", 16500.01, 16600,  1992.00, 1826.00, 3818.00],
+  [368, "Gaji melebihi RM16,600 tetapi tidak RM16,700", 16600.01, 16700,  2004.00, 1837.00, 3841.00],
+  [369, "Gaji melebihi RM16,700 tetapi tidak RM16,800", 16700.01, 16800,  2016.00, 1848.00, 3864.00],
+  [370, "Gaji melebihi RM16,800 tetapi tidak RM16,900", 16800.01, 16900,  2028.00, 1859.00, 3887.00],
+  [371, "Gaji melebihi RM16,900 tetapi tidak RM17,000", 16900.01, 17000,  2040.00, 1870.00, 3910.00],
+  [372, "Gaji melebihi RM17,000 tetapi tidak RM17,100", 17000.01, 17100,  2052.00, 1881.00, 3933.00],
+  [373, "Gaji melebihi RM17,100 tetapi tidak RM17,200", 17100.01, 17200,  2064.00, 1892.00, 3956.00],
+  [374, "Gaji melebihi RM17,200 tetapi tidak RM17,300", 17200.01, 17300,  2076.00, 1903.00, 3979.00],
+  [375, "Gaji melebihi RM17,300 tetapi tidak RM17,400", 17300.01, 17400,  2088.00, 1914.00, 4002.00],
+  [376, "Gaji melebihi RM17,400 tetapi tidak RM17,500", 17400.01, 17500,  2100.00, 1925.00, 4025.00],
+  [377, "Gaji melebihi RM17,500 tetapi tidak RM17,600", 17500.01, 17600,  2112.00, 1936.00, 4048.00],
+  [378, "Gaji melebihi RM17,600 tetapi tidak RM17,700", 17600.01, 17700,  2124.00, 1947.00, 4071.00],
+  [379, "Gaji melebihi RM17,700 tetapi tidak RM17,800", 17700.01, 17800,  2136.00, 1958.00, 4094.00],
+  [380, "Gaji melebihi RM17,800 tetapi tidak RM17,900", 17800.01, 17900,  2148.00, 1969.00, 4117.00],
+  [381, "Gaji melebihi RM17,900 tetapi tidak RM18,000", 17900.01, 18000,  2160.00, 1980.00, 4140.00],
+  [382, "Gaji melebihi RM18,000 tetapi tidak RM18,100", 18000.01, 18100,  2172.00, 1991.00, 4163.00],
+  [383, "Gaji melebihi RM18,100 tetapi tidak RM18,200", 18100.01, 18200,  2184.00, 2002.00, 4186.00],
+  [384, "Gaji melebihi RM18,200 tetapi tidak RM18,300", 18200.01, 18300,  2196.00, 2013.00, 4209.00],
+  [385, "Gaji melebihi RM18,300 tetapi tidak RM18,400", 18300.01, 18400,  2208.00, 2024.00, 4232.00],
+  [386, "Gaji melebihi RM18,400 tetapi tidak RM18,500", 18400.01, 18500,  2220.00, 2035.00, 4255.00],
+  [387, "Gaji melebihi RM18,500 tetapi tidak RM18,600", 18500.01, 18600,  2232.00, 2046.00, 4278.00],
+  [388, "Gaji melebihi RM18,600 tetapi tidak RM18,700", 18600.01, 18700,  2244.00, 2057.00, 4301.00],
+  [389, "Gaji melebihi RM18,700 tetapi tidak RM18,800", 18700.01, 18800,  2256.00, 2068.00, 4324.00],
+  [390, "Gaji melebihi RM18,800 tetapi tidak RM18,900", 18800.01, 18900,  2268.00, 2079.00, 4347.00],
+  [391, "Gaji melebihi RM18,900 tetapi tidak RM19,000", 18900.01, 19000,  2280.00, 2090.00, 4370.00],
+  [392, "Gaji melebihi RM19,000 tetapi tidak RM19,100", 19000.01, 19100,  2292.00, 2101.00, 4393.00],
+  [393, "Gaji melebihi RM19,100 tetapi tidak RM19,200", 19100.01, 19200,  2304.00, 2112.00, 4416.00],
+  [394, "Gaji melebihi RM19,200 tetapi tidak RM19,300", 19200.01, 19300,  2316.00, 2123.00, 4439.00],
+  [395, "Gaji melebihi RM19,300 tetapi tidak RM19,400", 19300.01, 19400,  2328.00, 2134.00, 4462.00],
+  [396, "Gaji melebihi RM19,400 tetapi tidak RM19,500", 19400.01, 19500,  2340.00, 2145.00, 4485.00],
+  [397, "Gaji melebihi RM19,500 tetapi tidak RM19,600", 19500.01, 19600,  2352.00, 2156.00, 4508.00],
+  [398, "Gaji melebihi RM19,600 tetapi tidak RM19,700", 19600.01, 19700,  2364.00, 2167.00, 4531.00],
+  [399, "Gaji melebihi RM19,700 tetapi tidak RM19,800", 19700.01, 19800,  2376.00, 2178.00, 4554.00],
+  [400, "Gaji melebihi RM19,800 tetapi tidak RM19,900", 19800.01, 19900,  2388.00, 2189.00, 4577.00],
+  [401, "Gaji melebihi RM19,900 tetapi tidak RM20,000", 19900.01, 20000,  2400.00, 2200.00, 4600.00],
+  [402, "Gaji melebihi RM20,000", 20000.01, Infinity, 0, 0, 0]
 ];
 
-// ================= 状态 =================
+// ============================================================
+// 状态
+// ============================================================
+let rows = EPF_DATA.map(r => ({
+  no: r[0],
+  wage: r[1],
+  min: r[2],
+  max: r[3],
+  employer: r[4],
+  employee: r[5],
+  total: r[6],
+  editable: false
+}));
+
 const PASSWORD = '0000';
-let unlockedRows = new Set();
-let pendingUnlockRow = null;
+let pendingCheckbox = null;
+let highlightedRowIdx = -1;
 
-// ================= 工具 =================
-function toast(msg, ok = true) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.style.background = ok ? '#1e293b' : '#b91c1c';
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2500);
+// ============================================================
+// 表头 sticky 对齐
+// ============================================================
+function fixStickyHeader() {
+  const row1 = document.getElementById('headRow1');
+  const row2 = document.getElementById('headRow2');
+  if (!row1 || !row2) return;
+  const r1 = row1.getBoundingClientRect();
+  const r2 = row2.getBoundingClientRect();
+  const offset = Math.max(0, Math.round(r2.top - r1.top));
+  Array.from(row2.cells).forEach(th => {
+    th.style.top = offset + 'px';
+  });
 }
 
-function fmtNum(v) {
-  return Number(v || 0).toFixed(2);
-}
-
-function fmtRange(lower, upper) {
-  return `${lower.toFixed(2)} – ${upper.toFixed(2)}`;
-}
-
-// ================= 渲染表格 =================
-function renderTable() {
+// ============================================================
+// 渲染
+// ============================================================
+function render() {
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
 
-  EPF_DATA.forEach((row, idx) => {
-    const [no, lower, upper, employer, employee, total] = row;
-    const isUnlocked = unlockedRows.has(idx);
-
+  rows.forEach((r, i) => {
     const tr = document.createElement('tr');
-    tr.dataset.idx = idx;
-    if (!isUnlocked) tr.classList.add('disabled');
+    if (r.editable) tr.classList.add('row-edit');
+    if (i === highlightedRowIdx) tr.classList.add('row-highlight');
 
-    const ro = isUnlocked ? '' : 'readonly';
+    const fmt = v => (v === Infinity || v > 100000) ? '—' : Number(v).toFixed(2);
 
     tr.innerHTML = `
       <td class="td-chk">
-        <input type="checkbox" class="row-chk" data-idx="${idx}" ${isUnlocked ? 'checked' : ''}>
+        <input type="checkbox" ${r.editable ? 'checked' : ''}
+               onchange="toggleEdit(${i}, this)">
       </td>
-      <td class="center" style="font-size:0.78rem;color:#64748b;">${no}</td>
-      <td class="wage-range">${fmtRange(lower, upper)}</td>
-      <td class="num"><input type="number" step="0.01" class="input" data-idx="${idx}" data-field="employer" value="${fmtNum(employer)}" ${ro}></td>
-      <td class="num"><input type="number" step="0.01" class="input" data-idx="${idx}" data-field="employee" value="${fmtNum(employee)}" ${ro}></td>
-      <td class="num"><input type="number" step="0.01" class="input" data-idx="${idx}" data-field="total" value="${fmtNum(total)}" readonly></td>
+      <td class="td-no">${r.no}</td>
+      <td class="td-wage">${escapeHtml(r.wage)}</td>
+      <td class="td-num">
+        ${r.editable
+          ? `<input class="cell-input" type="number" step="0.01" value="${r.employer}" onchange="updateField(${i}, 'employer', this.value)">`
+          : `<strong>RM ${fmt(r.employer)}</strong>`}
+      </td>
+      <td class="td-num">
+        ${r.editable
+          ? `<input class="cell-input" type="number" step="0.01" value="${r.employee}" onchange="updateField(${i}, 'employee', this.value)">`
+          : `<strong>RM ${fmt(r.employee)}</strong>`}
+      </td>
+      <td class="td-total">
+        ${r.editable
+          ? `<input class="cell-input" type="number" step="0.01" value="${r.total}" onchange="updateField(${i}, 'total', this.value)">`
+          : `<strong>RM ${fmt(r.total)}</strong>`}
+      </td>
     `;
     tbody.appendChild(tr);
   });
 
-  // 绑定勾选事件
-  tbody.querySelectorAll('.row-chk').forEach(chk => {
-    chk.addEventListener('change', e => {
-      const idx = Number(e.target.dataset.idx);
-      if (e.target.checked) {
-        pendingUnlockRow = idx;
-        e.target.checked = false;
-        openPwdModal();
-      } else {
-        unlockedRows.delete(idx);
-        renderTable();
-        toast('Baris ' + (idx + 1) + ' dikunci semula');
-      }
-    });
-  });
-
-  // 绑定输入事件
-  tbody.querySelectorAll('input.input:not([readonly])').forEach(inp => {
-    inp.addEventListener('input', e => {
-      const idx = Number(e.target.dataset.idx);
-      const field = e.target.dataset.field;
-      if (field === 'total') return;
-
-      const map = { 'employer': 3, 'employee': 4 };
-      const colIdx = map[field];
-      if (colIdx !== undefined) {
-        EPF_DATA[idx][colIdx] = parseFloat(e.target.value) || 0;
-      }
-
-      // 自动计算合计
-      const row = e.target.closest('tr');
-      const newTotal = EPF_DATA[idx][3] + EPF_DATA[idx][4];
-      EPF_DATA[idx][5] = newTotal;
-      const totalInp = row.querySelector('input[data-field="total"]');
-      if (totalInp) totalInp.value = fmtNum(newTotal);
-    });
-  });
+  requestAnimationFrame(fixStickyHeader);
 }
 
-// ================= 密码验证 =================
-function openPwdModal() {
-  document.getElementById('pwdModal').style.display = 'flex';
-  document.getElementById('pwdInput').value = '';
-  document.getElementById('pwdInput').focus();
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
 }
 
-function closePwdModal() {
-  document.getElementById('pwdModal').style.display = 'none';
-  pendingUnlockRow = null;
+// ============================================================
+// 薪资 → EPF 自动查询
+// ============================================================
+function calcEPFByWage(wage) {
+  const w = Number(wage);
+  if (!w || w <= 0) return { employee: 0, employer: 0, total: 0, idx: -1 };
+
+  // 超过 RM20,000 使用百分比计算
+  if (w > 20000) {
+    const employee = Math.round(w * 0.11 * 100) / 100;
+    const employer = Math.round(w * 0.12 * 100) / 100;
+    const total = Math.round((employee + employer) * 100) / 100;
+    return { employee, employer, total, idx: -1, isPercentage: true };
+  }
+
+  let match = null;
+  for (let i = 0; i < rows.length; i++) {
+    if (w >= rows[i].min) {
+      match = rows[i];
+    } else {
+      break;
+    }
+  }
+  if (!match) match = rows[0];
+  return {
+    employee: match.employee,
+    employer: match.employer,
+    total: match.total,
+    idx: match.no - 1,
+    isPercentage: false
+  };
+}
+
+function updateCalc() {
+  const wage = parseFloat(document.getElementById('wageInput').value) || 0;
+  const result = calcEPFByWage(wage);
+
+  document.getElementById('resultEmployee').textContent = 'RM ' + result.employee.toFixed(2);
+  document.getElementById('resultEmployer').textContent = 'RM ' + result.employer.toFixed(2);
+  document.getElementById('resultTotal').textContent = 'RM ' + result.total.toFixed(2);
+
+  if (highlightedRowIdx !== result.idx) {
+    highlightedRowIdx = result.idx;
+    const trs = document.querySelectorAll('#tbody tr');
+    trs.forEach((tr, i) => {
+      tr.classList.toggle('row-highlight', i === result.idx && wage > 0 && !result.isPercentage);
+    });
+    if (wage > 0 && result.idx >= 0 && trs[result.idx]) {
+      const row = trs[result.idx];
+      const wrap = document.querySelector('.table-wrap');
+      if (wrap) {
+        const rowTop = row.offsetTop;
+        const wrapTop = wrap.scrollTop;
+        const wrapH = wrap.clientHeight;
+        if (rowTop < wrapTop + 60 || rowTop > wrapTop + wrapH - 60) {
+          wrap.scrollTo({ top: Math.max(0, rowTop - wrapH / 2), behavior: 'smooth' });
+        }
+      }
+    }
+  }
+}
+
+// ============================================================
+// 编辑切换（带密码）
+// ============================================================
+function toggleEdit(idx, checkbox) {
+  if (checkbox.checked) {
+    pendingCheckbox = checkbox;
+    document.getElementById('pwdModal').style.display = 'flex';
+    document.getElementById('pwdInput').value = '';
+    setTimeout(() => document.getElementById('pwdInput').focus(), 100);
+  } else {
+    rows[idx].editable = false;
+    render();
+    toast(`Baris ${rows[idx].no} dikunci`);
+  }
 }
 
 function confirmPwd() {
-  const input = document.getElementById('pwdInput').value.trim();
-  if (input === PASSWORD) {
-    if (pendingUnlockRow !== null) {
-      unlockedRows.add(pendingUnlockRow);
-      renderTable();
-      toast('Baris ' + (pendingUnlockRow + 1) + ' dibuka untuk editan');
-    }
-    closePwdModal();
+  const val = document.getElementById('pwdInput').value;
+  if (val === PASSWORD) {
+    const cb = pendingCheckbox;
+    const idx = Number(cb.closest('tr').querySelector('.td-no').textContent) - 1;
+    rows[idx].editable = true;
+    closePwd();
+    render();
+    toast(`Baris ${rows[idx].no} boleh diedit`);
   } else {
-    toast('Password salah!', false);
+    toast('Kata laluan salah!', true);
     document.getElementById('pwdInput').value = '';
     document.getElementById('pwdInput').focus();
   }
 }
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && document.getElementById('pwdModal').style.display === 'flex') {
-    confirmPwd();
-  }
-  if (e.key === 'Escape' && document.getElementById('pwdModal').style.display === 'flex') {
-    closePwdModal();
-  }
-});
-
-// ================= 保存 =================
-function saveToStorage() {
-  try {
-    localStorage.setItem('epf_data_2025', JSON.stringify(EPF_DATA));
-    toast('Data berjaya disimpan');
-  } catch (err) {
-    toast('Gagal simpan: ' + err.message, false);
+function closePwd() {
+  document.getElementById('pwdModal').style.display = 'none';
+  if (pendingCheckbox) {
+    pendingCheckbox.checked = false;
+    pendingCheckbox = null;
   }
 }
 
-function loadFromStorage() {
-  try {
-    const saved = localStorage.getItem('epf_data_2025');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length === EPF_DATA.length) {
-        for (let i = 0; i < parsed.length; i++) EPF_DATA[i] = parsed[i];
-      }
-    }
-  } catch (err) {
-    console.warn('Load error:', err);
+function updateField(idx, field, value) {
+  const v = parseFloat(value);
+  if (isNaN(v) || v < 0) { render(); return; }
+  rows[idx][field] = v;
+  if (field === 'employer' || field === 'employee') {
+    rows[idx].total = Math.round((rows[idx].employer + rows[idx].employee) * 100) / 100;
   }
+  render();
 }
 
-// ================= 导出 =================
+// ============================================================
+// 导出
+// ============================================================
 function handleExport(val) {
   if (!val) return;
   try {
-    if (val === 'xlsx') exportToXLSX();
-    else if (val === 'txt') exportToTXT();
-    else if (val === 'doc') exportToDOC();
-  } catch (err) {
-    toast('Export error: ' + err.message, false);
+    if (val === 'xlsx') exportXLSX();
+    else if (val === 'txt') exportTXT();
+    else if (val === 'doc') exportDOC();
+  } catch(e) {
+    console.error(e);
+    toast('Export error: ' + e.message, true);
   } finally {
     document.getElementById('exportMenu').value = '';
   }
 }
 
 function getExportHeaders() {
-  return ['No.', 'Wage Range (RM)', 'Employer (RM)', 'Employee (RM)', 'Total (RM)'];
+  return ['No.', 'Gaji Bulanan', 'Majikan (RM)', 'Pekerja (RM)', 'Jumlah (RM)'];
 }
 
 function getExportRows() {
-  return EPF_DATA.map(row => {
-    const [no, lower, upper, employer, employee, total] = row;
-    return [no, fmtRange(lower, upper), employer, employee, total];
-  });
+  return rows.map(r => [
+    r.no, r.wage,
+    r.employer, r.employee, r.total
+  ]);
+}
+
+function todayStr() {
+  const d = new Date();
+  const p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
 }
 
 function downloadBlob(content, filename, mime) {
   const blob = new Blob(['\ufeff', content], { type: mime + ';charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
+  a.href = url; a.download = filename;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-function exportToXLSX() {
-  if (typeof XLSX === 'undefined') { toast('SheetJS tidak dimuat', false); return; }
+function exportXLSX() {
+  if (typeof XLSX === 'undefined') { exportCSV(); return; }
   const aoa = [getExportHeaders(), ...getExportRows()];
   const ws = XLSX.utils.aoa_to_sheet(aoa);
-  ws['!cols'] = [{ wch: 6 }, { wch: 24 }, { wch: 14 }, { wch: 14 }, { wch: 12 }];
+  ws['!cols'] = [
+    {wch:6},{wch:38},{wch:14},{wch:14},{wch:14}
+  ];
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let R = 1; R <= range.e.r; R++) {
+    for (let C = 2; C <= 4; C++) {
+      const addr = XLSX.utils.encode_cell({r:R, c:C});
+      if (ws[addr] && ws[addr].t === 'n') ws[addr].z = '#,##0.00';
+    }
+  }
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'EPF');
-  XLSX.writeFile(wb, 'epf_table_2025.xlsx');
+  XLSX.writeFile(wb, 'jadual_epf_' + todayStr() + '.xlsx');
   toast('Excel berjaya dieksport');
 }
 
-function exportToTXT() {
+function exportCSV() {
+  const esc = v => {
+    const s = String(v ?? '');
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  };
+  let out = getExportHeaders().map(esc).join(',') + '\n';
+  getExportRows().forEach(r => { out += r.map(esc).join(',') + '\n'; });
+  downloadBlob(out, 'jadual_epf_' + todayStr() + '.csv', 'text/csv');
+  toast('CSV berjaya dieksport');
+}
+
+function exportTXT() {
   const headers = getExportHeaders();
-  const rows = getExportRows();
+  const data = getExportRows();
   const widths = headers.map((h, i) => {
-    let w = String(h).length;
-    rows.forEach(r => { if (String(r[i] ?? '').length > w) w = String(r[i]).length; });
-    return Math.min(w, 26);
+    let w = h.length;
+    data.forEach(r => { const l = String(r[i] ?? '').length; if (l > w) w = l; });
+    return Math.min(w, 40);
   });
   const pad = (v, w) => {
     let s = String(v ?? '');
-    if (s.length > w) s = s.slice(0, w - 1) + '…';
+    if (s.length > w) s = s.slice(0, w-1) + '…';
     return s + ' '.repeat(Math.max(0, w - s.length));
   };
-  let out = 'EPF CONTRIBUTION TABLE 2025 (Third Schedule Part A)\n';
-  out += 'Effective October 2025 | KWSP Act 1991\n';
-  out += '='.repeat(widths.reduce((a, b) => a + b + 3, 0)) + '\n';
-  out += headers.map((h, i) => pad(h, widths[i])).join(' | ') + '\n';
+  let out = 'JADUAL CARUMAN EPF (AKTA 452)\n';
+  out += 'Dijana: ' + new Date().toLocaleString('ms-MY') + '\n';
+  out += '='.repeat(widths.reduce((a,b) => a+b+3, 0)) + '\n';
+  out += headers.map((h,i) => pad(h, widths[i])).join(' | ') + '\n';
   out += widths.map(w => '-'.repeat(w)).join('-+-') + '\n';
-  rows.forEach(r => { out += r.map((c, i) => pad(c, widths[i])).join(' | ') + '\n'; });
-  downloadBlob(out, 'epf_table_2025.txt', 'text/plain');
+  data.forEach(r => { out += r.map((c,i) => pad(c, widths[i])).join(' | ') + '\n'; });
+  out += '\nJumlah baris: ' + data.length + '\n';
+  downloadBlob(out, 'jadual_epf_' + todayStr() + '.txt', 'text/plain');
   toast('Text berjaya dieksport');
 }
 
-function exportToDOC() {
+function exportDOC() {
   const headers = getExportHeaders();
-  const rows = getExportRows();
+  const data = getExportRows();
   let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ';
   html += 'xmlns:w="urn:schemas-microsoft-com:office:word" ';
   html += 'xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8">';
-  html += '<title>EPF Contribution Table 2025</title>';
-  html += '<style>body{font-family:Arial,sans-serif;font-size:9pt;}';
+  html += '<title>Jadual Caruman EPF</title>';
+  html += '<style>body{font-family:Arial;font-size:9pt;}';
   html += 'table{border-collapse:collapse;width:100%;}';
   html += 'th,td{border:1px solid #999;padding:3px 5px;}';
-  html += 'th{background:#eef2ff;text-align:center;}';
+  html += 'th{background:#ccfbf1;text-align:left;}';
   html += 'td.num{text-align:right;}</style></head><body>';
-  html += '<h2>EPF Contribution Table 2025 (Third Schedule Part A)</h2>';
-  html += '<p style="font-size:9pt;color:#555;">Effective October 2025 | KWSP Act 1991</p>';
+  html += '<h2>Jadual Caruman EPF (Akta 452)</h2>';
+  html += '<p>Dijana: ' + new Date().toLocaleDateString('ms-MY') + '</p>';
   html += '<table><thead><tr>';
-  headers.forEach(h => { html += '<th>' + h + '</th>'; });
+  headers.forEach(h => { html += '<th>' + escapeHtml(h) + '</th>'; });
   html += '</tr></thead><tbody>';
-  rows.forEach(r => {
+  data.forEach(r => {
     html += '<tr>';
     r.forEach((c, i) => {
-      const cls = i >= 2 ? ' class="num"' : '';
-      html += '<td' + cls + '>' + c + '</td>';
+      html += `<td class="${i >= 2 ? 'num' : ''}">${escapeHtml(c)}</td>`;
     });
     html += '</tr>';
   });
   html += '</tbody></table></body></html>';
-  downloadBlob(html, 'epf_table_2025.doc', 'application/msword');
+  downloadBlob(html, 'jadual_epf_' + todayStr() + '.doc', 'application/msword');
   toast('Word berjaya dieksport');
 }
 
-// ================= 导入 =================
-function openImportModal() { document.getElementById('importModal').style.display = 'flex'; }
-function closeImportModal() {
+// ============================================================
+// 导入
+// ============================================================
+function openImport() {
+  document.getElementById('importModal').style.display = 'flex';
+}
+function closeImport() {
   document.getElementById('importModal').style.display = 'none';
   const fi = document.getElementById('importFile');
   if (fi) fi.value = '';
 }
-
-window.addEventListener('DOMContentLoaded', () => {
-  loadFromStorage();
-  renderTable();
-
-  const dz = document.getElementById('dropzone');
-  const fi = document.getElementById('importFile');
-  if (dz && fi) {
-    dz.addEventListener('click', e => { if (e.target !== fi) fi.click(); });
-    fi.addEventListener('change', e => {
-      if (e.target.files && e.target.files[0]) handleImportFile(e.target.files[0]);
-    });
-    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
-    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
-    dz.addEventListener('drop', e => {
-      e.preventDefault();
-      dz.classList.remove('drag-over');
-      if (e.dataTransfer.files && e.dataTransfer.files[0]) handleImportFile(e.dataTransfer.files[0]);
-    });
-  }
-  const modal = document.getElementById('importModal');
-  if (modal) modal.addEventListener('click', e => {
-    if (e.target.id === 'importModal') closeImportModal();
-  });
-});
 
 function parseCSVLine(line) {
   const cells = []; let cur = ''; let inQ = false;
@@ -1003,118 +1257,123 @@ function parseCSVLine(line) {
   return cells;
 }
 
-async function handleImportFile(file) {
-  const name = file.name.toLowerCase();
-  let rows = [];
+function parseTXT(text) {
+  const out = [];
+  text.split(/\r?\n/).forEach(line => {
+    const t = line.trim();
+    if (!t || /^[=\-+\s]+$/.test(t)) return;
+    if (t.startsWith('JADUAL') || t.startsWith('Dijana') || t.startsWith('Jumlah')) return;
+    if (t.includes('|')) out.push(t.split('|').map(s => s.trim()));
+    else out.push(parseCSVLine(t));
+  });
+  return out;
+}
 
+async function handleImport(file) {
+  const name = file.name.toLowerCase();
+  let raw = [];
   try {
     if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
-      if (typeof XLSX === 'undefined') { toast('SheetJS tidak dimuat', false); return; }
-      const data = await file.arrayBuffer();
-      const wb = XLSX.read(data);
+      if (typeof XLSX === 'undefined') { toast('SheetJS tidak dimuat', true); return; }
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf);
       const ws = wb.Sheets[wb.SheetNames[0]];
-      rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+      raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
     } else if (name.endsWith('.csv') || name.endsWith('.txt')) {
-      const text = await file.text();
-      const lines = text.split(/\r?\n/);
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed) continue;
-        if (/^[=\-+\s]+$/.test(trimmed)) continue;
-        if (trimmed.startsWith('EPF')) continue;
-        if (trimmed.startsWith('Effective')) continue;
-        if (trimmed.includes('|')) {
-          rows.push(trimmed.split('|').map(s => s.trim()));
-        } else {
-          rows.push(parseCSVLine(trimmed));
-        }
-      }
+      raw = parseTXT(await file.text());
     } else {
-      toast('Format fail tidak disokong', false);
-      return;
+      toast('Format fail tidak disokong', true); return;
     }
 
-    if (!rows || rows.length < 2) { toast('Fail tidak sah atau kosong', false); return; }
+    if (!raw || raw.length < 2) { toast('Fail kosong atau tidak sah', true); return; }
 
-    const headers = rows[0].map(h => String(h).trim());
-    const idx = {};
-    const WANTED = ['Employer (RM)', 'Employee (RM)'];
-    headers.forEach((h, i) => {
-      const lh = h.toLowerCase();
-      for (const w of WANTED) {
-        if (lh === w.toLowerCase()) { idx[w] = i; break; }
+    const dataRows = raw.slice(1).filter(r => r && r.length >= 3);
+    if (!dataRows.length) { toast('Tiada data dijumpai', true); return; }
+
+    const imported = [];
+    dataRows.forEach(r => {
+      const no = parseInt(r[0]) || (imported.length + 1);
+      const wage = String(r[1] || '');
+      const employer = parseFloat(r[2]) || 0;
+      const employee = parseFloat(r[3]) || 0;
+      const total = parseFloat(r[4]) || Math.round((employer + employee) * 100) / 100;
+      let min = 0, max = Infinity;
+      if (imported.length > 0) {
+        min = imported[imported.length - 1].max + 0.01;
       }
+      if (no < 402) max = min + 19.99;
+      imported.push({
+        no, wage, min, max,
+        employer, employee, total,
+        editable: false
+      });
     });
 
-    if (idx['Employer (RM)'] === undefined || idx['Employee (RM)'] === undefined) {
-      toast('Format fail tidak sah. Sila guna template.', false);
-      return;
-    }
+    if (!imported.length) { toast('Tiada baris sah', true); return; }
+    if (imported.length > 0) imported[imported.length - 1].max = Infinity;
 
-    const get = (row, key) => idx[key] !== undefined ? row[idx[key]] : '';
-
-    let updated = 0;
-    for (let r = 1; r < rows.length; r++) {
-      const row = rows[r];
-      if (!row || row.length < 2) continue;
-      const rowIdx = r - 1;
-      if (rowIdx >= EPF_DATA.length) break;
-
-      const employer = parseFloat(get(row, 'Employer (RM)'));
-      const employee = parseFloat(get(row, 'Employee (RM)'));
-
-      if (!isNaN(employer)) EPF_DATA[rowIdx][3] = employer;
-      if (!isNaN(employee)) EPF_DATA[rowIdx][4] = employee;
-      EPF_DATA[rowIdx][5] = EPF_DATA[rowIdx][3] + EPF_DATA[rowIdx][4];
-      updated++;
-    }
-
-    renderTable();
-    toast('Berjaya import ' + updated + ' baris');
-    closeImportModal();
-  } catch (err) {
-    console.error(err);
-    toast('Import error: ' + err.message, false);
+    rows = imported;
+    highlightedRowIdx = -1;
+    render();
+    updateCalc();
+    toast(`Berjaya import ${imported.length} baris`);
+    closeImport();
+  } catch(e) {
+    console.error(e);
+    toast('Import error: ' + e.message, true);
   }
 }
 
-// ================= 模板下载 =================
-function downloadTemplate(format) {
-  const headers = getExportHeaders();
-  const sample = getExportRows().slice(0, 5);
-
-  if (format === 'xlsx') {
-    if (typeof XLSX === 'undefined') { toast('SheetJS tidak dimuat', false); return; }
-    const aoa = [headers, ...sample];
-    const ws = XLSX.utils.aoa_to_sheet(aoa);
-    ws['!cols'] = headers.map(() => ({ wch: 18 }));
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'EPF');
-    XLSX.writeFile(wb, 'epf_template.xlsx');
-    toast('Template Excel dimuat turun');
-  } else if (format === 'doc') {
-    let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ';
-    html += 'xmlns:w="urn:schemas-microsoft-com:office:word" ';
-    html += 'xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8">';
-    html += '<title>EPF Template</title>';
-    html += '<style>body{font-family:Arial;font-size:9pt;}';
-    html += 'table{border-collapse:collapse;}';
-    html += 'th,td{border:1px solid #999;padding:3px 5px;}';
-    html += 'th{background:#eef2ff;}</style></head><body>';
-    html += '<h2>EPF Import Template</h2>';
-    html += '<p style="font-size:9pt;color:#555;">Fill in the rows below and import back.</p>';
-    html += '<table><thead><tr>';
-    headers.forEach(h => { html += '<th>' + h + '</th>'; });
-    html += '</tr></thead><tbody>';
-    sample.forEach(r => {
-      html += '<tr>';
-      r.forEach(c => { html += '<td>' + c + '</td>'; });
-      html += '</tr>';
+// ============================================================
+// 初始化
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+  const dz = document.getElementById('dropzone');
+  const fi = document.getElementById('importFile');
+  if (dz && fi) {
+    dz.addEventListener('click', e => { if (e.target !== fi) fi.click(); });
+    fi.addEventListener('change', e => {
+      if (e.target.files && e.target.files[0]) handleImport(e.target.files[0]);
     });
-    html += '</tbody></table></body></html>';
-    downloadBlob(html, 'epf_template.doc', 'application/msword');
-    toast('Template Word dimuat turun');
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault(); dz.classList.remove('drag-over');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) handleImport(e.dataTransfer.files[0]);
+    });
   }
+  const modal = document.getElementById('importModal');
+  if (modal) modal.addEventListener('click', e => { if (e.target.id === 'importModal') closeImport(); });
+  const pwd = document.getElementById('pwdModal');
+  if (pwd) pwd.addEventListener('click', e => { if (e.target.id === 'pwdModal') closePwd(); });
+
+  render();
+  updateCalc();
+});
+
+window.addEventListener('resize', () => {
+  requestAnimationFrame(fixStickyHeader);
+});
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => requestAnimationFrame(fixStickyHeader));
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('pwdModal').style.display === 'flex') {
+    confirmPwd();
+  }
+});
+
+// ============================================================
+// Toast
+// ============================================================
+function toast(msg, isError) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast' + (isError ? ' error' : '');
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 2600);
 }
 </script>
 </body>
