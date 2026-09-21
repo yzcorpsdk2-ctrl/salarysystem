@@ -33,7 +33,6 @@ body {
   display: flex; align-items: center; justify-content: center;
   color: #fff; font-size: 0.85rem; font-weight: 800;
 }
-
 .btn {
   background: #fff; border: 1px solid #cbd5e1;
   padding: 0.45rem 0.9rem; border-radius: 8px;
@@ -46,9 +45,7 @@ body {
 .btn-primary:hover { background: #1d4ed8; }
 .btn-success { background: #059669; border-color: #059669; color: #fff; }
 .btn-success:hover { background: #047857; }
-.btn-danger { background: #fee2e2; border-color: #fecaca; color: #b91c1c; }
 .btn-sm { padding: 0.3rem 0.6rem; font-size: 0.75rem; }
-
 select.btn { cursor: pointer; }
 
 /* ===== 主容器 ===== */
@@ -67,28 +64,20 @@ select.btn { cursor: pointer; }
 .page-header h1 {
   font-size: 1.35rem; font-weight: 700;
   margin-bottom: 0.35rem; letter-spacing: -0.01em;
-  color: #fff;
 }
-.page-header p {
-  font-size: 0.85rem; opacity: 0.85; line-height: 1.5;
-}
+.page-header p { font-size: 0.85rem; opacity: 0.85; line-height: 1.5; }
 .page-header .badge {
   display: inline-block; background: rgba(255,255,255,0.2);
   padding: 0.2rem 0.7rem; border-radius: 20px;
   font-size: 0.72rem; font-weight: 600; margin-top: 0.6rem;
   backdrop-filter: blur(4px);
 }
-.page-header .stat-badges {
-  display: flex; gap: 0.6rem; flex-wrap: wrap;
-}
+.page-header .stat-badges { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .page-header .stat-pill {
   background: rgba(255,255,255,0.15);
   border: 1px solid rgba(255,255,255,0.25);
-  border-radius: 10px;
-  padding: 0.5rem 0.9rem;
-  font-size: 0.78rem;
-  backdrop-filter: blur(4px);
-  min-width: 110px;
+  border-radius: 10px; padding: 0.5rem 0.9rem;
+  font-size: 0.78rem; backdrop-filter: blur(4px); min-width: 110px;
 }
 .page-header .stat-pill .label {
   font-size: 0.65rem; opacity: 0.8;
@@ -98,6 +87,21 @@ select.btn { cursor: pointer; }
 .page-header .stat-pill .value {
   font-size: 1.1rem; font-weight: 700;
   font-variant-numeric: tabular-nums;
+}
+
+/* ===== 分区图例 ===== */
+.section-legend {
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.section-legend .item {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: #fff; border: 1px solid #e2e8f0;
+  padding: 0.4rem 0.75rem; border-radius: 8px;
+  font-size: 0.75rem; color: #475569; font-weight: 500;
+}
+.section-legend .dot {
+  width: 12px; height: 12px; border-radius: 3px;
 }
 
 /* ===== 卡片容器 ===== */
@@ -113,13 +117,13 @@ select.btn { cursor: pointer; }
 
 /* ===== 表格容器 ===== */
 .table-wrap {
-  overflow: auto; max-height: calc(100vh - 320px);
+  overflow: auto; max-height: calc(100vh - 400px);
   background: #fff;
 }
 table {
   border-collapse: separate; border-spacing: 0; font-size: 0.82rem;
   table-layout: fixed;
-  width: 2860px; min-width: 2860px;
+  width: 2940px; min-width: 2940px;
 }
 
 /* ===== 表头基础 ===== */
@@ -131,108 +135,138 @@ th {
   word-break: break-word; overflow-wrap: anywhere;
 }
 th > div { word-break: break-word; overflow-wrap: anywhere; }
-th.grp { background: #eef2ff; }
-thead tr:nth-child(2) th {
-  background: #f1f5f9;
+
+/* ========== ★ 分区色块 ========== */
+/* 第一区：基本资料（冻结） - 琥珀黄 */
+.sec-basic { background: #fef3c7 !important; }
+.sec-basic-h { background: #fde68a !important; }
+
+/* 第二区：收入/津贴 - 绿色 */
+.sec-income { background: #dcfce7 !important; }
+.sec-income-h { background: #bbf7d0 !important; }
+
+/* 第三区：法定扣除 - 紫色 */
+.sec-statutory { background: #ede9fe !important; }
+.sec-statutory-h { background: #ddd6fe !important; }
+
+/* 第四区：SLR 参考 - 青绿 */
+.sec-slr { background: #ccfbf1 !important; }
+.sec-slr-h { background: #99f6e4 !important; }
+
+/* 第五区：汇总 - 蓝色 */
+.sec-summary { background: #dbeafe !important; }
+.sec-summary-h { background: #bfdbfe !important; }
+
+/* 第六区：操作 */
+.sec-action { background: #f1f5f9 !important; }
+
+/* 表头分区行（新增行显示分区名称） */
+.section-label-row th {
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   border-bottom: 1px solid #cbd5e1;
+  color: #334155;
+  text-align: center;
+}
+.section-label-row th .sec-title {
+  display: flex; align-items: center; justify-content: center; gap: 0.35rem;
 }
 
 /* ★ 筛选行 */
-#headRow3 th {
-  background: #f1f5f9;
+#headRow4 th {
+  background: #f8fafc;
   padding: 0.3rem 0.3rem;
   border-bottom: 2px solid #cbd5e1;
   vertical-align: middle;
 }
-#headRow3 .th-filter {
+#headRow4 .th-filter {
   display: block; width: 100%;
   padding: 3px 6px; font-size: 0.7rem; font-weight: 400;
   border: 1px solid #cbd5e1; border-radius: 5px;
   background: #fff; color: #1e293b; font-family: inherit;
   transition: 0.15s; margin: 0;
 }
-#headRow3 .th-filter:focus {
+#headRow4 .th-filter:focus {
   outline: none; border-color: #2563eb;
   box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
 }
-#headRow3 .th-filter::placeholder { color: #94a3b8; font-weight: 400; }
-#headRow3 th.no-filter { background: #e2e8f0; }
+#headRow4 .th-filter::placeholder { color: #94a3b8; font-weight: 400; }
+#headRow4 th.no-filter { background: #e2e8f0; }
 
 td {
   padding: 0.35rem 0.4rem; border-bottom: 1px solid #f1f5f9;
   vertical-align: middle; background: #fff;
+  transition: background 0.1s;
 }
 tr:hover td { background: #fafbfc; }
 
-/* ===== ★ 分割线：优雅的双线 + 阴影 ===== */
+/* ========== ★ 分组分割线 ========== */
+/* 普通分组分隔（组与组之间） */
 .divider-group {
-  position: relative;
   border-left: 2px solid #94a3b8 !important;
 }
-.divider-group::before {
-  content: '';
-  position: absolute;
-  top: 0; bottom: 0; left: -6px;
-  width: 4px;
-  background: linear-gradient(to right,
-    rgba(148,163,184,0) 0%,
-    rgba(148,163,184,0.15) 50%,
-    rgba(148,163,184,0) 100%);
-  pointer-events: none;
-}
 
-/* 冻结分割线（第一组右侧，带可点击手柄） */
+/* 冻结分割线（第一区右侧） - 蓝色 + 可点击 */
 .divider-freeze {
   position: relative;
   border-left: 2px solid #2563eb !important;
-  box-shadow: inset 1px 0 0 #bfdbfe;
 }
-.divider-freeze::before {
+.divider-freeze::after {
   content: '';
   position: absolute;
-  top: 0; bottom: 0; left: -6px;
-  width: 4px;
+  left: -8px;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: transparent;
+  cursor: pointer;
+  z-index: 20;
+}
+
+/* ★ 冻结列的拖拽/点击线 */
+.freeze-line {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 10px;
   background: linear-gradient(to right,
     rgba(37,99,235,0) 0%,
-    rgba(37,99,235,0.18) 50%,
-    rgba(37,99,235,0) 100%);
-  pointer-events: none;
-}
-
-/* 冻结手柄按钮 */
-.th-freeze-toggle { position: relative; }
-.freeze-toggle-btn {
-  position: absolute;
-  right: -11px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 22px; height: 22px;
-  border-radius: 50%;
-  background: #2563eb;
-  color: #fff;
-  border: 2px solid #fff;
+    rgba(37,99,235,0.1) 40%,
+    rgba(37,99,235,0.2) 100%);
   cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.6rem;
-  padding: 0;
-  z-index: 25;
+  z-index: 20;
+  pointer-events: auto;
   transition: 0.15s;
-  box-shadow: 0 2px 6px rgba(37,99,235,0.35);
+}
+.freeze-line:hover {
+  background: linear-gradient(to right,
+    rgba(37,99,235,0.05) 0%,
+    rgba(37,99,235,0.25) 40%,
+    rgba(37,99,235,0.4) 100%);
+}
+.freeze-line::before {
+  content: '⋮⋮';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  color: #2563eb;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: -2px;
   line-height: 1;
+  opacity: 0.5;
+  transition: 0.15s;
 }
-.freeze-toggle-btn:hover {
-  background: #1d4ed8;
-  transform: translateY(-50%) scale(1.15);
-}
-.freeze-toggle-btn.unlocked {
-  background: #94a3b8;
-  box-shadow: 0 2px 6px rgba(100,116,139,0.3);
-}
-.freeze-toggle-btn.unlocked:hover {
-  background: #64748b;
+.freeze-line:hover::before {
+  opacity: 1;
 }
 
-/* ===== ★ 冻结列（可切换） ===== */
+/* ========== ★ 冻结列 ========== */
 body.freeze-on .col-freeze { position: sticky; z-index: 8; background: #fff; }
 body.freeze-on .col-freeze.col-0 { left: 0px; }
 body.freeze-on .col-freeze.col-1 { left: 90px; }
@@ -240,23 +274,26 @@ body.freeze-on .col-freeze.col-2 { left: 165px; }
 body.freeze-on .col-freeze.col-3 { left: 325px; }
 body.freeze-on .col-freeze.col-4 { left: 435px; }
 
-/* 表头需更高 z-index 并且保持顶部 sticky */
-body.freeze-on thead .col-freeze { z-index: 15; background: #f8fafc; }
-body.freeze-on #headRow2 .col-freeze { background: #f1f5f9; }
-body.freeze-on #headRow3 .col-freeze { background: #f1f5f9; }
+/* 冻结列表头保持高 z-index */
+body.freeze-on thead .col-freeze { z-index: 15; }
+body.freeze-on thead .col-freeze.sec-basic-h { background: #fde68a !important; }
+body.freeze-on #headRow3 .col-freeze { background: #fef3c7 !important; }
+body.freeze-on #headRow4 .col-freeze { background: #f8fafc !important; }
 
-/* 悬停时保持不透明背景 */
+/* 冻结列最后列的右侧边框 + 阴影 */
+body.freeze-on .col-freeze.col-4 {
+  border-right: 2px solid #2563eb !important;
+  box-shadow: 4px 0 10px -4px rgba(15,23,42,0.15);
+}
+
+/* 悬停时保持冻结列不透明 */
 body.freeze-on tr:hover td.col-freeze { background: #fafbfc; }
 
 /* Situation 状态颜色需保留（覆盖冻结背景） */
 body.freeze-on td.col-freeze.sit-pending { background: #F5F5DC !important; }
 body.freeze-on td.col-freeze.sit-active  { background: #DCFCE7 !important; }
-
-/* 冻结分割线跟随 sticky */
-body.freeze-on .col-freeze.col-4 {
-  border-right: 2px solid #2563eb !important;
-  box-shadow: 4px 0 10px -4px rgba(15,23,42,0.12);
-}
+body.freeze-on tr:hover td.col-freeze.sit-pending { background: #F5F5DC !important; }
+body.freeze-on tr:hover td.col-freeze.sit-active  { background: #DCFCE7 !important; }
 
 /* ★ 复选框单元格 */
 .td-chk { text-align: center; vertical-align: middle; padding: 0.4rem 0.15rem !important; }
@@ -274,22 +311,16 @@ body.freeze-on .col-freeze.col-4 {
 .text-cell.center { text-align: center; }
 .text-cell.badge-cell {
   display: inline-block;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  padding: 0.2rem 0.6rem;
+  padding: 0.2rem 0.55rem;
   border-radius: 20px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
-.badge-yes {
-  background: #dcfce7; color: #166534;
-}
-.badge-no {
-  background: #fee2e2; color: #991b1b;
-}
-.badge-other {
-  background: #f1f5f9; color: #475569;
-}
+.badge-yes { background: #dcfce7; color: #166534; }
+.badge-no  { background: #fee2e2; color: #991b1b; }
+.badge-other { background: #f1f5f9; color: #475569; }
 
 /* ★ Situation 状态颜色 */
 .sit-pending { background: #F5F5DC !important; }
@@ -327,7 +358,7 @@ body.freeze-on .col-freeze.col-4 {
 .toast.show { opacity: 1; transform: translateY(0); }
 .toast.error { background: #b91c1c; }
 
-/* ========== 导入弹窗 ========== */
+/* ========== 弹窗 ========== */
 .modal-overlay {
   position: fixed; inset: 0; background: rgba(15,23,42,0.55);
   z-index: 9998; display: flex; align-items: center; justify-content: center;
@@ -339,6 +370,7 @@ body.freeze-on .col-freeze.col-4 {
   box-shadow: 0 20px 60px rgba(0,0,0,0.25);
   display: flex; flex-direction: column; gap: 1rem;
 }
+.modal-box.compact { max-width: 380px; padding: 1.5rem; text-align: center; }
 .modal-header { display: flex; justify-content: space-between; align-items: center; }
 .modal-header h3 { font-size: 1.05rem; font-weight: 600; color: #0f172a; }
 .modal-close {
@@ -366,12 +398,15 @@ body.freeze-on .col-freeze.col-4 {
   display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;
   font-size: 0.78rem; color: #64748b;
 }
+.modal-actions {
+  display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;
+}
 
 /* ========== 打印 ========== */
 #printArea { display: none; }
 @media print {
   body { background: #fff; padding: 0; }
-  .topbar, .container, .toast, .modal-overlay { display: none !important; }
+  .topbar, .container, .toast, .modal-overlay, .section-legend { display: none !important; }
   #printArea { display: block !important; }
   .payslip {
     page-break-after: always; padding: 12mm; font-size: 10pt;
@@ -464,17 +499,32 @@ body.freeze-on .col-freeze.col-4 {
     </div>
   </div>
 
+  <!-- ===== 分区图例 ===== -->
+  <div class="section-legend">
+    <span class="item"><span class="dot" style="background:#fde68a;"></span> 1. Maklumat Asas (Freeze)</span>
+    <span class="item"><span class="dot" style="background:#bbf7d0;"></span> 2. Pendapatan</span>
+    <span class="item"><span class="dot" style="background:#ddd6fe;"></span> 3. Caruman Statutori</span>
+    <span class="item"><span class="dot" style="background:#99f6e4;"></span> 4. STAFF LOGIN RECORD (U-Y)</span>
+    <span class="item"><span class="dot" style="background:#bfdbfe;"></span> 5. Ringkasan Gaji</span>
+    <span class="item"><span class="dot" style="background:#e2e8f0;"></span> 6. Tindakan</span>
+  </div>
+
   <!-- ===== 表格卡片 ===== -->
   <div class="card">
     <div class="card-body">
       <div class="table-wrap">
         <table id="mainTable">
+          <!-- ============================================
+               34 列（含 5 个 SLR 新列）
+               ============================================ -->
           <colgroup>
+            <!-- ① 基本资料（冻结） -->
             <col class="col-freeze col-0" style="width:90px">   <!-- 0  Situation -->
             <col class="col-freeze col-1" style="width:75px">   <!-- 1  Code -->
             <col class="col-freeze col-2" style="width:160px">  <!-- 2  Name -->
             <col class="col-freeze col-3" style="width:110px">  <!-- 3  Group -->
             <col class="col-freeze col-4" style="width:140px">  <!-- 4  Bank -->
+            <!-- ② 收入/津贴 -->
             <col style="width:85px">   <!-- 5  Basic -->
             <col style="width:85px">   <!-- 6  Allowance -->
             <col style="width:85px">   <!-- 7  Deduction -->
@@ -484,6 +534,7 @@ body.freeze-on .col-freeze.col-4 {
             <col style="width:70px">   <!-- 11 OtherOT -->
             <col style="width:85px">   <!-- 12 Pinjaman -->
             <col style="width:85px">   <!-- 13 Others -->
+            <!-- ③ 法定扣除 -->
             <col style="width:40px">   <!-- 14 EPF chk -->
             <col style="width:85px">   <!-- 15 EPF_E -->
             <col style="width:85px">   <!-- 16 EPF_R -->
@@ -495,17 +546,21 @@ body.freeze-on .col-freeze.col-4 {
             <col style="width:80px">   <!-- 22 EIS_R -->
             <col style="width:40px">   <!-- 23 24JAM chk -->
             <col style="width:85px">   <!-- 24 Lindung -->
-            <col style="width:130px">  <!-- 25 SLR BankNama -->
-            <col style="width:130px">  <!-- 26 SLR BankAccountNo -->
-            <col style="width:70px">   <!-- 27 SLR EPF -->
-            <col style="width:70px">   <!-- 28 SLR PERKESO -->
-            <col style="width:70px">   <!-- 29 SLR EIS -->
+            <!-- ④ SLR 参考（来自 STAFF LOGIN RECORD 表 U-Y 列） -->
+            <col style="width:130px">  <!-- 25 SLR BankNama (U) -->
+            <col style="width:130px">  <!-- 26 SLR BankAccountNo (V) -->
+            <col style="width:75px">   <!-- 27 SLR EPF (W) -->
+            <col style="width:75px">   <!-- 28 SLR PERKESO (X) -->
+            <col style="width:75px">   <!-- 29 SLR EIS (Y) -->
+            <!-- ⑤ 汇总 -->
             <col style="width:95px">   <!-- 30 Gross -->
             <col style="width:95px">   <!-- 31 TotalDed -->
             <col style="width:95px">   <!-- 32 Net -->
+            <!-- ⑥ 操作 -->
             <col style="width:80px">   <!-- 33 Action -->
           </colgroup>
           <thead>
+            <tr id="headRowSec" class="section-label-row"></tr>
             <tr id="headRow1"></tr>
             <tr id="headRow2"></tr>
             <tr id="headRow3"></tr>
@@ -521,6 +576,21 @@ body.freeze-on .col-freeze.col-4 {
 
 <div id="printArea"></div>
 <div id="toast" class="toast"></div>
+
+<!-- ============ 冻结确认弹窗 ============ -->
+<div id="freezeModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box compact">
+    <h3 style="justify-content:center; font-size:1.05rem; margin-bottom:0.3rem;">🔒 Tetapan Freeze Kolum</h3>
+    <p style="color:#64748b; font-size:0.82rem; margin-bottom:1rem;">
+      Pilih sama ada mahu kunci kolum pertama (Situation → Bank) supaya sentiasa kelihatan semasa scroll, atau buka kunci sepenuhnya.
+    </p>
+    <div class="modal-actions">
+      <button class="btn" onclick="setFreeze(false)">🔓 Buka Kunci</button>
+      <button class="btn btn-primary" onclick="setFreeze(true)">🔒 Kunci Kolum</button>
+    </div>
+    <button class="btn btn-sm" style="margin-top:0.5rem;" onclick="closeFreezeModal()">Batal</button>
+  </div>
+</div>
 
 <!-- ============ 导入弹窗 ============ -->
 <div id="importModal" class="modal-overlay" style="display:none;">
@@ -564,9 +634,6 @@ const GROUP_FIELDS = {
   '24JAM': ['Lindung24Jam']
 };
 
-// 冻结列左侧偏移（累积像素）
-const FREEZE_LEFT = { 0: 0, 1: 90, 2: 165, 3: 325, 4: 435 };
-
 // ================= 语言包 =================
 const I18N = {
   ms: {
@@ -574,67 +641,82 @@ const I18N = {
     save: 'Simpan ke Sheet', importBtn: 'Import / 导入',
     exportMenu: 'Eksport', allSlip: 'Semua Slip Gaji',
     checkAll: 'Semak Semua',
-    code: 'Kod', name: 'Nama', group: 'Kumpulan', ic: 'No. KP', jawatan: 'Jawatan',
+    code: 'Kod', name: 'Nama', group: 'Kumpulan',
     bank: 'Bank', basic: 'Gaji Asas', allowance: 'Elaun', deduction: 'Potongan',
     normalOT: 'OT Biasa', restOT: 'OT Rehat', publicOT: 'OT Awam', otherOT: 'OT Lain',
     pinjaman: 'Pinjaman', others: 'Lain-lain',
     epfE: 'EPF (Pekerja)', epfR: 'EPF (Majikan)',
     socsoE: 'SOCSO (Pekerja)', socsoR: 'SOCSO (Majikan)',
     eisE: 'EIS (Pekerja)', eisR: 'EIS (Majikan)',
-    lindung: '24JAM Lindungan',
+    lindung: '24JAM',
     gross: 'Gaji Kasar', totalDed: 'Jumlah Potongan', net: 'Gaji Bersih',
-    action: 'Tindakan', slip: 'Slip Gaji',
-    legend: 'Nota: Tandakan ✔ di hadapan EPF/SOCSO/EIS/24JAM untuk isi manual. Tidak ditanda = auto kira. Klik 🔒 di kolum Bank untuk toggle freeze. Situation UNACTIVE tidak dipaparkan.',
+    action: 'Tindakan', slip: 'Slip',
+    slrBankNama: 'Bank Nama',
+    slrBankAcc: 'Bank Acc',
+    slrEPF: 'EPF',
+    slrPERKESO: 'SOCSO',
+    slrEIS: 'EIS',
+    legend: 'Nota: Tandakan ✔ di hadapan EPF/SOCSO/EIS/24JAM untuk isi manual. Tidak ditanda = auto kira. Klik garisan biru di sebelah kanan kolum Bank untuk toggle freeze. Situation UNACTIVE tidak dipaparkan.',
     saved: 'Berjaya disimpan ke Sheet', failed: 'Gagal simpan',
     loading: 'Memuatkan data...',
     importSuccess: 'Berjaya import {n} pekerja',
     importFail: 'Fail tidak sah atau kosong',
     importFormat: 'Format fail tidak disokong',
     noData: 'Tiada data untuk dieksport',
-    freezeLocked: 'Kolum dibekukan',
-    freezeUnlocked: 'Kolum dibuka'
+    freezeLocked: 'Kolum dibekukan (freeze ON)',
+    freezeUnlocked: 'Kolum dibuka (freeze OFF)'
   },
   en: {
     title: 'Payroll System',
     save: 'Save to Sheet', importBtn: 'Import',
     exportMenu: 'Export', allSlip: 'All Payslips',
     checkAll: 'Check All',
-    code: 'Code', name: 'Name', group: 'Group', ic: 'IC No.', jawatan: 'Position',
-    bank: 'Bank', basic: 'Basic Salary', allowance: 'Allowance', deduction: 'Deduction',
-    normalOT: 'Normal OT', restOT: 'Rest Day OT', publicOT: 'Public OT', otherOT: 'Other OT',
+    code: 'Code', name: 'Name', group: 'Group',
+    bank: 'Bank', basic: 'Basic', allowance: 'Allowance', deduction: 'Deduction',
+    normalOT: 'Normal OT', restOT: 'Rest OT', publicOT: 'Public OT', otherOT: 'Other OT',
     pinjaman: 'Loan', others: 'Others',
-    epfE: 'EPF (Employee)', epfR: 'EPF (Employer)',
-    socsoE: 'SOCSO (Employee)', socsoR: 'SOCSO (Employer)',
-    eisE: 'EIS (Employee)', eisR: 'EIS (Employer)',
-    lindung: '24JAM Lindungan',
-    gross: 'Gross Pay', totalDed: 'Total Deduction', net: 'Net Salary',
+    epfE: 'EPF (Emp)', epfR: 'EPF (Er)',
+    socsoE: 'SOCSO (Emp)', socsoR: 'SOCSO (Er)',
+    eisE: 'EIS (Emp)', eisR: 'EIS (Er)',
+    lindung: '24JAM',
+    gross: 'Gross', totalDed: 'Total Ded', net: 'Net',
     action: 'Action', slip: 'Payslip',
-    legend: 'Note: Tick ✔ before EPF/SOCSO/EIS/24JAM to enter manually. Unticked = auto calc. Click 🔒 on Bank column to toggle freeze. UNACTIVE staff are hidden.',
-    saved: 'Saved to Sheet successfully', failed: 'Save failed',
+    slrBankNama: 'Bank Name',
+    slrBankAcc: 'Bank Acc',
+    slrEPF: 'EPF',
+    slrPERKESO: 'SOCSO',
+    slrEIS: 'EIS',
+    legend: 'Note: Tick ✔ before EPF/SOCSO/EIS/24JAM to enter manually. Unticked = auto calc. Click the blue line right of Bank column to toggle freeze. UNACTIVE staff are hidden.',
+    saved: 'Saved successfully', failed: 'Save failed',
     loading: 'Loading data...',
     importSuccess: 'Imported {n} employees',
     importFail: 'Invalid or empty file',
     importFormat: 'Unsupported file format',
     noData: 'No data to export',
-    freezeLocked: 'Columns frozen',
-    freezeUnlocked: 'Columns unfrozen'
+    freezeLocked: 'Columns frozen (ON)',
+    freezeUnlocked: 'Columns unfrozen (OFF)'
   },
   zh: {
     title: '薪资系统',
     save: '保存到 Sheet', importBtn: 'Import / 导入',
     exportMenu: '导出', allSlip: '全部粮单',
     checkAll: '检查全部',
-    code: '编号', name: '姓名', group: '分店', ic: '身份证', jawatan: '职位',
+    code: '编号', name: '姓名', group: '分店',
     bank: '银行', basic: '基本薪资', allowance: '津贴', deduction: '扣款',
     normalOT: '普通加班', restOT: '休息日加班', publicOT: '公假加班', otherOT: '其他加班',
     pinjaman: '借粮', others: '其他',
     epfE: 'EPF (员工)', epfR: 'EPF (雇主)',
     socsoE: 'SOCSO (员工)', socsoR: 'SOCSO (雇主)',
     eisE: 'EIS (员工)', eisR: 'EIS (雇主)',
-    lindung: '24JAM 保险',
+    lindung: '24JAM',
     gross: '总薪资', totalDed: '总扣款', net: '净薪资',
     action: '操作', slip: '粮单',
-    legend: '备注：勾选 EPF/SOCSO/EIS/24JAM 前的 ✔ 表示手动填写，不勾选则系统自动计算。点击 Bank 列的 🔒 切换冻结。UNACTIVE 员工不显示。',
+    slrBankNama: '银行名',
+    slrBankAcc: '银行账号',
+    slrEPF: 'EPF',
+    slrPERKESO: 'SOCSO',
+    slrEIS: 'EIS',
+    legend: '备注：勾选 EPF/SOCSO/EIS/24JAM 前的 ✔ 表示手动填写，不勾选则系统自动计算。点击 Bank 列右侧的蓝线切换冻结。UNACTIVE 员工不显示。',
     saved: '已成功保存到 Sheet', failed: '保存失败',
     loading: '加载数据中...',
     importSuccess: '成功导入 {n} 位员工',
@@ -671,20 +753,17 @@ function todayStr() {
   return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
 }
 
-// ================= 冻结切换 =================
-function toggleFreezeCols() {
-  const body = document.body;
-  body.classList.toggle('freeze-on');
-  const on = body.classList.contains('freeze-on');
-
-  const btn = document.getElementById('freezeToggleBtn');
-  if (btn) {
-    btn.classList.toggle('unlocked', !on);
-    btn.textContent = on ? '🔒' : '🔓';
-    btn.title = on ? 'Klik untuk buka freeze' : 'Klik untuk kunci freeze';
-  }
+// ================= 冻结切换（点击线条弹出确认） =================
+function openFreezeModal() {
+  document.getElementById('freezeModal').style.display = 'flex';
+}
+function closeFreezeModal() {
+  document.getElementById('freezeModal').style.display = 'none';
+}
+function setFreeze(on) {
+  document.body.classList.toggle('freeze-on', on);
+  closeFreezeModal();
   toast(on ? t('freezeLocked') : t('freezeUnlocked'));
-  // 重新计算表头偏移
   requestAnimationFrame(fixStickyHeader);
 }
 
@@ -795,7 +874,7 @@ function recalcRow(emp) {
   return emp;
 }
 
-// ================= 新列徽章 =================
+// ================= 徽章 =================
 function badgeStatus(val) {
   const v = String(val || '').trim().toUpperCase();
   if (!v) return '';
@@ -808,7 +887,7 @@ function badgeStatus(val) {
   return `<span class="text-cell badge-cell badge-other">${escapeHtml(v)}</span>`;
 }
 
-// ================= 渲染表头 =================
+// ================= 渲染表头（4 行：分区 + 主 + 子 + 筛选） =================
 function renderHeaders() {
   document.getElementById('pageTitle').textContent = t('title');
   document.getElementById('legend').textContent = t('legend');
@@ -818,56 +897,88 @@ function renderHeaders() {
   document.querySelector('button[onclick="openImportModal()"]').innerHTML = '📥 ' + t('importBtn');
   document.getElementById('exportMenu').options[0].textContent = '💾 ' + t('exportMenu') + ' / 导出…';
 
+  const hSec = document.getElementById('headRowSec');
   const h1 = document.getElementById('headRow1');
   const h2 = document.getElementById('headRow2');
   const h3 = document.getElementById('headRow3');
 
-  // ---------- Row 1 ----------
-  h1.innerHTML = `
-    <th rowspan="2" class="col-freeze col-0" style="background:#fef3c7;"><div>Situation</div></th>
-    <th rowspan="2" class="col-freeze col-1"><div>${t('code')}</div></th>
-    <th rowspan="2" class="col-freeze col-2"><div>${t('name')}</div></th>
-    <th rowspan="2" class="col-freeze col-3"><div>${t('group')}</div></th>
-    <th rowspan="2" class="col-freeze col-4 th-freeze-toggle">
-      <div>${t('bank')}</div>
-      <button class="freeze-toggle-btn" id="freezeToggleBtn" onclick="toggleFreezeCols()" title="Klik untuk kunci/buka freeze">🔒</button>
+  // ---------- 分区标题行 ----------
+  // 各分区横跨的列数：
+  // ① 基本资料：5 列
+  // ② 收入/津贴：9 列
+  // ③ 法定扣除：11 列（EPF chk + 2 + SOCSO chk + 2 + EIS chk + 2 + 24JAM chk + 1）
+  // ④ SLR 参考：5 列
+  // ⑤ 汇总：3 列
+  // ⑥ 操作：1 列
+  hSec.innerHTML = `
+    <th colspan="5" class="sec-basic-h">
+      <div class="sec-title">📌 1. MAKLUMAT ASAS (FREEZE)</div>
     </th>
-    <th rowspan="2" class="divider-group"><div>${t('basic')}</div></th>
-    <th rowspan="2"><div>${t('allowance')}</div></th>
-    <th rowspan="2"><div>${t('deduction')}</div></th>
-    <th rowspan="2"><div>${t('normalOT')}</div></th>
-    <th rowspan="2"><div>${t('restOT')}</div></th>
-    <th rowspan="2"><div>${t('publicOT')}</div></th>
-    <th rowspan="2"><div>${t('otherOT')}</div></th>
-    <th rowspan="2"><div>${t('pinjaman')}</div></th>
-    <th rowspan="2"><div>${t('others')}</div></th>
-    <th rowspan="2" class="grp divider-group" style="text-align:center;font-size:0.9rem;">✎</th>
-    <th class="grp" colspan="2">EPF</th>
-    <th rowspan="2" class="grp" style="text-align:center;font-size:0.9rem;">✎</th>
-    <th class="grp" colspan="2">SOCSO</th>
-    <th rowspan="2" class="grp" style="text-align:center;font-size:0.9rem;">✎</th>
-    <th class="grp" colspan="2">EIS</th>
-    <th rowspan="2" class="grp" style="text-align:center;font-size:0.9rem;">✎</th>
-    <th class="grp" rowspan="2"><div>24JAM</div></th>
-    <th rowspan="2" class="divider-group" style="background:#f0fdf4;"><div style="font-size:0.7rem;">Bank<br>Nama</div></th>
-    <th rowspan="2" style="background:#f0fdf4;"><div style="font-size:0.7rem;">Bank<br>Account</div></th>
-    <th rowspan="2" style="background:#f0fdf4;text-align:center;"><div style="font-size:0.7rem;">EPF</div></th>
-    <th rowspan="2" style="background:#f0fdf4;text-align:center;"><div style="font-size:0.7rem;">SOCSO</div></th>
-    <th rowspan="2" style="background:#f0fdf4;text-align:center;"><div style="font-size:0.7rem;">EIS</div></th>
-    <th rowspan="2" class="divider-group" style="background:#dbeafe;"><div>${t('gross')}</div></th>
-    <th rowspan="2" style="background:#dbeafe;"><div>${t('totalDed')}</div></th>
-    <th rowspan="2" style="background:#dbeafe;"><div>${t('net')}</div></th>
-    <th rowspan="2" class="divider-group">${t('action')}</th>
+    <th colspan="9" class="sec-income-h divider-group">
+      <div class="sec-title">💰 2. PENDAPATAN / ELAUN</div>
+    </th>
+    <th colspan="11" class="sec-statutory-h divider-group">
+      <div class="sec-title">🏛️ 3. CARUMAN STATUTORI (EPF / SOCSO / EIS / 24JAM)</div>
+    </th>
+    <th colspan="5" class="sec-slr-h divider-group">
+      <div class="sec-title">📋 4. STAFF LOGIN RECORD (U-Y)</div>
+    </th>
+    <th colspan="3" class="sec-summary-h divider-group">
+      <div class="sec-title">🧮 5. RINGKASAN GAJI</div>
+    </th>
+    <th colspan="1" class="sec-action divider-group">
+      <div class="sec-title">⚙️ 6. TINDAKAN</div>
+    </th>
   `;
 
-  // ---------- Row 2 ----------
+  // ---------- Row 1：主标题 ----------
+  // 列索引：0-4 冻结区 | 5-13 收入区 | 14 EPF_chk | 15-16 EPF | 17 SOCSO_chk | 18-19 SOCSO
+  //         20 EIS_chk | 21-22 EIS | 23 24JAM_chk | 24 Lindung | 25-29 SLR | 30-32 汇总 | 33 操作
+  h1.innerHTML = `
+    <th rowspan="2" class="col-freeze col-0 sec-basic-h"><div>Situation</div></th>
+    <th rowspan="2" class="col-freeze col-1 sec-basic-h"><div>${t('code')}</div></th>
+    <th rowspan="2" class="col-freeze col-2 sec-basic-h"><div>${t('name')}</div></th>
+    <th rowspan="2" class="col-freeze col-3 sec-basic-h"><div>${t('group')}</div></th>
+    <th rowspan="2" class="col-freeze col-4 sec-basic-h freeze-toggle-th">
+      <div>${t('bank')}</div>
+      <div class="freeze-line" onclick="openFreezeModal()" title="Klik untuk toggle freeze"></div>
+    </th>
+    <th rowspan="2" class="sec-income divider-group"><div>${t('basic')}</div></th>
+    <th rowspan="2" class="sec-income"><div>${t('allowance')}</div></th>
+    <th rowspan="2" class="sec-income"><div>${t('deduction')}</div></th>
+    <th rowspan="2" class="sec-income"><div>${t('normalOT')}</div></th>
+    <th rowspan="2" class="sec-income"><div>${t('restOT')}</div></th>
+    <th rowspan="2" class="sec-income"><div>${t('publicOT')}</div></th>
+    <th rowspan="2" class="sec-income"><div>${t('otherOT')}</div></th>
+    <th rowspan="2" class="sec-income"><div>${t('pinjaman')}</div></th>
+    <th rowspan="2" class="sec-income"><div>${t('others')}</div></th>
+    <th rowspan="2" class="sec-statutory divider-group" style="text-align:center;">✎</th>
+    <th colspan="2" class="sec-statutory-h">EPF</th>
+    <th rowspan="2" class="sec-statutory" style="text-align:center;">✎</th>
+    <th colspan="2" class="sec-statutory-h">SOCSO</th>
+    <th rowspan="2" class="sec-statutory" style="text-align:center;">✎</th>
+    <th colspan="2" class="sec-statutory-h">EIS</th>
+    <th rowspan="2" class="sec-statutory" style="text-align:center;">✎</th>
+    <th rowspan="2" class="sec-statutory"><div>${t('lindung')}</div></th>
+    <th rowspan="2" class="sec-slr divider-group"><div style="font-size:0.72rem;">${t('slrBankNama')}<br><span style="font-weight:400;font-size:0.6rem;">(U)</span></div></th>
+    <th rowspan="2" class="sec-slr"><div style="font-size:0.72rem;">${t('slrBankAcc')}<br><span style="font-weight:400;font-size:0.6rem;">(V)</span></div></th>
+    <th rowspan="2" class="sec-slr" style="text-align:center;"><div style="font-size:0.72rem;">${t('slrEPF')}<br><span style="font-weight:400;font-size:0.6rem;">(W)</span></div></th>
+    <th rowspan="2" class="sec-slr" style="text-align:center;"><div style="font-size:0.72rem;">${t('slrPERKESO')}<br><span style="font-weight:400;font-size:0.6rem;">(X)</span></div></th>
+    <th rowspan="2" class="sec-slr" style="text-align:center;"><div style="font-size:0.72rem;">${t('slrEIS')}<br><span style="font-weight:400;font-size:0.6rem;">(Y)</span></div></th>
+    <th rowspan="2" class="sec-summary divider-group"><div>${t('gross')}</div></th>
+    <th rowspan="2" class="sec-summary"><div>${t('totalDed')}</div></th>
+    <th rowspan="2" class="sec-summary"><div>${t('net')}</div></th>
+    <th rowspan="2" class="sec-action divider-group">${t('action')}</th>
+  `;
+
+  // ---------- Row 2：子标题 ----------
   h2.innerHTML = `
-    <th class="grp"><div>${t('epfE')}</div></th>
-    <th class="grp"><div>${t('epfR')}</div></th>
-    <th class="grp"><div>${t('socsoE')}</div></th>
-    <th class="grp"><div>${t('socsoR')}</div></th>
-    <th class="grp"><div>${t('eisE')}</div></th>
-    <th class="grp"><div>${t('eisR')}</div></th>
+    <th class="sec-statutory"><div>${t('epfE')}</div></th>
+    <th class="sec-statutory"><div>${t('epfR')}</div></th>
+    <th class="sec-statutory"><div>${t('socsoE')}</div></th>
+    <th class="sec-statutory"><div>${t('socsoR')}</div></th>
+    <th class="sec-statutory"><div>${t('eisE')}</div></th>
+    <th class="sec-statutory"><div>${t('eisR')}</div></th>
   `;
 
   // ---------- Row 3：筛选行 ----------
@@ -875,60 +986,64 @@ function renderHeaders() {
   const empty = (cls='') => `<th class="no-filter ${cls}"></th>`;
 
   h3.innerHTML = `
-    <th class="col-freeze col-0">${f(0)}</th>
-    <th class="col-freeze col-1">${f(1)}</th>
-    <th class="col-freeze col-2">${f(2)}</th>
-    <th class="col-freeze col-3">${f(3)}</th>
-    <th class="col-freeze col-4">${f(4)}</th>
-    <th class="divider-group">${f(5)}</th>
-    <th>${f(6)}</th>
-    <th>${f(7)}</th>
-    <th>${f(8)}</th>
-    <th>${f(9)}</th>
-    <th>${f(10)}</th>
-    <th>${f(11)}</th>
-    <th>${f(12)}</th>
-    <th>${f(13)}</th>
-    ${empty('divider-group')}
-    <th>${f(15)}</th>
-    <th>${f(16)}</th>
-    ${empty()}
-    <th>${f(18)}</th>
-    <th>${f(19)}</th>
-    ${empty()}
-    <th>${f(21)}</th>
-    <th>${f(22)}</th>
-    ${empty()}
-    <th>${f(24)}</th>
-    <th class="divider-group" style="background:#dcfce7;">${f(25)}</th>
-    <th style="background:#dcfce7;">${f(26)}</th>
-    <th style="background:#dcfce7;">${f(27)}</th>
-    <th style="background:#dcfce7;">${f(28)}</th>
-    <th style="background:#dcfce7;">${f(29)}</th>
-    <th class="divider-group" style="background:#bfdbfe;">${f(30)}</th>
-    <th style="background:#bfdbfe;">${f(31)}</th>
-    <th style="background:#bfdbfe;">${f(32)}</th>
-    ${empty('divider-group')}
+    <th class="col-freeze col-0 sec-basic">${f(0)}</th>
+    <th class="col-freeze col-1 sec-basic">${f(1)}</th>
+    <th class="col-freeze col-2 sec-basic">${f(2)}</th>
+    <th class="col-freeze col-3 sec-basic">${f(3)}</th>
+    <th class="col-freeze col-4 sec-basic">${f(4)}</th>
+    <th class="sec-income divider-group">${f(5)}</th>
+    <th class="sec-income">${f(6)}</th>
+    <th class="sec-income">${f(7)}</th>
+    <th class="sec-income">${f(8)}</th>
+    <th class="sec-income">${f(9)}</th>
+    <th class="sec-income">${f(10)}</th>
+    <th class="sec-income">${f(11)}</th>
+    <th class="sec-income">${f(12)}</th>
+    <th class="sec-income">${f(13)}</th>
+    ${empty('sec-statutory divider-group')}
+    <th class="sec-statutory">${f(15)}</th>
+    <th class="sec-statutory">${f(16)}</th>
+    ${empty('sec-statutory')}
+    <th class="sec-statutory">${f(18)}</th>
+    <th class="sec-statutory">${f(19)}</th>
+    ${empty('sec-statutory')}
+    <th class="sec-statutory">${f(21)}</th>
+    <th class="sec-statutory">${f(22)}</th>
+    ${empty('sec-statutory')}
+    <th class="sec-statutory">${f(24)}</th>
+    <th class="sec-slr divider-group">${f(25)}</th>
+    <th class="sec-slr">${f(26)}</th>
+    <th class="sec-slr">${f(27)}</th>
+    <th class="sec-slr">${f(28)}</th>
+    <th class="sec-slr">${f(29)}</th>
+    <th class="sec-summary divider-group">${f(30)}</th>
+    <th class="sec-summary">${f(31)}</th>
+    <th class="sec-summary">${f(32)}</th>
+    ${empty('sec-action divider-group')}
   `;
 
   requestAnimationFrame(fixStickyHeader);
 }
 
 function fixStickyHeader() {
+  const rowSec = document.getElementById('headRowSec');
   const row1 = document.getElementById('headRow1');
   const row2 = document.getElementById('headRow2');
   const row3 = document.getElementById('headRow3');
-  if (!row1 || !row2 || !row3) return;
+  if (!rowSec || !row1 || !row2 || !row3) return;
 
+  const hSec = rowSec.getBoundingClientRect().height;
   const h1 = row1.getBoundingClientRect().height;
   const h2 = row2.getBoundingClientRect().height;
 
-  document.querySelectorAll('#headRow2 th').forEach(th => {
-    th.style.top = Math.round(h1) + 'px';
-  });
-  document.querySelectorAll('#headRow3 th').forEach(th => {
-    th.style.top = Math.round(h1 + h2) + 'px';
-  });
+  // 分区行固定在最顶端
+  Array.from(rowSec.cells).forEach(th => { th.style.top = '0px'; });
+  // 第 1 行在主表头下方
+  Array.from(row1.cells).forEach(th => { th.style.top = Math.round(hSec) + 'px'; });
+  // 第 2 行
+  Array.from(row2.cells).forEach(th => { th.style.top = Math.round(hSec + h1) + 'px'; });
+  // 筛选行
+  Array.from(row3.cells).forEach(th => { th.style.top = Math.round(hSec + h1 + h2) + 'px'; });
 }
 window.addEventListener('resize', fixStickyHeader);
 
@@ -956,55 +1071,52 @@ function renderTable() {
     emp = recalcRow(emp);
     const tr = document.createElement('tr');
 
-    const textTd = (field, extraCls = '') =>
-      `<td class="td-text col-freeze-ignore ${extraCls}"><div class="text-cell">${escapeHtml(emp[field] ?? '')}</div></td>`;
-
     const numInput = (field, readonly, extraCls = '') =>
       `<input type="number" step="0.01" class="input num ${extraCls}" ${readonly ? 'readonly' : ''} data-idx="${idx}" data-field="${field}" value="${emp[field] ?? 0}">`;
 
-    const chkTd = (group) => {
+    const chkTd = (group, extraCls = '') => {
       const key = 'manual' + group;
       const checked = !!emp[key];
-      return `<td class="td-chk"><input type="checkbox" class="manual-chk" data-idx="${idx}" data-group="${group}" ${checked ? 'checked' : ''}></td>`;
+      return `<td class="td-chk ${extraCls}"><input type="checkbox" class="manual-chk" data-idx="${idx}" data-group="${group}" ${checked ? 'checked' : ''}></td>`;
     };
 
     const sitCls = situationClass(emp.Situation);
 
     tr.innerHTML = `
-      <td class="td-text col-freeze col-0 ${sitCls}"><div class="text-cell">${escapeHtml(emp.Situation || '')}</div></td>
-      <td class="td-text col-freeze col-1"><div class="text-cell">${escapeHtml(emp.Code || '')}</div></td>
-      <td class="td-text col-freeze col-2"><div class="text-cell">${escapeHtml(emp.Name || '')}</div></td>
-      <td class="td-text col-freeze col-3"><div class="text-cell">${escapeHtml(emp.GroupName || '')}</div></td>
-      <td class="td-text col-freeze col-4"><div class="text-cell">${escapeHtml(emp.BankNama || '')}</div></td>
-      <td class="divider-group">${numInput('Basic', false)}</td>
-      <td>${numInput('Allowance', false)}</td>
-      <td>${numInput('Deduction', false)}</td>
-      <td>${numInput('NormalOT', false)}</td>
-      <td>${numInput('RestOT', false)}</td>
-      <td>${numInput('PublicOT', false)}</td>
-      <td>${numInput('OtherOT', false)}</td>
-      <td>${numInput('Pinjaman', false)}</td>
-      <td>${numInput('Others', false)}</td>
-      ${chkTd('EPF').replace('class="td-chk"', 'class="td-chk divider-group"')}
-      <td>${numInput('EPF_Employee', !emp.manualEPF)}</td>
-      <td>${numInput('EPF_Employer', !emp.manualEPF)}</td>
-      ${chkTd('SOCSO')}
-      <td>${numInput('SOCSO_Employee', !emp.manualSOCSO)}</td>
-      <td>${numInput('SOCSO_Employer', !emp.manualSOCSO)}</td>
-      ${chkTd('EIS')}
-      <td>${numInput('EIS_Employee', !emp.manualEIS)}</td>
-      <td>${numInput('EIS_Employer', !emp.manualEIS)}</td>
-      ${chkTd('24JAM')}
-      <td>${numInput('Lindung24Jam', !emp.manual24JAM)}</td>
-      <td class="td-text divider-group" style="background:#f0fdf4;"><div class="text-cell">${escapeHtml(emp.SLRBankNama || '')}</div></td>
-      <td class="td-text" style="background:#f0fdf4;"><div class="text-cell">${escapeHtml(emp.SLRBankAccountNo || '')}</div></td>
-      <td class="td-text" style="background:#f0fdf4;text-align:center;">${badgeStatus(emp.SLREPF) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>'}</td>
-      <td class="td-text" style="background:#f0fdf4;text-align:center;">${badgeStatus(emp.SLRPERKESO) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>'}</td>
-      <td class="td-text" style="background:#f0fdf4;text-align:center;">${badgeStatus(emp.SLREIS) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>'}</td>
-      <td class="divider-group" style="background:#eff6ff;">${numInput('GrossPay', true)}</td>
-      <td style="background:#eff6ff;">${numInput('TotalDeduction', true)}</td>
-      <td style="background:#eff6ff;">${numInput('NetSalary', true)}</td>
-      <td class="divider-group" style="text-align:center;"><button class="btn btn-sm" onclick="showPayslip('${escapeHtml(emp.Code)}')">${t('slip')}</button></td>
+      <td class="td-text col-freeze col-0 sec-basic ${sitCls}"><div class="text-cell">${escapeHtml(emp.Situation || '')}</div></td>
+      <td class="td-text col-freeze col-1 sec-basic"><div class="text-cell">${escapeHtml(emp.Code || '')}</div></td>
+      <td class="td-text col-freeze col-2 sec-basic"><div class="text-cell">${escapeHtml(emp.Name || '')}</div></td>
+      <td class="td-text col-freeze col-3 sec-basic"><div class="text-cell">${escapeHtml(emp.GroupName || '')}</div></td>
+      <td class="td-text col-freeze col-4 sec-basic"><div class="text-cell">${escapeHtml(emp.BankNama || '')}</div></td>
+      <td class="sec-income divider-group">${numInput('Basic', false)}</td>
+      <td class="sec-income">${numInput('Allowance', false)}</td>
+      <td class="sec-income">${numInput('Deduction', false)}</td>
+      <td class="sec-income">${numInput('NormalOT', false)}</td>
+      <td class="sec-income">${numInput('RestOT', false)}</td>
+      <td class="sec-income">${numInput('PublicOT', false)}</td>
+      <td class="sec-income">${numInput('OtherOT', false)}</td>
+      <td class="sec-income">${numInput('Pinjaman', false)}</td>
+      <td class="sec-income">${numInput('Others', false)}</td>
+      ${chkTd('EPF', 'sec-statutory divider-group')}
+      <td class="sec-statutory">${numInput('EPF_Employee', !emp.manualEPF)}</td>
+      <td class="sec-statutory">${numInput('EPF_Employer', !emp.manualEPF)}</td>
+      ${chkTd('SOCSO', 'sec-statutory')}
+      <td class="sec-statutory">${numInput('SOCSO_Employee', !emp.manualSOCSO)}</td>
+      <td class="sec-statutory">${numInput('SOCSO_Employer', !emp.manualSOCSO)}</td>
+      ${chkTd('EIS', 'sec-statutory')}
+      <td class="sec-statutory">${numInput('EIS_Employee', !emp.manualEIS)}</td>
+      <td class="sec-statutory">${numInput('EIS_Employer', !emp.manualEIS)}</td>
+      ${chkTd('24JAM', 'sec-statutory')}
+      <td class="sec-statutory">${numInput('Lindung24Jam', !emp.manual24JAM)}</td>
+      <td class="td-text sec-slr divider-group"><div class="text-cell">${escapeHtml(emp.SLRBankNama || '')}</div></td>
+      <td class="td-text sec-slr"><div class="text-cell">${escapeHtml(emp.SLRBankAccountNo || '')}</div></td>
+      <td class="td-text sec-slr" style="text-align:center;">${badgeStatus(emp.SLREPF) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>'}</td>
+      <td class="td-text sec-slr" style="text-align:center;">${badgeStatus(emp.SLRPERKESO) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>'}</td>
+      <td class="td-text sec-slr" style="text-align:center;">${badgeStatus(emp.SLREIS) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>'}</td>
+      <td class="sec-summary divider-group">${numInput('GrossPay', true)}</td>
+      <td class="sec-summary">${numInput('TotalDeduction', true)}</td>
+      <td class="sec-summary">${numInput('NetSalary', true)}</td>
+      <td class="sec-action divider-group" style="text-align:center;"><button class="btn btn-sm" onclick="showPayslip('${escapeHtml(emp.Code)}')">${t('slip')}</button></td>
     `;
     tbody.appendChild(tr);
   });
@@ -1191,6 +1303,10 @@ window.addEventListener('DOMContentLoaded', () => {
   const modal = document.getElementById('importModal');
   if (modal) modal.addEventListener('click', e => {
     if (e.target.id === 'importModal') closeImportModal();
+  });
+  const fm = document.getElementById('freezeModal');
+  if (fm) fm.addEventListener('click', e => {
+    if (e.target.id === 'freezeModal') closeFreezeModal();
   });
 });
 
@@ -1559,7 +1675,7 @@ function exportToXLSX() {
       if (ws[addr] && ws[addr].t === 'n') ws[addr].z = '#,##0.00';
     }
   }
-  ws['!cols'] = headers.map(() => ({ wch: 14 }));
+  ws['!cols'] = getExportHeaders().map(() => ({ wch: 14 }));
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Payroll');
@@ -1680,12 +1796,12 @@ async function loadEmployees() {
         Age: 30,
         EPF: row.EPF, PERKESO: row.PERKESO,
         EIS: row.EIS, Lindungan: row.Lindungan,
-        // ★ STAFF LOGIN RECORD sheet 新字段（U~Y 列）
-        SLRBankNama: row.SLRBankNama || row.LoginBankNama || '',
-        SLRBankAccountNo: row.SLRBankAccountNo || row.LoginBankAccountNo || '',
-        SLREPF: row.SLREPF || row.LoginEPF || row.EPFStatus || '',
-        SLRPERKESO: row.SLRPERKESO || row.LoginPERKESO || row.PERKESOStatus || '',
-        SLREIS: row.SLREIS || row.LoginEIS || row.EISStatus || ''
+        // ★ 来自 STAFF LOGIN RECORD sheet (U~Y 列)
+        SLRBankNama: row.SLRBankNama || row.BankNamaSLR || '',
+        SLRBankAccountNo: row.SLRBankAccountNo || row.BankAccountNo || '',
+        SLREPF: row.SLREPF || row.EPFStatus || '',
+        SLRPERKESO: row.SLRPERKESO || row.PERKESOStatus || '',
+        SLREIS: row.SLREIS || row.EISStatus || ''
       }))
       .filter(e => e.Situation !== 'UNACTIVE' && e.Situation !== 'INACTIVE');
 
