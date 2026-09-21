@@ -1,1 +1,1033 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jadual Caruman EIS | PERKESO</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f0f4f8;
+  color: #1e293b;
+  padding: 0 0 3rem 0;
+  min-height: 100vh;
+}
 
+/* ===== 顶部导航栏 ===== */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.75rem 1.5rem;
+  display: flex; flex-wrap: wrap;
+  gap: 0.5rem; align-items: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.topbar .spacer { flex: 1; }
+.topbar .brand {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #0f172a;
+  display: flex; align-items: center; gap: 0.5rem;
+  margin-right: 0.5rem;
+}
+.topbar .brand .logo {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 0.85rem; font-weight: 800;
+}
+.btn {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  transition: all 0.15s;
+  color: #1e293b;
+}
+.btn:hover { background: #f1f5f9; border-color: #94a3b8; }
+.btn-primary { background: #2563eb; border-color: #2563eb; color: #fff; }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-success { background: #059669; border-color: #059669; color: #fff; }
+.btn-success:hover { background: #047857; }
+.btn-danger { background: #fee2e2; border-color: #fecaca; color: #b91c1c; }
+.btn-sm { padding: 0.3rem 0.6rem; font-size: 0.75rem; }
+
+/* ===== 主容器 ===== */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+/* ===== 页面标题卡片 ===== */
+.page-header {
+  background: linear-gradient(135deg, #6d28d9, #7c3aed);
+  color: #fff;
+  border-radius: 14px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 16px rgba(124,58,237,0.25);
+}
+.page-header h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.01em;
+}
+.page-header p {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  line-height: 1.5;
+}
+.page-header .badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  padding: 0.2rem 0.7rem;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-top: 0.6rem;
+  backdrop-filter: blur(4px);
+}
+
+/* ===== 计算卡片（输入 + 结果） ===== */
+.stats-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+@media (max-width: 900px) {
+  .stats-row { grid-template-columns: 1fr 1fr; }
+}
+.stat-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  transition: 0.15s;
+}
+.stat-card.highlight {
+  border-color: #c4b5fd;
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.08);
+}
+.stat-card .label {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.4rem;
+}
+.stat-card .value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+}
+.stat-card .value.green { color: #059669; }
+.stat-card .value.purple { color: #7c3aed; }
+
+/* 输入框（在卡片内） */
+.stat-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #0f172a;
+  padding: 0 0 4px 0;
+  font-family: inherit;
+  border-bottom: 2px solid #e2e8f0;
+  transition: 0.15s;
+  font-variant-numeric: tabular-nums;
+}
+.stat-input:focus {
+  outline: none;
+  border-bottom-color: #7c3aed;
+  box-shadow: 0 4px 6px -4px rgba(124,58,237,0.5);
+}
+.stat-input::placeholder { color: #cbd5e1; font-weight: 500; }
+.stat-input::-webkit-outer-spin-button,
+.stat-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.stat-input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+
+.stat-hint {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  margin-top: 0.3rem;
+}
+
+/* ===== 表格容器 ===== */
+.table-wrap {
+  overflow: auto;
+  max-height: calc(100vh - 340px);
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.82rem;
+  width: 100%;
+  min-width: 700px;
+  table-layout: fixed;
+}
+
+th {
+  position: sticky; top: 0; z-index: 10;
+  background: #f8fafc;
+  padding: 0.6rem 0.6rem;
+  text-align: left;
+  font-weight: 600;
+  color: #334155;
+  border-bottom: 2px solid #e2e8f0;
+  white-space: normal;
+  font-size: 0.75rem;
+  vertical-align: middle;
+  word-break: break-word;
+  line-height: 1.35;
+}
+thead tr:nth-child(2) th {
+  background: #f1f5f9;
+  border-bottom: 2px solid #cbd5e1;
+}
+th.th-chk { width: 50px; text-align: center; }
+th.th-no { width: 50px; text-align: center; }
+th.th-wage { width: 300px; }
+th.th-emp { width: 140px; text-align: right; }
+th.th-ee { width: 140px; text-align: right; }
+th.th-total { width: 140px; text-align: right; }
+th.grp-hd {
+  background: #ede9fe;
+  text-align: center;
+  font-size: 0.72rem;
+  color: #6d28d9;
+  border-bottom: 1px solid #ddd6fe;
+}
+thead tr:nth-child(2) th.grp-hd {
+  background: #e0d5fc;
+  border-bottom: 2px solid #c4b5fd;
+}
+
+td {
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+  background: #fff;
+  font-size: 0.82rem;
+}
+tr:hover td { background: #fafbfc; }
+tr.row-edit td { background: #fefce8; }
+tr.row-edit:hover td { background: #fef9c3; }
+tr.row-highlight td { background: #ede9fe !important; }
+
+.td-chk { text-align: center; }
+.td-chk input[type="checkbox"] {
+  width: 18px; height: 18px;
+  cursor: pointer;
+  accent-color: #7c3aed;
+}
+.td-no { text-align: center; color: #64748b; font-weight: 500; }
+.td-wage { color: #0f172a; }
+.td-num { text-align: right; font-variant-numeric: tabular-nums; }
+.td-num strong { color: #0f172a; }
+.td-total { text-align: right; font-variant-numeric: tabular-nums; color: #7c3aed; font-weight: 600; }
+
+/* ===== 可编辑输入框 ===== */
+.cell-input {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.82rem;
+  font-family: inherit;
+  background: #fff;
+  text-align: right;
+  transition: 0.15s;
+}
+.cell-input:focus {
+  outline: none;
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 2px rgba(124,58,237,0.15);
+}
+
+/* ===== Toast ===== */
+.toast {
+  position: fixed;
+  bottom: 1.5rem; right: 1.5rem;
+  background: #1e293b;
+  color: #fff;
+  padding: 0.8rem 1.3rem;
+  border-radius: 40px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: 0.2s;
+  pointer-events: none;
+  max-width: 360px;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.error { background: #b91c1c; }
+
+/* ===== 密码弹窗 ===== */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(15,23,42,0.55);
+  z-index: 9998;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+}
+.modal-box {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.5rem;
+  width: 100%; max-width: 380px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.modal-box h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.modal-box p {
+  font-size: 0.82rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+.modal-box input[type="password"] {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  letter-spacing: 0.2em;
+  text-align: center;
+  transition: 0.15s;
+}
+.modal-box input[type="password"]:focus {
+  outline: none;
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
+}
+.modal-actions {
+  display: flex; gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+/* ===== 导入弹窗 ===== */
+.import-box {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.5rem;
+  width: 100%; max-width: 520px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.import-box h3 {
+  font-size: 1rem; font-weight: 700; color: #0f172a;
+}
+.dropzone {
+  border: 2px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 2rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.15s;
+  background: #f8fafc;
+}
+.dropzone:hover, .dropzone.drag-over {
+  border-color: #7c3aed;
+  background: #f5f3ff;
+}
+.dropzone .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.dropzone p { font-size: 0.85rem; color: #475569; margin: 0.2rem 0; }
+.dropzone .hint { font-size: 0.72rem; color: #94a3b8; }
+
+/* ===== 图例 ===== */
+.legend {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.75rem;
+  padding-left: 0.25rem;
+  line-height: 1.6;
+}
+.legend strong { color: #334155; }
+
+/* ===== 打印 ===== */
+@media print {
+  .topbar, .stats-row, .page-header, .legend, .toast, .modal-overlay { display: none !important; }
+  .table-wrap { max-height: none; border: none; box-shadow: none; }
+  body { background: #fff; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== 顶部导航 ===== -->
+<div class="topbar">
+  <div class="brand">
+    <div class="logo">E</div>
+    Jadual Caruman EIS
+  </div>
+  <span style="width:1px;height:24px;background:#e2e8f0;margin:0 4px;"></span>
+
+  <button class="btn" onclick="openImport()">📥 Import</button>
+  <select id="exportMenu" class="btn" onchange="handleExport(this.value)">
+    <option value="">📤 Export…</option>
+    <option value="xlsx">📊 Excel (.xlsx)</option>
+    <option value="txt">📝 Text (.txt)</option>
+    <option value="doc">📘 Word (.doc)</option>
+  </select>
+
+  <span class="spacer"></span>
+  <span style="font-size:0.72rem;color:#94a3b8;">Kadar Caruman PERKESO · Akta 800</span>
+</div>
+
+<div class="container">
+  <!-- ===== 页面标题 ===== -->
+  <div class="page-header">
+    <h1>Jadual Kadar Caruman PERKESO (EIS)</h1>
+    <p>Kadar caruman di bawah Akta Sistem Insurans Pekerjaan 2017 (Akta 800) — Majikan 0.2% &amp; Pekerja 0.2% daripada gaji bulanan.</p>
+    <span class="badge">Berkuatkuasa mulai 1 Oktober 2024 · Siling gaji RM6,000</span>
+  </div>
+
+  <!-- ===== 薪资输入 + EIS 自动查询 ===== -->
+  <div class="stats-row">
+    <div class="stat-card highlight">
+      <div class="label">💰 Masukkan Gaji Bulanan</div>
+      <input type="number" id="wageInput" class="stat-input"
+             placeholder="0.00" step="0.01" min="0"
+             oninput="updateCalc()">
+      <div class="stat-hint">Taip gaji untuk cari caruman EIS</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Caruman Pekerja (0.2%)</div>
+      <div class="value green" id="resultEmployee">RM 0.00</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Caruman Majikan (0.2%)</div>
+      <div class="value purple" id="resultEmployer">RM 0.00</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Jumlah Caruman</div>
+      <div class="value" id="resultTotal">RM 0.00</div>
+    </div>
+  </div>
+
+  <!-- ===== 表格 ===== -->
+  <div class="table-wrap">
+    <table id="eisTable">
+      <colgroup>
+        <col style="width:50px">   <!-- Chk -->
+        <col style="width:50px">   <!-- No -->
+        <col style="width:300px">  <!-- Wages -->
+        <col style="width:140px">  <!-- Employer -->
+        <col style="width:140px">  <!-- Employee -->
+        <col style="width:140px">  <!-- Total -->
+      </colgroup>
+      <thead>
+        <tr id="headRow1">
+          <th class="th-chk" rowspan="2">✎</th>
+          <th class="th-no" rowspan="2">No.</th>
+          <th class="th-wage" rowspan="2">Gaji Bulanan Sebenar (RM)</th>
+          <th class="grp-hd" colspan="3">Caruman EIS<br><span style="font-weight:400;font-size:0.65rem;">Akta Sistem Insurans Pekerjaan 2017 (Akta 800)</span></th>
+        </tr>
+        <tr id="headRow2">
+          <th class="th-emp grp-hd">Majikan (RM)</th>
+          <th class="th-ee grp-hd">Pekerja (RM)</th>
+          <th class="th-total grp-hd">Jumlah (RM)</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="legend">
+    <strong>Nota:</strong> Kadar caruman mengikut Jadual Kedua Akta 800. Baris boleh diedit selepas menandakan ✔ dan memasukkan kata laluan. Majikan dan pekerja masing-masing menyumbang 0.2% daripada gaji bulanan, dihadkan pada gaji RM6,000.
+  </div>
+</div>
+
+<!-- ===== 密码弹窗 ===== -->
+<div id="pwdModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <h3>🔒 Sahkan Kata Laluan</h3>
+    <p>Masukkan kata laluan untuk membenarkan pengeditan baris ini.</p>
+    <input type="password" id="pwdInput" maxlength="4" placeholder="••••" autocomplete="off">
+    <div class="modal-actions">
+      <button class="btn" onclick="closePwd()">Batal</button>
+      <button class="btn btn-primary" onclick="confirmPwd()">Sahkan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 导入弹窗 ===== -->
+<div id="importModal" class="modal-overlay" style="display:none;">
+  <div class="import-box">
+    <h3>📥 Import Data EIS</h3>
+    <div class="dropzone" id="dropzone">
+      <div class="icon">📁</div>
+      <p><strong>Klik atau seret fail ke sini</strong></p>
+      <p class="hint">Format: .xlsx / .txt / .csv</p>
+      <input type="file" id="importFile" accept=".xlsx,.xls,.csv,.txt" style="display:none;">
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:0.5rem;">
+      <button class="btn" onclick="closeImport()">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+// ============================================================
+// EIS 官方数据（PERKESO Jadual Kedua Akta 800）
+// 格式：[No, 工资描述, 工资下限, 工资上限, 雇主, 员工, 合计]
+// ============================================================
+const EIS_DATA = [
+  [1,  "Gaji hingga RM30",                         0,       30,      0.05,  0.05,  0.10],
+  [2,  "Gaji melebihi RM30 tetapi tidak RM50",      30.01,   50,      0.10,  0.10,  0.20],
+  [3,  "Gaji melebihi RM50 tetapi tidak RM70",      50.01,   70,      0.15,  0.15,  0.30],
+  [4,  "Gaji melebihi RM70 tetapi tidak RM100",     70.01,   100,     0.20,  0.20,  0.40],
+  [5,  "Gaji melebihi RM100 tetapi tidak RM140",    100.01,  140,     0.25,  0.25,  0.50],
+  [6,  "Gaji melebihi RM140 tetapi tidak RM200",    140.01,  200,     0.35,  0.35,  0.70],
+  [7,  "Gaji melebihi RM200 tetapi tidak RM300",    200.01,  300,     0.50,  0.50,  1.00],
+  [8,  "Gaji melebihi RM300 tetapi tidak RM400",    300.01,  400,     0.70,  0.70,  1.40],
+  [9,  "Gaji melebihi RM400 tetapi tidak RM500",    400.01,  500,     0.90,  0.90,  1.80],
+  [10, "Gaji melebihi RM500 tetapi tidak RM600",    500.01,  600,     1.10,  1.10,  2.20],
+  [11, "Gaji melebihi RM600 tetapi tidak RM700",    600.01,  700,     1.30,  1.30,  2.60],
+  [12, "Gaji melebihi RM700 tetapi tidak RM800",    700.01,  800,     1.50,  1.50,  3.00],
+  [13, "Gaji melebihi RM800 tetapi tidak RM900",    800.01,  900,     1.70,  1.70,  3.40],
+  [14, "Gaji melebihi RM900 tetapi tidak RM1,000",  900.01,  1000,    1.90,  1.90,  3.80],
+  [15, "Gaji melebihi RM1,000 tetapi tidak RM1,100", 1000.01, 1100,    2.10,  2.10,  4.20],
+  [16, "Gaji melebihi RM1,100 tetapi tidak RM1,200", 1100.01, 1200,    2.30,  2.30,  4.60],
+  [17, "Gaji melebihi RM1,200 tetapi tidak RM1,300", 1200.01, 1300,    2.50,  2.50,  5.00],
+  [18, "Gaji melebihi RM1,300 tetapi tidak RM1,400", 1300.01, 1400,    2.70,  2.70,  5.40],
+  [19, "Gaji melebihi RM1,400 tetapi tidak RM1,500", 1400.01, 1500,    2.90,  2.90,  5.80],
+  [20, "Gaji melebihi RM1,500 tetapi tidak RM1,600", 1500.01, 1600,    3.10,  3.10,  6.20],
+  [21, "Gaji melebihi RM1,600 tetapi tidak RM1,700", 1600.01, 1700,    3.30,  3.30,  6.60],
+  [22, "Gaji melebihi RM1,700 tetapi tidak RM1,800", 1700.01, 1800,    3.50,  3.50,  7.00],
+  [23, "Gaji melebihi RM1,800 tetapi tidak RM1,900", 1800.01, 1900,    3.70,  3.70,  7.40],
+  [24, "Gaji melebihi RM1,900 tetapi tidak RM2,000", 1900.01, 2000,    3.90,  3.90,  7.80],
+  [25, "Gaji melebihi RM2,000 tetapi tidak RM2,100", 2000.01, 2100,    4.10,  4.10,  8.20],
+  [26, "Gaji melebihi RM2,100 tetapi tidak RM2,200", 2100.01, 2200,    4.30,  4.30,  8.60],
+  [27, "Gaji melebihi RM2,200 tetapi tidak RM2,300", 2200.01, 2300,    4.50,  4.50,  9.00],
+  [28, "Gaji melebihi RM2,300 tetapi tidak RM2,400", 2300.01, 2400,    4.70,  4.70,  9.40],
+  [29, "Gaji melebihi RM2,400 tetapi tidak RM2,500", 2400.01, 2500,    4.90,  4.90,  9.80],
+  [30, "Gaji melebihi RM2,500 tetapi tidak RM2,600", 2500.01, 2600,    5.10,  5.10,  10.20],
+  [31, "Gaji melebihi RM2,600 tetapi tidak RM2,700", 2600.01, 2700,    5.30,  5.30,  10.60],
+  [32, "Gaji melebihi RM2,700 tetapi tidak RM2,800", 2700.01, 2800,    5.50,  5.50,  11.00],
+  [33, "Gaji melebihi RM2,800 tetapi tidak RM2,900", 2800.01, 2900,    5.70,  5.70,  11.40],
+  [34, "Gaji melebihi RM2,900 tetapi tidak RM3,000", 2900.01, 3000,    5.90,  5.90,  11.80],
+  [35, "Gaji melebihi RM3,000 tetapi tidak RM3,100", 3000.01, 3100,    6.10,  6.10,  12.20],
+  [36, "Gaji melebihi RM3,100 tetapi tidak RM3,200", 3100.01, 3200,    6.30,  6.30,  12.60],
+  [37, "Gaji melebihi RM3,200 tetapi tidak RM3,300", 3200.01, 3300,    6.50,  6.50,  13.00],
+  [38, "Gaji melebihi RM3,300 tetapi tidak RM3,400", 3300.01, 3400,    6.70,  6.70,  13.40],
+  [39, "Gaji melebihi RM3,400 tetapi tidak RM3,500", 3400.01, 3500,    6.90,  6.90,  13.80],
+  [40, "Gaji melebihi RM3,500 tetapi tidak RM3,600", 3500.01, 3600,    7.10,  7.10,  14.20],
+  [41, "Gaji melebihi RM3,600 tetapi tidak RM3,700", 3600.01, 3700,    7.30,  7.30,  14.60],
+  [42, "Gaji melebihi RM3,700 tetapi tidak RM3,800", 3700.01, 3800,    7.50,  7.50,  15.00],
+  [43, "Gaji melebihi RM3,800 tetapi tidak RM3,900", 3800.01, 3900,    7.70,  7.70,  15.40],
+  [44, "Gaji melebihi RM3,900 tetapi tidak RM4,000", 3900.01, 4000,    7.90,  7.90,  15.80],
+  [45, "Gaji melebihi RM4,000 tetapi tidak RM4,100", 4000.01, 4100,    8.10,  8.10,  16.20],
+  [46, "Gaji melebihi RM4,100 tetapi tidak RM4,200", 4100.01, 4200,    8.30,  8.30,  16.60],
+  [47, "Gaji melebihi RM4,200 tetapi tidak RM4,300", 4200.01, 4300,    8.50,  8.50,  17.00],
+  [48, "Gaji melebihi RM4,300 tetapi tidak RM4,400", 4300.01, 4400,    8.70,  8.70,  17.40],
+  [49, "Gaji melebihi RM4,400 tetapi tidak RM4,500", 4400.01, 4500,    8.90,  8.90,  17.80],
+  [50, "Gaji melebihi RM4,500 tetapi tidak RM4,600", 4500.01, 4600,    9.10,  9.10,  18.20],
+  [51, "Gaji melebihi RM4,600 tetapi tidak RM4,700", 4600.01, 4700,    9.30,  9.30,  18.60],
+  [52, "Gaji melebihi RM4,700 tetapi tidak RM4,800", 4700.01, 4800,    9.50,  9.50,  19.00],
+  [53, "Gaji melebihi RM4,800 tetapi tidak RM4,900", 4800.01, 4900,    9.70,  9.70,  19.40],
+  [54, "Gaji melebihi RM4,900 tetapi tidak RM5,000", 4900.01, 5000,    9.90,  9.90,  19.80],
+  [55, "Gaji melebihi RM5,000 tetapi tidak RM5,100", 5000.01, 5100,    10.10, 10.10, 20.20],
+  [56, "Gaji melebihi RM5,100 tetapi tidak RM5,200", 5100.01, 5200,    10.30, 10.30, 20.60],
+  [57, "Gaji melebihi RM5,200 tetapi tidak RM5,300", 5200.01, 5300,    10.50, 10.50, 21.00],
+  [58, "Gaji melebihi RM5,300 tetapi tidak RM5,400", 5300.01, 5400,    10.70, 10.70, 21.40],
+  [59, "Gaji melebihi RM5,400 tetapi tidak RM5,500", 5400.01, 5500,    10.90, 10.90, 21.80],
+  [60, "Gaji melebihi RM5,500 tetapi tidak RM5,600", 5500.01, 5600,    11.10, 11.10, 22.20],
+  [61, "Gaji melebihi RM5,600 tetapi tidak RM5,700", 5600.01, 5700,    11.30, 11.30, 22.60],
+  [62, "Gaji melebihi RM5,700 tetapi tidak RM5,800", 5700.01, 5800,    11.50, 11.50, 23.00],
+  [63, "Gaji melebihi RM5,800 tetapi tidak RM5,900", 5800.01, 5900,    11.70, 11.70, 23.40],
+  [64, "Gaji melebihi RM5,900 tetapi tidak RM6,000", 5900.01, 6000,    11.90, 11.90, 23.80],
+  [65, "Gaji melebihi RM6,000",                       6000.01, Infinity, 11.90, 11.90, 23.80]
+];
+
+// ============================================================
+// 状态
+// ============================================================
+let rows = EIS_DATA.map(r => ({
+  no: r[0],
+  wage: r[1],
+  min: r[2],
+  max: r[3],
+  employer: r[4],
+  employee: r[5],
+  total: r[6],
+  editable: false
+}));
+
+const PASSWORD = '0000';
+let pendingCheckbox = null;
+let highlightedRowIdx = -1;
+
+// ============================================================
+// 表头 sticky 对齐
+// ============================================================
+function fixStickyHeader() {
+  const row1 = document.getElementById('headRow1');
+  const row2 = document.getElementById('headRow2');
+  if (!row1 || !row2) return;
+  const r1 = row1.getBoundingClientRect();
+  const r2 = row2.getBoundingClientRect();
+  const offset = Math.max(0, Math.round(r2.top - r1.top));
+  Array.from(row2.cells).forEach(th => {
+    th.style.top = offset + 'px';
+  });
+}
+
+// ============================================================
+// 渲染
+// ============================================================
+function render() {
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+
+  rows.forEach((r, i) => {
+    const tr = document.createElement('tr');
+    if (r.editable) tr.classList.add('row-edit');
+    if (i === highlightedRowIdx) tr.classList.add('row-highlight');
+
+    const fmt = v => (v === Infinity || v > 100000) ? '—' : Number(v).toFixed(2);
+
+    tr.innerHTML = `
+      <td class="td-chk">
+        <input type="checkbox" ${r.editable ? 'checked' : ''}
+               onchange="toggleEdit(${i}, this)">
+      </td>
+      <td class="td-no">${r.no}</td>
+      <td class="td-wage">${escapeHtml(r.wage)}</td>
+      <td class="td-num">
+        ${r.editable
+          ? `<input class="cell-input" type="number" step="0.01" value="${r.employer}" onchange="updateField(${i}, 'employer', this.value)">`
+          : `<strong>RM ${fmt(r.employer)}</strong>`}
+      </td>
+      <td class="td-num">
+        ${r.editable
+          ? `<input class="cell-input" type="number" step="0.01" value="${r.employee}" onchange="updateField(${i}, 'employee', this.value)">`
+          : `<strong>RM ${fmt(r.employee)}</strong>`}
+      </td>
+      <td class="td-total">
+        ${r.editable
+          ? `<input class="cell-input" type="number" step="0.01" value="${r.total}" onchange="updateField(${i}, 'total', this.value)">`
+          : `<strong>RM ${fmt(r.total)}</strong>`}
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  requestAnimationFrame(fixStickyHeader);
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+// ============================================================
+// 薪资 → EIS 自动查询
+// ============================================================
+function calcEISByWage(wage) {
+  const w = Number(wage);
+  if (!w || w <= 0) return { employee: 0, employer: 0, total: 0, idx: -1 };
+  let match = null;
+  for (let i = 0; i < rows.length; i++) {
+    if (w >= rows[i].min) {
+      match = rows[i];
+    } else {
+      break;
+    }
+  }
+  if (!match) match = rows[0];
+  return {
+    employee: match.employee,
+    employer: match.employer,
+    total: match.total,
+    idx: match.no - 1
+  };
+}
+
+function updateCalc() {
+  const wage = parseFloat(document.getElementById('wageInput').value) || 0;
+  const result = calcEISByWage(wage);
+
+  document.getElementById('resultEmployee').textContent = 'RM ' + result.employee.toFixed(2);
+  document.getElementById('resultEmployer').textContent = 'RM ' + result.employer.toFixed(2);
+  document.getElementById('resultTotal').textContent = 'RM ' + result.total.toFixed(2);
+
+  if (highlightedRowIdx !== result.idx) {
+    highlightedRowIdx = result.idx;
+    const trs = document.querySelectorAll('#tbody tr');
+    trs.forEach((tr, i) => {
+      tr.classList.toggle('row-highlight', i === result.idx && wage > 0);
+    });
+    if (wage > 0 && result.idx >= 0 && trs[result.idx]) {
+      const row = trs[result.idx];
+      const wrap = document.querySelector('.table-wrap');
+      if (wrap) {
+        const rowTop = row.offsetTop;
+        const wrapTop = wrap.scrollTop;
+        const wrapH = wrap.clientHeight;
+        if (rowTop < wrapTop + 60 || rowTop > wrapTop + wrapH - 60) {
+          wrap.scrollTo({ top: Math.max(0, rowTop - wrapH / 2), behavior: 'smooth' });
+        }
+      }
+    }
+  }
+}
+
+// ============================================================
+// 编辑切换（带密码）
+// ============================================================
+function toggleEdit(idx, checkbox) {
+  if (checkbox.checked) {
+    pendingCheckbox = checkbox;
+    document.getElementById('pwdModal').style.display = 'flex';
+    document.getElementById('pwdInput').value = '';
+    setTimeout(() => document.getElementById('pwdInput').focus(), 100);
+  } else {
+    rows[idx].editable = false;
+    render();
+    toast(`Baris ${rows[idx].no} dikunci`);
+  }
+}
+
+function confirmPwd() {
+  const val = document.getElementById('pwdInput').value;
+  if (val === PASSWORD) {
+    const cb = pendingCheckbox;
+    const idx = Number(cb.closest('tr').querySelector('.td-no').textContent) - 1;
+    rows[idx].editable = true;
+    closePwd();
+    render();
+    toast(`Baris ${rows[idx].no} boleh diedit`);
+  } else {
+    toast('Kata laluan salah!', true);
+    document.getElementById('pwdInput').value = '';
+    document.getElementById('pwdInput').focus();
+  }
+}
+
+function closePwd() {
+  document.getElementById('pwdModal').style.display = 'none';
+  if (pendingCheckbox) {
+    pendingCheckbox.checked = false;
+    pendingCheckbox = null;
+  }
+}
+
+function updateField(idx, field, value) {
+  const v = parseFloat(value);
+  if (isNaN(v) || v < 0) { render(); return; }
+  rows[idx][field] = v;
+  if (field === 'employer' || field === 'employee') {
+    rows[idx].total = Math.round((rows[idx].employer + rows[idx].employee) * 100) / 100;
+  }
+  render();
+}
+
+// ============================================================
+// 导出
+// ============================================================
+function handleExport(val) {
+  if (!val) return;
+  try {
+    if (val === 'xlsx') exportXLSX();
+    else if (val === 'txt') exportTXT();
+    else if (val === 'doc') exportDOC();
+  } catch(e) {
+    console.error(e);
+    toast('Export error: ' + e.message, true);
+  } finally {
+    document.getElementById('exportMenu').value = '';
+  }
+}
+
+function getExportHeaders() {
+  return ['No.', 'Gaji Bulanan', 'Majikan (RM)', 'Pekerja (RM)', 'Jumlah (RM)'];
+}
+
+function getExportRows() {
+  return rows.map(r => [
+    r.no, r.wage,
+    r.employer, r.employee, r.total
+  ]);
+}
+
+function todayStr() {
+  const d = new Date();
+  const p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
+}
+
+function downloadBlob(content, filename, mime) {
+  const blob = new Blob(['\ufeff', content], { type: mime + ';charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function exportXLSX() {
+  if (typeof XLSX === 'undefined') { exportCSV(); return; }
+  const aoa = [getExportHeaders(), ...getExportRows()];
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = [
+    {wch:6},{wch:38},{wch:14},{wch:14},{wch:14}
+  ];
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let R = 1; R <= range.e.r; R++) {
+    for (let C = 2; C <= 4; C++) {
+      const addr = XLSX.utils.encode_cell({r:R, c:C});
+      if (ws[addr] && ws[addr].t === 'n') ws[addr].z = '#,##0.00';
+    }
+  }
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'EIS');
+  XLSX.writeFile(wb, 'jadual_eis_' + todayStr() + '.xlsx');
+  toast('Excel berjaya dieksport');
+}
+
+function exportCSV() {
+  const esc = v => {
+    const s = String(v ?? '');
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  };
+  let out = getExportHeaders().map(esc).join(',') + '\n';
+  getExportRows().forEach(r => { out += r.map(esc).join(',') + '\n'; });
+  downloadBlob(out, 'jadual_eis_' + todayStr() + '.csv', 'text/csv');
+  toast('CSV berjaya dieksport');
+}
+
+function exportTXT() {
+  const headers = getExportHeaders();
+  const data = getExportRows();
+  const widths = headers.map((h, i) => {
+    let w = h.length;
+    data.forEach(r => { const l = String(r[i] ?? '').length; if (l > w) w = l; });
+    return Math.min(w, 40);
+  });
+  const pad = (v, w) => {
+    let s = String(v ?? '');
+    if (s.length > w) s = s.slice(0, w-1) + '…';
+    return s + ' '.repeat(Math.max(0, w - s.length));
+  };
+  let out = 'JADUAL CARUMAN EIS (AKTA 800)\n';
+  out += 'Dijana: ' + new Date().toLocaleString('ms-MY') + '\n';
+  out += '='.repeat(widths.reduce((a,b) => a+b+3, 0)) + '\n';
+  out += headers.map((h,i) => pad(h, widths[i])).join(' | ') + '\n';
+  out += widths.map(w => '-'.repeat(w)).join('-+-') + '\n';
+  data.forEach(r => { out += r.map((c,i) => pad(c, widths[i])).join(' | ') + '\n'; });
+  out += '\nJumlah baris: ' + data.length + '\n';
+  downloadBlob(out, 'jadual_eis_' + todayStr() + '.txt', 'text/plain');
+  toast('Text berjaya dieksport');
+}
+
+function exportDOC() {
+  const headers = getExportHeaders();
+  const data = getExportRows();
+  let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ';
+  html += 'xmlns:w="urn:schemas-microsoft-com:office:word" ';
+  html += 'xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8">';
+  html += '<title>Jadual Caruman EIS</title>';
+  html += '<style>body{font-family:Arial;font-size:9pt;}';
+  html += 'table{border-collapse:collapse;width:100%;}';
+  html += 'th,td{border:1px solid #999;padding:3px 5px;}';
+  html += 'th{background:#ede9fe;text-align:left;}';
+  html += 'td.num{text-align:right;}</style></head><body>';
+  html += '<h2>Jadual Caruman EIS (Akta 800)</h2>';
+  html += '<p>Dijana: ' + new Date().toLocaleDateString('ms-MY') + '</p>';
+  html += '<table><thead><tr>';
+  headers.forEach(h => { html += '<th>' + escapeHtml(h) + '</th>'; });
+  html += '</tr></thead><tbody>';
+  data.forEach(r => {
+    html += '<tr>';
+    r.forEach((c, i) => {
+      html += `<td class="${i >= 2 ? 'num' : ''}">${escapeHtml(c)}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table></body></html>';
+  downloadBlob(html, 'jadual_eis_' + todayStr() + '.doc', 'application/msword');
+  toast('Word berjaya dieksport');
+}
+
+// ============================================================
+// 导入
+// ============================================================
+function openImport() {
+  document.getElementById('importModal').style.display = 'flex';
+}
+function closeImport() {
+  document.getElementById('importModal').style.display = 'none';
+  const fi = document.getElementById('importFile');
+  if (fi) fi.value = '';
+}
+
+function parseCSVLine(line) {
+  const cells = []; let cur = ''; let inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQ) {
+      if (ch === '"') { if (line[i+1] === '"') { cur += '"'; i++; } else inQ = false; }
+      else cur += ch;
+    } else {
+      if (ch === ',') { cells.push(cur); cur = ''; }
+      else if (ch === '"') inQ = true;
+      else cur += ch;
+    }
+  }
+  cells.push(cur);
+  return cells;
+}
+
+function parseTXT(text) {
+  const out = [];
+  text.split(/\r?\n/).forEach(line => {
+    const t = line.trim();
+    if (!t || /^[=\-+\s]+$/.test(t)) return;
+    if (t.startsWith('JADUAL') || t.startsWith('Dijana') || t.startsWith('Jumlah')) return;
+    if (t.includes('|')) out.push(t.split('|').map(s => s.trim()));
+    else out.push(parseCSVLine(t));
+  });
+  return out;
+}
+
+async function handleImport(file) {
+  const name = file.name.toLowerCase();
+  let raw = [];
+  try {
+    if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
+      if (typeof XLSX === 'undefined') { toast('SheetJS tidak dimuat', true); return; }
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf);
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+    } else if (name.endsWith('.csv') || name.endsWith('.txt')) {
+      raw = parseTXT(await file.text());
+    } else {
+      toast('Format fail tidak disokong', true); return;
+    }
+
+    if (!raw || raw.length < 2) { toast('Fail kosong atau tidak sah', true); return; }
+
+    const dataRows = raw.slice(1).filter(r => r && r.length >= 3);
+    if (!dataRows.length) { toast('Tiada data dijumpai', true); return; }
+
+    const imported = [];
+    dataRows.forEach(r => {
+      const no = parseInt(r[0]) || (imported.length + 1);
+      const wage = String(r[1] || '');
+      const employer = parseFloat(r[2]) || 0;
+      const employee = parseFloat(r[3]) || 0;
+      const total = parseFloat(r[4]) || Math.round((employer + employee) * 100) / 100;
+      let min = 0, max = Infinity;
+      if (imported.length > 0) {
+        min = imported[imported.length - 1].max + 0.01;
+      }
+      if (no < 65) max = min + 19.99;
+      imported.push({
+        no, wage, min, max,
+        employer, employee, total,
+        editable: false
+      });
+    });
+
+    if (!imported.length) { toast('Tiada baris sah', true); return; }
+    if (imported.length > 0) imported[imported.length - 1].max = Infinity;
+
+    rows = imported;
+    highlightedRowIdx = -1;
+    render();
+    updateCalc();
+    toast(`Berjaya import ${imported.length} baris`);
+    closeImport();
+  } catch(e) {
+    console.error(e);
+    toast('Import error: ' + e.message, true);
+  }
+}
+
+// ============================================================
+// 初始化
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+  const dz = document.getElementById('dropzone');
+  const fi = document.getElementById('importFile');
+  if (dz && fi) {
+    dz.addEventListener('click', e => { if (e.target !== fi) fi.click(); });
+    fi.addEventListener('change', e => {
+      if (e.target.files && e.target.files[0]) handleImport(e.target.files[0]);
+    });
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault(); dz.classList.remove('drag-over');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) handleImport(e.dataTransfer.files[0]);
+    });
+  }
+  const modal = document.getElementById('importModal');
+  if (modal) modal.addEventListener('click', e => { if (e.target.id === 'importModal') closeImport(); });
+  const pwd = document.getElementById('pwdModal');
+  if (pwd) pwd.addEventListener('click', e => { if (e.target.id === 'pwdModal') closePwd(); });
+
+  render();
+  updateCalc();
+});
+
+window.addEventListener('resize', () => {
+  requestAnimationFrame(fixStickyHeader);
+});
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => requestAnimationFrame(fixStickyHeader));
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('pwdModal').style.display === 'flex') {
+    confirmPwd();
+  }
+});
+
+// ============================================================
+// Toast
+// ============================================================
+function toast(msg, isError) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast' + (isError ? ' error' : '');
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 2600);
+}
+</script>
+</body>
+</html>
