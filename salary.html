@@ -8,6 +8,7 @@
   /* ============================================================
      全新设计 · 玻璃质感 & 柔和光影
      修复：冻结列标题走位、多语言翻译、银行名称同步
+     修正：冻结时第一组区域整体冻结，筛选行改为放大镜搜索框
      ============================================================ */
   @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap');
 
@@ -213,7 +214,7 @@
   .main-header-row th { z-index: 11; vertical-align: middle; }
   .sub-header-row th { z-index: 10; vertical-align: middle; text-align: center; }
 
-  /* 筛选行 */
+  /* 筛选行：改为放大镜搜索框 */
   .filter-row th {
     position: sticky; z-index: 9;
     background: #f7fbff; padding: 0.3rem 0.35rem;
@@ -221,9 +222,11 @@
   }
   .filter-row .th-filter {
     display: block; width: 100%;
-    padding: 4px 8px; font-size: 0.7rem; font-weight: 400;
+    padding: 4px 8px 4px 26px; font-size: 0.7rem; font-weight: 400;
     border: 1px solid #d2e2f2; border-radius: 16px;
-    background: #ffffff; color: #1a2b3e;
+    background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238aa8c8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E") no-repeat left 6px center;
+    background-size: 12px 12px;
+    color: #1a2b3e;
     font-family: inherit; transition: 0.2s;
     margin: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.02);
   }
@@ -246,7 +249,8 @@
   .divider-group { border-left: 2px solid #d2e2f2 !important; }
 
   /* ========== 冻结列 ========== */
-  /* 关键修复：冻结时确保列宽和位置准确，不产生偏移 */
+  /* 关键修正：冻结时确保第一组所有列（Situation/Code/Nama/Kumpulan）整体冻结，
+     并且列标题保持原有背景色与样式，不产生位移或颜色突变 */
   body.freeze-on .col-freeze {
     position: sticky; z-index: 8; background: #ffffff;
   }
@@ -265,8 +269,24 @@
 
   /* 冻结列表头保持高 z-index 并确保背景色 */
   body.freeze-on thead .col-freeze { z-index: 15; }
+  /* 确保表头冻结列的颜色与未冻结时一致 */
   body.freeze-on thead .col-freeze.bg-slate { background: #eef4fa !important; }
   body.freeze-on thead .col-freeze.bg-amber { background: #fef8e7 !important; }
+  body.freeze-on thead .col-freeze.bg-emerald { background: #e9f9f1 !important; }
+  body.freeze-on thead .col-freeze.bg-violet { background: #f3effc !important; }
+  body.freeze-on thead .col-freeze.bg-blue { background: #eaf3ff !important; }
+  body.freeze-on thead .col-freeze.bg-gray { background: #f5f8fc !important; }
+  /* 分区标题行冻结列 */
+  body.freeze-on thead .section-label-row th.col-freeze {
+    background: inherit !important;
+  }
+  /* 筛选行冻结列 */
+  body.freeze-on thead .filter-row th.col-freeze {
+    background: #f7fbff !important;
+  }
+  body.freeze-on thead .filter-row th.col-freeze.no-filter {
+    background: #e9f0f9 !important;
+  }
 
   /* 冻结列拖拽线 */
   .freeze-line {
