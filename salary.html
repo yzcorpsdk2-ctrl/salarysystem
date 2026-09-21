@@ -8,7 +8,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f0f4f8; color: #1e293b; padding: 0 0 3rem 0;
+  background: #f1f5f9; color: #1e293b; padding: 0 0 3rem 0;
   min-height: 100vh;
 }
 
@@ -18,7 +18,7 @@ body {
   background: #ffffff; border-bottom: 1px solid #e2e8f0;
   padding: 0.75rem 1.5rem; display: flex; flex-wrap: wrap;
   gap: 0.5rem; align-items: center;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 .topbar .spacer { flex: 1; }
 .topbar .brand {
@@ -28,19 +28,18 @@ body {
 }
 .topbar .brand .logo {
   width: 32px; height: 32px;
-  background: linear-gradient(135deg, #1e40af, #2563eb);
-  border-radius: 8px;
+  background: #1e40af; border-radius: 6px;
   display: flex; align-items: center; justify-content: center;
   color: #fff; font-size: 0.85rem; font-weight: 800;
 }
 .btn {
   background: #fff; border: 1px solid #cbd5e1;
-  padding: 0.45rem 0.9rem; border-radius: 8px;
+  padding: 0.45rem 0.9rem; border-radius: 6px;
   font-size: 0.82rem; font-weight: 500; cursor: pointer;
   display: inline-flex; align-items: center; gap: 0.35rem;
   transition: all 0.15s; color: #1e293b;
 }
-.btn:hover { background: #f1f5f9; border-color: #94a3b8; }
+.btn:hover { background: #f8fafc; border-color: #94a3b8; }
 .btn-primary { background: #2563eb; border-color: #2563eb; color: #fff; }
 .btn-primary:hover { background: #1d4ed8; }
 .btn-success { background: #059669; border-color: #059669; color: #fff; }
@@ -49,44 +48,42 @@ body {
 select.btn { cursor: pointer; }
 
 /* ===== 主容器 ===== */
-.container { max-width: 1800px; margin: 0 auto; padding: 1.5rem; }
+.container { max-width: 100%; margin: 0 auto; padding: 1.5rem; }
 
 /* ===== 页面标题卡片 ===== */
 .page-header {
-  background: linear-gradient(135deg, #1e40af, #2563eb);
-  color: #fff; border-radius: 14px;
+  background: #ffffff; border-radius: 10px;
   padding: 1.5rem 2rem; margin-bottom: 1.5rem;
-  box-shadow: 0 4px 16px rgba(37,99,235,0.25);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 1px solid #e2e8f0;
   display: flex; flex-wrap: wrap; gap: 1rem;
   align-items: center; justify-content: space-between;
 }
 .page-header .info { flex: 1; min-width: 260px; }
 .page-header h1 {
   font-size: 1.35rem; font-weight: 700;
-  margin-bottom: 0.35rem; letter-spacing: -0.01em;
+  margin-bottom: 0.35rem; color: #0f172a;
 }
-.page-header p { font-size: 0.85rem; opacity: 0.85; line-height: 1.5; }
+.page-header p { font-size: 0.85rem; color: #64748b; line-height: 1.5; }
 .page-header .badge {
-  display: inline-block; background: rgba(255,255,255,0.2);
+  display: inline-block; background: #e0e7ff; color: #3730a3;
   padding: 0.2rem 0.7rem; border-radius: 20px;
   font-size: 0.72rem; font-weight: 600; margin-top: 0.6rem;
-  backdrop-filter: blur(4px);
 }
 .page-header .stat-badges { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .page-header .stat-pill {
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.25);
-  border-radius: 10px; padding: 0.5rem 0.9rem;
-  font-size: 0.78rem; backdrop-filter: blur(4px); min-width: 110px;
+  background: #f8fafc; border: 1px solid #e2e8f0;
+  border-radius: 8px; padding: 0.5rem 0.9rem;
+  font-size: 0.78rem; min-width: 110px;
 }
 .page-header .stat-pill .label {
-  font-size: 0.65rem; opacity: 0.8;
+  font-size: 0.65rem; color: #64748b;
   text-transform: uppercase; letter-spacing: 0.05em;
   font-weight: 600; margin-bottom: 0.15rem;
 }
 .page-header .stat-pill .value {
   font-size: 1.1rem; font-weight: 700;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: tabular-nums; color: #0f172a;
 }
 
 /* ===== 分区图例 ===== */
@@ -97,219 +94,169 @@ select.btn { cursor: pointer; }
 .section-legend .item {
   display: inline-flex; align-items: center; gap: 0.4rem;
   background: #fff; border: 1px solid #e2e8f0;
-  padding: 0.4rem 0.75rem; border-radius: 8px;
+  padding: 0.4rem 0.75rem; border-radius: 6px;
   font-size: 0.75rem; color: #475569; font-weight: 500;
 }
 .section-legend .dot {
-  width: 12px; height: 12px; border-radius: 3px;
+  width: 10px; height: 10px; border-radius: 2px;
 }
 
 /* ===== 卡片容器 ===== */
 .card {
-  background: #fff;
-  border-radius: 14px;
+  background: #fff; border-radius: 10px;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-  overflow: hidden;
-  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  overflow: hidden; margin-bottom: 1rem;
 }
 .card-body { padding: 0; }
 
 /* ===== 表格容器 ===== */
 .table-wrap {
-  overflow: auto; max-height: calc(100vh - 400px);
+  overflow: auto; max-height: calc(100vh - 350px);
   background: #fff;
 }
 table {
   border-collapse: separate; border-spacing: 0; font-size: 0.82rem;
   table-layout: fixed;
-  width: 2730px; min-width: 2730px;
+  width: 2650px; min-width: 2650px;
 }
 
 /* ===== 表头基础 ===== */
 th {
   position: sticky; top: 0; z-index: 10;
-  background: #f8fafc; padding: 0.5rem 0.45rem; text-align: left;
+  background: #f8fafc; padding: 0.5rem 0.4rem; text-align: left;
   font-weight: 600; color: #334155; border-bottom: 1px solid #e2e8f0;
-  white-space: normal; font-size: 0.75rem; vertical-align: top;
+  white-space: normal; font-size: 0.72rem; vertical-align: top;
   word-break: break-word; overflow-wrap: anywhere;
 }
 th > div { word-break: break-word; overflow-wrap: anywhere; }
 
-/* ========== ★ 分区色块 ========== */
-/* 第一区：基本资料（冻结） - 琥珀黄 */
-.sec-basic { background: #fef3c7 !important; }
-.sec-basic-h { background: #fde68a !important; }
-
-/* 第二区：收入/津贴 - 绿色 */
-.sec-income { background: #dcfce7 !important; }
-.sec-income-h { background: #bbf7d0 !important; }
-
-/* 第三区：法定扣除 - 紫色 */
-.sec-statutory { background: #ede9fe !important; }
-.sec-statutory-h { background: #ddd6fe !important; }
-
-/* 第四区：SLR 参考 - 青绿 */
-.sec-slr { background: #ccfbf1 !important; }
-.sec-slr-h { background: #99f6e4 !important; }
-
-/* 第五区：汇总 - 蓝色 */
-.sec-summary { background: #dbeafe !important; }
-.sec-summary-h { background: #bfdbfe !important; }
-
-/* 第六区：操作 */
-.sec-action { background: #f1f5f9 !important; }
+/* ========== 分区颜色（仅表头，柔和专业） ========== */
+.bg-slate   { background: #f1f5f9 !important; color: #334155 !important; }
+.bg-emerald { background: #ecfdf5 !important; color: #065f46 !important; }
+.bg-violet  { background: #f5f3ff !important; color: #5b21b6 !important; }
+.bg-amber   { background: #fffbeb !important; color: #92400e !important; }
+.bg-blue    { background: #eff6ff !important; color: #1e40af !important; }
+.bg-gray    { background: #f8fafc !important; color: #475569 !important; }
 
 /* 表头分区行（显示分区名称） */
 .section-label-row th {
-  position: sticky;
-  top: 0;
-  z-index: 12;
-  padding: 0.35rem 0.5rem;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  border-bottom: 1px solid #cbd5e1;
-  color: #334155;
-  text-align: center;
+  position: sticky; top: 0; z-index: 12;
+  padding: 0.4rem 0.5rem; font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.03em; text-transform: uppercase;
+  border-bottom: 2px solid #cbd5e1; text-align: center;
 }
 .section-label-row th .sec-title {
   display: flex; align-items: center; justify-content: center; gap: 0.35rem;
 }
 
-/* ★ 筛选行 */
-#headRow3 th {
-  background: #f8fafc;
-  padding: 0.3rem 0.3rem;
-  border-bottom: 2px solid #cbd5e1;
-  vertical-align: middle;
+/* 表头主行 */
+.main-header-row th { z-index: 11; vertical-align: middle; }
+/* 表头子行 */
+.sub-header-row th { z-index: 10; vertical-align: middle; text-align: center; }
+
+/* 筛选行 */
+.filter-row th {
+  position: sticky; z-index: 9;
+  background: #f8fafc; padding: 0.3rem 0.3rem;
+  border-bottom: 2px solid #cbd5e1; vertical-align: middle;
 }
-#headRow3 .th-filter {
+.filter-row .th-filter {
   display: block; width: 100%;
   padding: 3px 6px; font-size: 0.7rem; font-weight: 400;
-  border: 1px solid #cbd5e1; border-radius: 5px;
+  border: 1px solid #cbd5e1; border-radius: 4px;
   background: #fff; color: #1e293b; font-family: inherit;
   transition: 0.15s; margin: 0;
 }
-#headRow3 .th-filter:focus {
+.filter-row .th-filter:focus {
   outline: none; border-color: #2563eb;
   box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
 }
-#headRow3 .th-filter::placeholder { color: #94a3b8; font-weight: 400; }
-#headRow3 th.no-filter { background: #e2e8f0; }
+.filter-row .th-filter::placeholder { color: #94a3b8; font-weight: 400; }
+.filter-row th.no-filter { background: #e2e8f0; }
 
+/* 表格数据行 */
 td {
   padding: 0.35rem 0.4rem; border-bottom: 1px solid #f1f5f9;
-  vertical-align: middle; background: #fff;
-  transition: background 0.1s;
+  vertical-align: middle; background: #fff; transition: background 0.1s;
 }
-tr:hover td { background: #fafbfc; }
+tr:nth-child(even) td { background: #f8fafc; }
+tr:hover td { background: #f1f5f9; }
 
-/* ========== ★ 分组分割线 ========== */
-.divider-group {
-  border-left: 2px solid #94a3b8 !important;
-}
+/* ========== 分组分割线 ========== */
+.divider-group { border-left: 2px solid #cbd5e1 !important; }
 
-/* ★ 冻结列的拖拽/点击线 */
-.freeze-line {
-  position: absolute;
-  top: 0; bottom: 0; right: 0;
-  width: 10px;
-  background: linear-gradient(to right,
-    rgba(37,99,235,0) 0%,
-    rgba(37,99,235,0.1) 40%,
-    rgba(37,99,235,0.2) 100%);
-  cursor: pointer;
-  z-index: 20;
-  pointer-events: auto;
-  transition: 0.15s;
-}
-.freeze-line:hover {
-  background: linear-gradient(to right,
-    rgba(37,99,235,0.05) 0%,
-    rgba(37,99,235,0.25) 40%,
-    rgba(37,99,235,0.4) 100%);
-}
-.freeze-line::before {
-  content: '⋮⋮';
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  color: #2563eb;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: -2px;
-  line-height: 1;
-  opacity: 0.5;
-  transition: 0.15s;
-}
-.freeze-line:hover::before { opacity: 1; }
+/* ========== 冻结列 ========== */
+body.freeze-on .col-freeze { position: sticky; z-index: 8; background: #fff; }
+body.freeze-on tr:nth-child(even) td.col-freeze { background: #f8fafc; }
+body.freeze-on tr:hover td.col-freeze { background: #f1f5f9; }
 
-/* ========== ★ 冻结列 ========== */
-body.freeze-on .col-freeze { position: sticky; z-index: 8; }
 body.freeze-on .col-freeze.col-0 { left: 0px; }
-body.freeze-on .col-freeze.col-1 { left: 90px; }
-body.freeze-on .col-freeze.col-2 { left: 165px; }
+body.freeze-on .col-freeze.col-1 { left: 80px; }
+body.freeze-on .col-freeze.col-2 { left: 150px; }
 body.freeze-on .col-freeze.col-3 {
-  left: 335px;
+  left: 310px;
   border-right: 2px solid #2563eb !important;
-  box-shadow: 4px 0 10px -4px rgba(15,23,42,0.15);
+  box-shadow: 4px 0 10px -4px rgba(15,23,42,0.1);
 }
 
 /* 冻结列表头保持高 z-index */
 body.freeze-on thead .col-freeze { z-index: 15; }
+body.freeze-on thead .col-freeze.bg-slate { background: #f1f5f9 !important; }
+body.freeze-on thead .col-freeze.bg-amber { background: #fffbeb !important; }
 
-/* 悬停时保持冻结列不透明 */
-body.freeze-on tr:hover td.col-freeze { background: #fafbfc; }
-
-/* Situation 状态颜色需保留（覆盖冻结背景） */
-body.freeze-on td.col-freeze.sit-pending { background: #F5F5DC !important; }
-body.freeze-on td.col-freeze.sit-active  { background: #DCFCE7 !important; }
-body.freeze-on tr:hover td.col-freeze.sit-pending { background: #F5F5DC !important; }
-body.freeze-on tr:hover td.col-freeze.sit-active  { background: #DCFCE7 !important; }
-
-/* ★ 复选框单元格 */
-.td-chk { text-align: center; vertical-align: middle; padding: 0.4rem 0.15rem !important; }
-.td-chk input[type="checkbox"] {
-  width: 18px; height: 18px; cursor: pointer; accent-color: #2563eb;
+/* 冻结列拖拽线 */
+.freeze-line {
+  position: absolute; top: 0; bottom: 0; right: 0; width: 12px;
+  background: linear-gradient(to right, rgba(37,99,235,0) 0%, rgba(37,99,235,0.08) 60%, rgba(37,99,235,0.15) 100%);
+  cursor: pointer; z-index: 20; pointer-events: auto; transition: 0.15s;
 }
+.freeze-line:hover {
+  background: linear-gradient(to right, rgba(37,99,235,0.05) 0%, rgba(37,99,235,0.2) 60%, rgba(37,99,235,0.3) 100%);
+}
+.freeze-line::before {
+  content: '⋮⋮'; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%); color: #2563eb;
+  font-size: 0.65rem; font-weight: 700; letter-spacing: -2px;
+  line-height: 1; opacity: 0.4; transition: 0.15s;
+}
+.freeze-line:hover::before { opacity: 0.9; }
 
-/* ★ 只读文字单元格 */
+/* 复选框单元格 */
+.td-chk { text-align: center; vertical-align: middle; padding: 0.4rem 0.15rem !important; }
+.td-chk input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb; }
+
+/* 只读文字单元格 */
 .td-text { vertical-align: top !important; padding: 0.4rem 0.4rem !important; }
 .text-cell {
-  font-size: 0.82rem; line-height: 1.35;
+  font-size: 0.8rem; line-height: 1.35;
   white-space: normal; word-break: break-word;
   overflow-wrap: anywhere; color: #0f172a;
 }
 .text-cell.center { text-align: center; }
 .text-cell.badge-cell {
-  display: inline-block;
-  font-size: 0.68rem;
-  font-weight: 700;
-  padding: 0.2rem 0.55rem;
-  border-radius: 20px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+  display: inline-block; font-size: 0.65rem; font-weight: 700;
+  padding: 0.15rem 0.5rem; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: 0.03em;
 }
 .badge-yes { background: #dcfce7; color: #166534; }
 .badge-no  { background: #fee2e2; color: #991b1b; }
 .badge-other { background: #f1f5f9; color: #475569; }
 
-/* ★ Situation 状态颜色 */
-.sit-pending { background: #F5F5DC !important; }
-.sit-pending .text-cell { color: #78350F; font-weight: 700; }
-.sit-active  { background: #DCFCE7 !important; }
+/* Situation 状态颜色 */
+.sit-pending { background: #fef3c7 !important; }
+.sit-pending .text-cell { color: #92400e; font-weight: 700; }
+.sit-active  { background: #dcfce7 !important; }
 .sit-active .text-cell { color: #166534; font-weight: 700; }
 .sit-default { background: #ffffff !important; }
 
 .input {
   width: 100%; min-width: 0; border: 1px solid #e2e8f0;
-  border-radius: 6px; padding: 0.35rem 0.45rem; font-size: 0.82rem;
+  border-radius: 4px; padding: 0.3rem 0.4rem; font-size: 0.8rem;
   background: #fff; transition: 0.15s; font-family: inherit;
 }
 .input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
-.input[readonly] { background: #f8fafc; color: #475569; }
+.input[readonly] { background: #f8fafc; color: #64748b; }
 .input.num { text-align: right; }
 .input[readonly].num { background: #f1f5f9; }
 .cell-bad { background: #fee2e2 !important; border-color: #fca5a5 !important; }
@@ -317,64 +264,53 @@ body.freeze-on tr:hover td.col-freeze.sit-active  { background: #DCFCE7 !importa
 
 .legend {
   font-size: 0.75rem; color: #64748b;
-  margin-top: 0.75rem; padding-left: 0.25rem;
-  line-height: 1.6;
+  margin-top: 0.75rem; padding-left: 0.25rem; line-height: 1.6;
 }
 .legend strong { color: #334155; }
 
 /* ===== Toast ===== */
 .toast {
   position: fixed; bottom: 1.5rem; right: 1.5rem; background: #1e293b; color: #fff;
-  padding: 0.8rem 1.3rem; border-radius: 40px; font-size: 0.85rem; font-weight: 500;
+  padding: 0.8rem 1.3rem; border-radius: 6px; font-size: 0.85rem; font-weight: 500;
   z-index: 9999; opacity: 0; transform: translateY(10px);
   transition: 0.2s; pointer-events: none; max-width: 360px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 .toast.show { opacity: 1; transform: translateY(0); }
 .toast.error { background: #b91c1c; }
 
 /* ========== 弹窗 ========== */
 .modal-overlay {
-  position: fixed; inset: 0; background: rgba(15,23,42,0.55);
-  z-index: 9998; display: flex; align-items: center; justify-content: center;
-  padding: 1rem;
+  position: fixed; inset: 0; background: rgba(15,23,42,0.5);
+  z-index: 9998; display: flex; align-items: center; justify-content: center; padding: 1rem;
 }
 .modal-box {
-  background: #fff; border-radius: 14px; padding: 1.4rem;
+  background: #fff; border-radius: 10px; padding: 1.4rem;
   width: 100%; max-width: 560px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-  display: flex; flex-direction: column; gap: 1rem;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 1rem;
 }
 .modal-box.compact { max-width: 380px; padding: 1.5rem; text-align: center; }
 .modal-header { display: flex; justify-content: space-between; align-items: center; }
 .modal-header h3 { font-size: 1.05rem; font-weight: 600; color: #0f172a; }
 .modal-close {
   background: none; border: none; font-size: 1.2rem; cursor: pointer;
-  color: #64748b; padding: 0.2rem 0.55rem; border-radius: 6px; line-height: 1;
+  color: #64748b; padding: 0.2rem 0.55rem; border-radius: 4px; line-height: 1;
 }
 .modal-close:hover { background: #f1f5f9; color: #0f172a; }
 .modal-dropzone {
-  border: 2px dashed #cbd5e1; border-radius: 10px; padding: 2.2rem 1rem;
-  text-align: center; cursor: pointer; transition: 0.15s;
-  background: #f8fafc;
+  border: 2px dashed #cbd5e1; border-radius: 8px; padding: 2.2rem 1rem;
+  text-align: center; cursor: pointer; transition: 0.15s; background: #f8fafc;
 }
-.modal-dropzone:hover, .modal-dropzone.drag-over {
-  border-color: #2563eb; background: #eff6ff;
-}
+.modal-dropzone:hover, .modal-dropzone.drag-over { border-color: #2563eb; background: #eff6ff; }
 .modal-dropzone p { font-size: 0.9rem; color: #475569; margin: 0.25rem 0; }
 .modal-dropzone .hint { font-size: 0.75rem; color: #94a3b8; }
 .modal-dropzone .icon { font-size: 2rem; margin-bottom: 0.4rem; }
 .modal-footer {
   display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;
-  flex-wrap: wrap;
-  padding-top: 0.8rem; border-top: 1px solid #e2e8f0;
+  flex-wrap: wrap; padding-top: 0.8rem; border-top: 1px solid #e2e8f0;
 }
-.template-download {
-  display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;
-  font-size: 0.78rem; color: #64748b;
-}
-.modal-actions {
-  display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;
-}
+.template-download { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; font-size: 0.78rem; color: #64748b; }
+.modal-actions { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
 
 /* ========== 打印 ========== */
 #printArea { display: none; }
@@ -382,10 +318,7 @@ body.freeze-on tr:hover td.col-freeze.sit-active  { background: #DCFCE7 !importa
   body { background: #fff; padding: 0; }
   .topbar, .container, .toast, .modal-overlay, .section-legend { display: none !important; }
   #printArea { display: block !important; }
-  .payslip {
-    page-break-after: always; padding: 12mm; font-size: 10pt;
-    font-family: 'Arial', sans-serif; color: #000;
-  }
+  .payslip { page-break-after: always; padding: 12mm; font-size: 10pt; font-family: 'Arial', sans-serif; color: #000; }
   .payslip:last-child { page-break-after: auto; }
   .ps-header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 4mm; margin-bottom: 4mm; }
   .ps-title { font-size: 14pt; font-weight: bold; }
@@ -398,7 +331,6 @@ body.freeze-on tr:hover td.col-freeze.sit-active  { background: #DCFCE7 !importa
   .ps-cols > div { flex: 1; }
   .ps-sign { margin-top: 8mm; display: flex; justify-content: space-between; font-size: 9pt; }
   .ps-sign div { border-top: 1px solid #000; padding-top: 1mm; width: 45%; text-align: center; }
-
   .export-print { padding: 6mm; font-family: Arial, sans-serif; color: #000; }
   .export-table { border-collapse: collapse; width: 100%; font-size: 8.5pt; }
   .export-table th, .export-table td { border: 1px solid #999; padding: 3px 4px; }
@@ -475,12 +407,12 @@ body.freeze-on tr:hover td.col-freeze.sit-active  { background: #DCFCE7 !importa
 
   <!-- ===== 分区图例 ===== -->
   <div class="section-legend">
-    <span class="item"><span class="dot" style="background:#fde68a;"></span> 1. Maklumat Asas (Freeze)</span>
-    <span class="item"><span class="dot" style="background:#bbf7d0;"></span> 2. Pendapatan</span>
-    <span class="item"><span class="dot" style="background:#ddd6fe;"></span> 3. Caruman Statutori</span>
-    <span class="item"><span class="dot" style="background:#99f6e4;"></span> 4. Staff Login Record (U-Y)</span>
-    <span class="item"><span class="dot" style="background:#bfdbfe;"></span> 5. Ringkasan Gaji</span>
-    <span class="item"><span class="dot" style="background:#e2e8f0;"></span> 6. Tindakan</span>
+    <span class="item"><span class="dot bg-slate" style="border:1px solid #cbd5e1;"></span> 1. Maklumat Asas (Freeze)</span>
+    <span class="item"><span class="dot bg-emerald" style="border:1px solid #a7f3d0;"></span> 2. Pendapatan</span>
+    <span class="item"><span class="dot bg-violet" style="border:1px solid #ddd6fe;"></span> 3. Caruman Statutori</span>
+    <span class="item"><span class="dot bg-amber" style="border:1px solid #fde68a;"></span> 4. Staff Login Record (U-Y)</span>
+    <span class="item"><span class="dot bg-blue" style="border:1px solid #bfdbfe;"></span> 5. Ringkasan Gaji</span>
+    <span class="item"><span class="dot bg-gray" style="border:1px solid #e2e8f0;"></span> 6. Tindakan</span>
   </div>
 
   <!-- ===== 表格卡片 ===== -->
@@ -495,9 +427,9 @@ body.freeze-on tr:hover td.col-freeze.sit-active  { background: #DCFCE7 !importa
                ============================================ -->
           <colgroup>
             <!-- ① 基本资料（冻结） -->
-            <col class="col-freeze col-0" style="width:90px">   <!-- 0  Situation -->
-            <col class="col-freeze col-1" style="width:75px">   <!-- 1  Code -->
-            <col class="col-freeze col-2" style="width:170px">  <!-- 2  Name -->
+            <col class="col-freeze col-0" style="width:80px">   <!-- 0  Situation -->
+            <col class="col-freeze col-1" style="width:70px">   <!-- 1  Code -->
+            <col class="col-freeze col-2" style="width:160px">  <!-- 2  Name -->
             <col class="col-freeze col-3" style="width:110px">  <!-- 3  Group -->
             <!-- ② 收入/津贴 -->
             <col style="width:85px">   <!-- 4  Basic -->
@@ -535,10 +467,105 @@ body.freeze-on tr:hover td.col-freeze.sit-active  { background: #DCFCE7 !importa
             <col style="width:80px">   <!-- 32 Action -->
           </colgroup>
           <thead>
-            <tr id="headRowSec" class="section-label-row"></tr>
-            <tr id="headRow1"></tr>
-            <tr id="headRow2"></tr>
-            <tr id="headRow3"></tr>
+            <!-- Row 1: 分区标题 -->
+            <tr class="section-label-row">
+              <th colspan="4" class="bg-slate"><div class="sec-title">📌 1. MAKLUMAT ASAS (FREEZE)</div></th>
+              <th colspan="9" class="bg-emerald divider-group"><div class="sec-title">💰 2. PENDAPATAN / ELAUN</div></th>
+              <th colspan="11" class="bg-violet divider-group"><div class="sec-title">🏛️ 3. CARUMAN STATUTORI (EPF / SOCSO / EIS / 24JAM)</div></th>
+              <th colspan="5" class="bg-amber divider-group"><div class="sec-title">📋 4. STAFF LOGIN RECORD (U-Y)</div></th>
+              <th colspan="3" class="bg-blue divider-group"><div class="sec-title">🧮 5. RINGKASAN GAJI</div></th>
+              <th colspan="1" class="bg-gray divider-group"><div class="sec-title">⚙️ 6. TINDAKAN</div></th>
+            </tr>
+            <!-- Row 2: 主标题 -->
+            <tr class="main-header-row">
+              <th class="col-freeze col-0 bg-slate" rowspan="2">Situation</th>
+              <th class="col-freeze col-1 bg-slate" rowspan="2">Kod</th>
+              <th class="col-freeze col-2 bg-slate" rowspan="2">Nama</th>
+              <th class="col-freeze col-3 bg-slate" rowspan="2" style="position:relative;">
+                Kumpulan
+                <div class="freeze-line" onclick="openFreezeModal()" title="Klik untuk toggle freeze"></div>
+              </th>
+              
+              <th class="bg-emerald divider-group" rowspan="2">Gaji Asas</th>
+              <th class="bg-emerald" rowspan="2">Elaun</th>
+              <th class="bg-emerald" rowspan="2">Potongan</th>
+              <th class="bg-emerald" rowspan="2">OT Biasa</th>
+              <th class="bg-emerald" rowspan="2">OT Rehat</th>
+              <th class="bg-emerald" rowspan="2">OT Awam</th>
+              <th class="bg-emerald" rowspan="2">OT Lain</th>
+              <th class="bg-emerald" rowspan="2">Pinjaman</th>
+              <th class="bg-emerald" rowspan="2">Lain-lain</th>
+
+              <th class="bg-violet divider-group" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-violet" colspan="2" style="text-align:center;">EPF</th>
+              <th class="bg-violet" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-violet" colspan="2" style="text-align:center;">SOCSO</th>
+              <th class="bg-violet" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-violet" colspan="2" style="text-align:center;">EIS</th>
+              <th class="bg-violet" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-violet" rowspan="2">24JAM</th>
+
+              <th class="bg-amber divider-group" rowspan="2"><div style="font-size:0.72rem;">Bank Nama<br><span style="font-weight:400;font-size:0.6rem;">(U)</span></div></th>
+              <th class="bg-amber" rowspan="2"><div style="font-size:0.72rem;">Bank Acc<br><span style="font-weight:400;font-size:0.6rem;">(V)</span></div></th>
+              <th class="bg-amber" rowspan="2" style="text-align:center;"><div style="font-size:0.72rem;">EPF<br><span style="font-weight:400;font-size:0.6rem;">(W)</span></div></th>
+              <th class="bg-amber" rowspan="2" style="text-align:center;"><div style="font-size:0.72rem;">SOCSO<br><span style="font-weight:400;font-size:0.6rem;">(X)</span></div></th>
+              <th class="bg-amber" rowspan="2" style="text-align:center;"><div style="font-size:0.72rem;">EIS<br><span style="font-weight:400;font-size:0.6rem;">(Y)</span></div></th>
+
+              <th class="bg-blue divider-group" rowspan="2">Gaji Kasar</th>
+              <th class="bg-blue" rowspan="2">Total Potongan</th>
+              <th class="bg-blue" rowspan="2">Gaji Bersih</th>
+
+              <th class="bg-gray divider-group" rowspan="2" style="text-align:center;">Tindakan</th>
+            </tr>
+            <!-- Row 3: 子标题（仅 EPF, SOCSO, EIS 需要） -->
+            <tr class="sub-header-row">
+              <th class="bg-violet">Pekerja</th>
+              <th class="bg-violet">Majikan</th>
+              <th class="bg-violet">Pekerja</th>
+              <th class="bg-violet">Majikan</th>
+              <th class="bg-violet">Pekerja</th>
+              <th class="bg-violet">Majikan</th>
+            </tr>
+            <!-- Row 4: 筛选行 -->
+            <tr class="filter-row">
+              <th class="col-freeze col-0 bg-slate"><input class="th-filter" data-col="0" placeholder="🔍"></th>
+              <th class="col-freeze col-1 bg-slate"><input class="th-filter" data-col="1" placeholder="🔍"></th>
+              <th class="col-freeze col-2 bg-slate"><input class="th-filter" data-col="2" placeholder="🔍"></th>
+              <th class="col-freeze col-3 bg-slate"><input class="th-filter" data-col="3" placeholder="🔍"></th>
+              <th class="bg-emerald divider-group"><input class="th-filter" data-col="4" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="5" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="6" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="7" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="8" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="9" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="10" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="11" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="12" placeholder="🔍"></th>
+              
+              <th class="bg-violet divider-group no-filter"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="14" placeholder="🔍"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="15" placeholder="🔍"></th>
+              <th class="bg-violet no-filter"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="17" placeholder="🔍"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="18" placeholder="🔍"></th>
+              <th class="bg-violet no-filter"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="20" placeholder="🔍"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="21" placeholder="🔍"></th>
+              <th class="bg-violet no-filter"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="23" placeholder="🔍"></th>
+
+              <th class="bg-amber divider-group"><input class="th-filter" data-col="24" placeholder="🔍"></th>
+              <th class="bg-amber"><input class="th-filter" data-col="25" placeholder="🔍"></th>
+              <th class="bg-amber"><input class="th-filter" data-col="26" placeholder="🔍"></th>
+              <th class="bg-amber"><input class="th-filter" data-col="27" placeholder="🔍"></th>
+              <th class="bg-amber"><input class="th-filter" data-col="28" placeholder="🔍"></th>
+
+              <th class="bg-blue divider-group"><input class="th-filter" data-col="29" placeholder="🔍"></th>
+              <th class="bg-blue"><input class="th-filter" data-col="30" placeholder="🔍"></th>
+              <th class="bg-blue"><input class="th-filter" data-col="31" placeholder="🔍"></th>
+
+              <th class="bg-gray divider-group no-filter"></th>
+            </tr>
           </thead>
           <tbody id="tbody"></tbody>
         </table>
@@ -557,7 +584,7 @@ body.freeze-on tr:hover td.col-freeze.sit-active  { background: #DCFCE7 !importa
   <div class="modal-box compact">
     <h3 style="justify-content:center; font-size:1.05rem; margin-bottom:0.3rem;">🔒 Tetapan Freeze Kolum</h3>
     <p style="color:#64748b; font-size:0.82rem; margin-bottom:1rem;">
-      Pilih sama ada mahu kunci kolum pertama (Situation → Group) supaya sentiasa kelihatan semasa scroll, atau buka kunci sepenuhnya.
+      Pilih sama ada mahu kunci kolum pertama (Situation → Kumpulan) supaya sentiasa kelihatan semasa scroll, atau buka kunci sepenuhnya.
     </p>
     <div class="modal-actions">
       <button class="btn" onclick="setFreeze(false)">🔓 Buka Kunci</button>
@@ -617,20 +644,17 @@ const I18N = {
     exportMenu: 'Eksport', allSlip: 'Semua Slip Gaji',
     checkAll: 'Semak Semua',
     code: 'Kod', name: 'Nama', group: 'Kumpulan',
-    bank: 'Bank', basic: 'Gaji Asas', allowance: 'Elaun', deduction: 'Potongan',
+    basic: 'Gaji Asas', allowance: 'Elaun', deduction: 'Potongan',
     normalOT: 'OT Biasa', restOT: 'OT Rehat', publicOT: 'OT Awam', otherOT: 'OT Lain',
     pinjaman: 'Pinjaman', others: 'Lain-lain',
     epfE: 'Pekerja', epfR: 'Majikan',
     socsoE: 'Pekerja', socsoR: 'Majikan',
     eisE: 'Pekerja', eisR: 'Majikan',
     lindung: '24JAM',
-    gross: 'Gaji Kasar', totalDed: 'Jumlah Potongan', net: 'Gaji Bersih',
+    gross: 'Gaji Kasar', totalDed: 'Total Potongan', net: 'Gaji Bersih',
     action: 'Tindakan', slip: 'Slip',
-    slrBankNama: 'Bank Nama',
-    slrBankAcc: 'Bank Acc',
-    slrEPF: 'EPF',
-    slrPERKESO: 'SOCSO',
-    slrEIS: 'EIS',
+    slrBankNama: 'Bank Nama', slrBankAcc: 'Bank Acc',
+    slrEPF: 'EPF', slrPERKESO: 'SOCSO', slrEIS: 'EIS',
     legend: 'Nota: Tandakan ✔ di hadapan EPF/SOCSO/EIS/24JAM untuk isi manual. Tidak ditanda = auto kira. Klik garisan biru di sebelah kanan kolum Kumpulan untuk toggle freeze. Situation UNACTIVE tidak dipaparkan.',
     saved: 'Berjaya disimpan ke Sheet', failed: 'Gagal simpan',
     loading: 'Memuatkan data...',
@@ -647,7 +671,7 @@ const I18N = {
     exportMenu: 'Export', allSlip: 'All Payslips',
     checkAll: 'Check All',
     code: 'Code', name: 'Name', group: 'Group',
-    bank: 'Bank', basic: 'Basic', allowance: 'Allowance', deduction: 'Deduction',
+    basic: 'Basic', allowance: 'Allowance', deduction: 'Deduction',
     normalOT: 'Normal OT', restOT: 'Rest OT', publicOT: 'Public OT', otherOT: 'Other OT',
     pinjaman: 'Loan', others: 'Others',
     epfE: 'Employee', epfR: 'Employer',
@@ -656,11 +680,8 @@ const I18N = {
     lindung: '24JAM',
     gross: 'Gross', totalDed: 'Total Ded', net: 'Net',
     action: 'Action', slip: 'Payslip',
-    slrBankNama: 'Bank Name',
-    slrBankAcc: 'Bank Acc',
-    slrEPF: 'EPF',
-    slrPERKESO: 'SOCSO',
-    slrEIS: 'EIS',
+    slrBankNama: 'Bank Name', slrBankAcc: 'Bank Acc',
+    slrEPF: 'EPF', slrPERKESO: 'SOCSO', slrEIS: 'EIS',
     legend: 'Note: Tick ✔ before EPF/SOCSO/EIS/24JAM to enter manually. Unticked = auto calc. Click the blue line right of Group column to toggle freeze. UNACTIVE staff are hidden.',
     saved: 'Saved successfully', failed: 'Save failed',
     loading: 'Loading data...',
@@ -677,7 +698,7 @@ const I18N = {
     exportMenu: '导出', allSlip: '全部粮单',
     checkAll: '检查全部',
     code: '编号', name: '姓名', group: '分店',
-    bank: '银行', basic: '基本薪资', allowance: '津贴', deduction: '扣款',
+    basic: '基本薪资', allowance: '津贴', deduction: '扣款',
     normalOT: '普通加班', restOT: '休息日加班', publicOT: '公假加班', otherOT: '其他加班',
     pinjaman: '借粮', others: '其他',
     epfE: '员工', epfR: '雇主',
@@ -686,11 +707,8 @@ const I18N = {
     lindung: '24JAM',
     gross: '总薪资', totalDed: '总扣款', net: '净薪资',
     action: '操作', slip: '粮单',
-    slrBankNama: '银行名',
-    slrBankAcc: '银行账号',
-    slrEPF: 'EPF',
-    slrPERKESO: 'SOCSO',
-    slrEIS: 'EIS',
+    slrBankNama: '银行名', slrBankAcc: '银行账号',
+    slrEPF: 'EPF', slrPERKESO: 'SOCSO', slrEIS: 'EIS',
     legend: '备注：勾选 EPF/SOCSO/EIS/24JAM 前的 ✔ 表示手动填写，不勾选则系统自动计算。点击“分店”列右侧的蓝线切换冻结。UNACTIVE 员工不显示。',
     saved: '已成功保存到 Sheet', failed: '保存失败',
     loading: '加载数据中...',
@@ -729,17 +747,12 @@ function todayStr() {
 }
 
 // ================= 冻结切换 =================
-function openFreezeModal() {
-  document.getElementById('freezeModal').style.display = 'flex';
-}
-function closeFreezeModal() {
-  document.getElementById('freezeModal').style.display = 'none';
-}
+function openFreezeModal() { document.getElementById('freezeModal').style.display = 'flex'; }
+function closeFreezeModal() { document.getElementById('freezeModal').style.display = 'none'; }
 function setFreeze(on) {
   document.body.classList.toggle('freeze-on', on);
   closeFreezeModal();
   toast(on ? t('freezeLocked') : t('freezeUnlocked'));
-  requestAnimationFrame(fixStickyHeader);
 }
 
 // ================= 统计卡片 =================
@@ -800,8 +813,7 @@ function calcLindung(salary) {
   return Math.round(salary * 0.007325 * 100) / 100;
 }
 function isExempt(staff) {
-  // Bank 名称可能来自主表 BankNama 或 SLR 区的 SLRBankNama
-  const bank = (String(staff.BankNama || '') + ' ' + String(staff.SLRBankNama || '')).toLowerCase();
+  const bank = (String(staff.SLRBankNama || '') + ' ' + String(staff.BankNama || '')).toLowerCase();
   if (bank.includes('cash') || bank.includes('merchantrade')) {
     return { epf: true, socso: true, eis: true, lindung: true };
   }
@@ -863,8 +875,8 @@ function badgeStatus(val) {
   return `<span class="text-cell badge-cell badge-other">${escapeHtml(v)}</span>`;
 }
 
-// ================= 渲染表头 =================
-function renderHeaders() {
+// ================= 渲染表格 =================
+function renderTable() {
   document.getElementById('pageTitle').textContent = t('title');
   document.getElementById('legend').textContent = t('legend');
   document.querySelector('button[onclick="showAllPayslips()"]').innerHTML = '📄 ' + t('allSlip');
@@ -873,169 +885,6 @@ function renderHeaders() {
   document.querySelector('button[onclick="openImportModal()"]').innerHTML = '📥 ' + t('importBtn');
   document.getElementById('exportMenu').options[0].textContent = '💾 ' + t('exportMenu') + ' / 导出…';
 
-  const hSec = document.getElementById('headRowSec');
-  const h1 = document.getElementById('headRow1');
-  const h2 = document.getElementById('headRow2');
-  const h3 = document.getElementById('headRow3');
-
-  // ---------- Row 0：分区标题行 ----------
-  // ① 4 列 | ② 9 列 | ③ 11 列 | ④ 5 列 | ⑤ 3 列 | ⑥ 1 列
-  hSec.innerHTML = `
-    <th colspan="4" class="sec-basic-h">
-      <div class="sec-title">📌 1. MAKLUMAT ASAS (FREEZE)</div>
-    </th>
-    <th colspan="9" class="sec-income-h divider-group">
-      <div class="sec-title">💰 2. PENDAPATAN / ELAUN</div>
-    </th>
-    <th colspan="11" class="sec-statutory-h divider-group">
-      <div class="sec-title">🏛️ 3. CARUMAN STATUTORI (EPF / SOCSO / EIS / 24JAM)</div>
-    </th>
-    <th colspan="5" class="sec-slr-h divider-group">
-      <div class="sec-title">📋 4. STAFF LOGIN RECORD (U-Y)</div>
-    </th>
-    <th colspan="3" class="sec-summary-h divider-group">
-      <div class="sec-title">🧮 5. RINGKASAN GAJI</div>
-    </th>
-    <th colspan="1" class="sec-action divider-group">
-      <div class="sec-title">⚙️ 6. TINDAKAN</div>
-    </th>
-  `;
-
-  // ---------- Row 1：主标题行 ----------
-  h1.innerHTML = `
-    <th class="col-freeze col-0 sec-basic-h"><div>Situation</div></th>
-    <th class="col-freeze col-1 sec-basic-h"><div>${t('code')}</div></th>
-    <th class="col-freeze col-2 sec-basic-h"><div>${t('name')}</div></th>
-    <th class="col-freeze col-3 sec-basic-h" style="position:relative;">
-      <div>${t('group')}</div>
-      <div class="freeze-line" onclick="openFreezeModal()" title="Klik untuk toggle freeze"></div>
-    </th>
-    <th class="sec-income divider-group"><div>${t('basic')}</div></th>
-    <th class="sec-income"><div>${t('allowance')}</div></th>
-    <th class="sec-income"><div>${t('deduction')}</div></th>
-    <th class="sec-income"><div>${t('normalOT')}</div></th>
-    <th class="sec-income"><div>${t('restOT')}</div></th>
-    <th class="sec-income"><div>${t('publicOT')}</div></th>
-    <th class="sec-income"><div>${t('otherOT')}</div></th>
-    <th class="sec-income"><div>${t('pinjaman')}</div></th>
-    <th class="sec-income"><div>${t('others')}</div></th>
-    <th class="sec-statutory divider-group" style="text-align:center;">✎</th>
-    <th colspan="2" class="sec-statutory-h" style="text-align:center;">EPF</th>
-    <th class="sec-statutory" style="text-align:center;">✎</th>
-    <th colspan="2" class="sec-statutory-h" style="text-align:center;">SOCSO</th>
-    <th class="sec-statutory" style="text-align:center;">✎</th>
-    <th colspan="2" class="sec-statutory-h" style="text-align:center;">EIS</th>
-    <th class="sec-statutory" style="text-align:center;">✎</th>
-    <th class="sec-statutory"><div>${t('lindung')}</div></th>
-    <th class="sec-slr divider-group">
-      <div style="font-size:0.72rem;">${t('slrBankNama')}<br><span style="font-weight:400;font-size:0.6rem;">(U)</span></div>
-    </th>
-    <th class="sec-slr">
-      <div style="font-size:0.72rem;">${t('slrBankAcc')}<br><span style="font-weight:400;font-size:0.6rem;">(V)</span></div>
-    </th>
-    <th class="sec-slr" style="text-align:center;">
-      <div style="font-size:0.72rem;">${t('slrEPF')}<br><span style="font-weight:400;font-size:0.6rem;">(W)</span></div>
-    </th>
-    <th class="sec-slr" style="text-align:center;">
-      <div style="font-size:0.72rem;">${t('slrPERKESO')}<br><span style="font-weight:400;font-size:0.6rem;">(X)</span></div>
-    </th>
-    <th class="sec-slr" style="text-align:center;">
-      <div style="font-size:0.72rem;">${t('slrEIS')}<br><span style="font-weight:400;font-size:0.6rem;">(Y)</span></div>
-    </th>
-    <th class="sec-summary divider-group"><div>${t('gross')}</div></th>
-    <th class="sec-summary"><div>${t('totalDed')}</div></th>
-    <th class="sec-summary"><div>${t('net')}</div></th>
-    <th class="sec-action divider-group" style="text-align:center;"><div>${t('action')}</div></th>
-  `;
-
-  // ---------- Row 2：子标题行（只显示 Pekerja / Majikan）----------
-  // 各段用 colspan 精确拼满 33 列：4+9+1+2+1+2+1+2+1+1+5+3+1
-  h2.innerHTML = `
-    <th colspan="4" class="sec-basic"></th>
-    <th colspan="9" class="sec-income divider-group"></th>
-    <th class="sec-statutory divider-group"></th>
-    <th class="sec-statutory" style="text-align:center;"><div>${t('epfE')}</div></th>
-    <th class="sec-statutory" style="text-align:center;"><div>${t('epfR')}</div></th>
-    <th class="sec-statutory"></th>
-    <th class="sec-statutory" style="text-align:center;"><div>${t('socsoE')}</div></th>
-    <th class="sec-statutory" style="text-align:center;"><div>${t('socsoR')}</div></th>
-    <th class="sec-statutory"></th>
-    <th class="sec-statutory" style="text-align:center;"><div>${t('eisE')}</div></th>
-    <th class="sec-statutory" style="text-align:center;"><div>${t('eisR')}</div></th>
-    <th class="sec-statutory"></th>
-    <th class="sec-statutory"></th>
-    <th colspan="5" class="sec-slr divider-group"></th>
-    <th colspan="3" class="sec-summary divider-group"></th>
-    <th colspan="1" class="sec-action divider-group"></th>
-  `;
-
-  // ---------- Row 3：筛选行 ----------
-  const f = (col) => `<input class="th-filter" data-col="${col}" placeholder="🔍">`;
-  const empty = (cls = '') => `<th class="no-filter ${cls}"></th>`;
-
-  h3.innerHTML = `
-    <th class="col-freeze col-0 sec-basic">${f(0)}</th>
-    <th class="col-freeze col-1 sec-basic">${f(1)}</th>
-    <th class="col-freeze col-2 sec-basic">${f(2)}</th>
-    <th class="col-freeze col-3 sec-basic">${f(3)}</th>
-    <th class="sec-income divider-group">${f(4)}</th>
-    <th class="sec-income">${f(5)}</th>
-    <th class="sec-income">${f(6)}</th>
-    <th class="sec-income">${f(7)}</th>
-    <th class="sec-income">${f(8)}</th>
-    <th class="sec-income">${f(9)}</th>
-    <th class="sec-income">${f(10)}</th>
-    <th class="sec-income">${f(11)}</th>
-    <th class="sec-income">${f(12)}</th>
-    ${empty('sec-statutory divider-group')}
-    <th class="sec-statutory">${f(14)}</th>
-    <th class="sec-statutory">${f(15)}</th>
-    ${empty('sec-statutory')}
-    <th class="sec-statutory">${f(17)}</th>
-    <th class="sec-statutory">${f(18)}</th>
-    ${empty('sec-statutory')}
-    <th class="sec-statutory">${f(20)}</th>
-    <th class="sec-statutory">${f(21)}</th>
-    ${empty('sec-statutory')}
-    <th class="sec-statutory">${f(23)}</th>
-    <th class="sec-slr divider-group">${f(24)}</th>
-    <th class="sec-slr">${f(25)}</th>
-    <th class="sec-slr">${f(26)}</th>
-    <th class="sec-slr">${f(27)}</th>
-    <th class="sec-slr">${f(28)}</th>
-    <th class="sec-summary divider-group">${f(29)}</th>
-    <th class="sec-summary">${f(30)}</th>
-    <th class="sec-summary">${f(31)}</th>
-    ${empty('sec-action divider-group')}
-  `;
-
-  requestAnimationFrame(fixStickyHeader);
-}
-
-function fixStickyHeader() {
-  const ids = ['headRowSec', 'headRow1', 'headRow2', 'headRow3'];
-  let top = 0;
-  ids.forEach(id => {
-    const row = document.getElementById(id);
-    if (!row) return;
-    const h = row.getBoundingClientRect().height;
-    Array.from(row.cells).forEach(th => { th.style.top = Math.round(top) + 'px'; });
-    top += h;
-  });
-}
-window.addEventListener('resize', fixStickyHeader);
-
-// ================= Situation 样式 =================
-function situationClass(sit) {
-  const s = String(sit || '').trim().toUpperCase();
-  if (s === 'PENDING') return 'sit-pending';
-  if (s === 'ACTIVE')  return 'sit-active';
-  return 'sit-default';
-}
-
-// ================= 渲染表格 =================
-function renderTable() {
-  renderHeaders();
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
 
@@ -1058,42 +907,52 @@ function renderTable() {
       return `<td class="td-chk ${extraCls}"><input type="checkbox" class="manual-chk" data-idx="${idx}" data-group="${group}" ${checked ? 'checked' : ''}></td>`;
     };
 
-    const sitCls = situationClass(emp.Situation);
+    const sitCls = (() => {
+      const s = String(emp.Situation || '').trim().toUpperCase();
+      if (s === 'PENDING') return 'sit-pending';
+      if (s === 'ACTIVE')  return 'sit-active';
+      return 'sit-default';
+    })();
 
     tr.innerHTML = `
-      <td class="td-text col-freeze col-0 sec-basic ${sitCls}"><div class="text-cell">${escapeHtml(emp.Situation || '')}</div></td>
-      <td class="td-text col-freeze col-1 sec-basic"><div class="text-cell">${escapeHtml(emp.Code || '')}</div></td>
-      <td class="td-text col-freeze col-2 sec-basic"><div class="text-cell">${escapeHtml(emp.Name || '')}</div></td>
-      <td class="td-text col-freeze col-3 sec-basic"><div class="text-cell">${escapeHtml(emp.GroupName || '')}</div></td>
-      <td class="sec-income divider-group">${numInput('Basic', false)}</td>
-      <td class="sec-income">${numInput('Allowance', false)}</td>
-      <td class="sec-income">${numInput('Deduction', false)}</td>
-      <td class="sec-income">${numInput('NormalOT', false)}</td>
-      <td class="sec-income">${numInput('RestOT', false)}</td>
-      <td class="sec-income">${numInput('PublicOT', false)}</td>
-      <td class="sec-income">${numInput('OtherOT', false)}</td>
-      <td class="sec-income">${numInput('Pinjaman', false)}</td>
-      <td class="sec-income">${numInput('Others', false)}</td>
-      ${chkTd('EPF', 'sec-statutory divider-group')}
-      <td class="sec-statutory">${numInput('EPF_Employee', !emp.manualEPF)}</td>
-      <td class="sec-statutory">${numInput('EPF_Employer', !emp.manualEPF)}</td>
-      ${chkTd('SOCSO', 'sec-statutory')}
-      <td class="sec-statutory">${numInput('SOCSO_Employee', !emp.manualSOCSO)}</td>
-      <td class="sec-statutory">${numInput('SOCSO_Employer', !emp.manualSOCSO)}</td>
-      ${chkTd('EIS', 'sec-statutory')}
-      <td class="sec-statutory">${numInput('EIS_Employee', !emp.manualEIS)}</td>
-      <td class="sec-statutory">${numInput('EIS_Employer', !emp.manualEIS)}</td>
-      ${chkTd('24JAM', 'sec-statutory')}
-      <td class="sec-statutory">${numInput('Lindung24Jam', !emp.manual24JAM)}</td>
-      <td class="td-text sec-slr divider-group"><div class="text-cell">${escapeHtml(emp.SLRBankNama || '')}</div></td>
-      <td class="td-text sec-slr"><div class="text-cell">${escapeHtml(emp.SLRBankAccountNo || '')}</div></td>
-      <td class="td-text sec-slr" style="text-align:center;">${badgeStatus(emp.SLREPF) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>'}</td>
-      <td class="td-text sec-slr" style="text-align:center;">${badgeStatus(emp.SLRPERKESO) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>'}</td>
-      <td class="td-text sec-slr" style="text-align:center;">${badgeStatus(emp.SLREIS) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>'}</td>
-      <td class="sec-summary divider-group">${numInput('GrossPay', true)}</td>
-      <td class="sec-summary">${numInput('TotalDeduction', true)}</td>
-      <td class="sec-summary">${numInput('NetSalary', true)}</td>
-      <td class="sec-action divider-group" style="text-align:center;"><button class="btn btn-sm" onclick="showPayslip('${escapeHtml(emp.Code)}')">${t('slip')}</button></td>
+      <td class="td-text col-freeze col-0 ${sitCls}"><div class="text-cell">${escapeHtml(emp.Situation || '')}</div></td>
+      <td class="td-text col-freeze col-1"><div class="text-cell">${escapeHtml(emp.Code || '')}</div></td>
+      <td class="td-text col-freeze col-2"><div class="text-cell">${escapeHtml(emp.Name || '')}</div></td>
+      <td class="td-text col-freeze col-3"><div class="text-cell">${escapeHtml(emp.GroupName || '')}</div></td>
+      
+      <td class="divider-group">${numInput('Basic', false)}</td>
+      <td>${numInput('Allowance', false)}</td>
+      <td>${numInput('Deduction', false)}</td>
+      <td>${numInput('NormalOT', false)}</td>
+      <td>${numInput('RestOT', false)}</td>
+      <td>${numInput('PublicOT', false)}</td>
+      <td>${numInput('OtherOT', false)}</td>
+      <td>${numInput('Pinjaman', false)}</td>
+      <td>${numInput('Others', false)}</td>
+      
+      ${chkTd('EPF', 'divider-group')}
+      <td>${numInput('EPF_Employee', !emp.manualEPF)}</td>
+      <td>${numInput('EPF_Employer', !emp.manualEPF)}</td>
+      ${chkTd('SOCSO')}
+      <td>${numInput('SOCSO_Employee', !emp.manualSOCSO)}</td>
+      <td>${numInput('SOCSO_Employer', !emp.manualSOCSO)}</td>
+      ${chkTd('EIS')}
+      <td>${numInput('EIS_Employee', !emp.manualEIS)}</td>
+      <td>${numInput('EIS_Employer', !emp.manualEIS)}</td>
+      ${chkTd('24JAM')}
+      <td>${numInput('Lindung24Jam', !emp.manual24JAM)}</td>
+      
+      <td class="td-text divider-group"><div class="text-cell">${escapeHtml(emp.SLRBankNama || '')}</div></td>
+      <td class="td-text"><div class="text-cell">${escapeHtml(emp.SLRBankAccountNo || '')}</div></td>
+      <td class="td-text" style="text-align:center;">${badgeStatus(emp.SLREPF) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>'}</td>
+      <td class="td-text" style="text-align:center;">${badgeStatus(emp.SLRPERKESO) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>'}</td>
+      <td class="td-text" style="text-align:center;">${badgeStatus(emp.SLREIS) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>'}</td>
+      
+      <td class="divider-group">${numInput('GrossPay', true)}</td>
+      <td>${numInput('TotalDeduction', true)}</td>
+      <td>${numInput('NetSalary', true)}</td>
+      
+      <td class="divider-group" style="text-align:center;"><button class="btn btn-sm" onclick="showPayslip('${escapeHtml(emp.Code)}')">${t('slip')}</button></td>
     `;
     tbody.appendChild(tr);
   });
@@ -1250,9 +1109,7 @@ async function saveToSheet() {
 }
 
 // ================= 导入 =================
-function openImportModal() {
-  document.getElementById('importModal').style.display = 'flex';
-}
+function openImportModal() { document.getElementById('importModal').style.display = 'flex'; }
 function closeImportModal() {
   document.getElementById('importModal').style.display = 'none';
   const fi = document.getElementById('importFile');
@@ -1263,40 +1120,28 @@ window.addEventListener('DOMContentLoaded', () => {
   const dz = document.getElementById('dropzone');
   const fi = document.getElementById('importFile');
   if (dz && fi) {
-    dz.addEventListener('click', e => {
-      if (e.target !== fi) fi.click();
-    });
-    fi.addEventListener('change', e => {
-      if (e.target.files && e.target.files[0]) handleImportFile(e.target.files[0]);
-    });
+    dz.addEventListener('click', e => { if (e.target !== fi) fi.click(); });
+    fi.addEventListener('change', e => { if (e.target.files && e.target.files[0]) handleImportFile(e.target.files[0]); });
     dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
     dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
     dz.addEventListener('drop', e => {
-      e.preventDefault();
-      dz.classList.remove('drag-over');
+      e.preventDefault(); dz.classList.remove('drag-over');
       if (e.dataTransfer.files && e.dataTransfer.files[0]) handleImportFile(e.dataTransfer.files[0]);
     });
   }
   const modal = document.getElementById('importModal');
-  if (modal) modal.addEventListener('click', e => {
-    if (e.target.id === 'importModal') closeImportModal();
-  });
+  if (modal) modal.addEventListener('click', e => { if (e.target.id === 'importModal') closeImportModal(); });
   const fm = document.getElementById('freezeModal');
-  if (fm) fm.addEventListener('click', e => {
-    if (e.target.id === 'freezeModal') closeFreezeModal();
-  });
+  if (fm) fm.addEventListener('click', e => { if (e.target.id === 'freezeModal') closeFreezeModal(); });
 });
 
 function parseCSVLine(line) {
-  const cells = [];
-  let cur = '';
-  let inQ = false;
+  const cells = []; let cur = ''; let inQ = false;
   for (let i = 0; i < line.length; i++) {
     const ch = line[i];
     if (inQ) {
       if (ch === '"') {
-        if (line[i+1] === '"') { cur += '"'; i++; }
-        else inQ = false;
+        if (line[i+1] === '"') { cur += '"'; i++; } else inQ = false;
       } else cur += ch;
     } else {
       if (ch === ',') { cells.push(cur); cur = ''; }
@@ -1304,24 +1149,19 @@ function parseCSVLine(line) {
       else cur += ch;
     }
   }
-  cells.push(cur);
-  return cells;
+  cells.push(cur); return cells;
 }
 
 function parseTextFile(text) {
-  const rows = [];
-  const lines = text.split(/\r?\n/);
+  const rows = []; const lines = text.split(/\r?\n/);
   for (const line of lines) {
     const trimmed = line.trim();
     if (!trimmed) continue;
     if (/^[=\-+\s]+$/.test(trimmed)) continue;
     if (trimmed.startsWith('PAYROLL REPORT')) continue;
     if (trimmed.startsWith('Total rows')) continue;
-    if (trimmed.includes('|')) {
-      rows.push(trimmed.split('|').map(s => s.trim()));
-    } else {
-      rows.push(parseCSVLine(trimmed));
-    }
+    if (trimmed.includes('|')) rows.push(trimmed.split('|').map(s => s.trim()));
+    else rows.push(parseCSVLine(trimmed));
   }
   return rows;
 }
@@ -1329,13 +1169,9 @@ function parseTextFile(text) {
 async function handleImportFile(file) {
   const name = file.name.toLowerCase();
   let rows = [];
-
   try {
     if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
-      if (typeof XLSX === 'undefined') {
-        toast('SheetJS tidak dimuat, sila guna .csv atau .txt', false);
-        return;
-      }
+      if (typeof XLSX === 'undefined') { toast('SheetJS tidak dimuat, sila guna .csv atau .txt', false); return; }
       const data = await file.arrayBuffer();
       const wb = XLSX.read(data);
       const ws = wb.Sheets[wb.SheetNames[0]];
@@ -1343,10 +1179,7 @@ async function handleImportFile(file) {
     } else if (name.endsWith('.csv') || name.endsWith('.txt')) {
       const text = await file.text();
       rows = parseTextFile(text);
-    } else {
-      toast(t('importFormat'), false);
-      return;
-    }
+    } else { toast(t('importFormat'), false); return; }
 
     if (!rows || rows.length < 2) { toast(t('importFail'), false); return; }
 
@@ -1365,25 +1198,18 @@ async function handleImportFile(file) {
     ];
     headers.forEach((h, i) => {
       const lh = h.toLowerCase();
-      for (const w of WANTED) {
-        if (lh === w.toLowerCase()) { idx[w] = i; break; }
-      }
+      for (const w of WANTED) { if (lh === w.toLowerCase()) { idx[w] = i; break; } }
     });
 
-    if (idx['Code'] === undefined) {
-      toast('Fail mesti ada lajur "Code"', false);
-      return;
-    }
+    if (idx['Code'] === undefined) { toast('Fail mesti ada lajur "Code"', false); return; }
 
     const get = (row, key) => idx[key] !== undefined ? row[idx[key]] : '';
-
     const imported = [];
     for (let r = 1; r < rows.length; r++) {
       const row = rows[r];
       if (!row || row.length === 0) continue;
       const code = String(get(row, 'Code') || '').trim();
       if (!code) continue;
-
       const sit = String(get(row, 'Situation') || 'ACTIVE').trim().toUpperCase();
       if (sit === 'UNACTIVE' || sit === 'INACTIVE') continue;
 
@@ -1402,33 +1228,23 @@ async function handleImportFile(file) {
       const impLindung = parseFloat(get(row, '24JAM')) || 0;
 
       imported.push({
-        Situation: sit,
-        Code: code,
-        Name: String(get(row, 'Name') || ''),
-        GroupName: String(get(row, 'Group') || ''),
-        BankNama: String(get(row, 'Bank') || ''),
-        Basic: basic,
-        Allowance: parseFloat(get(row, 'Allowance')) || 0,
+        Situation: sit, Code: code, Name: String(get(row, 'Name') || ''),
+        GroupName: String(get(row, 'Group') || ''), BankNama: String(get(row, 'Bank') || ''),
+        Basic: basic, Allowance: parseFloat(get(row, 'Allowance')) || 0,
         Deduction: parseFloat(get(row, 'Deduction')) || 0,
         NormalOT: parseFloat(get(row, 'Normal OT')) || 0,
         RestOT: parseFloat(get(row, 'Rest OT')) || 0,
         PublicOT: parseFloat(get(row, 'Public OT')) || 0,
         OtherOT: parseFloat(get(row, 'Other OT')) || 0,
         Pinjaman: parseFloat(get(row, 'Pinjaman')) || 0,
-        Others: parseFloat(get(row, 'Others')) || 0,
-        Age: 30,
+        Others: parseFloat(get(row, 'Others')) || 0, Age: 30,
         EPF: 'YES', PERKESO: 'YES', EIS: 'YES', Lindungan: 'YES',
-        EPF_Employee: impEPFE,
-        EPF_Employer: impEPFR,
-        SOCSO_Employee: impSOCSOE,
-        SOCSO_Employer: impSOCSOR,
-        EIS_Employee: impEISE,
-        EIS_Employer: impEISR,
-        Lindung24Jam: impLindung,
+        EPF_Employee: impEPFE, EPF_Employer: impEPFR,
+        SOCSO_Employee: impSOCSOE, SOCSO_Employer: impSOCSOR,
+        EIS_Employee: impEISE, EIS_Employer: impEISR, Lindung24Jam: impLindung,
         SLRBankNama: String(get(row, 'SLR Bank Nama') || ''),
         SLRBankAccountNo: String(get(row, 'SLR Bank Account No') || ''),
-        SLREPF: String(get(row, 'SLR EPF') || ''),
-        SLRPERKESO: String(get(row, 'SLR SOCSO') || ''),
+        SLREPF: String(get(row, 'SLR EPF') || ''), SLRPERKESO: String(get(row, 'SLR SOCSO') || ''),
         SLREIS: String(get(row, 'SLR EIS') || ''),
         manualEPF:   Math.abs(impEPFE - autoEPF.employee) > 0.01 || Math.abs(impEPFR - autoEPF.employer) > 0.01,
         manualSOCSO: Math.abs(impSOCSOE - autoSOCSO.employee) > 0.01 || Math.abs(impSOCSOR - autoSOCSO.employer) > 0.01,
@@ -1436,14 +1252,11 @@ async function handleImportFile(file) {
         manual24JAM: Math.abs(impLindung - autoLindung) > 0.01
       });
     }
-
     if (!imported.length) { toast(t('importFail'), false); return; }
-
     employees = imported;
     renderTable();
     toast(t('importSuccess').replace('{n}', imported.length));
     closeImportModal();
-
   } catch (err) {
     console.error(err);
     toast('Import error: ' + err.message, false);
@@ -1454,18 +1267,9 @@ async function handleImportFile(file) {
 function downloadTemplate(format) {
   const headers = getExportHeaders();
   const sample = [
-    ['ACTIVE','EMP001','Ahmad bin Ali','YZ UFO',
-      4500, 600, 0, 0, 0, 0, 0, 0, 0,
-      495, 585, 22.25, 77.85, 9, 9, 32.96,
-      'Maybank','1234567890','YES','YES','YES',
-      5100, 1125.06, 3974.94],
-    ['PENDING','EMP002','Siti Nurhaliza','YZ CYBER',
-      3800, 450, 0, 0, 0, 0, 0, 0, 0,
-      418, 494, 19.75, 69.15, 7.6, 7.6, 27.83,
-      'CIMB','9876543210','YES','NO','YES',
-      4250, 930.93, 3319.07]
+    ['ACTIVE','EMP001','Ahmad bin Ali','YZ UFO', 4500, 600, 0, 0, 0, 0, 0, 0, 0, 495, 585, 22.25, 77.85, 9, 9, 32.96, 'Maybank','1234567890','YES','YES','YES', 5100, 1125.06, 3974.94],
+    ['PENDING','EMP002','Siti Nurhaliza','YZ CYBER', 3800, 450, 0, 0, 0, 0, 0, 0, 0, 418, 494, 19.75, 69.15, 7.6, 7.6, 27.83, 'CIMB','9876543210','YES','NO','YES', 4250, 930.93, 3319.07]
   ];
-
   if (format === 'xlsx') {
     if (typeof XLSX === 'undefined') { toast('SheetJS tidak dimuat', false); return; }
     const aoa = [headers, ...sample];
@@ -1476,24 +1280,10 @@ function downloadTemplate(format) {
     XLSX.writeFile(wb, 'payroll_template.xlsx');
     toast('Template Excel dimuat turun');
   } else if (format === 'doc') {
-    let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ';
-    html += 'xmlns:w="urn:schemas-microsoft-com:office:word" ';
-    html += 'xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8">';
-    html += '<title>Payroll Template</title>';
-    html += '<style>body{font-family:Arial;font-size:9pt;}';
-    html += 'table{border-collapse:collapse;}';
-    html += 'th,td{border:1px solid #999;padding:3px 5px;}';
-    html += 'th{background:#eef2ff;}</style></head><body>';
-    html += '<h2>Payroll Import Template</h2>';
-    html += '<p style="font-size:9pt;color:#555;">Fill in the rows below and import back into the payroll system.</p>';
-    html += '<table><thead><tr>';
+    let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><title>Payroll Template</title><style>body{font-family:Arial;font-size:9pt;}table{border-collapse:collapse;}th,td{border:1px solid #999;padding:3px 5px;}th{background:#eef2ff;}</style></head><body><h2>Payroll Import Template</h2><p style="font-size:9pt;color:#555;">Fill in the rows below and import back into the payroll system.</p><table><thead><tr>';
     headers.forEach(h => { html += '<th>' + escapeHtml(h) + '</th>'; });
     html += '</tr></thead><tbody>';
-    sample.forEach(r => {
-      html += '<tr>';
-      r.forEach(c => { html += '<td>' + escapeHtml(c) + '</td>'; });
-      html += '</tr>';
-    });
+    sample.forEach(r => { html += '<tr>'; r.forEach(c => { html += '<td>' + escapeHtml(c) + '</td>'; }); html += '</tr>'; });
     html += '</tbody></table></body></html>';
     downloadBlob(html, 'payroll_template.doc', 'application/msword');
     toast('Template Word dimuat turun');
@@ -1511,9 +1301,7 @@ function handleExport(val) {
   } catch (err) {
     console.error(err);
     toast('Export error: ' + err.message, false);
-  } finally {
-    document.getElementById('exportMenu').value = '';
-  }
+  } finally { document.getElementById('exportMenu').value = ''; }
 }
 
 function getExportHeaders() {
@@ -1542,10 +1330,7 @@ function getExportRows() {
     if (!emp) return;
     const e = recalcRow({ ...emp });
     rows.push([
-      emp.Situation || '',
-      emp.Code || '',
-      emp.Name || '',
-      emp.GroupName || '',
+      emp.Situation || '', emp.Code || '', emp.Name || '', emp.GroupName || '',
       num(e.Basic), num(e.Allowance), num(e.Deduction),
       num(e.NormalOT), num(e.RestOT), num(e.PublicOT), num(e.OtherOT),
       num(e.Pinjaman), num(e.Others),
@@ -1553,11 +1338,8 @@ function getExportRows() {
       num(e.SOCSO_Employee), num(e.SOCSO_Employer),
       num(e.EIS_Employee), num(e.EIS_Employer),
       num(e.Lindung24Jam),
-      emp.SLRBankNama || '',
-      emp.SLRBankAccountNo || '',
-      emp.SLREPF || '',
-      emp.SLRPERKESO || '',
-      emp.SLREIS || '',
+      emp.SLRBankNama || '', emp.SLRBankAccountNo || '',
+      emp.SLREPF || '', emp.SLRPERKESO || '', emp.SLREIS || '',
       num(e.GrossPay), num(e.TotalDeduction), num(e.NetSalary)
     ]);
   });
@@ -1568,19 +1350,15 @@ function downloadBlob(content, filename, mime) {
   const blob = new Blob(['\ufeff', content], { type: mime + ';charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 function buildExportTableHTML() {
   const headers = getExportHeaders();
   const rows = getExportRows();
-  let html = '<table class="export-table">';
-  html += '<thead><tr>';
+  let html = '<table class="export-table"><thead><tr>';
   headers.forEach(h => { html += `<th>${escapeHtml(h)}</th>`; });
   html += '</tr></thead><tbody>';
   rows.forEach(r => {
@@ -1597,32 +1375,18 @@ function buildExportTableHTML() {
 
 let exportPrintCleanup = null;
 window.addEventListener('afterprint', () => {
-  if (exportPrintCleanup) {
-    exportPrintCleanup();
-    exportPrintCleanup = null;
-  }
+  if (exportPrintCleanup) { exportPrintCleanup(); exportPrintCleanup = null; }
 });
 
 function exportToPDF() {
   const rows = getExportRows();
   if (!rows.length) { toast(t('noData'), false); return; }
-
   const printArea = document.getElementById('printArea');
-  printArea.innerHTML = `
-    <div class="export-print">
-      <h2 style="margin-bottom:6mm;font-size:14pt;">Payroll Report — ${new Date().toLocaleDateString('ms-MY')}</h2>
-      ${buildExportTableHTML()}
-    </div>`;
-
+  printArea.innerHTML = `<div class="export-print"><h2 style="margin-bottom:6mm;font-size:14pt;">Payroll Report — ${new Date().toLocaleDateString('ms-MY')}</h2>${buildExportTableHTML()}</div>`;
   const style = document.createElement('style');
   style.textContent = '@page { size: A4 landscape; margin: 8mm; }';
   document.head.appendChild(style);
-
-  exportPrintCleanup = () => {
-    printArea.innerHTML = '';
-    style.remove();
-  };
-
+  exportPrintCleanup = () => { printArea.innerHTML = ''; style.remove(); };
   toast('Sedia untuk cetak / simpan PDF');
   setTimeout(() => window.print(), 100);
 }
@@ -1630,16 +1394,9 @@ function exportToPDF() {
 function exportToXLSX() {
   const rows = getExportRows();
   if (!rows.length) { toast(t('noData'), false); return; }
-
-  if (typeof XLSX === 'undefined') {
-    exportToCSV();
-    toast('SheetJS tidak dimuat, dieksport sebagai CSV', false);
-    return;
-  }
-
+  if (typeof XLSX === 'undefined') { exportToCSV(); toast('SheetJS tidak dimuat, dieksport sebagai CSV', false); return; }
   const aoa = [getExportHeaders(), ...rows];
   const ws = XLSX.utils.aoa_to_sheet(aoa);
-
   const range = XLSX.utils.decode_range(ws['!ref']);
   for (let R = 1; R <= range.e.r; R++) {
     for (let C = 4; C <= 19; C++) {
@@ -1652,7 +1409,6 @@ function exportToXLSX() {
     }
   }
   ws['!cols'] = getExportHeaders().map(() => ({ wch: 14 }));
-
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Payroll');
   XLSX.writeFile(wb, 'payroll_' + todayStr() + '.xlsx');
@@ -1662,10 +1418,7 @@ function exportToXLSX() {
 function exportToCSV() {
   const headers = getExportHeaders();
   const rows = getExportRows();
-  const esc = v => {
-    const s = String(v ?? '');
-    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
-  };
+  const esc = v => { const s = String(v ?? ''); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
   let out = headers.map(esc).join(',') + '\n';
   rows.forEach(r => { out += r.map(esc).join(',') + '\n'; });
   downloadBlob(out, 'payroll_' + todayStr() + '.csv', 'text/csv');
@@ -1675,31 +1428,22 @@ function exportToTXT() {
   const headers = getExportHeaders();
   const rows = getExportRows();
   if (!rows.length) { toast(t('noData'), false); return; }
-
   const widths = headers.map((h, i) => {
     let w = String(h).length;
-    rows.forEach(r => {
-      const len = String(r[i] ?? '').length;
-      if (len > w) w = len;
-    });
+    rows.forEach(r => { const len = String(r[i] ?? '').length; if (len > w) w = len; });
     return Math.min(w, 28);
   });
-
   const pad = (v, w) => {
     let s = String(v ?? '');
     if (s.length > w) s = s.slice(0, w - 1) + '…';
     return s + ' '.repeat(Math.max(0, w - s.length));
   };
-
   let out = 'PAYROLL REPORT — ' + new Date().toLocaleString('ms-MY') + '\n';
   out += '='.repeat(widths.reduce((a, b) => a + b + 3, 0)) + '\n';
   out += headers.map((h, i) => pad(h, widths[i])).join(' | ') + '\n';
   out += widths.map(w => '-'.repeat(w)).join('-+-') + '\n';
-  rows.forEach(r => {
-    out += r.map((c, i) => pad(c, widths[i])).join(' | ') + '\n';
-  });
+  rows.forEach(r => { out += r.map((c, i) => pad(c, widths[i])).join(' | ') + '\n'; });
   out += '\nTotal rows: ' + rows.length + '\n';
-
   downloadBlob(out, 'payroll_' + todayStr() + '.txt', 'text/plain');
   toast('Text berjaya dieksport');
 }
@@ -1708,18 +1452,7 @@ function exportToDOC() {
   const rows = getExportRows();
   if (!rows.length) { toast(t('noData'), false); return; }
   const headers = getExportHeaders();
-
-  let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ';
-  html += 'xmlns:w="urn:schemas-microsoft-com:office:word" ';
-  html += 'xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8">';
-  html += '<title>Payroll Report</title>';
-  html += '<style>body{font-family:Arial,sans-serif;font-size:9pt;}';
-  html += 'table{border-collapse:collapse;width:100%;}';
-  html += 'th,td{border:1px solid #999;padding:3px 5px;}';
-  html += 'th{background:#eef2ff;text-align:left;}';
-  html += 'td.num{text-align:right;}</style></head><body>';
-  html += '<h2>Payroll Report — ' + new Date().toLocaleDateString('ms-MY') + '</h2>';
-  html += '<table><thead><tr>';
+  let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><title>Payroll Report</title><style>body{font-family:Arial,sans-serif;font-size:9pt;}table{border-collapse:collapse;width:100%;}th,td{border:1px solid #999;padding:3px 5px;}th{background:#eef2ff;text-align:left;}td.num{text-align:right;}</style></head><body><h2>Payroll Report — ' + new Date().toLocaleDateString('ms-MY') + '</h2><table><thead><tr>';
   headers.forEach(h => { html += `<th>${escapeHtml(h)}</th>`; });
   html += '</tr></thead><tbody>';
   rows.forEach(r => {
@@ -1731,7 +1464,6 @@ function exportToDOC() {
     html += '</tr>';
   });
   html += '</tbody></table></body></html>';
-
   downloadBlob(html, 'payroll_' + todayStr() + '.doc', 'application/msword');
   toast('Word berjaya dieksport');
 }
@@ -1761,34 +1493,20 @@ async function loadEmployees() {
     if (json.status === 'success') {
       employees = json.data.map(row => ({
         Situation: String(row.Situation || 'ACTIVE').trim().toUpperCase(),
-        Code: row.Code,
-        Name: row.Name,
-        GroupName: row.GroupName || '',
-        BankNama: row.BankNama || '',
-        Basic: Number(row.Salary) || 0,
-        Allowance: 0, Deduction: 0,
-        NormalOT: 0, RestOT: 0, PublicOT: 0, OtherOT: 0,
-        Pinjaman: 0, Others: 0,
-        Age: 30,
-        EPF: row.EPF, PERKESO: row.PERKESO,
-        EIS: row.EIS, Lindungan: row.Lindungan,
-        // ★ 来自 STAFF LOGIN RECORD sheet (U~Y 列)
+        Code: row.Code, Name: row.Name, GroupName: row.GroupName || '',
+        BankNama: row.BankNama || '', Basic: Number(row.Salary) || 0,
+        Allowance: 0, Deduction: 0, NormalOT: 0, RestOT: 0, PublicOT: 0, OtherOT: 0,
+        Pinjaman: 0, Others: 0, Age: 30,
+        EPF: row.EPF, PERKESO: row.PERKESO, EIS: row.EIS, Lindungan: row.Lindungan,
         SLRBankNama: row.SLRBankNama || row.BankNamaSLR || '',
         SLRBankAccountNo: row.SLRBankAccountNo || row.BankAccountNo || '',
         SLREPF: row.SLREPF || row.EPFStatus || '',
         SLRPERKESO: row.SLRPERKESO || row.PERKESOStatus || '',
         SLREIS: row.SLREIS || row.EISStatus || ''
-      }))
-      .filter(e => e.Situation !== 'UNACTIVE' && e.Situation !== 'INACTIVE');
-
+      })).filter(e => e.Situation !== 'UNACTIVE' && e.Situation !== 'INACTIVE');
       renderTable();
-    } else {
-      toast('Load error: ' + json.message, false);
-    }
-  } catch (err) {
-    console.error(err);
-    toast('Gagal muat data', false);
-  }
+    } else { toast('Load error: ' + json.message, false); }
+  } catch (err) { console.error(err); toast('Gagal muat data', false); }
 }
 
 // ================= 粮单 =================
@@ -1823,18 +1541,11 @@ function buildPayslip(emp) {
       <div>
         <div class="ps-title">SLIP GAJI</div>
         <div class="ps-info">
-          ${emp.GroupName || ''}<br>
-          ${emp.Name || ''}<br>
-          ${emp.IC || ''} &nbsp;|&nbsp; ${emp.Jawatan || ''}<br>
-          ${emp.SLRBankNama || emp.BankNama || ''}
+          ${emp.GroupName || ''}<br>${emp.Name || ''}<br>${emp.IC || ''} &nbsp;|&nbsp; ${emp.Jawatan || ''}<br>${emp.SLRBankNama || emp.BankNama || ''}
         </div>
       </div>
-      <div class="ps-info" style="text-align:right;">
-        <strong>${emp.Code}</strong><br>
-        ${new Date().toLocaleDateString('ms-MY')}
-      </div>
+      <div class="ps-info" style="text-align:right;"><strong>${emp.Code}</strong><br>${new Date().toLocaleDateString('ms-MY')}</div>
     </div>
-
     <div class="ps-cols">
       <div class="ps-section">
         <h4>PENDAPATAN</h4>
@@ -1843,7 +1554,6 @@ function buildPayslip(emp) {
         <div class="ps-row"><span>OT</span><span>${fmt(ot)}</span></div>
         <div class="ps-row total"><span>${L.gross}</span><span>${fmt(emp.GrossPay)}</span></div>
       </div>
-
       <div class="ps-section">
         <h4>POTONGAN</h4>
         <div class="ps-row"><span>EPF</span><span>${fmt(emp.EPF_Employee)}</span></div>
@@ -1856,13 +1566,9 @@ function buildPayslip(emp) {
         <div class="ps-row total"><span>${L.totalDed}</span><span>${fmt(emp.TotalDeduction)}</span></div>
       </div>
     </div>
-
     <div class="ps-section" style="margin-top:5mm;">
-      <div class="ps-row total" style="font-size:12pt;">
-        <span>${L.net}</span><span>RM ${fmt(emp.NetSalary)}</span>
-      </div>
+      <div class="ps-row total" style="font-size:12pt;"><span>${L.net}</span><span>RM ${fmt(emp.NetSalary)}</span></div>
     </div>
-
     <div class="ps-section">
       <h4>SUMBANGAN MAJIKAN (tidak ditolak)</h4>
       <div class="ps-cols">
@@ -1873,11 +1579,7 @@ function buildPayslip(emp) {
         </div>
       </div>
     </div>
-
-    <div class="ps-sign">
-      <div>Pekerja</div>
-      <div>Majikan</div>
-    </div>
+    <div class="ps-sign"><div>Pekerja</div><div>Majikan</div></div>
   </div>`;
 }
 
