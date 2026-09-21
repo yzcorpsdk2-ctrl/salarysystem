@@ -125,6 +125,7 @@ select.btn { cursor: pointer; }
 .table-wrap {
   overflow: auto; max-height: calc(100vh - 320px);
   background: #fff;
+  position: relative;
 }
 table {
   border-collapse: separate; border-spacing: 0; font-size: 0.82rem;
@@ -172,17 +173,147 @@ td {
 }
 tr:hover td { background: #fafbfc; }
 
-/* ★ 分割线 */
-.divider-left  { border-left: 3px solid #94a3b8 !important; }
-.divider-right { border-right: 3px solid #94a3b8 !important; }
+/* ============================================================
+   ★★★ 精美分割线（组与组之间）
+   ============================================================ */
+.divider-right {
+  position: relative;
+  border-right: none !important;
+}
+.divider-right::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(
+    to bottom,
+    rgba(148,163,184,0.35) 0%,
+    #94a3b8 12%,
+    #475569 50%,
+    #94a3b8 88%,
+    rgba(148,163,184,0.35) 100%
+  );
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 2;
+}
 
-/* ★ 复选框单元格 */
+.divider-left {
+  position: relative;
+  border-left: none !important;
+}
+.divider-left::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(
+    to bottom,
+    rgba(148,163,184,0.35) 0%,
+    #94a3b8 12%,
+    #475569 50%,
+    #94a3b8 88%,
+    rgba(148,163,184,0.35) 100%
+  );
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* 冻结边界分割线 —— 高亮 */
+.col-bank.divider-right::after {
+  background: linear-gradient(
+    to bottom,
+    rgba(37,99,235,0.25) 0%,
+    #3b82f6 12%,
+    #1e40af 50%,
+    #3b82f6 88%,
+    rgba(37,99,235,0.25) 100%
+  );
+  width: 4px;
+  box-shadow: 0 0 8px rgba(37,99,235,0.35);
+}
+.col-bank.divider-right {
+  cursor: pointer;
+}
+.col-bank.divider-right:hover::after {
+  width: 5px;
+  background: linear-gradient(
+    to bottom,
+    rgba(37,99,235,0.4) 0%,
+    #2563eb 12%,
+    #1d4ed8 50%,
+    #2563eb 88%,
+    rgba(37,99,235,0.4) 100%
+  );
+}
+
+/* 组内小分割线（EPF/SOCSO/EIS/24JAM 之间） */
+.grp-divider-right {
+  position: relative;
+}
+.grp-divider-right::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 15%; bottom: 15%;
+  width: 1.5px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #cbd5e1 25%,
+    #94a3b8 50%,
+    #cbd5e1 75%,
+    transparent 100%
+  );
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ============================================================
+   ★★★ 冻结列
+   ============================================================ */
+body.freeze-on .col-situation,
+body.freeze-on .col-code,
+body.freeze-on .col-name,
+body.freeze-on .col-group,
+body.freeze-on .col-bank {
+  position: sticky;
+  z-index: 5;
+  background: #fff;
+}
+body.freeze-on thead .col-situation,
+body.freeze-on thead .col-code,
+body.freeze-on thead .col-name,
+body.freeze-on thead .col-group,
+body.freeze-on thead .col-bank {
+  z-index: 20;
+}
+body.freeze-on .col-situation { left: 0; }
+body.freeze-on .col-code      { left: 90px; }
+body.freeze-on .col-name      { left: 165px; }
+body.freeze-on .col-group     { left: 325px; }
+body.freeze-on .col-bank      { left: 435px; }
+
+/* 冻结列的阴影（仅最右边一列） */
+body.freeze-on .col-bank {
+  box-shadow: 6px 0 12px -6px rgba(15,23,42,0.12);
+}
+body.freeze-on thead .col-bank {
+  box-shadow: 6px 0 12px -6px rgba(15,23,42,0.15);
+}
+
+/* 冻结状态下的状态背景保留 */
+body.freeze-on .col-situation.sit-pending { background: #F5F5DC !important; }
+body.freeze-on .col-situation.sit-active  { background: #DCFCE7 !important; }
+
+/* ===== 复选框单元格 ===== */
 .td-chk { text-align: center; vertical-align: middle; padding: 0.4rem 0.15rem !important; }
 .td-chk input[type="checkbox"] {
   width: 18px; height: 18px; cursor: pointer; accent-color: #2563eb;
 }
 
-/* ★ 只读文字单元格 */
+/* ===== 只读文字单元格 ===== */
 .td-text { vertical-align: top !important; padding: 0.4rem 0.4rem !important; }
 .text-cell {
   font-size: 0.82rem; line-height: 1.35;
@@ -190,7 +321,7 @@ tr:hover td { background: #fafbfc; }
   overflow-wrap: anywhere; color: #0f172a;
 }
 
-/* ★ Situation 状态颜色 */
+/* ===== Situation 状态颜色 ===== */
 .sit-pending { background: #F5F5DC !important; }
 .sit-pending .text-cell { color: #78350F; font-weight: 700; }
 .sit-active  { background: #DCFCE7 !important; }
@@ -225,6 +356,61 @@ tr:hover td { background: #fafbfc; }
 }
 .toast.show { opacity: 1; transform: translateY(0); }
 .toast.error { background: #b91c1c; }
+
+/* ============================================================
+   ★★★ 冻结切换菜单
+   ============================================================ */
+.freeze-menu {
+  position: fixed;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow:
+    0 12px 48px rgba(15,23,42,0.18),
+    0 0 0 1px rgba(15,23,42,0.06);
+  padding: 0.4rem;
+  z-index: 9999;
+  min-width: 250px;
+  font-size: 0.82rem;
+  animation: freezePop 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes freezePop {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.freeze-menu-header {
+  padding: 0.55rem 0.75rem 0.4rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex; align-items: center; gap: 0.35rem;
+}
+.freeze-menu-option {
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background 0.15s;
+  color: #1e293b;
+  font-weight: 500;
+}
+.freeze-menu-option:hover { background: #f1f5f9; }
+.freeze-menu-option.active {
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+.freeze-menu-option .check { opacity: 0; font-size: 0.95rem; color: #2563eb; }
+.freeze-menu-option.active .check { opacity: 1; }
+.freeze-menu-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 0.3rem 0.5rem;
+}
 
 /* ========== 导入弹窗 ========== */
 .modal-overlay {
@@ -270,7 +456,7 @@ tr:hover td { background: #fafbfc; }
 #printArea { display: none; }
 @media print {
   body { background: #fff; padding: 0; }
-  .topbar, .container, .toast, .modal-overlay { display: none !important; }
+  .topbar, .container, .toast, .modal-overlay, .freeze-menu { display: none !important; }
   #printArea { display: block !important; }
   .payslip {
     page-break-after: always; padding: 12mm; font-size: 10pt;
@@ -298,7 +484,7 @@ tr:hover td { background: #fafbfc; }
 }
 </style>
 </head>
-<body>
+<body class="freeze-on">
 
 <!-- ============ 顶部导航栏 ============ -->
 <div class="topbar">
@@ -413,6 +599,23 @@ tr:hover td { background: #fafbfc; }
   <div class="legend" id="legend"></div>
 </div>
 
+<!-- ============ 冻结菜单 ============ -->
+<div id="freezeMenu" class="freeze-menu" style="display:none;">
+  <div class="freeze-menu-header">📌 Tetapan Freeze / 冻结设置</div>
+  <div class="freeze-menu-option active" data-mode="on" onclick="setFreezeMode(true)">
+    <span>🔒 Freeze (Kunci paparan)</span>
+    <span class="check">✓</span>
+  </div>
+  <div class="freeze-menu-option" data-mode="off" onclick="setFreezeMode(false)">
+    <span>🔓 Nyahbeku (Tidak freeze)</span>
+    <span class="check">✓</span>
+  </div>
+  <div class="freeze-menu-divider"></div>
+  <div style="padding:0.5rem 0.75rem;font-size:0.72rem;color:#94a3b8;line-height:1.5;">
+    Klik pada garis biru di antara lajur untuk tukar mod freeze.
+  </div>
+</div>
+
 <div id="printArea"></div>
 <div id="toast" class="toast"></div>
 
@@ -475,7 +678,7 @@ const I18N = {
     lindung: '24JAM Lindungan',
     gross: 'Gaji Kasar', totalDed: 'Jumlah Potongan', net: 'Gaji Bersih',
     action: 'Tindakan', slip: 'Slip Gaji',
-    legend: 'Nota: Tandakan ✔ di hadapan EPF/SOCSO/EIS/24JAM untuk isi manual. Tidak ditanda = auto kira. Situation UNACTIVE tidak dipaparkan.',
+    legend: 'Nota: Tandakan ✔ di hadapan EPF/SOCSO/EIS/24JAM untuk isi manual. Tidak ditanda = auto kira. Situation UNACTIVE tidak dipaparkan. Klik garis biru untuk toggle freeze.',
     saved: 'Berjaya disimpan ke Sheet', failed: 'Gagal simpan',
     loading: 'Memuatkan data...',
     importSuccess: 'Berjaya import {n} pekerja',
@@ -498,7 +701,7 @@ const I18N = {
     lindung: '24JAM Lindungan',
     gross: 'Gross Pay', totalDed: 'Total Deduction', net: 'Net Salary',
     action: 'Action', slip: 'Payslip',
-    legend: 'Note: Tick ✔ before EPF/SOCSO/EIS/24JAM to enter manually. Unticked = auto calc. UNACTIVE staff are hidden.',
+    legend: 'Note: Tick ✔ before EPF/SOCSO/EIS/24JAM to enter manually. Unticked = auto calc. UNACTIVE staff are hidden. Click the blue line to toggle freeze.',
     saved: 'Saved to Sheet successfully', failed: 'Save failed',
     loading: 'Loading data...',
     importSuccess: 'Imported {n} employees',
@@ -521,7 +724,7 @@ const I18N = {
     lindung: '24JAM 保险',
     gross: '总薪资', totalDed: '总扣款', net: '净薪资',
     action: '操作', slip: '粮单',
-    legend: '备注：勾选 EPF/SOCSO/EIS/24JAM 前的 ✔ 表示手动填写，不勾选则系统自动计算。UNACTIVE 员工不显示。',
+    legend: '备注：勾选 EPF/SOCSO/EIS/24JAM 前的 ✔ 表示手动填写，不勾选则系统自动计算。UNACTIVE 员工不显示。点击蓝线切换冻结。',
     saved: '已成功保存到 Sheet', failed: '保存失败',
     loading: '加载数据中...',
     importSuccess: '成功导入 {n} 位员工',
@@ -677,13 +880,19 @@ function renderHeaders() {
   const h2 = document.getElementById('headRow2');
   const h3 = document.getElementById('headRow3');
 
+  // ---------- Row 1: 主表头 ----------
+  // 冻结组: Situation | Code | Name | Group | Bank
+  // 收入组: Basic ... Others
+  // EPF/SOCSO/EIS/24JAM 组
+  // 总计组: Gross | TotalDed | Net
+  // Action
   h1.innerHTML = `
-    <th rowspan="2" style="background:#fef3c7;"><div>Situation</div></th>
-    <th rowspan="2"><div>${t('code')}</div></th>
-    <th rowspan="2"><div>${t('name')}</div></th>
-    <th rowspan="2"><div>${t('group')}</div></th>
-    <th rowspan="2" class="divider-right"><div>${t('bank')}</div></th>
-    <th rowspan="2" class="divider-left divider-right"><div>${t('basic')}</div></th>
+    <th rowspan="2" class="col-situation" style="background:#fef3c7;"><div>Situation</div></th>
+    <th rowspan="2" class="col-code"><div>${t('code')}</div></th>
+    <th rowspan="2" class="col-name"><div>${t('name')}</div></th>
+    <th rowspan="2" class="col-group"><div>${t('group')}</div></th>
+    <th rowspan="2" class="col-bank divider-right" title="Klik untuk toggle freeze"><div>${t('bank')}</div></th>
+    <th rowspan="2"><div>${t('basic')}</div></th>
     <th rowspan="2"><div>${t('allowance')}</div></th>
     <th rowspan="2"><div>${t('deduction')}</div></th>
     <th rowspan="2"><div>${t('normalOT')}</div></th>
@@ -692,38 +901,40 @@ function renderHeaders() {
     <th rowspan="2"><div>${t('otherOT')}</div></th>
     <th rowspan="2"><div>${t('pinjaman')}</div></th>
     <th rowspan="2"><div>${t('others')}</div></th>
-    <th rowspan="2" class="grp divider-left" style="text-align:center;font-size:0.9rem;">✎</th>
+    <th rowspan="2" class="grp divider-left grp-divider-right" style="text-align:center;font-size:0.9rem;">✎</th>
     <th class="grp" colspan="2">EPF</th>
-    <th rowspan="2" class="grp divider-left" style="text-align:center;font-size:0.9rem;">✎</th>
+    <th rowspan="2" class="grp grp-divider-right" style="text-align:center;font-size:0.9rem;">✎</th>
     <th class="grp" colspan="2">SOCSO</th>
-    <th rowspan="2" class="grp divider-left" style="text-align:center;font-size:0.9rem;">✎</th>
+    <th rowspan="2" class="grp grp-divider-right" style="text-align:center;font-size:0.9rem;">✎</th>
     <th class="grp" colspan="2">EIS</th>
-    <th rowspan="2" class="grp divider-left" style="text-align:center;font-size:0.9rem;">✎</th>
+    <th rowspan="2" class="grp grp-divider-right" style="text-align:center;font-size:0.9rem;">✎</th>
     <th class="grp" rowspan="2"><div>24JAM</div></th>
-    <th rowspan="2"><div>${t('gross')}</div></th>
+    <th rowspan="2" class="divider-left"><div>${t('gross')}</div></th>
     <th rowspan="2"><div>${t('totalDed')}</div></th>
     <th rowspan="2"><div>${t('net')}</div></th>
     <th rowspan="2">${t('action')}</th>
   `;
 
+  // ---------- Row 2: 子表头 ----------
   h2.innerHTML = `
     <th class="grp"><div>${t('epfE')}</div></th>
-    <th class="grp"><div>${t('epfR')}</div></th>
+    <th class="grp grp-divider-right"><div>${t('epfR')}</div></th>
     <th class="grp"><div>${t('socsoE')}</div></th>
-    <th class="grp"><div>${t('socsoR')}</div></th>
+    <th class="grp grp-divider-right"><div>${t('socsoR')}</div></th>
     <th class="grp"><div>${t('eisE')}</div></th>
     <th class="grp"><div>${t('eisR')}</div></th>
   `;
 
+  // ---------- Row 3: 筛选行 ----------
   const f = (col) => `<input class="th-filter" data-col="${col}" placeholder="🔍">`;
-  const empty = `<th class="no-filter"></th>`;
+  const empty = (cls = '') => `<th class="no-filter ${cls}"></th>`;
   h3.innerHTML = `
-    <th>${f(0)}</th>
-    <th>${f(1)}</th>
-    <th>${f(2)}</th>
-    <th>${f(3)}</th>
-    <th class="divider-right">${f(4)}</th>
-    <th class="divider-left divider-right">${f(5)}</th>
+    <th class="col-situation">${f(0)}</th>
+    <th class="col-code">${f(1)}</th>
+    <th class="col-name">${f(2)}</th>
+    <th class="col-group">${f(3)}</th>
+    <th class="col-bank divider-right" title="Klik untuk toggle freeze">${f(4)}</th>
+    <th>${f(5)}</th>
     <th>${f(6)}</th>
     <th>${f(7)}</th>
     <th>${f(8)}</th>
@@ -732,21 +943,21 @@ function renderHeaders() {
     <th>${f(11)}</th>
     <th>${f(12)}</th>
     <th>${f(13)}</th>
-    ${empty.replace('class="no-filter"', 'class="no-filter divider-left"')}
+    ${empty('divider-left grp-divider-right')}
     <th>${f(15)}</th>
-    <th>${f(16)}</th>
-    ${empty.replace('class="no-filter"', 'class="no-filter divider-left"')}
+    <th class="grp-divider-right">${f(16)}</th>
+    ${empty('grp-divider-right')}
     <th>${f(18)}</th>
-    <th>${f(19)}</th>
-    ${empty.replace('class="no-filter"', 'class="no-filter divider-left"')}
+    <th class="grp-divider-right">${f(19)}</th>
+    ${empty('grp-divider-right')}
     <th>${f(21)}</th>
-    <th>${f(22)}</th>
-    ${empty.replace('class="no-filter"', 'class="no-filter divider-left"')}
+    <th class="grp-divider-right">${f(22)}</th>
+    ${empty('grp-divider-right')}
     <th>${f(24)}</th>
-    <th>${f(25)}</th>
+    <th class="divider-left">${f(25)}</th>
     <th>${f(26)}</th>
     <th>${f(27)}</th>
-    ${empty}
+    ${empty()}
   `;
 
   requestAnimationFrame(fixStickyHeader);
@@ -794,27 +1005,27 @@ function renderTable() {
     emp = recalcRow(emp);
     const tr = document.createElement('tr');
 
-    const textTd = (field, extraCls = '') =>
-      `<td class="td-text ${extraCls}"><div class="text-cell">${escapeHtml(emp[field] ?? '')}</div></td>`;
+    const textTd = (field, extraCls = '', colCls = '') =>
+      `<td class="td-text ${colCls} ${extraCls}"><div class="text-cell">${escapeHtml(emp[field] ?? '')}</div></td>`;
 
     const numInput = (field, readonly, extraCls = '') =>
       `<input type="number" step="0.01" class="input num ${extraCls}" ${readonly ? 'readonly' : ''} data-idx="${idx}" data-field="${field}" value="${emp[field] ?? 0}">`;
 
-    const chkTd = (group) => {
+    const chkTd = (group, extraCls = '') => {
       const key = 'manual' + group;
       const checked = !!emp[key];
-      return `<td class="td-chk divider-left"><input type="checkbox" class="manual-chk" data-idx="${idx}" data-group="${group}" ${checked ? 'checked' : ''}></td>`;
+      return `<td class="td-chk ${extraCls}"><input type="checkbox" class="manual-chk" data-idx="${idx}" data-group="${group}" ${checked ? 'checked' : ''}></td>`;
     };
 
     const sitCls = situationClass(emp.Situation);
 
     tr.innerHTML = `
-      <td class="td-text ${sitCls}"><div class="text-cell">${escapeHtml(emp.Situation || '')}</div></td>
-      ${textTd('Code')}
-      ${textTd('Name')}
-      ${textTd('GroupName')}
-      ${textTd('BankNama', 'divider-right')}
-      <td class="divider-left divider-right">${numInput('Basic', false)}</td>
+      <td class="td-text col-situation ${sitCls}"><div class="text-cell">${escapeHtml(emp.Situation || '')}</div></td>
+      <td class="td-text col-code"><div class="text-cell">${escapeHtml(emp.Code || '')}</div></td>
+      <td class="td-text col-name"><div class="text-cell">${escapeHtml(emp.Name || '')}</div></td>
+      <td class="td-text col-group"><div class="text-cell">${escapeHtml(emp.GroupName || '')}</div></td>
+      <td class="td-text col-bank divider-right" title="Klik untuk toggle freeze"><div class="text-cell">${escapeHtml(emp.BankNama || '')}</div></td>
+      <td>${numInput('Basic', false)}</td>
       <td>${numInput('Allowance', false)}</td>
       <td>${numInput('Deduction', false)}</td>
       <td>${numInput('NormalOT', false)}</td>
@@ -823,18 +1034,18 @@ function renderTable() {
       <td>${numInput('OtherOT', false)}</td>
       <td>${numInput('Pinjaman', false)}</td>
       <td>${numInput('Others', false)}</td>
-      ${chkTd('EPF')}
+      ${chkTd('EPF', 'divider-left grp-divider-right')}
       <td>${numInput('EPF_Employee', !emp.manualEPF)}</td>
-      <td>${numInput('EPF_Employer', !emp.manualEPF)}</td>
-      ${chkTd('SOCSO')}
+      <td class="grp-divider-right">${numInput('EPF_Employer', !emp.manualEPF)}</td>
+      ${chkTd('SOCSO', 'grp-divider-right')}
       <td>${numInput('SOCSO_Employee', !emp.manualSOCSO)}</td>
-      <td>${numInput('SOCSO_Employer', !emp.manualSOCSO)}</td>
-      ${chkTd('EIS')}
+      <td class="grp-divider-right">${numInput('SOCSO_Employer', !emp.manualSOCSO)}</td>
+      ${chkTd('EIS', 'grp-divider-right')}
       <td>${numInput('EIS_Employee', !emp.manualEIS)}</td>
-      <td>${numInput('EIS_Employer', !emp.manualEIS)}</td>
-      ${chkTd('24JAM')}
+      <td class="grp-divider-right">${numInput('EIS_Employer', !emp.manualEIS)}</td>
+      ${chkTd('24JAM', 'grp-divider-right')}
       <td>${numInput('Lindung24Jam', !emp.manual24JAM)}</td>
-      <td>${numInput('GrossPay', true)}</td>
+      <td class="divider-left">${numInput('GrossPay', true)}</td>
       <td>${numInput('TotalDeduction', true)}</td>
       <td>${numInput('NetSalary', true)}</td>
       <td><button class="btn btn-sm" onclick="showPayslip('${escapeHtml(emp.Code)}')">${t('slip')}</button></td>
@@ -918,6 +1129,77 @@ document.addEventListener('input', e => {
   if (e.target && e.target.classList && e.target.classList.contains('th-filter')) {
     applyFilters();
   }
+});
+
+// ============================================================
+// ★★★ 冻结切换功能
+// ============================================================
+function setFreezeMode(isOn) {
+  if (isOn) {
+    document.body.classList.add('freeze-on');
+  } else {
+    document.body.classList.remove('freeze-on');
+  }
+  // 更新菜单选项状态
+  document.querySelectorAll('.freeze-menu-option').forEach(opt => {
+    const mode = opt.dataset.mode;
+    if ((mode === 'on' && isOn) || (mode === 'off' && !isOn)) {
+      opt.classList.add('active');
+    } else {
+      opt.classList.remove('active');
+    }
+  });
+  closeFreezeMenu();
+  toast(isOn ? '🔒 Freeze diaktifkan' : '🔓 Freeze dinyahaktifkan', true);
+}
+
+function openFreezeMenu(x, y) {
+  const menu = document.getElementById('freezeMenu');
+  const isFrozen = document.body.classList.contains('freeze-on');
+  // 更新选项状态
+  menu.querySelectorAll('.freeze-menu-option').forEach(opt => {
+    const mode = opt.dataset.mode;
+    if ((mode === 'on' && isFrozen) || (mode === 'off' && !isFrozen)) {
+      opt.classList.add('active');
+    } else {
+      opt.classList.remove('active');
+    }
+  });
+  // 定位
+  const menuRect = menu.getBoundingClientRect();
+  const menuWidth = 250;
+  let left = x + 10;
+  let top = y + 10;
+  if (left + menuWidth > window.innerWidth - 10) left = window.innerWidth - menuWidth - 10;
+  if (top + 200 > window.innerHeight - 10) top = y - 210;
+  menu.style.left = left + 'px';
+  menu.style.top = top + 'px';
+  menu.style.display = 'block';
+}
+
+function closeFreezeMenu() {
+  document.getElementById('freezeMenu').style.display = 'none';
+}
+
+// 点击冻结边界分割线
+document.addEventListener('click', e => {
+  const bankCell = e.target.closest('.col-bank.divider-right');
+  if (bankCell) {
+    e.stopPropagation();
+    const rect = bankCell.getBoundingClientRect();
+    openFreezeMenu(rect.right - 2, rect.top + rect.height / 2);
+    return;
+  }
+  // 点击菜单之外关闭菜单
+  const menu = document.getElementById('freezeMenu');
+  if (menu.style.display === 'block' && !menu.contains(e.target)) {
+    closeFreezeMenu();
+  }
+});
+
+// ESC 关闭菜单
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeFreezeMenu();
 });
 
 // ================= 检查 =================
