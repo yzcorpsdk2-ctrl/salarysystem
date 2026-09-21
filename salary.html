@@ -6,114 +6,135 @@
 <title>Payroll System · 薪资系统</title>
 <style>
   /* ============================================================
-     重新设计 · 参考 EPF 页面风格 (https://yzcorpsdk2-ctrl.github.io/salarysystem/epf.html)
+     重新设计 · 参考 EPF 页面风格
      干净白色卡片 + 浅蓝边框 + 文档式表格
-     功能保持：冻结列、多语言、银行同步、放大镜筛选
      ============================================================ */
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --epf-blue: #1a4f8a;
+    --epf-blue-light: #e8f0fa;
+    --epf-blue-soft: #f4f8fd;
+    --epf-border: #d4e0ee;
+    --epf-border-soft: #e6eef7;
+    --epf-text: #1f2d3d;
+    --epf-muted: #64748b;
+    --epf-bg: #f7fafd;
+  }
 
   body {
     font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background: #f5f7fa;
-    color: #333;
+    background: var(--epf-bg);
+    color: var(--epf-text);
     padding: 0 0 3rem 0;
     min-height: 100vh;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    font-size: 14px;
   }
 
   /* ===== 顶部导航栏 ===== */
   .topbar {
     position: sticky; top: 0; z-index: 100;
     background: #ffffff;
-    border-bottom: 1px solid #e0e6ed;
+    border-bottom: 1px solid var(--epf-border);
     padding: 0.65rem 1.75rem;
     display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+    box-shadow: 0 1px 2px rgba(26, 79, 138, 0.04);
   }
   .topbar .spacer { flex: 1; }
   .topbar .brand {
-    font-weight: 600; font-size: 1rem; color: #1a2b3e;
+    font-weight: 700; font-size: 0.95rem; color: var(--epf-blue);
     display: flex; align-items: center; gap: 0.6rem;
     margin-right: 0.5rem;
+    letter-spacing: -0.01em;
   }
   .topbar .brand .logo {
-    width: 34px; height: 34px;
-    background: #2b6cb0;
-    border-radius: 8px;
+    width: 32px; height: 32px;
+    background: var(--epf-blue);
+    border-radius: 6px;
     display: flex; align-items: center; justify-content: center;
-    color: #fff; font-size: 1rem; font-weight: 700;
+    color: #fff; font-size: 0.95rem; font-weight: 800;
   }
 
-  /* ===== 按钮 ===== */
+  /* ===== 按钮 (EPF 风格) ===== */
   .btn {
-    background: #ffffff; border: 1px solid #cbd5e1;
-    padding: 0.45rem 0.95rem; border-radius: 6px;
-    font-size: 0.8rem; font-weight: 500; cursor: pointer;
+    background: #ffffff;
+    border: 1px solid var(--epf-border);
+    padding: 0.42rem 0.9rem;
+    border-radius: 5px;
+    font-size: 0.78rem; font-weight: 500;
+    cursor: pointer; color: var(--epf-blue);
     display: inline-flex; align-items: center; gap: 0.4rem;
-    transition: all 0.15s ease; color: #334155;
+    transition: all 0.15s ease;
     white-space: nowrap; font-family: inherit;
   }
   .btn:hover {
-    background: #f1f5f9; border-color: #94a3b8;
+    background: var(--epf-blue-soft);
+    border-color: #b8cfe8;
   }
   .btn-primary {
-    background: #2b6cb0; border: 1px solid #2b6cb0; color: #fff;
+    background: var(--epf-blue);
+    border: 1px solid var(--epf-blue);
+    color: #fff;
   }
   .btn-primary:hover {
-    background: #1e50b0; border-color: #1e50b0;
+    background: #15406f;
+    border-color: #15406f;
   }
   .btn-success {
-    background: #0f9d6e; border: 1px solid #0f9d6e; color: #fff;
+    background: #0f7a54; border: 1px solid #0f7a54; color: #fff;
   }
-  .btn-success:hover {
-    background: #0b8a60; border-color: #0b8a60;
-  }
+  .btn-success:hover { background: #0c6a48; border-color: #0c6a48; }
   .btn-sm { padding: 0.25rem 0.7rem; font-size: 0.72rem; border-radius: 4px; }
   select.btn {
     cursor: pointer; padding-right: 1.8rem; appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23475569' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%231a4f8a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat; background-position: right 0.7rem center;
   }
 
   /* ===== 主容器 ===== */
   .container { max-width: 100%; margin: 0 auto; padding: 1.5rem 1.75rem; }
 
-  /* ===== 页面标题卡片 ===== */
+  /* ===== 页面标题卡片 (EPF 风格) ===== */
   .page-header {
     background: #ffffff;
-    border: 1px solid #e0e6ed;
-    border-radius: 8px; padding: 1.6rem 2rem; margin-bottom: 1.5rem;
+    border: 1px solid var(--epf-border);
+    border-radius: 8px; padding: 1.6rem 2rem; margin-bottom: 1.25rem;
     display: flex; flex-wrap: wrap; gap: 1rem;
     align-items: center; justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(26, 79, 138, 0.04);
   }
   .page-header .info { flex: 1; min-width: 260px; }
   .page-header h1 {
-    font-size: 1.5rem; font-weight: 600;
-    margin-bottom: 0.3rem; color: #1a2b3e;
+    font-size: 1.45rem; font-weight: 700;
+    margin-bottom: 0.35rem; color: var(--epf-blue);
+    letter-spacing: -0.015em;
   }
-  .page-header p { font-size: 0.85rem; color: #64748b; line-height: 1.6; }
+  .page-header p { font-size: 0.85rem; color: var(--epf-muted); line-height: 1.6; }
   .page-header .badge {
-    display: inline-block; background: #eff6ff; color: #2b6cb0;
-    padding: 0.2rem 0.8rem; border-radius: 4px;
+    display: inline-block;
+    background: var(--epf-blue-light);
+    color: var(--epf-blue);
+    padding: 0.25rem 0.85rem; border-radius: 4px;
     font-size: 0.7rem; font-weight: 600; margin-top: 0.6rem;
-    border: 1px solid #dbeafe;
+    border: 1px solid #cfe0f2;
   }
   .page-header .stat-badges { display: flex; gap: 0.75rem; flex-wrap: wrap; }
   .page-header .stat-pill {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: var(--epf-blue-soft);
+    border: 1px solid var(--epf-border-soft);
     border-radius: 6px; padding: 0.6rem 1.1rem;
     font-size: 0.78rem; min-width: 110px;
   }
   .page-header .stat-pill .label {
-    font-size: 0.62rem; color: #64748b;
+    font-size: 0.62rem; color: var(--epf-muted);
     text-transform: uppercase; letter-spacing: 0.06em;
     font-weight: 600; margin-bottom: 0.1rem;
   }
   .page-header .stat-pill .value {
     font-size: 1.2rem; font-weight: 700;
-    font-variant-numeric: tabular-nums; color: #1a2b3e;
+    font-variant-numeric: tabular-nums; color: var(--epf-blue);
   }
 
   /* ===== 分区图例 ===== */
@@ -123,20 +144,21 @@
   .section-legend .item {
     display: inline-flex; align-items: center; gap: 0.45rem;
     background: #ffffff;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--epf-border-soft);
     padding: 0.35rem 0.85rem; border-radius: 4px;
-    font-size: 0.72rem; color: #475569; font-weight: 500;
+    font-size: 0.72rem; color: var(--epf-muted); font-weight: 500;
   }
   .section-legend .dot {
     width: 10px; height: 10px; border-radius: 2px;
-    border: 1px solid rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.05);
   }
 
   /* ===== 卡片容器 ===== */
   .card {
     background: #ffffff; border-radius: 8px;
-    border: 1px solid #e0e6ed;
+    border: 1px solid var(--epf-border);
     overflow: hidden; margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(26, 79, 138, 0.04);
   }
   .card-body { padding: 0; }
 
@@ -151,31 +173,32 @@
     width: 2650px; min-width: 2650px;
   }
 
-  /* ===== 表头 ===== */
+  /* ===== 表头 (EPF 文档表格风格) ===== */
   th {
     position: sticky; top: 0; z-index: 10;
-    background: #f2f5f9; padding: 0.55rem 0.5rem;
-    text-align: left; font-weight: 600; color: #334155;
-    border-bottom: 1px solid #d6dee8;
+    background: var(--epf-blue-soft);
+    padding: 0.55rem 0.5rem;
+    text-align: left; font-weight: 600; color: var(--epf-blue);
+    border-bottom: 1px solid var(--epf-border);
     white-space: normal; font-size: 0.7rem; vertical-align: top;
     word-break: break-word; overflow-wrap: anywhere;
   }
   th > div { word-break: break-word; overflow-wrap: anywhere; }
 
-  /* ========== 分区颜色 (浅色系，参考 EPF 页面) ========== */
-  .bg-slate   { background: #eef2f7 !important; color: #334155 !important; }
-  .bg-emerald { background: #edf7f1 !important; color: #166534 !important; }
-  .bg-violet  { background: #f1eefb !important; color: #4c3a8a !important; }
-  .bg-amber   { background: #fdf7e7 !important; color: #854d0e !important; }
-  .bg-blue    { background: #eaf2fb !important; color: #1e40af !important; }
-  .bg-gray    { background: #f4f6f9 !important; color: #475569 !important; }
+  /* ========== 分区颜色 (EPF 浅色系) ========== */
+  .bg-slate   { background: #f0f4f9 !important; color: var(--epf-blue) !important; }
+  .bg-emerald { background: #f0f9f4 !important; color: #14663f !important; }
+  .bg-violet  { background: #f4f1fb !important; color: #4a3a8a !important; }
+  .bg-amber   { background: #fdf8ec !important; color: #7a5a12 !important; }
+  .bg-blue    { background: #eef5fd !important; color: var(--epf-blue) !important; }
+  .bg-gray    { background: #f4f6f9 !important; color: var(--epf-muted) !important; }
 
   /* 表头分区行 */
   .section-label-row th {
     position: sticky; top: 0; z-index: 12;
     padding: 0.45rem 0.6rem; font-size: 0.68rem; font-weight: 700;
     letter-spacing: 0.05em; text-transform: uppercase;
-    border-bottom: 2px solid #c5d0dd; text-align: center;
+    border-bottom: 1px solid var(--epf-border); text-align: center;
   }
   .section-label-row th .sec-title {
     display: flex; align-items: center; justify-content: center; gap: 0.4rem;
@@ -184,84 +207,84 @@
   .main-header-row th { z-index: 11; vertical-align: middle; }
   .sub-header-row th { z-index: 10; vertical-align: middle; text-align: center; }
 
-  /* 筛选行：放大镜搜索框 */
+  /* 筛选行 */
   .filter-row th {
     position: sticky; z-index: 9;
-    background: #f8fafc; padding: 0.3rem 0.35rem;
-    border-bottom: 2px solid #c5d0dd; vertical-align: middle;
+    background: #ffffff; padding: 0.3rem 0.35rem;
+    border-bottom: 1px solid var(--epf-border); vertical-align: middle;
   }
   .filter-row .th-filter {
     display: block; width: 100%;
-    padding: 4px 8px 4px 26px; font-size: 0.7rem; font-weight: 400;
-    border: 1px solid #cbd5e1; border-radius: 4px;
-    background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E") no-repeat left 6px center;
-    background-size: 12px 12px;
-    color: #334155;
+    padding: 4px 8px 4px 24px; font-size: 0.7rem; font-weight: 400;
+    border: 1px solid var(--epf-border); border-radius: 4px;
+    background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%231a4f8a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E") no-repeat left 6px center;
+    background-size: 11px 11px;
+    color: var(--epf-text);
     font-family: inherit; transition: 0.15s;
     margin: 0;
   }
   .filter-row .th-filter:focus {
-    outline: none; border-color: #2b6cb0;
-    box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.12);
+    outline: none; border-color: var(--epf-blue);
+    box-shadow: 0 0 0 2px rgba(26, 79, 138, 0.10);
   }
-  .filter-row .th-filter::placeholder { color: #94a3b8; font-weight: 400; }
-  .filter-row th.no-filter { background: #eef2f7; }
+  .filter-row .th-filter::placeholder { color: #a7b7c9; font-weight: 400; }
+  .filter-row th.no-filter { background: var(--epf-blue-soft); }
 
   /* ===== 数据行 ===== */
   td {
-    padding: 0.4rem 0.45rem; border-bottom: 1px solid #eef2f7;
+    padding: 0.4rem 0.45rem; border-bottom: 1px solid var(--epf-border-soft);
     vertical-align: middle; background: #ffffff; transition: background 0.15s;
   }
-  tr:nth-child(even) td { background: #fafbfc; }
-  tr:hover td { background: #f1f5f9; }
+  tr:nth-child(even) td { background: #fbfdff; }
+  tr:hover td { background: var(--epf-blue-soft); }
 
   /* ========== 分组分割线 ========== */
-  .divider-group { border-left: 1px solid #d6dee8 !important; }
+  .divider-group { border-left: 1px solid var(--epf-border) !important; }
 
   /* ========== 冻结列 ========== */
   body.freeze-on .col-freeze {
     position: sticky; z-index: 8; background: #ffffff;
   }
-  body.freeze-on tr:nth-child(even) td.col-freeze { background: #fafbfc; }
-  body.freeze-on tr:hover td.col-freeze { background: #f1f5f9; }
+  body.freeze-on tr:nth-child(even) td.col-freeze { background: #fbfdff; }
+  body.freeze-on tr:hover td.col-freeze { background: var(--epf-blue-soft); }
 
   body.freeze-on .col-freeze.col-0 { left: 0px; }
   body.freeze-on .col-freeze.col-1 { left: 80px; }
   body.freeze-on .col-freeze.col-2 { left: 150px; }
   body.freeze-on .col-freeze.col-3 {
     left: 310px;
-    border-right: 2px solid #2b6cb0 !important;
+    border-right: 2px solid var(--epf-blue) !important;
   }
 
   body.freeze-on thead .col-freeze { z-index: 15; }
-  body.freeze-on thead .col-freeze.bg-slate { background: #eef2f7 !important; }
-  body.freeze-on thead .col-freeze.bg-amber { background: #fdf7e7 !important; }
-  body.freeze-on thead .col-freeze.bg-emerald { background: #edf7f1 !important; }
-  body.freeze-on thead .col-freeze.bg-violet { background: #f1eefb !important; }
-  body.freeze-on thead .col-freeze.bg-blue { background: #eaf2fb !important; }
-  body.freeze-on thead .col-freeze.bg-gray { background: #f4f6f9 !important; }
+  body.freeze-on thead .col-freeze.bg-slate   { background: #f0f4f9 !important; }
+  body.freeze-on thead .col-freeze.bg-amber   { background: #fdf8ec !important; }
+  body.freeze-on thead .col-freeze.bg-emerald { background: #f0f9f4 !important; }
+  body.freeze-on thead .col-freeze.bg-violet  { background: #f4f1fb !important; }
+  body.freeze-on thead .col-freeze.bg-blue    { background: #eef5fd !important; }
+  body.freeze-on thead .col-freeze.bg-gray    { background: #f4f6f9 !important; }
   body.freeze-on thead .section-label-row th.col-freeze {
     background: inherit !important;
   }
   body.freeze-on thead .filter-row th.col-freeze {
-    background: #f8fafc !important;
+    background: #ffffff !important;
   }
   body.freeze-on thead .filter-row th.col-freeze.no-filter {
-    background: #eef2f7 !important;
+    background: var(--epf-blue-soft) !important;
   }
 
   /* 冻结列拖拽线 */
   .freeze-line {
     position: absolute; top: 0; bottom: 0; right: 0; width: 14px;
-    background: linear-gradient(to right, rgba(43,108,176,0) 0%, rgba(43,108,176,0.06) 60%, rgba(43,108,176,0.12) 100%);
+    background: linear-gradient(to right, rgba(26,79,138,0) 0%, rgba(26,79,138,0.05) 60%, rgba(26,79,138,0.12) 100%);
     cursor: pointer; z-index: 20; pointer-events: auto; transition: 0.15s;
   }
   .freeze-line:hover {
-    background: linear-gradient(to right, rgba(43,108,176,0.04) 0%, rgba(43,108,176,0.18) 60%, rgba(43,108,176,0.25) 100%);
+    background: linear-gradient(to right, rgba(26,79,138,0.04) 0%, rgba(26,79,138,0.16) 60%, rgba(26,79,138,0.24) 100%);
   }
   .freeze-line::before {
     content: '⋮⋮'; position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%); color: #2b6cb0;
+    transform: translate(-50%, -50%); color: var(--epf-blue);
     font-size: 0.7rem; font-weight: 700; letter-spacing: -2px;
     line-height: 1; opacity: 0.35; transition: 0.15s;
   }
@@ -270,8 +293,8 @@
   /* 复选框单元格 */
   .td-chk { text-align: center; vertical-align: middle; padding: 0.4rem 0.15rem !important; }
   .td-chk input[type="checkbox"] {
-    width: 16px; height: 16px; cursor: pointer;
-    accent-color: #2b6cb0; border-radius: 3px;
+    width: 15px; height: 15px; cursor: pointer;
+    accent-color: var(--epf-blue); border-radius: 3px;
   }
 
   /* 只读文字单元格 */
@@ -279,7 +302,7 @@
   .text-cell {
     font-size: 0.78rem; line-height: 1.4;
     white-space: normal; word-break: break-word;
-    overflow-wrap: anywhere; color: #334155;
+    overflow-wrap: anywhere; color: var(--epf-text);
   }
   .text-cell.center { text-align: center; }
   .text-cell.badge-cell {
@@ -287,96 +310,96 @@
     padding: 0.15rem 0.6rem; border-radius: 4px;
     text-transform: uppercase; letter-spacing: 0.04em;
   }
-  .badge-yes { background: #dcfce7; color: #166534; }
-  .badge-no  { background: #fee2e2; color: #991b1b; }
-  .badge-other { background: #eef2f6; color: #475569; }
+  .badge-yes { background: #e3f5ea; color: #14663f; }
+  .badge-no  { background: #fdeaea; color: #a02020; }
+  .badge-other { background: #eef2f6; color: var(--epf-muted); }
 
-  /* Situation 状态颜色 */
-  .sit-pending { background: #fefce8 !important; }
-  .sit-pending .text-cell { color: #854d0e; font-weight: 700; }
-  .sit-active  { background: #f0fdf4 !important; }
-  .sit-active .text-cell { color: #166534; font-weight: 700; }
+  /* Situation 状态颜色 (EPF 浅底风格) */
+  .sit-pending { background: #fdf8ec !important; }
+  .sit-pending .text-cell { color: #7a5a12; font-weight: 700; }
+  .sit-active  { background: #f0f9f4 !important; }
+  .sit-active .text-cell { color: #14663f; font-weight: 700; }
   .sit-default { background: #ffffff !important; }
 
-  /* ===== 输入框 ===== */
+  /* ===== 输入框 (EPF 风格) ===== */
   .input {
     width: 100%; min-width: 0;
-    border: 1px solid #cbd5e1; border-radius: 4px;
+    border: 1px solid var(--epf-border); border-radius: 4px;
     padding: 0.3rem 0.55rem; font-size: 0.78rem;
     background: #ffffff; transition: 0.15s;
-    font-family: inherit; color: #334155;
+    font-family: inherit; color: var(--epf-text);
   }
   .input:focus {
-    outline: none; border-color: #2b6cb0;
-    box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.12);
+    outline: none; border-color: var(--epf-blue);
+    box-shadow: 0 0 0 2px rgba(26, 79, 138, 0.10);
   }
-  .input[readonly] { background: #f8fafc; color: #64748b; border-color: #e2e8f0; }
+  .input[readonly] { background: var(--epf-blue-soft); color: var(--epf-muted); border-color: var(--epf-border-soft); }
   .input.num { text-align: right; font-variant-numeric: tabular-nums; }
-  .input[readonly].num { background: #f1f5f9; }
-  .cell-bad { background: #fee2e2 !important; border-color: #fca5a5 !important; }
-  .cell-ok  { background: #dcfce7 !important; }
+  .input[readonly].num { background: #eef3f9; }
+  .cell-bad { background: #fdeaea !important; border-color: #f0b4b4 !important; }
+  .cell-ok  { background: #e3f5ea !important; }
 
   .legend {
-    font-size: 0.75rem; color: #64748b;
+    font-size: 0.75rem; color: var(--epf-muted);
     margin-top: 0.75rem; padding-left: 0.25rem; line-height: 1.7;
   }
-  .legend strong { color: #334155; }
+  .legend strong { color: var(--epf-text); }
 
   /* ===== Toast ===== */
   .toast {
     position: fixed; bottom: 1.8rem; right: 1.8rem;
-    background: #1e293b; color: #fff;
+    background: var(--epf-blue); color: #fff;
     padding: 0.85rem 1.5rem; border-radius: 6px;
     font-size: 0.85rem; font-weight: 500;
     z-index: 9999; opacity: 0; transform: translateY(12px);
     transition: 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
     pointer-events: none; max-width: 380px;
-    box-shadow: 0 8px 24px -8px rgba(0, 20, 40, 0.3);
+    box-shadow: 0 8px 24px -8px rgba(26, 79, 138, 0.35);
   }
   .toast.show { opacity: 1; transform: translateY(0); }
-  .toast.error { background: #991b1b; }
+  .toast.error { background: #a02020; }
 
-  /* ========== 弹窗 ========== */
+  /* ========== 弹窗 (EPF 风格) ========== */
   .modal-overlay {
     position: fixed; inset: 0;
-    background: rgba(15, 23, 42, 0.5);
+    background: rgba(26, 79, 138, 0.25);
     z-index: 9998; display: flex; align-items: center; justify-content: center; padding: 1rem;
   }
   .modal-box {
     background: #ffffff; border-radius: 8px; padding: 1.6rem;
     width: 100%; max-width: 560px;
-    box-shadow: 0 20px 40px -12px rgba(0, 20, 50, 0.3);
+    box-shadow: 0 20px 40px -12px rgba(26, 79, 138, 0.25);
     display: flex; flex-direction: column; gap: 1.1rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--epf-border);
   }
   .modal-box.compact { max-width: 400px; padding: 1.8rem; text-align: center; }
   .modal-header { display: flex; justify-content: space-between; align-items: center; }
-  .modal-header h3 { font-size: 1.1rem; font-weight: 600; color: #1a2b3e; }
+  .modal-header h3 { font-size: 1.1rem; font-weight: 700; color: var(--epf-blue); }
   .modal-close {
     background: none; border: none; font-size: 1.3rem; cursor: pointer;
-    color: #64748b; padding: 0.2rem 0.6rem; border-radius: 4px; line-height: 1;
+    color: var(--epf-muted); padding: 0.2rem 0.6rem; border-radius: 4px; line-height: 1;
     transition: 0.15s;
   }
-  .modal-close:hover { background: #f1f5f9; color: #1a2b3e; }
+  .modal-close:hover { background: var(--epf-blue-soft); color: var(--epf-blue); }
   .modal-dropzone {
-    border: 2px dashed #cbd5e1; border-radius: 8px;
+    border: 2px dashed var(--epf-border); border-radius: 8px;
     padding: 2.4rem 1.2rem; text-align: center;
-    cursor: pointer; transition: 0.2s; background: #f8fafc;
+    cursor: pointer; transition: 0.2s; background: var(--epf-blue-soft);
   }
   .modal-dropzone:hover, .modal-dropzone.drag-over {
-    border-color: #2b6cb0; background: #eff6ff;
+    border-color: var(--epf-blue); background: var(--epf-blue-light);
   }
-  .modal-dropzone p { font-size: 0.9rem; color: #475569; margin: 0.3rem 0; }
-  .modal-dropzone .hint { font-size: 0.72rem; color: #94a3b8; }
+  .modal-dropzone p { font-size: 0.9rem; color: var(--epf-text); margin: 0.3rem 0; }
+  .modal-dropzone .hint { font-size: 0.72rem; color: var(--epf-muted); }
   .modal-dropzone .icon { font-size: 2.4rem; margin-bottom: 0.4rem; opacity: 0.8; }
   .modal-footer {
     display: flex; justify-content: space-between; align-items: center;
     gap: 0.5rem; flex-wrap: wrap;
-    padding-top: 0.8rem; border-top: 1px solid #e2e8f0;
+    padding-top: 0.8rem; border-top: 1px solid var(--epf-border-soft);
   }
   .template-download {
     display: flex; align-items: center; gap: 0.4rem;
-    flex-wrap: wrap; font-size: 0.75rem; color: #64748b;
+    flex-wrap: wrap; font-size: 0.75rem; color: var(--epf-muted);
   }
   .modal-actions { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
 
@@ -420,18 +443,18 @@
     .export-print { padding: 6mm; font-family: Arial, sans-serif; color: #000; }
     .export-table { border-collapse: collapse; width: 100%; font-size: 8.5pt; }
     .export-table th, .export-table td { border: 1px solid #999; padding: 3px 4px; }
-    .export-table th { background: #eef2ff; text-align: left; }
+    .export-table th { background: #eef5fd; text-align: left; }
     .export-table td.num { text-align: right; }
     .export-table tr { page-break-inside: avoid; }
   }
 
   /* 滚动条美化 */
   .table-wrap::-webkit-scrollbar { width: 8px; height: 8px; }
-  .table-wrap::-webkit-scrollbar-track { background: #f1f5f9; }
+  .table-wrap::-webkit-scrollbar-track { background: var(--epf-blue-soft); }
   .table-wrap::-webkit-scrollbar-thumb {
-    background: #cbd5e1; border-radius: 4px;
+    background: #c2d4e6; border-radius: 4px;
   }
-  .table-wrap::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  .table-wrap::-webkit-scrollbar-thumb:hover { background: #9db8d2; }
 
   @media (max-width: 768px) {
     .topbar { padding: 0.6rem 1rem; }
@@ -452,7 +475,7 @@
     <div class="logo">P</div>
     Payroll System
   </div>
-  <span style="width:1px;height:22px;background:#e2e8f0;margin:0 6px;"></span>
+  <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
 
   <button class="btn btn-success" onclick="saveToSheet()" id="btnSaveSheet">💾 Simpan ke Sheet</button>
   <button class="btn" onclick="openImportModal()" id="btnImport">📥 Import / 导入</button>
@@ -467,7 +490,7 @@
 
   <button class="btn" onclick="showAllPayslips()" id="btnAllSlip">📄 Semua Slip Gaji</button>
   <button class="btn" onclick="checkAll()" id="btnCheckAll">✅ Semak Semua</button>
-  <span style="width:1px;height:22px;background:#e2e8f0;margin:0 6px;"></span>
+  <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
 
   <select id="checkMenu" class="btn" onchange="jumpToCheckPage(this.value)">
     <option value="">🔍 Semak / 检查…</option>
@@ -662,8 +685,8 @@
 <!-- ============ 冻结确认弹窗 ============ -->
 <div id="freezeModal" class="modal-overlay" style="display:none;">
   <div class="modal-box compact">
-    <h3 style="justify-content:center; font-size:1.05rem; margin-bottom:0.3rem;">🔒 Tetapan Freeze Kolum</h3>
-    <p style="color:#64748b; font-size:0.82rem; margin-bottom:1rem;">
+    <h3 style="justify-content:center; font-size:1.05rem; margin-bottom:0.3rem; color:var(--epf-blue);">🔒 Tetapan Freeze Kolum</h3>
+    <p style="color:var(--epf-muted); font-size:0.82rem; margin-bottom:1rem;">
       Pilih sama ada mahu kunci kolum pertama (Situation → Kumpulan) supaya sentiasa kelihatan semasa scroll, atau buka kunci sepenuhnya.
     </p>
     <div class="modal-actions">
@@ -852,7 +875,7 @@ let employees = [];
 function toast(msg, ok = true) {
   const el = document.getElementById('toast');
   el.textContent = msg;
-  el.style.background = ok ? '#1e293b' : '#991b1b';
+  el.style.background = ok ? '#1a4f8a' : '#a02020';
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 2500);
 }
@@ -1064,7 +1087,7 @@ function renderTable() {
   tbody.innerHTML = '';
 
   if (!employees.length) {
-    tbody.innerHTML = `<tr><td colspan="33" style="text-align:center;padding:2.5rem;color:#94a3b8;">${t('loading')}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="33" style="text-align:center;padding:2.5rem;color:#a7b7c9;">${t('loading')}</td></tr>`;
     updateStats();
     return;
   }
@@ -1096,7 +1119,7 @@ function renderTable() {
       <td class="td-text col-freeze col-1"><div class="text-cell">${escapeHtml(emp.Code || '')}</div></td>
       <td class="td-text col-freeze col-2"><div class="text-cell">${escapeHtml(emp.Name || '')}</div></td>
       <td class="td-text col-freeze col-3"><div class="text-cell">${escapeHtml(emp.GroupName || '')}</div></td>
-      
+
       <td class="divider-group">${numInput('Basic', false)}</td>
       <td>${numInput('Allowance', false)}</td>
       <td>${numInput('Deduction', false)}</td>
@@ -1106,7 +1129,7 @@ function renderTable() {
       <td>${numInput('OtherOT', false)}</td>
       <td>${numInput('Pinjaman', false)}</td>
       <td>${numInput('Others', false)}</td>
-      
+
       ${chkTd('EPF', 'divider-group')}
       <td>${numInput('EPF_Employee', !emp.manualEPF)}</td>
       <td>${numInput('EPF_Employer', !emp.manualEPF)}</td>
@@ -1118,17 +1141,17 @@ function renderTable() {
       <td>${numInput('EIS_Employer', !emp.manualEIS)}</td>
       ${chkTd('24JAM')}
       <td>${numInput('Lindung24Jam', !emp.manual24JAM)}</td>
-      
+
       <td class="td-text divider-group"><div class="text-cell">${escapeHtml(bankNama)}</div></td>
       <td class="td-text"><div class="text-cell">${escapeHtml(emp.SLRBankAccountNo || emp.BankAccountNo || '')}</div></td>
       <td class="td-text" style="text-align:center;">${badgeStatus(emp.SLREPF) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>'}</td>
       <td class="td-text" style="text-align:center;">${badgeStatus(emp.SLRPERKESO) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>'}</td>
       <td class="td-text" style="text-align:center;">${badgeStatus(emp.SLREIS) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>'}</td>
-      
+
       <td class="divider-group">${numInput('GrossPay', true)}</td>
       <td>${numInput('TotalDeduction', true)}</td>
       <td>${numInput('NetSalary', true)}</td>
-      
+
       <td class="divider-group" style="text-align:center;"><button class="btn btn-sm" onclick="showPayslip('${escapeHtml(emp.Code)}')">${t('slip')}</button></td>
     `;
     tbody.appendChild(tr);
@@ -1457,7 +1480,7 @@ function downloadTemplate(format) {
     XLSX.writeFile(wb, 'payroll_template.xlsx');
     toast('Template Excel dimuat turun');
   } else if (format === 'doc') {
-    let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><title>Payroll Template</title><style>body{font-family:Arial;font-size:9pt;}table{border-collapse:collapse;}th,td{border:1px solid #999;padding:3px 5px;}th{background:#eef2ff;}</style></head><body><h2>Payroll Import Template</h2><p style="font-size:9pt;color:#555;">Fill in the rows below and import back into the payroll system.</p><table><thead><tr>';
+    let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><title>Payroll Template</title><style>body{font-family:Arial;font-size:9pt;}table{border-collapse:collapse;}th,td{border:1px solid #999;padding:3px 5px;}th{background:#eef5fd;}</style></head><body><h2>Payroll Import Template</h2><p style="font-size:9pt;color:#555;">Fill in the rows below and import back into the payroll system.</p><table><thead><tr>';
     headers.forEach(h => { html += '<th>' + escapeHtml(h) + '</th>'; });
     html += '</tr></thead><tbody>';
     sample.forEach(r => { html += '<tr>'; r.forEach(c => { html += '<td>' + escapeHtml(c) + '</td>'; }); html += '</tr>'; });
@@ -1559,7 +1582,7 @@ function exportToPDF() {
   const rows = getExportRows();
   if (!rows.length) { toast(t('noData'), false); return; }
   const printArea = document.getElementById('printArea');
-  printArea.innerHTML = `<div class="export-print"><h2 style="margin-bottom:6mm;font-size:14pt;">Payroll Report — ${new Date().toLocaleDateString('ms-MY')}</h2>${buildExportTableHTML()}</div>`;
+  printArea.innerHTML = `<div class="export-print"><h2 style="margin-bottom:6mm;font-size:14pt;color:#1a4f8a;">Payroll Report — ${new Date().toLocaleDateString('ms-MY')}</h2>${buildExportTableHTML()}</div>`;
   const style = document.createElement('style');
   style.textContent = '@page { size: A4 landscape; margin: 8mm; }';
   document.head.appendChild(style);
@@ -1629,7 +1652,7 @@ function exportToDOC() {
   const rows = getExportRows();
   if (!rows.length) { toast(t('noData'), false); return; }
   const headers = getExportHeaders();
-  let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><title>Payroll Report</title><style>body{font-family:Arial,sans-serif;font-size:9pt;}table{border-collapse:collapse;width:100%;}th,td{border:1px solid #999;padding:3px 5px;}th{background:#eef2ff;text-align:left;}td.num{text-align:right;}</style></head><body><h2>Payroll Report — ' + new Date().toLocaleDateString('ms-MY') + '</h2><table><thead><tr>';
+  let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><title>Payroll Report</title><style>body{font-family:Arial,sans-serif;font-size:9pt;}table{border-collapse:collapse;width:100%;}th,td{border:1px solid #999;padding:3px 5px;}th{background:#eef5fd;text-align:left;}td.num{text-align:right;}</style></head><body><h2 style="color:#1a4f8a;">Payroll Report — ' + new Date().toLocaleDateString('ms-MY') + '</h2><table><thead><tr>';
   headers.forEach(h => { html += `<th>${escapeHtml(h)}</th>`; });
   html += '</tr></thead><tbody>';
   rows.forEach(r => {
