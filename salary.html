@@ -8,6 +8,7 @@
   /* ============================================================
      全新设计 · 玻璃质感 & 柔和光影
      保留所有原始功能，仅改变视觉风格
+     修复：冻结列（表头 + 数据行）横向固定
      ============================================================ */
   @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap');
 
@@ -332,7 +333,7 @@
   .section-label-row th {
     position: sticky;
     top: 0;
-    z-index: 12;
+    z-index: 14;
     padding: 0.45rem 0.6rem;
     font-size: 0.68rem;
     font-weight: 700;
@@ -349,8 +350,8 @@
     gap: 0.4rem;
   }
 
-  .main-header-row th { z-index: 11; vertical-align: middle; }
-  .sub-header-row th { z-index: 10; vertical-align: middle; text-align: center; }
+  .main-header-row th { z-index: 16; vertical-align: middle; }
+  .sub-header-row th { z-index: 15; vertical-align: middle; text-align: center; }
 
   /* 筛选行 */
   .filter-row th {
@@ -415,7 +416,12 @@
     border-left: 2px solid #d2e2f2 !important;
   }
 
-  /* ========== 冻结列 ========== */
+  /* ============================================================
+     冻结列 · 修复版
+     - td 和 th 都要设置 left
+     - 表头冻结列 z-index 提高，盖住普通表头
+     - 表头冻结列同时 sticky top + left
+     ============================================================ */
   body.freeze-on .col-freeze {
     position: sticky;
     z-index: 8;
@@ -430,6 +436,7 @@
     background: #f2f9ff;
   }
 
+  /* 数据行冻结列 left 值 */
   body.freeze-on .col-freeze.col-0 { left: 0px; }
   body.freeze-on .col-freeze.col-1 { left: 80px; }
   body.freeze-on .col-freeze.col-2 { left: 150px; }
@@ -439,7 +446,17 @@
     box-shadow: 6px 0 16px -8px rgba(20, 60, 120, 0.12);
   }
 
-  body.freeze-on thead .col-freeze { z-index: 15; }
+  /* ===== 表头冻结列：同时 sticky top + left ===== */
+  body.freeze-on thead .col-freeze {
+    position: sticky;
+    z-index: 18;
+  }
+  body.freeze-on thead .col-freeze.col-0 { left: 0px; }
+  body.freeze-on thead .col-freeze.col-1 { left: 80px; }
+  body.freeze-on thead .col-freeze.col-2 { left: 150px; }
+  body.freeze-on thead .col-freeze.col-3 { left: 310px; }
+
+  /* 表头冻结列背景（保持分区颜色） */
   body.freeze-on thead .col-freeze.bg-slate { background: #eef4fa !important; }
   body.freeze-on thead .col-freeze.bg-amber { background: #fef8e7 !important; }
 
