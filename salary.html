@@ -251,13 +251,21 @@
 
   .divider-group { box-shadow: inset 1px 0 0 var(--epf-border) !important; }
 
+  /* ==========================================================
+     冻结列：Situation / Kod / Nama / Kumpulan / Gaji Asas(Basic)
+     Basic 现在也是冻结列 (col-4, left:420px)
+     ========================================================== */
   body.freeze-on .col-freeze { position: sticky; z-index: 8; background: #ffffff; }
   body.freeze-on tr:nth-child(even) td.col-freeze { background: #fbfdff; }
   body.freeze-on tr:hover td.col-freeze { background: var(--epf-blue-soft); }
   body.freeze-on .col-freeze.col-0 { left: 0px; }
   body.freeze-on .col-freeze.col-1 { left: 80px; }
   body.freeze-on .col-freeze.col-2 { left: 150px; }
-  body.freeze-on .col-freeze.col-3 { left: 310px; box-shadow: inset -2px 0 0 var(--epf-blue); }
+  body.freeze-on .col-freeze.col-3 { left: 310px; }
+  body.freeze-on .col-freeze.col-4 {
+    left: 420px;
+    box-shadow: inset -2px 0 0 var(--epf-blue);
+  }
   body.freeze-on thead .col-freeze { z-index: 16; }
   body.freeze-on thead .col-freeze.bg-slate   { background: #f0f4f9 !important; }
   body.freeze-on thead .col-freeze.bg-amber   { background: #fdf8ec !important; }
@@ -271,7 +279,7 @@
     position: sticky !important; left: 0 !important; z-index: 17 !important;
   }
 
-  /* 折叠用的竖线按钮 */
+  /* 折叠竖线按钮 */
   .fold-line {
     position: absolute; top: 0; bottom: 0; width: 12px;
     background: linear-gradient(to right, rgba(14,92,110,0) 0%, rgba(14,92,110,0.06) 60%, rgba(14,92,110,0.15) 100%);
@@ -291,20 +299,8 @@
   .fold-line:hover::before { opacity: 1; }
   body.salary-folded .fold-line::before { content: '▾'; }
 
-  /* GAJI UNTUK CARUMAN 折叠后的显示 */
-  body.salary-folded .foldable-col { display: none; }
-  body.salary-folded .fold-hint {
-    display: table-cell !important;
-  }
-  .fold-hint {
-    display: none;
-    background: #ecf9fc !important;
-    text-align: center;
-    color: #0e5c6e !important;
-    font-size: 0.68rem;
-    font-weight: 600;
-    cursor: pointer;
-  }
+  /* 折叠 GAJI UNTUK CARUMAN：整组隐藏（含分区标题） */
+  body.salary-folded .foldable-col { display: none !important; }
 
   .freeze-line {
     position: absolute; top: 0; bottom: 0; right: 0; width: 14px;
@@ -379,7 +375,6 @@
     border-color: #b7e4c7 !important;
   }
 
-  /* BASIC SALARY 组高亮（淡黄） */
   td.bg-slate-basic .input.num {
     background: #fffaf0;
     border-color: #f0d8a8;
@@ -390,7 +385,6 @@
     box-shadow: 0 0 0 2px rgba(138, 106, 20, 0.12);
   }
 
-  /* 缴款薪资列：淡蓝背景 */
   td.bg-cyan .input.num {
     background: #f6fdff;
     border-color: #c7e6ef;
@@ -401,7 +395,6 @@
     box-shadow: 0 0 0 2px rgba(14, 92, 110, 0.12);
   }
 
-  /* 扣款列：淡粉背景 */
   td.bg-rose .input.num {
     background: #fff8fa;
     border-color: #f0c7d3;
@@ -625,12 +618,11 @@
   </div>
 
   <div class="section-legend">
-    <span class="item"><span class="dot bg-slate" style="border:1px solid #cbd5e1;"></span> <span id="legend1">1. Maklumat Asas (Freeze)</span></span>
-    <span class="item"><span class="dot bg-slate" style="border:1px solid #e0c98a;"></span> <span id="legendBasic">Basic Salary</span></span>
+    <span class="item"><span class="dot bg-slate" style="border:1px solid #cbd5e1;"></span> <span id="legend1">1. Maklumat Asas + Basic Salary (Freeze)</span></span>
     <span class="item"><span class="dot bg-emerald" style="border:1px solid #a7d7b8;"></span> <span id="legend2">2. Pendapatan (OT)</span></span>
     <span class="item"><span class="dot bg-emerald" style="border:1px solid #a7d7b8;"></span> <span id="legend2b">2.5 Pendapatan Tambahan</span></span>
     <span class="item"><span class="dot bg-rose" style="border:1px solid #f0c7d3;"></span> <span id="legend2d">2.8 Potongan (On Leave + Pinjaman)</span></span>
-    <span class="item"><span class="dot bg-cyan" style="border:1px solid #a3d8e3;"></span> <span id="legend2c">2.9 Gaji untuk Caruman</span></span>
+    <span class="item"><span class="dot bg-cyan" style="border:1px solid #a3d8e3;"></span> <span id="legend2c">2.9 Gaji untuk Caruman (boleh lipat)</span></span>
     <span class="item"><span class="dot bg-violet" style="border:1px solid #c4b8e8;"></span> <span id="legend3">3. Caruman Statutori</span></span>
     <span class="item"><span class="dot bg-amber" style="border:1px solid #e8d48a;"></span> <span id="legend4">4. Staff Login Record (U-Y)</span></span>
     <span class="item"><span class="dot bg-blue" style="border:1px solid #a8c4e8;"></span> <span id="legend5">5. Ringkasan Gaji</span></span>
@@ -642,21 +634,21 @@
       <div class="table-wrap">
         <table id="mainTable">
           <colgroup>
-            <!-- 1. Maklumat Asas -->
+            <!-- 1. Maklumat Asas (冻结) -->
             <col class="col-freeze col-0" style="width:80px">
             <col class="col-freeze col-1" style="width:70px">
             <col class="col-freeze col-2" style="width:160px">
             <col class="col-freeze col-3" style="width:110px">
-            <!-- BASIC SALARY (1 列) -->
-            <col style="width:110px">
-            <!-- 2. Pendapatan (OT 类型 4 列) -->
+            <!-- BASIC SALARY (col-freeze col-4) -->
+            <col class="col-freeze col-4" style="width:110px">
+            <!-- 2. Pendapatan (OT) 4 列 -->
             <col style="width:85px"><col style="width:85px"><col style="width:85px"><col style="width:85px">
-            <!-- ADDITIONAL INCOME (3 列 + 1 合计 = 4) -->
+            <!-- ADDITIONAL INCOME 4 列 -->
             <col style="width:130px"><col style="width:130px"><col style="width:130px"><col style="width:130px">
-            <!-- POTONGAN: ON LEAVE 4 + PINJAMAN 1 = 5 -->
+            <!-- POTONGAN 5 列 -->
             <col style="width:130px"><col style="width:130px"><col style="width:130px"><col style="width:130px">
             <col style="width:110px">
-            <!-- SALARY FOR CONTRIBUTIONS (4) -->
+            <!-- SALARY FOR CONTRIBUTIONS 4 列 -->
             <col style="width:130px"><col style="width:130px">
             <col style="width:130px"><col style="width:130px">
             <!-- Section 3 (11) -->
@@ -677,13 +669,13 @@
           </colgroup>
           <thead>
             <tr class="section-label-row">
-              <th colspan="4" class="bg-slate col-freeze-group"><div class="sec-title" id="sec1">📌 1. MAKLUMAT ASAS (FREEZE)</div></th>
-              <th colspan="1" class="bg-slate divider-group"><div class="sec-title" id="secBasic">💵 BASIC SALARY</div></th>
+              <!-- 第一组包含 Gaji Asas: colspan 4 → 5 -->
+              <th colspan="5" class="bg-slate col-freeze-group"><div class="sec-title" id="sec1">📌 1. MAKLUMAT ASAS + 💵 BASIC SALARY (FREEZE)</div></th>
               <th colspan="4" class="bg-emerald divider-group"><div class="sec-title" id="sec2">💰 2. PENDAPATAN / ELAUN (OT)</div></th>
               <th colspan="4" class="bg-emerald divider-group"><div class="sec-title" id="sec2b">➕ PENDAPATAN TAMBAHAN</div></th>
               <th colspan="5" class="bg-rose divider-group"><div class="sec-title" id="sec2d">➖ POTONGAN (ON LEAVE + PINJAMAN)</div></th>
-              <!-- GAJI UNTUK CARUMAN 用 fold 类 -->
-              <th colspan="4" class="bg-cyan divider-group fold-label" style="position: relative;">
+              <!-- GAJI UNTUK CARUMAN: 分区标题也要 foldable-col -->
+              <th colspan="4" class="bg-cyan divider-group foldable-col" style="position: relative;">
                 <div class="fold-line left" onclick="toggleSalaryFold(event)" title="Fold / Unfold"></div>
                 <div class="sec-title" id="sec2c">📐 GAJI UNTUK CARUMAN</div>
                 <div class="fold-line right" onclick="toggleSalaryFold(event)" title="Fold / Unfold"></div>
@@ -697,40 +689,35 @@
               <th class="col-freeze col-0 bg-slate" rowspan="2" id="thSituation">Situation</th>
               <th class="col-freeze col-1 bg-slate" rowspan="2" id="thKod">Kod</th>
               <th class="col-freeze col-2 bg-slate" rowspan="2" id="thNama">Nama</th>
-              <th class="col-freeze col-3 bg-slate" rowspan="2" id="thKumpulan" style="position: sticky;">
-                Kumpulan
+              <th class="col-freeze col-3 bg-slate" rowspan="2" id="thKumpulan">Kumpulan</th>
+
+              <!-- BASIC SALARY (col-freeze col-4) —— 冻结线的拖拽线放这里 -->
+              <th class="col-freeze col-4 bg-slate divider-group" rowspan="2" id="thBasic" style="position: sticky;">
+                Gaji Asas
                 <div class="freeze-line" onclick="openFreezeModal()" title="Toggle freeze"></div>
               </th>
 
-              <!-- BASIC SALARY -->
-              <th class="bg-slate divider-group" rowspan="2" id="thBasic">Gaji Asas</th>
-
-              <!-- OT 类型：4 列 -->
               <th class="bg-emerald divider-group" rowspan="2" id="thNormalOT">OT Biasa</th>
               <th class="bg-emerald" rowspan="2" id="thRestOT">OT Rehat</th>
               <th class="bg-emerald" rowspan="2" id="thPublicOT">OT Awam</th>
               <th class="bg-emerald" rowspan="2" id="thOtherOT">OT Lain</th>
 
-              <!-- ADDITIONAL INCOME -->
               <th class="bg-emerald divider-group" rowspan="2" id="thAllowance2">ALLOWANCE</th>
               <th class="bg-emerald" rowspan="2" id="thCommission">COMMISION</th>
               <th class="bg-emerald" rowspan="2" id="thIncentives">INCENTIVES</th>
               <th class="bg-emerald" rowspan="2" id="thFirstCalcTotal">FIRST CALCULATION TOTAL</th>
 
-              <!-- POTONGAN: ON LEAVE 4 + PINJAMAN 1 -->
               <th class="bg-rose divider-group" rowspan="2" id="thAnnualLeave">ANNUAL LEAVE</th>
               <th class="bg-rose" rowspan="2" id="thUnpaidLeave">UNPAID LEAVE</th>
               <th class="bg-rose" rowspan="2" id="thSickLeave">SICK LEAVE</th>
               <th class="bg-rose" rowspan="2" id="thHalfDays">HALF DAYS LEAVE (HOURS)</th>
               <th class="bg-rose" rowspan="2" id="thPinjaman">PINJAMAN</th>
 
-              <!-- SALARY FOR CONTRIBUTIONS -->
               <th class="bg-cyan divider-group foldable-col" rowspan="2" id="thEPFSalary">Salary for EPF Contributions<br><span style="font-weight:400;font-size:0.6rem;">(Gaji untuk caruman KWSP)</span></th>
               <th class="bg-cyan foldable-col" rowspan="2" id="thSOCSOSalary">Salary for SOCSO Contributions<br><span style="font-weight:400;font-size:0.6rem;">(Gaji untuk caruman PERKESO)</span></th>
               <th class="bg-cyan foldable-col" rowspan="2" id="thEISSalary">Salary for EIS Contributions<br><span style="font-weight:400;font-size:0.6rem;">(Gaji untuk caruman EIS)</span></th>
               <th class="bg-cyan foldable-col" rowspan="2" id="thLindungSalary">Salary for 24JAM Contributions<br><span style="font-weight:400;font-size:0.6rem;">(Gaji untuk caruman 24JAM)</span></th>
 
-              <!-- Section 3 -->
               <th class="bg-violet divider-group" rowspan="2" style="text-align:center;">✎</th>
               <th class="bg-violet" colspan="2" style="text-align:center;">EPF</th>
               <th class="bg-violet" rowspan="2" style="text-align:center;">✎</th>
@@ -740,7 +727,6 @@
               <th class="bg-violet" rowspan="2" style="text-align:center;">✎</th>
               <th class="bg-violet" rowspan="2" id="th24JAM">24JAM</th>
 
-              <!-- Section 4 -->
               <th class="bg-amber divider-group" rowspan="2" style="text-align:center;">✎</th>
               <th class="bg-amber" rowspan="2"><div style="font-size:0.72rem;" id="thBankNama">Bank Nama<br><span style="font-weight:400;font-size:0.6rem;">(U)</span></div></th>
               <th class="bg-amber" rowspan="2" style="text-align:center;">✎</th>
@@ -752,12 +738,10 @@
               <th class="bg-amber" rowspan="2" style="text-align:center;">✎</th>
               <th class="bg-amber" rowspan="2" style="text-align:center;"><div style="font-size:0.72rem;" id="thEIS">EIS<br><span style="font-weight:400;font-size:0.6rem;">(Y)</span></div></th>
 
-              <!-- Section 5 -->
               <th class="bg-blue divider-group" rowspan="2" id="thGross">Gaji Kasar</th>
               <th class="bg-blue" rowspan="2" id="thTotalDed">Total Potongan</th>
               <th class="bg-blue" rowspan="2" id="thNet">Gaji Bersih</th>
 
-              <!-- Section 6 -->
               <th class="bg-gray divider-group" rowspan="2" style="text-align:center;" id="thAction">Tindakan</th>
             </tr>
             <tr class="sub-header-row">
@@ -773,8 +757,8 @@
               <th class="col-freeze col-1 bg-slate"><input class="th-filter" data-col="1" placeholder="🔍"></th>
               <th class="col-freeze col-2 bg-slate"><input class="th-filter" data-col="2" placeholder="🔍"></th>
               <th class="col-freeze col-3 bg-slate"><input class="th-filter" data-col="3" placeholder="🔍"></th>
-              <!-- BASIC SALARY -->
-              <th class="bg-slate divider-group"><input class="th-filter" data-col="4" placeholder="🔍"></th>
+              <!-- BASIC SALARY (col-freeze col-4) -->
+              <th class="col-freeze col-4 bg-slate divider-group"><input class="th-filter" data-col="4" placeholder="🔍"></th>
               <!-- OT -->
               <th class="bg-emerald divider-group"><input class="th-filter" data-col="5" placeholder="🔍"></th>
               <th class="bg-emerald"><input class="th-filter" data-col="6" placeholder="🔍"></th>
@@ -791,7 +775,7 @@
               <th class="bg-rose"><input class="th-filter" data-col="15" placeholder="🔍"></th>
               <th class="bg-rose"><input class="th-filter" data-col="16" placeholder="🔍"></th>
               <th class="bg-rose"><input class="th-filter" data-col="17" placeholder="🔍"></th>
-              <!-- SALARY FOR CONTRIBUTIONS -->
+              <!-- SALARY FOR CONTRIBUTIONS（筛选行也折叠） -->
               <th class="bg-cyan divider-group foldable-col"><input class="th-filter" data-col="18" placeholder="🔍"></th>
               <th class="bg-cyan foldable-col"><input class="th-filter" data-col="19" placeholder="🔍"></th>
               <th class="bg-cyan foldable-col"><input class="th-filter" data-col="20" placeholder="🔍"></th>
@@ -823,7 +807,6 @@
               <th class="bg-blue divider-group"><input class="th-filter" data-col="43" placeholder="🔍"></th>
               <th class="bg-blue"><input class="th-filter" data-col="44" placeholder="🔍"></th>
               <th class="bg-blue"><input class="th-filter" data-col="45" placeholder="🔍"></th>
-              <!-- Section 6 -->
               <th class="bg-gray divider-group no-filter"></th>
             </tr>
           </thead>
@@ -843,7 +826,7 @@
   <div class="modal-box compact">
     <h3 style="justify-content:center; font-size:1.05rem; margin-bottom:0.3rem; color:var(--epf-blue);" id="freezeTitle">🔒 Tetapan Freeze Kolum</h3>
     <p style="color:var(--epf-muted); font-size:0.82rem; margin-bottom:1rem;" id="freezeDesc">
-      Pilih sama ada mahu kunci kolum pertama (Situation → Kumpulan) supaya sentiasa kelihatan semasa scroll, atau buka kunci sepenuhnya.
+      Pilih sama ada mahu kunci kolum pertama (Situation → Gaji Asas) supaya sentiasa kelihatan semasa scroll, atau buka kunci sepenuhnya.
     </p>
     <div class="modal-actions">
       <button class="btn" onclick="setFreeze(false)" id="freezeUnlockBtn">🔓 Buka Kunci</button>
@@ -896,14 +879,14 @@ const I18N = {
     badge: 'Auto kira caruman statutori · Manual override dengan kotak semak',
     save: 'Simpan ke Sheet', importBtn: 'Import / 导入',
     exportMenu: 'Eksport', allSlip: 'Semua Slip Gaji', checkAll: 'Semak Semua',
-    legend1: '1. Maklumat Asas (Freeze)', legend2: '2. Pendapatan (OT)',
+    legend1: '1. Maklumat Asas + Basic Salary (Freeze)', legend2: '2. Pendapatan (OT)',
     legendBasic: 'Basic Salary',
     legend2b: '2.5 Pendapatan Tambahan',
     legend2d: '2.8 Potongan (On Leave + Pinjaman)',
-    legend2c: '2.9 Gaji untuk Caruman',
+    legend2c: '2.9 Gaji untuk Caruman (boleh lipat)',
     legend3: '3. Caruman Statutori', legend4: '4. Staff Login Record (U-Y)',
     legend5: '5. Ringkasan Gaji', legend6: '6. Tindakan',
-    sec1: '📌 1. MAKLUMAT ASAS (FREEZE)', secBasic: '💵 BASIC SALARY',
+    sec1: '📌 1. MAKLUMAT ASAS + 💵 BASIC SALARY (FREEZE)', secBasic: '💵 BASIC SALARY',
     sec2: '💰 2. PENDAPATAN / ELAUN (OT)',
     sec2b: '➕ PENDAPATAN TAMBAHAN',
     sec2d: '➖ POTONGAN (ON LEAVE + PINJAMAN)',
@@ -928,7 +911,7 @@ const I18N = {
     epf: 'EPF', socso: 'SOCSO', eis: 'EIS',
     gross: 'Gaji Kasar', totalDed: 'Total Potongan', net: 'Gaji Bersih',
     action: 'Tindakan', slip: 'Slip',
-    legend: 'Nota: Tandakan ✔ di hadapan EPF/SOCSO/EIS/24JAM untuk isi manual. Tandakan ✔ di Section 4 (U-Y) untuk edit Bank/EPF/SOCSO/EIS. Jika Bank Nama = CASH, EPF/SOCSO/EIS auto 0. FIRST CALCULATION TOTAL = jumlah pendapatan tolak ON LEAVE + PINJAMAN, sebelum EPF/SOCSO/EIS/24JAM. GAJI UNTUK CARUMAN = asas kiraan caruman; kosong = guna Gaji Asas. Klik garis fold di kanan/kiri GAJI UNTUK CARUMAN untuk lipat.',
+    legend: 'Nota: Tandakan ✔ di hadapan EPF/SOCSO/EIS/24JAM untuk isi manual. Section 4 (U-Y) juga boleh edit. Jika Bank Nama = CASH, EPF/SOCSO/EIS auto 0. FIRST CALCULATION TOTAL = pendapatan − potongan (On Leave + Pinjaman), sebelum EPF/SOCSO/EIS/24JAM. GAJI UNTUK CARUMAN boleh dilipat dengan klik garis kiri/kanan. Lock line di kanan Gaji Asas.',
     saved: 'Berjaya disimpan ke Sheet', failed: 'Gagal simpan',
     loading: 'Memuatkan data...', importSuccess: 'Berjaya import {n} pekerja',
     importFail: 'Fail tidak sah atau kosong', importFormat: 'Format fail tidak disokong',
@@ -936,7 +919,7 @@ const I18N = {
     freezeLocked: 'Kolum dibekukan (freeze ON)', freezeUnlocked: 'Kolum dibuka (freeze OFF)',
     salaryFolded: 'GAJI UNTUK CARUMAN dilipat', salaryUnfolded: 'GAJI UNTUK CARUMAN dibuka',
     freezeTitle: '🔒 Tetapan Freeze Kolum',
-    freezeDesc: 'Pilih sama ada mahu kunci kolum pertama (Situation → Kumpulan) supaya sentiasa kelihatan semasa scroll, atau buka kunci sepenuhnya.',
+    freezeDesc: 'Pilih sama ada mahu kunci kolum pertama (Situation → Gaji Asas) supaya sentiasa kelihatan semasa scroll, atau buka kunci sepenuhnya.',
     freezeUnlock: '🔓 Buka Kunci', freezeLock: '🔒 Kunci Kolum', freezeCancel: 'Batal',
     importTitle: '📥 Import Data / 导入资料',
     importDrop: 'Lepaskan fail di sini atau klik untuk pilih',
@@ -953,14 +936,14 @@ const I18N = {
     badge: 'Auto-calculate statutory contributions · Manual override with checkbox',
     save: 'Save to Sheet', importBtn: 'Import',
     exportMenu: 'Export', allSlip: 'All Payslips', checkAll: 'Check All',
-    legend1: '1. Basic Info (Freeze)', legend2: '2. Income (OT)',
+    legend1: '1. Basic Info + Basic Salary (Freeze)', legend2: '2. Income (OT)',
     legendBasic: 'Basic Salary',
     legend2b: '2.5 Additional Income',
     legend2d: '2.8 Deductions (On Leave + Loan)',
-    legend2c: '2.9 Salary for Contributions',
+    legend2c: '2.9 Salary for Contributions (collapsible)',
     legend3: '3. Statutory Contributions', legend4: '4. Staff Login Record (U-Y)',
     legend5: '5. Salary Summary', legend6: '6. Actions',
-    sec1: '📌 1. BASIC INFO (FREEZE)', secBasic: '💵 BASIC SALARY',
+    sec1: '📌 1. BASIC INFO + 💵 BASIC SALARY (FREEZE)', secBasic: '💵 BASIC SALARY',
     sec2: '💰 2. INCOME / ALLOWANCE (OT)',
     sec2b: '➕ ADDITIONAL INCOME',
     sec2d: '➖ DEDUCTIONS (ON LEAVE + LOAN)',
@@ -985,7 +968,7 @@ const I18N = {
     epf: 'EPF', socso: 'SOCSO', eis: 'EIS',
     gross: 'Gross', totalDed: 'Total Ded', net: 'Net',
     action: 'Action', slip: 'Payslip',
-    legend: 'Note: Tick ✔ before EPF/SOCSO/EIS/24JAM to enter manually. Tick ✔ in Section 4 (U-Y) to edit Bank/EPF/SOCSO/EIS. If Bank Nama = CASH, EPF/SOCSO/EIS auto 0. FIRST CALCULATION TOTAL = total income minus ON LEAVE + LOAN, before EPF/SOCSO/EIS/24JAM. SALARY FOR CONTRIBUTIONS = basis for contribution calc; blank = use Basic. Click the fold line right/left of SALARY FOR CONTRIBUTIONS to collapse.',
+    legend: 'Note: Tick ✔ before EPF/SOCSO/EIS/24JAM to enter manually. Section 4 (U-Y) is also editable. If Bank Nama = CASH, EPF/SOCSO/EIS auto 0. FIRST CALCULATION TOTAL = income − deductions (On Leave + Loan), before EPF/SOCSO/EIS/24JAM. SALARY FOR CONTRIBUTIONS can be collapsed via fold line. Lock line right of Basic salary.',
     saved: 'Saved successfully', failed: 'Save failed',
     loading: 'Loading data...', importSuccess: 'Imported {n} employees',
     importFail: 'Invalid or empty file', importFormat: 'Unsupported file format',
@@ -993,7 +976,7 @@ const I18N = {
     freezeLocked: 'Columns frozen (ON)', freezeUnlocked: 'Columns unfrozen (OFF)',
     salaryFolded: 'SALARY FOR CONTRIBUTIONS collapsed', salaryUnfolded: 'SALARY FOR CONTRIBUTIONS expanded',
     freezeTitle: '🔒 Freeze Column Setting',
-    freezeDesc: 'Choose whether to lock the first columns (Situation → Group) so they stay visible while scrolling, or unlock them completely.',
+    freezeDesc: 'Choose whether to lock the first columns (Situation → Basic salary) so they stay visible while scrolling, or unlock them completely.',
     freezeUnlock: '🔓 Unlock', freezeLock: '🔒 Lock Columns', freezeCancel: 'Cancel',
     importTitle: '📥 Import Data',
     importDrop: 'Drop file here or click to select',
@@ -1010,14 +993,14 @@ const I18N = {
     badge: '自动计算法定缴款 · 使用复选框手动覆盖',
     save: '保存到 Sheet', importBtn: 'Import / 导入',
     exportMenu: '导出', allSlip: '全部粮单', checkAll: '检查全部',
-    legend1: '1. 基本资料 (冻结)', legend2: '2. 收入 (OT)',
+    legend1: '1. 基本资料 + 基本薪资 (冻结)', legend2: '2. 收入 (OT)',
     legendBasic: '基本薪资',
     legend2b: '2.5 额外收入',
     legend2d: '2.8 扣款 (请假 + 借粮)',
-    legend2c: '2.9 缴款薪资',
+    legend2c: '2.9 缴款薪资 (可折叠)',
     legend3: '3. 法定缴款', legend4: '4. 员工登录记录 (U-Y)',
     legend5: '5. 薪资汇总', legend6: '6. 操作',
-    sec1: '📌 1. 基本资料 (冻结)', secBasic: '💵 基本薪资',
+    sec1: '📌 1. 基本资料 + 💵 基本薪资 (冻结)', secBasic: '💵 基本薪资',
     sec2: '💰 2. 收入 / 津贴 (OT)',
     sec2b: '➕ 额外收入',
     sec2d: '➖ 扣款 (请假 + 借粮)',
@@ -1042,7 +1025,7 @@ const I18N = {
     epf: 'EPF', socso: 'SOCSO', eis: 'EIS',
     gross: '总薪资', totalDed: '总扣款', net: '净薪资',
     action: '操作', slip: '粮单',
-    legend: '备注：勾选 EPF/SOCSO/EIS/24JAM 前的 ✔ 手动填写。勾选 Section 4 (U-Y) 前的 ✔ 可手动编辑银行/EPF/SOCSO/EIS。若银行名填 CASH，EPF/SOCSO/EIS 自动归零。首次计算总额 = 所有收入 − 请假+借粮，在 EPF/SOCSO/EIS/24JAM 之前。缴款薪资 = 计算基数；留空 = 使用基本薪资。点击「缴款薪资」左右折叠线可折叠该组。',
+    legend: '备注：勾选 EPF/SOCSO/EIS/24JAM 前的 ✔ 手动填写。Section 4 (U-Y) 也可编辑。若银行名填 CASH，EPF/SOCSO/EIS 自动归零。首次计算总额 = 收入 − 扣款（请假 + 借粮），在 EPF/SOCSO/EIS/24JAM 之前。缴款薪资可用折叠线收起/展开。锁定线在基本薪资右侧。',
     saved: '已成功保存到 Sheet', failed: '保存失败',
     loading: '加载数据中...', importSuccess: '成功导入 {n} 位员工',
     importFail: '文件无效或为空', importFormat: '不支持的文件格式',
@@ -1050,7 +1033,7 @@ const I18N = {
     freezeLocked: '列已冻结', freezeUnlocked: '列已解冻',
     salaryFolded: '缴款薪资组已折叠', salaryUnfolded: '缴款薪资组已展开',
     freezeTitle: '🔒 冻结列设置',
-    freezeDesc: '选择是否锁定前几列（状态 → 分店），让它们在滚动时保持可见，或完全解锁。',
+    freezeDesc: '选择是否锁定前几列（状态 → 基本薪资），让它们在滚动时保持可见，或完全解锁。',
     freezeUnlock: '🔓 解锁', freezeLock: '🔒 锁定列', freezeCancel: '取消',
     importTitle: '📥 导入资料',
     importDrop: '拖入文件或点击选择',
@@ -1315,7 +1298,6 @@ function isExempt(staff) {
   };
 }
 
-// 非法定扣款总额 = On Leave 4 项 + Pinjaman + 兼容旧的 Deduction
 function totalNonStatutoryDeduction(emp) {
   return num(emp.Deduction)
        + num(emp.AnnualLeave)
@@ -1356,7 +1338,6 @@ function recalcRow(emp) {
 
   const ot = num(emp.NormalOT) + num(emp.RestOT) + num(emp.PublicOT) + num(emp.OtherOT);
 
-  // 总收入 = Basic + Allowance + Allowance2 + Commission + Incentives + OT
   const gross = basic
     + num(emp.Allowance)
     + num(emp.Allowance2)
@@ -1364,14 +1345,11 @@ function recalcRow(emp) {
     + num(emp.Incentives)
     + ot;
 
-  // 非法定扣款（On Leave + Pinjaman + 兼容 Deduction）
   const nonStatDed = totalNonStatutoryDeduction(emp);
 
-  // FIRST CALCULATION TOTAL = 总收入 − 非法定扣款（法定缴款之前）
   const firstCalcTotal = gross - nonStatDed;
   emp.FirstCalcTotal = firstCalcTotal;
 
-  // 总扣款 = 非法定扣款 + 法定缴款
   const totalDed = nonStatDed
                  + num(emp.EPF_Employee) + num(emp.SOCSO_Employee) + num(emp.EIS_Employee)
                  + num(emp.Lindung24Jam);
@@ -1401,7 +1379,6 @@ function updateUILanguage() {
   document.getElementById('pageDesc').textContent = t('desc');
   document.getElementById('pageBadge').textContent = t('badge');
   document.getElementById('legend1').textContent = t('legend1');
-  document.getElementById('legendBasic').textContent = t('legendBasic');
   document.getElementById('legend2').textContent = t('legend2');
   document.getElementById('legend2b').textContent = t('legend2b');
   document.getElementById('legend2d').textContent = t('legend2d');
@@ -1411,7 +1388,6 @@ function updateUILanguage() {
   document.getElementById('legend5').textContent = t('legend5');
   document.getElementById('legend6').textContent = t('legend6');
   document.getElementById('sec1').textContent = t('sec1');
-  document.getElementById('secBasic').textContent = t('secBasic');
   document.getElementById('sec2').textContent = t('sec2');
   document.getElementById('sec2b').textContent = t('sec2b');
   document.getElementById('sec2d').textContent = t('sec2d');
@@ -1423,8 +1399,8 @@ function updateUILanguage() {
   document.getElementById('thSituation').textContent = t('situation');
   document.getElementById('thKod').textContent = t('kod');
   document.getElementById('thNama').textContent = t('nama');
-  document.getElementById('thKumpulan').childNodes[0].textContent = t('kumpulan');
-  document.getElementById('thBasic').textContent = t('basic');
+  document.getElementById('thKumpulan').textContent = t('kumpulan');
+  document.getElementById('thBasic').childNodes[0].textContent = t('basic') + ' ';
   document.getElementById('thNormalOT').textContent = t('normalOT');
   document.getElementById('thRestOT').textContent = t('restOT');
   document.getElementById('thPublicOT').textContent = t('publicOT');
@@ -1540,8 +1516,8 @@ function renderTable() {
       <td class="td-text col-freeze col-2"><div class="text-cell">${escapeHtml(emp.Name || '')}</div></td>
       <td class="td-text col-freeze col-3"><div class="text-cell">${escapeHtml(emp.GroupName || '')}</div></td>
 
-      <!-- BASIC SALARY -->
-      <td class="divider-group bg-slate-basic">${numInput('Basic', false)}</td>
+      <!-- BASIC SALARY (col-freeze col-4) -->
+      <td class="col-freeze col-4 bg-slate-basic">${numInput('Basic', false)}</td>
 
       <!-- OT 4 列 -->
       <td class="divider-group">${numInput('NormalOT', false)}</td>
@@ -1555,7 +1531,7 @@ function renderTable() {
       <td>${numInput('Incentives', false)}</td>
       <td>${numInput('FirstCalcTotal', true, 'first-total')}</td>
 
-      <!-- POTONGAN: ON LEAVE 4 + PINJAMAN 1 -->
+      <!-- POTONGAN -->
       <td class="divider-group bg-rose">${numInput('AnnualLeave', false)}</td>
       <td class="bg-rose">${numInput('UnpaidLeave', false)}</td>
       <td class="bg-rose">${numInput('SickLeave', false)}</td>
@@ -1604,7 +1580,6 @@ function renderTable() {
     tbody.appendChild(tr);
   });
 
-  // 数值输入监听
   tbody.querySelectorAll('input.input.num:not([readonly])').forEach(inp => {
     inp.addEventListener('input', e => {
       const idx = Number(e.target.dataset.idx);
@@ -1624,7 +1599,6 @@ function renderTable() {
     });
   });
 
-  // Section 3 手动覆盖
   tbody.querySelectorAll('.manual-chk').forEach(chk => {
     chk.addEventListener('change', e => {
       const idx = Number(e.target.dataset.idx);
@@ -1646,7 +1620,6 @@ function renderTable() {
     });
   });
 
-  // Section 4 SLR 勾选
   tbody.querySelectorAll('.slr-manual-chk').forEach(chk => {
     chk.addEventListener('change', e => {
       const idx = Number(e.target.dataset.idx);
@@ -1662,7 +1635,6 @@ function renderTable() {
     });
   });
 
-  // Section 4 SLR 输入
   tbody.querySelectorAll('input.slr-plain').forEach(inp => {
     inp.addEventListener('input', e => {
       const idx = Number(e.target.dataset.idx);
@@ -1689,7 +1661,6 @@ function renderTable() {
   updateStickyOffsets();
 }
 
-// ================= 表头筛选 =================
 function applyFilters() {
   const filters = [];
   document.querySelectorAll('.th-filter').forEach(inp => {
@@ -1977,7 +1948,6 @@ async function handleImportFile(file) {
   } catch (err) { console.error(err); toast('Import error: ' + err.message, false); }
 }
 
-// ================= 模板 / 导出 =================
 function getExportHeaders() {
   return [
     'Situation','Code','Name','Group','Bank',
@@ -2232,7 +2202,6 @@ async function loadEmployees() {
   } catch (err) { console.error(err); toast('Gagal muat data', false); }
 }
 
-// ================= 粮单 =================
 function showPayslip(code) {
   const emp = employees.find(e => e.Code === code);
   if (!emp) return;
@@ -2306,7 +2275,6 @@ function buildPayslip(emp) {
   </div>`;
 }
 
-// ================= 语言切换 =================
 function switchLang(lang) {
   currentLang = lang;
   document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
@@ -2314,7 +2282,6 @@ function switchLang(lang) {
   setTimeout(updateStickyOffsets, 60);
 }
 
-// ================= 启动 =================
 window.addEventListener('DOMContentLoaded', () => {
   const langSelect = document.getElementById('langSelect');
   if (langSelect) langSelect.value = currentLang;
