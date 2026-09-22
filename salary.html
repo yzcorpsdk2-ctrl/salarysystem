@@ -190,7 +190,7 @@
   table {
     border-collapse: separate; border-spacing: 0;
     font-size: 0.8rem; table-layout: fixed;
-    width: 2905px; min-width: 2905px;
+    width: 3605px; min-width: 3605px;
   }
 
   th {
@@ -290,7 +290,6 @@
     width: 15px; height: 15px; cursor: pointer;
     accent-color: var(--epf-blue); border-radius: 3px;
   }
-  /* 新：Section 4 里的小勾选框 */
   .td-chk-sm { text-align: center; vertical-align: middle; padding: 0.4rem 0.1rem !important; }
   .td-chk-sm input[type="checkbox"] {
     width: 14px; height: 14px; cursor: pointer;
@@ -336,7 +335,14 @@
   .cell-bad { background: #fdeaea !important; border-color: #f0b4b4 !important; }
   .cell-ok  { background: #e3f5ea !important; }
 
-  /* 新：SLR 字段样式 */
+  /* 新增：FIRST CALCULATION TOTAL 高亮 */
+  .input.first-total {
+    background: #eafaf1 !important;
+    color: #14663f !important;
+    font-weight: 700;
+    border-color: #b7e4c7 !important;
+  }
+
   .input.slr-plain {
     background: transparent !important;
     border-color: transparent !important;
@@ -552,6 +558,7 @@
   <div class="section-legend">
     <span class="item"><span class="dot bg-slate" style="border:1px solid #cbd5e1;"></span> <span id="legend1">1. Maklumat Asas (Freeze)</span></span>
     <span class="item"><span class="dot bg-emerald" style="border:1px solid #a7d7b8;"></span> <span id="legend2">2. Pendapatan</span></span>
+    <span class="item"><span class="dot bg-emerald" style="border:1px solid #a7d7b8;"></span> <span id="legend2b">2.5 Pendapatan Tambahan</span></span>
     <span class="item"><span class="dot bg-violet" style="border:1px solid #c4b8e8;"></span> <span id="legend3">3. Caruman Statutori</span></span>
     <span class="item"><span class="dot bg-amber" style="border:1px solid #e8d48a;"></span> <span id="legend4">4. Staff Login Record (U-Y)</span></span>
     <span class="item"><span class="dot bg-blue" style="border:1px solid #a8c4e8;"></span> <span id="legend5">5. Ringkasan Gaji</span></span>
@@ -570,23 +577,30 @@
             <col style="width:85px"><col style="width:85px"><col style="width:85px">
             <col style="width:70px"><col style="width:70px"><col style="width:70px"><col style="width:70px">
             <col style="width:85px"><col style="width:85px">
+            <!-- 新增加 4 列，各 130px -->
+            <col style="width:130px"><col style="width:130px">
+            <col style="width:130px"><col style="width:130px">
+            <!-- Section 3 -->
             <col style="width:40px"><col style="width:85px"><col style="width:85px">
             <col style="width:40px"><col style="width:85px"><col style="width:85px">
             <col style="width:40px"><col style="width:85px"><col style="width:85px">
             <col style="width:40px"><col style="width:80px">
-            <!-- Section 4 新增勾选列 -->
+            <!-- Section 4 -->
             <col style="width:40px"><col style="width:130px">
             <col style="width:40px"><col style="width:130px">
-            <col style="width:40px"><col style="width:70px">
-            <col style="width:40px"><col style="width:70px">
-            <col style="width:40px"><col style="width:70px">
+            <col style="width:40px"><col style="width:130px">
+            <col style="width:40px"><col style="width:130px">
+            <col style="width:40px"><col style="width:130px">
+            <!-- Section 5 -->
             <col style="width:95px"><col style="width:95px"><col style="width:95px">
+            <!-- Section 6 -->
             <col style="width:80px">
           </colgroup>
           <thead>
             <tr class="section-label-row">
               <th colspan="4" class="bg-slate col-freeze-group"><div class="sec-title" id="sec1">📌 1. MAKLUMAT ASAS (FREEZE)</div></th>
               <th colspan="9" class="bg-emerald divider-group"><div class="sec-title" id="sec2">💰 2. PENDAPATAN / ELAUN</div></th>
+              <th colspan="4" class="bg-emerald divider-group"><div class="sec-title" id="sec2b">➕ PENDAPATAN TAMBAHAN</div></th>
               <th colspan="11" class="bg-violet divider-group"><div class="sec-title" id="sec3">🏛️ 3. CARUMAN STATUTORI (EPF / SOCSO / EIS / 24JAM)</div></th>
               <th colspan="10" class="bg-amber divider-group"><div class="sec-title" id="sec4">📋 4. STAFF LOGIN RECORD (U-Y)</div></th>
               <th colspan="3" class="bg-blue divider-group"><div class="sec-title" id="sec5">🧮 5. RINGKASAN GAJI</div></th>
@@ -609,6 +623,13 @@
               <th class="bg-emerald" rowspan="2" id="thOtherOT">OT Lain</th>
               <th class="bg-emerald" rowspan="2" id="thPinjaman">Pinjaman</th>
               <th class="bg-emerald" rowspan="2" id="thOthers">Lain-lain</th>
+
+              <!-- 新增 4 列 -->
+              <th class="bg-emerald divider-group" rowspan="2" id="thAllowance2">ALLOWANCE</th>
+              <th class="bg-emerald" rowspan="2" id="thCommission">COMMISION</th>
+              <th class="bg-emerald" rowspan="2" id="thIncentives">INCENTIVES</th>
+              <th class="bg-emerald" rowspan="2" id="thFirstCalcTotal">FIRST CALCULATION TOTAL</th>
+
               <th class="bg-violet divider-group" rowspan="2" style="text-align:center;">✎</th>
               <th class="bg-violet" colspan="2" style="text-align:center;">EPF</th>
               <th class="bg-violet" rowspan="2" style="text-align:center;">✎</th>
@@ -618,7 +639,6 @@
               <th class="bg-violet" rowspan="2" style="text-align:center;">✎</th>
               <th class="bg-violet" rowspan="2" id="th24JAM">24JAM</th>
 
-              <!-- Section 4 - 每列前加勾选 -->
               <th class="bg-amber divider-group" rowspan="2" style="text-align:center;">✎</th>
               <th class="bg-amber" rowspan="2"><div style="font-size:0.72rem;" id="thBankNama">Bank Nama<br><span style="font-weight:400;font-size:0.6rem;">(U)</span></div></th>
               <th class="bg-amber" rowspan="2" style="text-align:center;">✎</th>
@@ -657,31 +677,38 @@
               <th class="bg-emerald"><input class="th-filter" data-col="10" placeholder="🔍"></th>
               <th class="bg-emerald"><input class="th-filter" data-col="11" placeholder="🔍"></th>
               <th class="bg-emerald"><input class="th-filter" data-col="12" placeholder="🔍"></th>
+              <!-- 新增 4 列筛选 -->
+              <th class="bg-emerald divider-group"><input class="th-filter" data-col="13" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="14" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="15" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="16" placeholder="🔍"></th>
+              <!-- Section 3 -->
               <th class="bg-violet divider-group no-filter"></th>
-              <th class="bg-violet"><input class="th-filter" data-col="14" placeholder="🔍"></th>
-              <th class="bg-violet"><input class="th-filter" data-col="15" placeholder="🔍"></th>
-              <th class="bg-violet no-filter"></th>
-              <th class="bg-violet"><input class="th-filter" data-col="17" placeholder="🔍"></th>
               <th class="bg-violet"><input class="th-filter" data-col="18" placeholder="🔍"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="19" placeholder="🔍"></th>
               <th class="bg-violet no-filter"></th>
-              <th class="bg-violet"><input class="th-filter" data-col="20" placeholder="🔍"></th>
               <th class="bg-violet"><input class="th-filter" data-col="21" placeholder="🔍"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="22" placeholder="🔍"></th>
               <th class="bg-violet no-filter"></th>
-              <th class="bg-violet"><input class="th-filter" data-col="23" placeholder="🔍"></th>
-              <!-- Section 4 filter - 只有可读字段有筛选 -->
+              <th class="bg-violet"><input class="th-filter" data-col="24" placeholder="🔍"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="25" placeholder="🔍"></th>
+              <th class="bg-violet no-filter"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="27" placeholder="🔍"></th>
+              <!-- Section 4 -->
               <th class="bg-amber divider-group no-filter"></th>
-              <th class="bg-amber"><input class="th-filter" data-col="25" placeholder="🔍"></th>
-              <th class="bg-amber no-filter"></th>
-              <th class="bg-amber"><input class="th-filter" data-col="27" placeholder="🔍"></th>
-              <th class="bg-amber no-filter"></th>
               <th class="bg-amber"><input class="th-filter" data-col="29" placeholder="🔍"></th>
               <th class="bg-amber no-filter"></th>
               <th class="bg-amber"><input class="th-filter" data-col="31" placeholder="🔍"></th>
               <th class="bg-amber no-filter"></th>
               <th class="bg-amber"><input class="th-filter" data-col="33" placeholder="🔍"></th>
-              <th class="bg-blue divider-group"><input class="th-filter" data-col="34" placeholder="🔍"></th>
-              <th class="bg-blue"><input class="th-filter" data-col="35" placeholder="🔍"></th>
-              <th class="bg-blue"><input class="th-filter" data-col="36" placeholder="🔍"></th>
+              <th class="bg-amber no-filter"></th>
+              <th class="bg-amber"><input class="th-filter" data-col="35" placeholder="🔍"></th>
+              <th class="bg-amber no-filter"></th>
+              <th class="bg-amber"><input class="th-filter" data-col="37" placeholder="🔍"></th>
+              <!-- Section 5 -->
+              <th class="bg-blue divider-group"><input class="th-filter" data-col="38" placeholder="🔍"></th>
+              <th class="bg-blue"><input class="th-filter" data-col="39" placeholder="🔍"></th>
+              <th class="bg-blue"><input class="th-filter" data-col="40" placeholder="🔍"></th>
               <th class="bg-gray divider-group no-filter"></th>
             </tr>
           </thead>
@@ -754,11 +781,12 @@ const I18N = {
     badge: 'Auto kira caruman statutori · Manual override dengan kotak semak',
     save: 'Simpan ke Sheet', importBtn: 'Import / 导入',
     exportMenu: 'Eksport', allSlip: 'Semua Slip Gaji', checkAll: 'Semak Semua',
-    statTotal: 'Jumlah Pekerja', statActive: 'Aktif', statPending: 'Pending',
     legend1: '1. Maklumat Asas (Freeze)', legend2: '2. Pendapatan',
+    legend2b: '2.5 Pendapatan Tambahan',
     legend3: '3. Caruman Statutori', legend4: '4. Staff Login Record (U-Y)',
     legend5: '5. Ringkasan Gaji', legend6: '6. Tindakan',
     sec1: '📌 1. MAKLUMAT ASAS (FREEZE)', sec2: '💰 2. PENDAPATAN / ELAUN',
+    sec2b: '➕ PENDAPATAN TAMBAHAN',
     sec3: '🏛️ 3. CARUMAN STATUTORI (EPF / SOCSO / EIS / 24JAM)',
     sec4: '📋 4. STAFF LOGIN RECORD (U-Y)', sec5: '🧮 5. RINGKASAN GAJI',
     sec6: '⚙️ 6. TINDAKAN',
@@ -766,6 +794,8 @@ const I18N = {
     basic: 'Gaji Asas', allowance: 'Elaun', deduction: 'Potongan',
     normalOT: 'OT Biasa', restOT: 'OT Rehat', publicOT: 'OT Awam', otherOT: 'OT Lain',
     pinjaman: 'Pinjaman', others: 'Lain-lain',
+    allowance2: 'ELAUN', commission: 'KOMISEN', incentives: 'INSENTIF',
+    firstCalcTotal: 'JUMLAH PENGIRAAN PERTAMA',
     epfE: 'Pekerja', epfR: 'Majikan',
     socsoE: 'Pekerja', socsoR: 'Majikan',
     eisE: 'Pekerja', eisR: 'Majikan',
@@ -773,7 +803,7 @@ const I18N = {
     epf: 'EPF', socso: 'SOCSO', eis: 'EIS',
     gross: 'Gaji Kasar', totalDed: 'Total Potongan', net: 'Gaji Bersih',
     action: 'Tindakan', slip: 'Slip',
-    legend: 'Nota: Tandakan ✔ di hadapan EPF/SOCSO/EIS/24JAM untuk isi manual. Tidak ditanda = auto kira. Tandakan ✔ di Section 4 (U-Y) untuk edit Bank/EPF/SOCSO/EIS. Jika Bank Nama = CASH, EPF/SOCSO/EIS auto 0. Klik garisan biru di kanan kolum Kumpulan untuk toggle freeze.',
+    legend: 'Nota: Tandakan ✔ di hadapan EPF/SOCSO/EIS/24JAM untuk isi manual. Tidak ditanda = auto kira. Tandakan ✔ di Section 4 (U-Y) untuk edit Bank/EPF/SOCSO/EIS. Jika Bank Nama = CASH, EPF/SOCSO/EIS auto 0. FIRST CALCULATION TOTAL = Jumlah semua pendapatan (termasuk ELAUN/KOMISEN/INSENTIF) tolak Potongan/Pinjaman/Lain-lain, sebelum EPF/SOCSO/EIS/24JAM ditolak.',
     saved: 'Berjaya disimpan ke Sheet', failed: 'Gagal simpan',
     loading: 'Memuatkan data...', importSuccess: 'Berjaya import {n} pekerja',
     importFail: 'Fail tidak sah atau kosong', importFormat: 'Format fail tidak disokong',
@@ -797,11 +827,12 @@ const I18N = {
     badge: 'Auto-calculate statutory contributions · Manual override with checkbox',
     save: 'Save to Sheet', importBtn: 'Import',
     exportMenu: 'Export', allSlip: 'All Payslips', checkAll: 'Check All',
-    statTotal: 'Total Employees', statActive: 'Active', statPending: 'Pending',
     legend1: '1. Basic Info (Freeze)', legend2: '2. Income',
+    legend2b: '2.5 Additional Income',
     legend3: '3. Statutory Contributions', legend4: '4. Staff Login Record (U-Y)',
     legend5: '5. Salary Summary', legend6: '6. Actions',
     sec1: '📌 1. BASIC INFO (FREEZE)', sec2: '💰 2. INCOME / ALLOWANCE',
+    sec2b: '➕ ADDITIONAL INCOME',
     sec3: '🏛️ 3. STATUTORY CONTRIBUTIONS (EPF / SOCSO / EIS / 24JAM)',
     sec4: '📋 4. STAFF LOGIN RECORD (U-Y)', sec5: '🧮 5. SALARY SUMMARY',
     sec6: '⚙️ 6. ACTIONS',
@@ -809,6 +840,8 @@ const I18N = {
     basic: 'Basic', allowance: 'Allowance', deduction: 'Deduction',
     normalOT: 'Normal OT', restOT: 'Rest OT', publicOT: 'Public OT', otherOT: 'Other OT',
     pinjaman: 'Loan', others: 'Others',
+    allowance2: 'ALLOWANCE', commission: 'COMMISION', incentives: 'INCENTIVES',
+    firstCalcTotal: 'FIRST CALCULATION TOTAL',
     epfE: 'Employee', epfR: 'Employer',
     socsoE: 'Employee', socsoR: 'Employer',
     eisE: 'Employee', eisR: 'Employer',
@@ -816,7 +849,7 @@ const I18N = {
     epf: 'EPF', socso: 'SOCSO', eis: 'EIS',
     gross: 'Gross', totalDed: 'Total Ded', net: 'Net',
     action: 'Action', slip: 'Payslip',
-    legend: 'Note: Tick ✔ before EPF/SOCSO/EIS/24JAM to enter manually. Unticked = auto calc. Tick ✔ in Section 4 (U-Y) to edit Bank/EPF/SOCSO/EIS. If Bank Nama = CASH, EPF/SOCSO/EIS auto 0. Click the blue line right of Group column to toggle freeze.',
+    legend: 'Note: Tick ✔ before EPF/SOCSO/EIS/24JAM to enter manually. Unticked = auto calc. Tick ✔ in Section 4 (U-Y) to edit Bank/EPF/SOCSO/EIS. If Bank Nama = CASH, EPF/SOCSO/EIS auto 0. FIRST CALCULATION TOTAL = all income (incl. ALLOWANCE/COMMISION/INCENTIVES) minus Deduction/Loan/Others, before EPF/SOCSO/EIS/24JAM deduction.',
     saved: 'Saved successfully', failed: 'Save failed',
     loading: 'Loading data...', importSuccess: 'Imported {n} employees',
     importFail: 'Invalid or empty file', importFormat: 'Unsupported file format',
@@ -840,11 +873,12 @@ const I18N = {
     badge: '自动计算法定缴款 · 使用复选框手动覆盖',
     save: '保存到 Sheet', importBtn: 'Import / 导入',
     exportMenu: '导出', allSlip: '全部粮单', checkAll: '检查全部',
-    statTotal: '员工总数', statActive: '活跃', statPending: '待处理',
     legend1: '1. 基本资料 (冻结)', legend2: '2. 收入',
+    legend2b: '2.5 额外收入',
     legend3: '3. 法定缴款', legend4: '4. 员工登录记录 (U-Y)',
     legend5: '5. 薪资汇总', legend6: '6. 操作',
     sec1: '📌 1. 基本资料 (冻结)', sec2: '💰 2. 收入 / 津贴',
+    sec2b: '➕ 额外收入',
     sec3: '🏛️ 3. 法定缴款 (EPF / SOCSO / EIS / 24JAM)',
     sec4: '📋 4. 员工登录记录 (U-Y)', sec5: '🧮 5. 薪资汇总',
     sec6: '⚙️ 6. 操作',
@@ -852,6 +886,8 @@ const I18N = {
     basic: '基本薪资', allowance: '津贴', deduction: '扣款',
     normalOT: '普通加班', restOT: '休息日加班', publicOT: '公假加班', otherOT: '其他加班',
     pinjaman: '借粮', others: '其他',
+    allowance2: '津贴', commission: '佣金', incentives: '奖励',
+    firstCalcTotal: '首次计算总额',
     epfE: '员工', epfR: '雇主',
     socsoE: '员工', socsoR: '雇主',
     eisE: '员工', eisR: '雇主',
@@ -859,7 +895,7 @@ const I18N = {
     epf: 'EPF', socso: 'SOCSO', eis: 'EIS',
     gross: '总薪资', totalDed: '总扣款', net: '净薪资',
     action: '操作', slip: '粮单',
-    legend: '备注：勾选 EPF/SOCSO/EIS/24JAM 前的 ✔ 表示手动填写，不勾选则系统自动计算。勾选 Section 4 (U-Y) 前的 ✔ 可手动编辑银行/EPF/SOCSO/EIS。若银行名填 CASH，EPF/SOCSO/EIS 自动归零不计算。点击“分店”列右侧蓝线切换冻结。',
+    legend: '备注：勾选 EPF/SOCSO/EIS/24JAM 前的 ✔ 表示手动填写，不勾选则系统自动计算。勾选 Section 4 (U-Y) 前的 ✔ 可手动编辑银行/EPF/SOCSO/EIS。若银行名填 CASH，EPF/SOCSO/EIS 自动归零不计算。首次计算总额 = 所有收入（含津贴/佣金/奖励）减去扣款/借粮/其他，在扣除 EPF/SOCSO/EIS/24JAM 之前。',
     saved: '已成功保存到 Sheet', failed: '保存失败',
     loading: '加载数据中...', importSuccess: '成功导入 {n} 位员工',
     importFail: '文件无效或为空', importFormat: '不支持的文件格式',
@@ -1098,7 +1134,6 @@ function calcLindung(salary) {
   return Math.round(salary * 0.007325 * 100) / 100;
 }
 
-// 判断是否为 CASH / MERCHANTRADE
 function isCashBank(emp) {
   const bank = String(emp.SLRBankNama || emp.BankNama || '').trim().toUpperCase();
   return bank === 'CASH' || bank.includes('MERCHANTRADE');
@@ -1121,7 +1156,7 @@ function isExempt(staff) {
 function recalcRow(emp) {
   const basic = num(emp.Basic);
   const exempt = isExempt(emp);
-  const forceZero = isCashBank(emp); // 手动或原本就是 CASH
+  const forceZero = isCashBank(emp);
 
   if (!emp.manualEPF || forceZero) {
     const epf = (exempt.epf || forceZero) ? { employee: 0, employer: 0 } : calcEPF(basic, emp.Age || 30);
@@ -1143,7 +1178,20 @@ function recalcRow(emp) {
   }
 
   const ot = num(emp.NormalOT) + num(emp.RestOT) + num(emp.PublicOT) + num(emp.OtherOT);
-  const gross = basic + num(emp.Allowance) + ot;
+
+  // 总收入：Basic + Allowance + Allowance2 + Commission + Incentives + 所有 OT
+  const gross = basic
+    + num(emp.Allowance)
+    + num(emp.Allowance2)
+    + num(emp.Commission)
+    + num(emp.Incentives)
+    + ot;
+
+  // FIRST CALCULATION TOTAL = 所有收入 − 非法定扣款（Deduction / Pinjaman / Others）
+  // 也就是在扣除 EPF/SOCSO/EIS/LINDUNGAN 之前的总和
+  const firstCalcTotal = gross - num(emp.Deduction) - num(emp.Pinjaman) - num(emp.Others);
+  emp.FirstCalcTotal = firstCalcTotal;
+
   const totalDed = num(emp.Deduction) + num(emp.Pinjaman) + num(emp.Others)
                  + num(emp.EPF_Employee) + num(emp.SOCSO_Employee) + num(emp.EIS_Employee)
                  + num(emp.Lindung24Jam);
@@ -1174,12 +1222,14 @@ function updateUILanguage() {
   document.getElementById('pageBadge').textContent = t('badge');
   document.getElementById('legend1').textContent = t('legend1');
   document.getElementById('legend2').textContent = t('legend2');
+  document.getElementById('legend2b').textContent = t('legend2b');
   document.getElementById('legend3').textContent = t('legend3');
   document.getElementById('legend4').textContent = t('legend4');
   document.getElementById('legend5').textContent = t('legend5');
   document.getElementById('legend6').textContent = t('legend6');
   document.getElementById('sec1').textContent = t('sec1');
   document.getElementById('sec2').textContent = t('sec2');
+  document.getElementById('sec2b').textContent = t('sec2b');
   document.getElementById('sec3').textContent = t('sec3');
   document.getElementById('sec4').textContent = t('sec4');
   document.getElementById('sec5').textContent = t('sec5');
@@ -1197,6 +1247,10 @@ function updateUILanguage() {
   document.getElementById('thOtherOT').textContent = t('otherOT');
   document.getElementById('thPinjaman').textContent = t('pinjaman');
   document.getElementById('thOthers').textContent = t('others');
+  document.getElementById('thAllowance2').textContent = t('allowance2');
+  document.getElementById('thCommission').textContent = t('commission');
+  document.getElementById('thIncentives').textContent = t('incentives');
+  document.getElementById('thFirstCalcTotal').textContent = t('firstCalcTotal');
   document.getElementById('subEPFE').textContent = t('epfE');
   document.getElementById('subEPFR').textContent = t('epfR');
   document.getElementById('subSOCSOE').textContent = t('socsoE');
@@ -1253,7 +1307,7 @@ function renderTable() {
   tbody.innerHTML = '';
 
   if (!employees.length) {
-    tbody.innerHTML = `<tr><td colspan="38" style="text-align:center;padding:2.5rem;color:#a7b7c9;">${t('loading')}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="42" style="text-align:center;padding:2.5rem;color:#a7b7c9;">${t('loading')}</td></tr>`;
     buildFilterDropdowns();
     updateStickyOffsets();
     return;
@@ -1272,7 +1326,6 @@ function renderTable() {
       return `<td class="td-chk ${extraCls}"><input type="checkbox" class="manual-chk" data-idx="${idx}" data-group="${group}" ${checked ? 'checked' : ''}></td>`;
     };
 
-    // SLR 手动勾选 + 可编辑输入框
     const slrChkTd = (key, extraCls = '') => {
       const manual = !!emp['manual' + key];
       return `<td class="td-chk-sm bg-amber ${extraCls}"><input type="checkbox" class="slr-manual-chk" data-idx="${idx}" data-key="${key}" ${manual ? 'checked' : ''}></td>`;
@@ -1305,6 +1358,12 @@ function renderTable() {
       <td>${numInput('OtherOT', false)}</td>
       <td>${numInput('Pinjaman', false)}</td>
       <td>${numInput('Others', false)}</td>
+
+      <!-- 新增加 4 列 -->
+      <td class="divider-group">${numInput('Allowance2', false)}</td>
+      <td>${numInput('Commission', false)}</td>
+      <td>${numInput('Incentives', false)}</td>
+      <td>${numInput('FirstCalcTotal', true, 'first-total')}</td>
 
       ${chkTd('EPF', 'divider-group')}
       <td>${numInput('EPF_Employee', !emp.manualEPF)}</td>
@@ -1347,7 +1406,8 @@ function renderTable() {
       const updated = recalcRow(employees[idx]);
       const row = e.target.closest('tr');
       ['EPF_Employee','EPF_Employer','SOCSO_Employee','SOCSO_Employer',
-       'EIS_Employee','EIS_Employer','Lindung24Jam','GrossPay','TotalDeduction','NetSalary'
+       'EIS_Employee','EIS_Employer','Lindung24Jam',
+       'FirstCalcTotal','GrossPay','TotalDeduction','NetSalary'
       ].forEach(f => {
         if (f === field) return;
         const cell = row.querySelector(`input[data-field="${f}"]`);
@@ -1357,7 +1417,7 @@ function renderTable() {
     });
   });
 
-  // Section 3 手动覆盖 EPF/SOCSO/EIS/24JAM 勾选
+  // Section 3 手动覆盖 EPF/SOCSO/EIS/24JAM
   tbody.querySelectorAll('.manual-chk').forEach(chk => {
     chk.addEventListener('change', e => {
       const idx = Number(e.target.dataset.idx);
@@ -1371,7 +1431,7 @@ function renderTable() {
         const inp = row.querySelector(`input[data-field="${f}"]`);
         if (inp) { inp.readOnly = !e.target.checked; inp.value = updated[f]; }
       });
-      ['GrossPay','TotalDeduction','NetSalary'].forEach(f => {
+      ['FirstCalcTotal','GrossPay','TotalDeduction','NetSalary'].forEach(f => {
         const inp = row.querySelector(`input[data-field="${f}"]`);
         if (inp) inp.value = updated[f];
       });
@@ -1379,7 +1439,7 @@ function renderTable() {
     });
   });
 
-  // Section 4 SLR 勾选（Bank Nama / Bank Acc / EPF / SOCSO / EIS）
+  // Section 4 SLR 勾选
   tbody.querySelectorAll('.slr-manual-chk').forEach(chk => {
     chk.addEventListener('change', e => {
       const idx = Number(e.target.dataset.idx);
@@ -1395,19 +1455,19 @@ function renderTable() {
     });
   });
 
-  // Section 4 SLR 输入框实时更新
+  // Section 4 SLR 输入框
   tbody.querySelectorAll('input.slr-plain').forEach(inp => {
     inp.addEventListener('input', e => {
       const idx = Number(e.target.dataset.idx);
       const key = e.target.dataset.slrKey;
       employees[idx][key] = e.target.value;
 
-      // 若改的是 Bank Nama，重新计算整行（CASH 判断）
       if (key === 'SLRBankNama') {
         const updated = recalcRow(employees[idx]);
         const row = e.target.closest('tr');
         ['EPF_Employee','EPF_Employer','SOCSO_Employee','SOCSO_Employer',
-         'EIS_Employee','EIS_Employer','Lindung24Jam','GrossPay','TotalDeduction','NetSalary'
+         'EIS_Employee','EIS_Employer','Lindung24Jam',
+         'FirstCalcTotal','GrossPay','TotalDeduction','NetSalary'
         ].forEach(f => {
           const cell = row.querySelector(`input[data-field="${f}"]`);
           if (cell) cell.value = updated[f];
@@ -1415,7 +1475,6 @@ function renderTable() {
         updateFilterStats();
       }
     });
-    // 失焦时若值为空则恢复为 sheet 原值？这里不恢复，允许清空。
   });
 
   applyFilters();
@@ -1599,6 +1658,7 @@ async function handleImportFile(file) {
       'Basic','Allowance','Deduction',
       'Normal OT','Rest OT','Public OT','Other OT',
       'Pinjaman','Others',
+      'Allowance2','Commission','Incentives',
       'EPF (Employee)','EPF (Employer)',
       'SOCSO (Employee)','SOCSO (Employer)',
       'EIS (Employee)','EIS (Employer)',
@@ -1644,6 +1704,9 @@ async function handleImportFile(file) {
         Situation: sit, Code: code, Name: String(get(row, 'Name') || ''),
         GroupName: String(get(row, 'Group') || ''), BankNama: String(get(row, 'Bank') || ''),
         Basic: basic, Allowance: parseFloat(get(row, 'Allowance')) || 0,
+        Allowance2: parseFloat(get(row, 'Allowance2')) || 0,
+        Commission: parseFloat(get(row, 'Commission')) || 0,
+        Incentives: parseFloat(get(row, 'Incentives')) || 0,
         Deduction: parseFloat(get(row, 'Deduction')) || 0,
         NormalOT: parseFloat(get(row, 'Normal OT')) || 0,
         RestOT: parseFloat(get(row, 'Rest OT')) || 0,
@@ -1675,13 +1738,14 @@ async function handleImportFile(file) {
   } catch (err) { console.error(err); toast('Import error: ' + err.message, false); }
 }
 
-// ================= 模板 =================
+// ================= 模板 / 导出 =================
 function getExportHeaders() {
   return [
     'Situation','Code','Name','Group','Bank',
     'Basic','Allowance','Deduction',
     'Normal OT','Rest OT','Public OT','Other OT',
     'Pinjaman','Others',
+    'Allowance2','Commission','Incentives','FirstCalcTotal',
     'EPF (Employee)','EPF (Employer)',
     'SOCSO (Employee)','SOCSO (Employer)',
     'EIS (Employee)','EIS (Employer)',
@@ -1693,8 +1757,8 @@ function getExportHeaders() {
 function downloadTemplate(format) {
   const headers = getExportHeaders();
   const sample = [
-    ['ACTIVE','EMP001','Ahmad bin Ali','YZ UFO','Maybank',4500,600,0,0,0,0,0,0,0,495,585,22.25,77.85,9,9,32.96,'Maybank','1234567890','YES','YES','YES',5100,1125.06,3974.94],
-    ['PENDING','EMP002','Siti Nurhaliza','YZ CYBER','CIMB',3800,450,0,0,0,0,0,0,0,418,494,19.75,69.15,7.6,7.6,27.83,'CIMB','9876543210','YES','NO','YES',4250,930.93,3319.07]
+    ['ACTIVE','EMP001','Ahmad bin Ali','YZ UFO','Maybank',4500,600,0,0,0,0,0,0,0,0,0,0,5100,495,585,22.25,77.85,9,9,32.96,'Maybank','1234567890','YES','YES','YES',5100,1125.06,3974.94],
+    ['PENDING','EMP002','Siti Nurhaliza','YZ CYBER','CIMB',3800,450,0,0,0,0,0,0,0,200,150,100,4700,418,494,19.75,69.15,7.6,7.6,27.83,'CIMB','9876543210','YES','NO','YES',4700,930.93,3769.07]
   ];
   if (format === 'xlsx') {
     if (typeof XLSX === 'undefined') { toast('SheetJS tidak dimuat', false); return; }
@@ -1715,8 +1779,6 @@ function downloadTemplate(format) {
     toast('Template Word dimuat turun');
   }
 }
-
-// ================= 导出 =================
 function handleExport(val) {
   if (!val) return;
   try {
@@ -1743,6 +1805,7 @@ function getExportRows() {
       num(e.Basic), num(e.Allowance), num(e.Deduction),
       num(e.NormalOT), num(e.RestOT), num(e.PublicOT), num(e.OtherOT),
       num(e.Pinjaman), num(e.Others),
+      num(e.Allowance2), num(e.Commission), num(e.Incentives), num(e.FirstCalcTotal),
       num(e.EPF_Employee), num(e.EPF_Employer),
       num(e.SOCSO_Employee), num(e.SOCSO_Employer),
       num(e.EIS_Employee), num(e.EIS_Employer),
@@ -1771,7 +1834,8 @@ function buildExportTableHTML() {
   rows.forEach(r => {
     html += '<tr>';
     r.forEach((c, i) => {
-      const cls = (i >= 5 && i <= 20) || i >= 26 ? ' class="num"' : '';
+      // 数值列（Basic 到 NetSalary）右对齐
+      const cls = (i >= 5 && i <= 30) ? ' class="num"' : '';
       html += `<td${cls}>${escapeHtml(c)}</td>`;
     });
     html += '</tr>';
@@ -1848,7 +1912,7 @@ function exportToDOC() {
   rows.forEach(r => {
     html += '<tr>';
     r.forEach((c, i) => {
-      const cls = (i >= 5 && i <= 20) || i >= 26 ? ' class="num"' : '';
+      const cls = (i >= 5 && i <= 30) ? ' class="num"' : '';
       html += `<td${cls}>${escapeHtml(c)}</td>`;
     });
     html += '</tr>';
@@ -1863,15 +1927,18 @@ async function loadEmployees() {
   if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
     employees = [
       { Situation:'ACTIVE',  Code:'EMP001', Name:'Ahmad bin Ali', GroupName:'YZ UFO', BankNama:'Maybank',
-        Basic:4500, Allowance:600, Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
+        Basic:4500, Allowance:600, Allowance2:0, Commission:0, Incentives:0,
+        Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
         OtherOT:0, Pinjaman:0, Others:0, Age:30, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES',
         SLRBankNama:'Maybank', SLRBankAccountNo:'1234567890', SLREPF:'YES', SLRPERKESO:'YES', SLREIS:'YES' },
       { Situation:'PENDING', Code:'EMP002', Name:'Siti Nurhaliza', GroupName:'YZ CYBER', BankNama:'CIMB',
-        Basic:3800, Allowance:450, Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
+        Basic:3800, Allowance:450, Allowance2:200, Commission:150, Incentives:100,
+        Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
         OtherOT:0, Pinjaman:0, Others:0, Age:28, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES',
         SLRBankNama:'CIMB', SLRBankAccountNo:'9876543210', SLREPF:'YES', SLRPERKESO:'NO', SLREIS:'YES' },
       { Situation:'ACTIVE', Code:'EMP003', Name:'Cash Worker', GroupName:'YZ UFO', BankNama:'CASH',
-        Basic:2500, Allowance:0, Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
+        Basic:2500, Allowance:0, Allowance2:0, Commission:0, Incentives:0,
+        Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
         OtherOT:0, Pinjaman:0, Others:0, Age:30, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES',
         SLRBankNama:'CASH', SLRBankAccountNo:'-', SLREPF:'NO', SLRPERKESO:'NO', SLREIS:'NO' }
     ];
@@ -1887,17 +1954,19 @@ async function loadEmployees() {
         Code: row.Code, Name: row.Name, GroupName: row.GroupName || '',
         BankNama: row.BankNama || row.Bank || '',
         Basic: Number(row.Salary || row.Basic) || 0,
-        Allowance: 0, Deduction: 0, NormalOT: 0, RestOT: 0, PublicOT: 0, OtherOT: 0,
+        Allowance: Number(row.Allowance) || 0,
+        Allowance2: Number(row.Allowance2) || 0,
+        Commission: Number(row.Commission) || 0,
+        Incentives: Number(row.Incentives) || 0,
+        Deduction: 0, NormalOT: 0, RestOT: 0, PublicOT: 0, OtherOT: 0,
         Pinjaman: 0, Others: 0, Age: 30,
         EPF: row.EPF || 'YES', PERKESO: row.PERKESO || 'YES',
         EIS: row.EIS || 'YES', Lindungan: row.Lindungan || 'YES',
-        // ===== 关键：从 W/X/Y 列读到的数据（Apps Script 已重命名好） =====
         SLRBankNama: String(row.SLRBankNama || row.BankNama || row.Bank || '').trim(),
         SLRBankAccountNo: String(row.SLRBankAccountNo || row.BankAccountNo || row.BankAcc || '').trim(),
         SLREPF: String(row.SLREPF || row.EPF || '').trim(),
         SLRPERKESO: String(row.SLRPERKESO || row.SOCSO || row.PERKESO || '').trim(),
         SLREIS: String(row.SLREIS || row.EIS || '').trim(),
-        // 手动标志默认 false
         manualSLRBankNama: false, manualSLRBankAccountNo: false,
         manualSLREPF: false, manualSLRPERKESO: false, manualSLREIS: false
       })).filter(e => e.Situation !== 'UNACTIVE' && e.Situation !== 'INACTIVE');
@@ -1930,6 +1999,7 @@ function buildPayslip(emp) {
   const fmt = n => Number(n || 0).toFixed(2);
   const ot = num(emp.NormalOT) + num(emp.RestOT) + num(emp.PublicOT) + num(emp.OtherOT);
   const L = I18N[currentLang];
+  const extraIncome = num(emp.Allowance2) + num(emp.Commission) + num(emp.Incentives);
   return `
   <div class="payslip">
     <div class="ps-header">
@@ -1946,8 +2016,10 @@ function buildPayslip(emp) {
         <h4>PENDAPATAN</h4>
         <div class="ps-row"><span>${L.basic}</span><span>${fmt(emp.Basic)}</span></div>
         <div class="ps-row"><span>${L.allowance}</span><span>${fmt(emp.Allowance)}</span></div>
+        ${extraIncome > 0 ? `<div class="ps-row"><span>${L.allowance2} / ${L.commission} / ${L.incentives}</span><span>${fmt(extraIncome)}</span></div>` : ''}
         <div class="ps-row"><span>OT</span><span>${fmt(ot)}</span></div>
         <div class="ps-row total"><span>${L.gross}</span><span>${fmt(emp.GrossPay)}</span></div>
+        <div class="ps-row" style="font-size:9pt;color:#666;"><span>${L.firstCalcTotal}</span><span>${fmt(emp.FirstCalcTotal)}</span></div>
       </div>
       <div class="ps-section">
         <h4>POTONGAN</h4>
