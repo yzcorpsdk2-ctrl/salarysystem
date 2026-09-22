@@ -29,7 +29,6 @@
     font-size: 14px;
   }
 
-  /* ===== 顶部导航栏 ===== */
   .topbar {
     position: sticky; top: 0; z-index: 100;
     background: #ffffff;
@@ -53,7 +52,6 @@
     color: #fff; font-size: 0.95rem; font-weight: 800;
   }
 
-  /* ===== 按钮 ===== */
   .btn {
     background: #ffffff;
     border: 1px solid var(--epf-border);
@@ -77,10 +75,8 @@
     background-repeat: no-repeat; background-position: right 0.7rem center;
   }
 
-  /* ===== 主容器 ===== */
   .container { max-width: 100%; margin: 0 auto; padding: 1.5rem 1.75rem; }
 
-  /* ===== 页面标题卡片 ===== */
   .page-header {
     background: #ffffff;
     border: 1px solid var(--epf-border);
@@ -105,7 +101,6 @@
     border: 1px solid #cfe0f2;
   }
 
-  /* ===== 筛选 + 统计区 ===== */
   .stat-badges {
     display: flex; gap: 0.6rem; flex-wrap: wrap;
     align-items: stretch;
@@ -128,11 +123,7 @@
     white-space: nowrap;
   }
 
-  /* ===== 多选下拉 ===== */
-  .multiselect {
-    position: relative;
-    display: inline-flex;
-  }
+  .multiselect { position: relative; display: inline-flex; }
   .ms-btn {
     background: var(--epf-blue-soft);
     border: 1px solid var(--epf-border-soft);
@@ -163,11 +154,7 @@
     overflow: hidden; text-overflow: ellipsis;
     max-width: 140px;
   }
-  .ms-arrow {
-    color: var(--epf-blue);
-    font-size: 0.7rem;
-    transition: transform 0.15s;
-  }
+  .ms-arrow { color: var(--epf-blue); font-size: 0.7rem; transition: transform 0.15s; }
   .multiselect.open .ms-arrow { transform: rotate(180deg); }
 
   .ms-panel {
@@ -186,71 +173,41 @@
   }
   .multiselect.open .ms-panel { display: flex; }
   .ms-actions {
-    display: flex;
-    gap: 0.35rem;
+    display: flex; gap: 0.35rem;
     padding: 0.5rem 0.6rem;
     border-bottom: 1px solid var(--epf-border-soft);
     background: var(--epf-blue-soft);
   }
   .ms-actions button {
-    background: #fff;
-    border: 1px solid var(--epf-border);
-    padding: 0.22rem 0.6rem;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    cursor: pointer;
-    color: var(--epf-blue);
-    font-family: inherit;
-    font-weight: 500;
+    background: #fff; border: 1px solid var(--epf-border);
+    padding: 0.22rem 0.6rem; border-radius: 4px;
+    font-size: 0.7rem; cursor: pointer; color: var(--epf-blue);
+    font-family: inherit; font-weight: 500;
   }
   .ms-actions button:hover { background: var(--epf-blue-light); }
-  .ms-list {
-    overflow-y: auto;
-    max-height: 260px;
-    padding: 0.3rem 0;
-  }
+  .ms-list { overflow-y: auto; max-height: 260px; padding: 0.3rem 0; }
   .ms-list::-webkit-scrollbar { width: 6px; }
   .ms-list::-webkit-scrollbar-thumb { background: #c2d4e6; border-radius: 3px; }
   .ms-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.4rem 0.75rem;
-    font-size: 0.78rem;
-    cursor: pointer;
-    color: var(--epf-text);
-    user-select: none;
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.4rem 0.75rem; font-size: 0.78rem;
+    cursor: pointer; color: var(--epf-text); user-select: none;
   }
   .ms-item:hover { background: var(--epf-blue-soft); }
   .ms-item input[type="checkbox"] {
     accent-color: var(--epf-blue);
-    width: 14px; height: 14px;
-    cursor: pointer;
-    flex-shrink: 0;
+    width: 14px; height: 14px; cursor: pointer; flex-shrink: 0;
   }
   .ms-item .ms-item-name {
-    flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .ms-item .ms-count {
-    font-size: 0.65rem;
-    color: var(--epf-blue);
-    background: var(--epf-blue-light);
-    padding: 0.1rem 0.45rem;
-    border-radius: 3px;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
+    font-size: 0.65rem; color: var(--epf-blue);
+    background: var(--epf-blue-light); padding: 0.1rem 0.45rem;
+    border-radius: 3px; font-weight: 600; font-variant-numeric: tabular-nums;
   }
-  .ms-empty {
-    padding: 1rem;
-    text-align: center;
-    color: #a7b7c9;
-    font-size: 0.75rem;
-  }
+  .ms-empty { padding: 1rem; text-align: center; color: #a7b7c9; font-size: 0.75rem; }
 
-  /* ===== 分区图例 ===== */
   .section-legend {
     display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;
   }
@@ -266,7 +223,6 @@
     border: 1px solid rgba(0,0,0,0.05);
   }
 
-  /* ===== 卡片容器 ===== */
   .card {
     background: #ffffff; border-radius: 8px;
     border: 1px solid var(--epf-border);
@@ -275,7 +231,6 @@
   }
   .card-body { padding: 0; }
 
-  /* ===== 表格容器 ===== */
   .table-wrap {
     overflow: auto; max-height: calc(100vh - 350px);
     background: #ffffff;
@@ -283,10 +238,9 @@
   table {
     border-collapse: separate; border-spacing: 0;
     font-size: 0.8rem; table-layout: fixed;
-    width: 2650px; min-width: 2650px;
+    width: 2690px; min-width: 2690px;
   }
 
-  /* ===== 表头 ===== */
   th {
     background: var(--epf-blue-soft);
     padding: 0.5rem 0.5rem;
@@ -341,7 +295,6 @@
   .filter-row .th-filter::placeholder { color: #a7b7c9; font-weight: 400; }
   .filter-row th.no-filter { background: var(--epf-blue-soft); }
 
-  /* ===== 数据行 ===== */
   td {
     padding: 0.4rem 0.45rem; border-bottom: 1px solid var(--epf-border-soft);
     vertical-align: middle; background: #ffffff; transition: background 0.15s;
@@ -351,7 +304,6 @@
 
   .divider-group { box-shadow: inset 1px 0 0 var(--epf-border) !important; }
 
-  /* ========== 冻结列 ========== */
   body.freeze-on .col-freeze {
     position: sticky; z-index: 8; background: #ffffff;
   }
@@ -448,7 +400,6 @@
   }
   .legend strong { color: var(--epf-text); }
 
-  /* ===== Toast ===== */
   .toast {
     position: fixed; bottom: 1.8rem; right: 1.8rem;
     background: var(--epf-blue); color: #fff;
@@ -462,7 +413,6 @@
   .toast.show { opacity: 1; transform: translateY(0); }
   .toast.error { background: #a02020; }
 
-  /* ========== 弹窗 ========== */
   .modal-overlay {
     position: fixed; inset: 0;
     background: rgba(26, 79, 138, 0.25);
@@ -506,7 +456,6 @@
   }
   .modal-actions { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
 
-  /* ========== 打印 ========== */
   #printArea { display: none; }
   @media print {
     body { background: #fff; padding: 0; }
@@ -616,9 +565,7 @@
       <span class="badge" id="pageBadge">Auto kira caruman statutori · Manual override dengan kotak semak</span>
     </div>
 
-    <!-- ====== 多选筛选 + 统计 ====== -->
     <div class="stat-badges">
-      <!-- 分店多选 -->
       <div class="multiselect" id="msGroup">
         <button class="ms-btn" onclick="toggleMS('msGroup', event)">
           <div class="ms-btn-inner">
@@ -636,7 +583,6 @@
         </div>
       </div>
 
-      <!-- Bank 多选 -->
       <div class="multiselect" id="msBank">
         <button class="ms-btn" onclick="toggleMS('msBank', event)">
           <div class="ms-btn-inner">
@@ -654,13 +600,11 @@
         </div>
       </div>
 
-      <!-- 符合人数 -->
       <div class="stat-pill">
         <div class="label" id="statLabelMatched">Padan</div>
         <div class="value" id="filteredCount">0</div>
       </div>
 
-      <!-- 净薪资合计 -->
       <div class="stat-pill" style="min-width: 150px;">
         <div class="label" id="statLabelNetTotal">Jumlah Bersih</div>
         <div class="value" id="filteredNet">RM 0.00</div>
@@ -706,6 +650,7 @@
             <col style="width:80px">
             <col style="width:40px">
             <col style="width:85px">
+            <col style="width:40px">
             <col style="width:130px">
             <col style="width:130px">
             <col style="width:70px">
@@ -721,7 +666,7 @@
               <th colspan="4" class="bg-slate col-freeze-group"><div class="sec-title" id="sec1">📌 1. MAKLUMAT ASAS (FREEZE)</div></th>
               <th colspan="9" class="bg-emerald divider-group"><div class="sec-title" id="sec2">💰 2. PENDAPATAN / ELAUN</div></th>
               <th colspan="11" class="bg-violet divider-group"><div class="sec-title" id="sec3">🏛️ 3. CARUMAN STATUTORI (EPF / SOCSO / EIS / 24JAM)</div></th>
-              <th colspan="5" class="bg-amber divider-group"><div class="sec-title" id="sec4">📋 4. STAFF LOGIN RECORD (U-Y)</div></th>
+              <th colspan="6" class="bg-amber divider-group"><div class="sec-title" id="sec4">📋 4. STAFF LOGIN RECORD (U-Y)</div></th>
               <th colspan="3" class="bg-blue divider-group"><div class="sec-title" id="sec5">🧮 5. RINGKASAN GAJI</div></th>
               <th colspan="1" class="bg-gray divider-group"><div class="sec-title" id="sec6">⚙️ 6. TINDAKAN</div></th>
             </tr>
@@ -750,7 +695,8 @@
               <th class="bg-violet" colspan="2" style="text-align:center;">EIS</th>
               <th class="bg-violet" rowspan="2" style="text-align:center;">✎</th>
               <th class="bg-violet" rowspan="2" id="th24JAM">24JAM</th>
-              <th class="bg-amber divider-group" rowspan="2"><div style="font-size:0.72rem;" id="thBankNama">Bank Nama<br><span style="font-weight:400;font-size:0.6rem;">(U)</span></div></th>
+              <th class="bg-amber divider-group" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-amber" rowspan="2"><div style="font-size:0.72rem;" id="thBankNama">Bank Nama<br><span style="font-weight:400;font-size:0.6rem;">(U)</span></div></th>
               <th class="bg-amber" rowspan="2"><div style="font-size:0.72rem;" id="thBankAcc">Bank Acc<br><span style="font-weight:400;font-size:0.6rem;">(V)</span></div></th>
               <th class="bg-amber" rowspan="2" style="text-align:center;"><div style="font-size:0.72rem;" id="thEPF">EPF<br><span style="font-weight:400;font-size:0.6rem;">(W)</span></div></th>
               <th class="bg-amber" rowspan="2" style="text-align:center;"><div style="font-size:0.72rem;" id="thSOCSO">SOCSO<br><span style="font-weight:400;font-size:0.6rem;">(X)</span></div></th>
@@ -793,14 +739,15 @@
               <th class="bg-violet"><input class="th-filter" data-col="21" placeholder="🔍"></th>
               <th class="bg-violet no-filter"></th>
               <th class="bg-violet"><input class="th-filter" data-col="23" placeholder="🔍"></th>
-              <th class="bg-amber divider-group"><input class="th-filter" data-col="24" placeholder="🔍"></th>
+              <th class="bg-amber divider-group no-filter"></th>
               <th class="bg-amber"><input class="th-filter" data-col="25" placeholder="🔍"></th>
               <th class="bg-amber"><input class="th-filter" data-col="26" placeholder="🔍"></th>
               <th class="bg-amber"><input class="th-filter" data-col="27" placeholder="🔍"></th>
               <th class="bg-amber"><input class="th-filter" data-col="28" placeholder="🔍"></th>
-              <th class="bg-blue divider-group"><input class="th-filter" data-col="29" placeholder="🔍"></th>
-              <th class="bg-blue"><input class="th-filter" data-col="30" placeholder="🔍"></th>
+              <th class="bg-amber"><input class="th-filter" data-col="29" placeholder="🔍"></th>
+              <th class="bg-blue divider-group"><input class="th-filter" data-col="30" placeholder="🔍"></th>
               <th class="bg-blue"><input class="th-filter" data-col="31" placeholder="🔍"></th>
+              <th class="bg-blue"><input class="th-filter" data-col="32" placeholder="🔍"></th>
               <th class="bg-gray divider-group no-filter"></th>
             </tr>
           </thead>
@@ -872,187 +819,120 @@ const I18N = {
     desc: 'Pengurusan gaji pekerja dengan pengiraan automatik EPF, SOCSO, EIS & 24JAM Lindungan.',
     badge: 'Auto kira caruman statutori · Manual override dengan kotak semak',
     save: 'Simpan ke Sheet', importBtn: 'Import / 导入',
-    exportMenu: 'Eksport', allSlip: 'Semua Slip Gaji',
-    checkAll: 'Semak Semua',
-    statTotal: 'Jumlah Pekerja', statActive: 'Aktif', statPending: 'Pending',
-    legend1: '1. Maklumat Asas (Freeze)',
-    legend2: '2. Pendapatan',
-    legend3: '3. Caruman Statutori',
-    legend4: '4. Staff Login Record (U-Y)',
-    legend5: '5. Ringkasan Gaji',
-    legend6: '6. Tindakan',
-    sec1: '📌 1. MAKLUMAT ASAS (FREEZE)',
-    sec2: '💰 2. PENDAPATAN / ELAUN',
+    exportMenu: 'Eksport', allSlip: 'Semua Slip Gaji', checkAll: 'Semak Semua',
+    legend1: '1. Maklumat Asas (Freeze)', legend2: '2. Pendapatan',
+    legend3: '3. Caruman Statutori', legend4: '4. Staff Login Record (U-Y)',
+    legend5: '5. Ringkasan Gaji', legend6: '6. Tindakan',
+    sec1: '📌 1. MAKLUMAT ASAS (FREEZE)', sec2: '💰 2. PENDAPATAN / ELAUN',
     sec3: '🏛️ 3. CARUMAN STATUTORI (EPF / SOCSO / EIS / 24JAM)',
-    sec4: '📋 4. STAFF LOGIN RECORD (U-Y)',
-    sec5: '🧮 5. RINGKASAN GAJI',
+    sec4: '📋 4. STAFF LOGIN RECORD (U-Y)', sec5: '🧮 5. RINGKASAN GAJI',
     sec6: '⚙️ 6. TINDAKAN',
     situation: 'Situation', kod: 'Kod', nama: 'Nama', kumpulan: 'Kumpulan',
     basic: 'Gaji Asas', allowance: 'Elaun', deduction: 'Potongan',
     normalOT: 'OT Biasa', restOT: 'OT Rehat', publicOT: 'OT Awam', otherOT: 'OT Lain',
     pinjaman: 'Pinjaman', others: 'Lain-lain',
-    epfE: 'Pekerja', epfR: 'Majikan',
-    socsoE: 'Pekerja', socsoR: 'Majikan',
-    eisE: 'Pekerja', eisR: 'Majikan',
-    lindung: '24JAM',
+    epfE: 'Pekerja', epfR: 'Majikan', socsoE: 'Pekerja', socsoR: 'Majikan',
+    eisE: 'Pekerja', eisR: 'Majikan', lindung: '24JAM',
     bankNama: 'Bank Nama', bankAcc: 'Bank Acc',
     epf: 'EPF', socso: 'SOCSO', eis: 'EIS',
     gross: 'Gaji Kasar', totalDed: 'Total Potongan', net: 'Gaji Bersih',
     action: 'Tindakan', slip: 'Slip',
-    legend: 'Nota: Tandakan ✔ di hadapan EPF/SOCSO/EIS/24JAM untuk isi manual. Tidak ditanda = auto kira. Klik garisan biru di sebelah kanan kolum Kumpulan untuk toggle freeze. Situation UNACTIVE tidak dipaparkan.',
+    legend: 'Nota: Tandakan ✔ di hadapan EPF/SOCSO/EIS/24JAM untuk isi manual. Tidak ditanda = auto kira. Tandakan ✔ di hadapan Staff Login Record (U-Y) untuk edit Bank Nama / Bank Acc / EPF / SOCSO / EIS. Isi "CASH" pada Bank Nama akan auto-kosongkan EPF/SOCSO/EIS. Klik garisan biru di sebelah kanan kolum Kumpulan untuk toggle freeze. Situation UNACTIVE tidak dipaparkan.',
     saved: 'Berjaya disimpan ke Sheet', failed: 'Gagal simpan',
     loading: 'Memuatkan data...',
-    importSuccess: 'Berjaya import {n} pekerja',
-    importFail: 'Fail tidak sah atau kosong',
-    importFormat: 'Format fail tidak disokong',
-    noData: 'Tiada data untuk dieksport',
-    freezeLocked: 'Kolum dibekukan (freeze ON)',
-    freezeUnlocked: 'Kolum dibuka (freeze OFF)',
+    importSuccess: 'Berjaya import {n} pekerja', importFail: 'Fail tidak sah atau kosong',
+    importFormat: 'Format fail tidak disokong', noData: 'Tiada data untuk dieksport',
+    freezeLocked: 'Kolum dibekukan (freeze ON)', freezeUnlocked: 'Kolum dibuka (freeze OFF)',
     freezeTitle: '🔒 Tetapan Freeze Kolum',
     freezeDesc: 'Pilih sama ada mahu kunci kolum pertama (Situation → Kumpulan) supaya sentiasa kelihatan semasa scroll, atau buka kunci sepenuhnya.',
-    freezeUnlock: '🔓 Buka Kunci',
-    freezeLock: '🔒 Kunci Kolum',
-    freezeCancel: 'Batal',
+    freezeUnlock: '🔓 Buka Kunci', freezeLock: '🔒 Kunci Kolum', freezeCancel: 'Batal',
     importTitle: '📥 Import Data / 导入资料',
     importDrop: 'Lepaskan fail di sini atau klik untuk pilih',
     importDropHint: 'Drag & drop file here, or click to browse',
     importFormatHint: 'Format: .xlsx / .csv / .txt',
-    importTemplate: '📥 Template:',
-    importClose: 'Tutup',
-    // 筛选相关
-    filterGroup: 'Kumpulan',
-    filterBank: 'Bank',
-    all: 'Semua',
-    selectedSuffix: ' dipilih',
-    matchedCount: 'Padan',
-    netTotal: 'Jumlah Bersih',
-    btnSelectAll: 'Semua',
-    btnClear: 'Kosong',
-    noOptions: 'Tiada pilihan'
+    importTemplate: '📥 Template:', importClose: 'Tutup',
+    filterGroup: 'Kumpulan', filterBank: 'Bank', all: 'Semua',
+    selectedSuffix: ' dipilih', matchedCount: 'Padan', netTotal: 'Jumlah Bersih',
+    btnSelectAll: 'Semua', btnClear: 'Kosong', noOptions: 'Tiada pilihan'
   },
   en: {
     title: 'Payroll System',
     desc: 'Employee payroll management with automatic EPF, SOCSO, EIS & 24JAM Lindungan calculation.',
     badge: 'Auto-calculate statutory contributions · Manual override with checkbox',
-    save: 'Save to Sheet', importBtn: 'Import',
-    exportMenu: 'Export', allSlip: 'All Payslips',
-    checkAll: 'Check All',
-    statTotal: 'Total Employees', statActive: 'Active', statPending: 'Pending',
-    legend1: '1. Basic Info (Freeze)',
-    legend2: '2. Income',
-    legend3: '3. Statutory Contributions',
-    legend4: '4. Staff Login Record (U-Y)',
-    legend5: '5. Salary Summary',
-    legend6: '6. Actions',
-    sec1: '📌 1. BASIC INFO (FREEZE)',
-    sec2: '💰 2. INCOME / ALLOWANCE',
+    save: 'Save to Sheet', importBtn: 'Import', exportMenu: 'Export',
+    allSlip: 'All Payslips', checkAll: 'Check All',
+    legend1: '1. Basic Info (Freeze)', legend2: '2. Income',
+    legend3: '3. Statutory Contributions', legend4: '4. Staff Login Record (U-Y)',
+    legend5: '5. Salary Summary', legend6: '6. Actions',
+    sec1: '📌 1. BASIC INFO (FREEZE)', sec2: '💰 2. INCOME / ALLOWANCE',
     sec3: '🏛️ 3. STATUTORY CONTRIBUTIONS (EPF / SOCSO / EIS / 24JAM)',
-    sec4: '📋 4. STAFF LOGIN RECORD (U-Y)',
-    sec5: '🧮 5. SALARY SUMMARY',
+    sec4: '📋 4. STAFF LOGIN RECORD (U-Y)', sec5: '🧮 5. SALARY SUMMARY',
     sec6: '⚙️ 6. ACTIONS',
     situation: 'Situation', kod: 'Code', nama: 'Name', kumpulan: 'Group',
     basic: 'Basic', allowance: 'Allowance', deduction: 'Deduction',
     normalOT: 'Normal OT', restOT: 'Rest OT', publicOT: 'Public OT', otherOT: 'Other OT',
     pinjaman: 'Loan', others: 'Others',
-    epfE: 'Employee', epfR: 'Employer',
-    socsoE: 'Employee', socsoR: 'Employer',
-    eisE: 'Employee', eisR: 'Employer',
-    lindung: '24JAM',
+    epfE: 'Employee', epfR: 'Employer', socsoE: 'Employee', socsoR: 'Employer',
+    eisE: 'Employee', eisR: 'Employer', lindung: '24JAM',
     bankNama: 'Bank Name', bankAcc: 'Bank Acc',
     epf: 'EPF', socso: 'SOCSO', eis: 'EIS',
     gross: 'Gross', totalDed: 'Total Ded', net: 'Net',
     action: 'Action', slip: 'Payslip',
-    legend: 'Note: Tick ✔ before EPF/SOCSO/EIS/24JAM to enter manually. Unticked = auto calc. Click the blue line right of Group column to toggle freeze. UNACTIVE staff are hidden.',
+    legend: 'Note: Tick ✔ before EPF/SOCSO/EIS/24JAM to enter manually. Unticked = auto calc. Tick ✔ before Staff Login Record (U-Y) to edit Bank Name / Bank Acc / EPF / SOCSO / EIS. Enter "CASH" in Bank Name will auto-clear EPF/SOCSO/EIS. Click the blue line right of Group column to toggle freeze. UNACTIVE staff are hidden.',
     saved: 'Saved successfully', failed: 'Save failed',
     loading: 'Loading data...',
-    importSuccess: 'Imported {n} employees',
-    importFail: 'Invalid or empty file',
-    importFormat: 'Unsupported file format',
-    noData: 'No data to export',
-    freezeLocked: 'Columns frozen (ON)',
-    freezeUnlocked: 'Columns unfrozen (OFF)',
+    importSuccess: 'Imported {n} employees', importFail: 'Invalid or empty file',
+    importFormat: 'Unsupported file format', noData: 'No data to export',
+    freezeLocked: 'Columns frozen (ON)', freezeUnlocked: 'Columns unfrozen (OFF)',
     freezeTitle: '🔒 Freeze Column Setting',
     freezeDesc: 'Choose whether to lock the first columns (Situation → Group) so they stay visible while scrolling, or unlock them completely.',
-    freezeUnlock: '🔓 Unlock',
-    freezeLock: '🔒 Lock Columns',
-    freezeCancel: 'Cancel',
+    freezeUnlock: '🔓 Unlock', freezeLock: '🔒 Lock Columns', freezeCancel: 'Cancel',
     importTitle: '📥 Import Data',
     importDrop: 'Drop file here or click to select',
     importDropHint: 'Drag & drop file here, or click to browse',
     importFormatHint: 'Format: .xlsx / .csv / .txt',
-    importTemplate: '📥 Template:',
-    importClose: 'Close',
-    filterGroup: 'Group',
-    filterBank: 'Bank',
-    all: 'All',
-    selectedSuffix: ' selected',
-    matchedCount: 'Matched',
-    netTotal: 'Net Total',
-    btnSelectAll: 'All',
-    btnClear: 'Clear',
-    noOptions: 'No options'
+    importTemplate: '📥 Template:', importClose: 'Close',
+    filterGroup: 'Group', filterBank: 'Bank', all: 'All',
+    selectedSuffix: ' selected', matchedCount: 'Matched', netTotal: 'Net Total',
+    btnSelectAll: 'All', btnClear: 'Clear', noOptions: 'No options'
   },
   zh: {
     title: '薪资系统',
     desc: '员工薪资管理，自动计算 EPF、SOCSO、EIS 及 24JAM Lindungan。',
     badge: '自动计算法定缴款 · 使用复选框手动覆盖',
-    save: '保存到 Sheet', importBtn: 'Import / 导入',
-    exportMenu: '导出', allSlip: '全部粮单',
-    checkAll: '检查全部',
-    statTotal: '员工总数', statActive: '活跃', statPending: '待处理',
-    legend1: '1. 基本资料 (冻结)',
-    legend2: '2. 收入',
-    legend3: '3. 法定缴款',
-    legend4: '4. 员工登录记录 (U-Y)',
-    legend5: '5. 薪资汇总',
-    legend6: '6. 操作',
-    sec1: '📌 1. 基本资料 (冻结)',
-    sec2: '💰 2. 收入 / 津贴',
+    save: '保存到 Sheet', importBtn: 'Import / 导入', exportMenu: '导出',
+    allSlip: '全部粮单', checkAll: '检查全部',
+    legend1: '1. 基本资料 (冻结)', legend2: '2. 收入',
+    legend3: '3. 法定缴款', legend4: '4. 员工登录记录 (U-Y)',
+    legend5: '5. 薪资汇总', legend6: '6. 操作',
+    sec1: '📌 1. 基本资料 (冻结)', sec2: '💰 2. 收入 / 津贴',
     sec3: '🏛️ 3. 法定缴款 (EPF / SOCSO / EIS / 24JAM)',
-    sec4: '📋 4. 员工登录记录 (U-Y)',
-    sec5: '🧮 5. 薪资汇总',
-    sec6: '⚙️ 6. 操作',
+    sec4: '📋 4. 员工登录记录 (U-Y)', sec5: '🧮 5. 薪资汇总', sec6: '⚙️ 6. 操作',
     situation: '状态', kod: '编号', nama: '姓名', kumpulan: '分店',
     basic: '基本薪资', allowance: '津贴', deduction: '扣款',
     normalOT: '普通加班', restOT: '休息日加班', publicOT: '公假加班', otherOT: '其他加班',
     pinjaman: '借粮', others: '其他',
-    epfE: '员工', epfR: '雇主',
-    socsoE: '员工', socsoR: '雇主',
-    eisE: '员工', eisR: '雇主',
-    lindung: '24JAM',
+    epfE: '员工', epfR: '雇主', socsoE: '员工', socsoR: '雇主',
+    eisE: '员工', eisR: '雇主', lindung: '24JAM',
     bankNama: '银行名', bankAcc: '银行账号',
     epf: 'EPF', socso: 'SOCSO', eis: 'EIS',
     gross: '总薪资', totalDed: '总扣款', net: '净薪资',
     action: '操作', slip: '粮单',
-    legend: '备注：勾选 EPF/SOCSO/EIS/24JAM 前的 ✔ 表示手动填写，不勾选则系统自动计算。点击“分店”列右侧的蓝线切换冻结。UNACTIVE 员工不显示。',
+    legend: '备注：勾选 EPF/SOCSO/EIS/24JAM 前的 ✔ 表示手动填写，不勾选则系统自动计算。勾选 Staff Login Record (U-Y) 前的 ✔ 可编辑 银行名/银行账号/EPF/SOCSO/EIS。银行名填 "CASH" 会自动清空 EPF/SOCSO/EIS。点击“分店”列右侧的蓝线切换冻结。UNACTIVE 员工不显示。',
     saved: '已成功保存到 Sheet', failed: '保存失败',
     loading: '加载数据中...',
-    importSuccess: '成功导入 {n} 位员工',
-    importFail: '文件无效或为空',
-    importFormat: '不支持的文件格式',
-    noData: '没有可导出的数据',
-    freezeLocked: '列已冻结',
-    freezeUnlocked: '列已解冻',
+    importSuccess: '成功导入 {n} 位员工', importFail: '文件无效或为空',
+    importFormat: '不支持的文件格式', noData: '没有可导出的数据',
+    freezeLocked: '列已冻结', freezeUnlocked: '列已解冻',
     freezeTitle: '🔒 冻结列设置',
     freezeDesc: '选择是否锁定前几列（状态 → 分店），让它们在滚动时保持可见，或完全解锁。',
-    freezeUnlock: '🔓 解锁',
-    freezeLock: '🔒 锁定列',
-    freezeCancel: '取消',
-    importTitle: '📥 导入资料',
-    importDrop: '拖入文件或点击选择',
-    importDropHint: '拖入文件或点击浏览',
-    importFormatHint: '格式：.xlsx / .csv / .txt',
-    importTemplate: '📥 模板：',
-    importClose: '关闭',
-    filterGroup: '分店',
-    filterBank: '银行',
-    all: '全部',
-    selectedSuffix: ' 项',
-    matchedCount: '符合人数',
-    netTotal: '净薪资合计',
-    btnSelectAll: '全选',
-    btnClear: '清除',
-    noOptions: '暂无选项'
+    freezeUnlock: '🔓 解锁', freezeLock: '🔒 锁定列', freezeCancel: '取消',
+    importTitle: '📥 导入资料', importDrop: '拖入文件或点击选择',
+    importDropHint: '拖入文件或点击浏览', importFormatHint: '格式：.xlsx / .csv / .txt',
+    importTemplate: '📥 模板：', importClose: '关闭',
+    filterGroup: '分店', filterBank: '银行', all: '全部',
+    selectedSuffix: ' 项', matchedCount: '符合人数', netTotal: '净薪资合计',
+    btnSelectAll: '全选', btnClear: '清除', noOptions: '暂无选项'
   }
 };
 let currentLang = 'ms';
@@ -1060,11 +940,9 @@ function t(key) { return I18N[currentLang][key] || key; }
 
 let employees = [];
 
-// ===== 多选筛选状态 =====
 const filterGroup = new Set();
 const filterBank = new Set();
 
-// ================= 工具 =================
 function toast(msg, ok = true) {
   const el = document.getElementById('toast');
   el.textContent = msg;
@@ -1085,7 +963,6 @@ function todayStr() {
   return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
 }
 
-// ================= 动态计算表头 sticky top 偏移 =================
 function updateStickyOffsets() {
   requestAnimationFrame(() => {
     const thead = document.querySelector('#mainTable thead');
@@ -1094,15 +971,13 @@ function updateStickyOffsets() {
     let top = 0;
     rows.forEach(row => {
       const h = Math.ceil(row.getBoundingClientRect().height);
-      row.querySelectorAll('th').forEach(th => {
-        th.style.top = top + 'px';
-      });
+      row.querySelectorAll('th').forEach(th => { th.style.top = top + 'px'; });
       top += h;
     });
   });
 }
 
-// ================= 多选下拉逻辑 =================
+// ================= 多选下拉 =================
 function toggleMS(id, e) {
   if (e) e.stopPropagation();
   const el = document.getElementById(id);
@@ -1110,7 +985,6 @@ function toggleMS(id, e) {
   document.querySelectorAll('.multiselect.open').forEach(m => m.classList.remove('open'));
   if (!wasOpen) el.classList.add('open');
 }
-
 function onFilterChange(type, cb) {
   if (type === 'group') {
     if (cb.checked) filterGroup.add(cb.dataset.value);
@@ -1122,24 +996,20 @@ function onFilterChange(type, cb) {
   updateMSLabels();
   updateFilterStats();
 }
-
 function selectAllMS(type, e) {
   if (e) e.stopPropagation();
   if (type === 'group') {
     document.querySelectorAll('#msGroupList input[type=checkbox]').forEach(cb => {
-      cb.checked = true;
-      filterGroup.add(cb.dataset.value);
+      cb.checked = true; filterGroup.add(cb.dataset.value);
     });
   } else {
     document.querySelectorAll('#msBankList input[type=checkbox]').forEach(cb => {
-      cb.checked = true;
-      filterBank.add(cb.dataset.value);
+      cb.checked = true; filterBank.add(cb.dataset.value);
     });
   }
   updateMSLabels();
   updateFilterStats();
 }
-
 function clearMS(type, e) {
   if (e) e.stopPropagation();
   if (type === 'group') {
@@ -1152,43 +1022,25 @@ function clearMS(type, e) {
   updateMSLabels();
   updateFilterStats();
 }
-
 function updateMSLabels() {
   const txtG = document.getElementById('msGroupText');
   const txtB = document.getElementById('msBankText');
-
-  if (filterGroup.size === 0) {
-    txtG.textContent = t('all');
-  } else if (filterGroup.size === 1) {
-    txtG.textContent = Array.from(filterGroup)[0];
-  } else {
-    txtG.textContent = filterGroup.size + t('selectedSuffix');
-  }
-
-  if (filterBank.size === 0) {
-    txtB.textContent = t('all');
-  } else if (filterBank.size === 1) {
-    txtB.textContent = Array.from(filterBank)[0];
-  } else {
-    txtB.textContent = filterBank.size + t('selectedSuffix');
-  }
+  if (filterGroup.size === 0) txtG.textContent = t('all');
+  else if (filterGroup.size === 1) txtG.textContent = Array.from(filterGroup)[0];
+  else txtG.textContent = filterGroup.size + t('selectedSuffix');
+  if (filterBank.size === 0) txtB.textContent = t('all');
+  else if (filterBank.size === 1) txtB.textContent = Array.from(filterBank)[0];
+  else txtB.textContent = filterBank.size + t('selectedSuffix');
 }
-
-// 计算符合条件的员工
 function getFilteredForStats() {
   let list = employees.filter(e => {
     const s = String(e.Situation || '').trim().toUpperCase();
     return s !== 'UNACTIVE' && s !== 'INACTIVE';
   });
-  if (filterGroup.size > 0) {
-    list = list.filter(e => filterGroup.has(String(e.GroupName || '').trim()));
-  }
-  if (filterBank.size > 0) {
-    list = list.filter(e => filterBank.has(String(e.SLRBankNama || e.BankNama || '').trim()));
-  }
+  if (filterGroup.size > 0) list = list.filter(e => filterGroup.has(String(e.GroupName || '').trim()));
+  if (filterBank.size > 0) list = list.filter(e => filterBank.has(String(e.SLRBankNama || e.BankNama || '').trim()));
   return list;
 }
-
 function updateFilterStats() {
   const list = getFilteredForStats();
   const count = list.length;
@@ -1198,12 +1050,9 @@ function updateFilterStats() {
   if (countEl) countEl.textContent = count;
   if (netEl) netEl.textContent = 'RM ' + totalNet.toFixed(2);
 }
-
-// 构建两个下拉列表的选项
 function buildFilterDropdowns() {
-  const groups = new Map(); // 名称 -> 计数
+  const groups = new Map();
   const banks = new Map();
-
   employees.forEach(e => {
     const s = String(e.Situation || '').trim().toUpperCase();
     if (s === 'UNACTIVE' || s === 'INACTIVE') return;
@@ -1212,53 +1061,40 @@ function buildFilterDropdowns() {
     if (g) groups.set(g, (groups.get(g) || 0) + 1);
     if (b) banks.set(b, (banks.get(b) || 0) + 1);
   });
-
-  // 清理 set 中已不存在的项
   Array.from(filterGroup).forEach(k => { if (!groups.has(k)) filterGroup.delete(k); });
   Array.from(filterBank).forEach(k => { if (!banks.has(k)) filterBank.delete(k); });
 
   const listG = document.getElementById('msGroupList');
   const sortedGroups = Array.from(groups.keys()).sort();
-  if (sortedGroups.length === 0) {
-    listG.innerHTML = `<div class="ms-empty">${t('noOptions')}</div>`;
-  } else {
-    listG.innerHTML = sortedGroups.map(g => `
-      <label class="ms-item">
-        <input type="checkbox" data-value="${escapeHtml(g)}" ${filterGroup.has(g) ? 'checked' : ''}
-               onchange="onFilterChange('group', this)">
-        <span class="ms-item-name">${escapeHtml(g)}</span>
-        <span class="ms-count">${groups.get(g)}</span>
-      </label>
-    `).join('');
-  }
+  if (sortedGroups.length === 0) listG.innerHTML = `<div class="ms-empty">${t('noOptions')}</div>`;
+  else listG.innerHTML = sortedGroups.map(g => `
+    <label class="ms-item">
+      <input type="checkbox" data-value="${escapeHtml(g)}" ${filterGroup.has(g) ? 'checked' : ''}
+             onchange="onFilterChange('group', this)">
+      <span class="ms-item-name">${escapeHtml(g)}</span>
+      <span class="ms-count">${groups.get(g)}</span>
+    </label>`).join('');
 
   const listB = document.getElementById('msBankList');
   const sortedBanks = Array.from(banks.keys()).sort();
-  if (sortedBanks.length === 0) {
-    listB.innerHTML = `<div class="ms-empty">${t('noOptions')}</div>`;
-  } else {
-    listB.innerHTML = sortedBanks.map(b => `
-      <label class="ms-item">
-        <input type="checkbox" data-value="${escapeHtml(b)}" ${filterBank.has(b) ? 'checked' : ''}
-               onchange="onFilterChange('bank', this)">
-        <span class="ms-item-name">${escapeHtml(b)}</span>
-        <span class="ms-count">${banks.get(b)}</span>
-      </label>
-    `).join('');
-  }
+  if (sortedBanks.length === 0) listB.innerHTML = `<div class="ms-empty">${t('noOptions')}</div>`;
+  else listB.innerHTML = sortedBanks.map(b => `
+    <label class="ms-item">
+      <input type="checkbox" data-value="${escapeHtml(b)}" ${filterBank.has(b) ? 'checked' : ''}
+             onchange="onFilterChange('bank', this)">
+      <span class="ms-item-name">${escapeHtml(b)}</span>
+      <span class="ms-count">${banks.get(b)}</span>
+    </label>`).join('');
 
   updateMSLabels();
   updateFilterStats();
 }
-
-// 点击外部关闭下拉
 document.addEventListener('click', e => {
   if (!e.target.closest('.multiselect')) {
     document.querySelectorAll('.multiselect.open').forEach(m => m.classList.remove('open'));
   }
 });
 
-// ================= 冻结切换 =================
 function openFreezeModal() { document.getElementById('freezeModal').style.display = 'flex'; }
 function closeFreezeModal() { document.getElementById('freezeModal').style.display = 'none'; }
 function setFreeze(on) {
@@ -1268,7 +1104,6 @@ function setFreeze(on) {
   toast(on ? t('freezeLocked') : t('freezeUnlocked'));
 }
 
-// ================= 计算 =================
 const SOCSO_TABLE = [
   [30,0.10,0.40],[50,0.20,0.70],[70,0.30,1.10],[100,0.40,1.50],
   [140,0.60,2.10],[200,0.85,2.95],[300,1.25,4.35],[400,1.75,6.15],
@@ -1374,7 +1209,6 @@ function badgeStatus(val) {
   return `<span class="text-cell badge-cell badge-other">${escapeHtml(v)}</span>`;
 }
 
-// ================= 更新 UI 文字 (含弹窗 + 筛选) =================
 function updateUILanguage() {
   document.getElementById('pageTitle').textContent = t('title');
   document.getElementById('pageDesc').textContent = t('desc');
@@ -1428,7 +1262,6 @@ function updateUILanguage() {
   document.getElementById('btnCheckAll').innerHTML = '✅ ' + t('checkAll');
   document.getElementById('exportMenu').options[0].textContent = '💾 ' + t('exportMenu') + ' / 导出…';
 
-  // ==== 弹窗 ====
   document.getElementById('freezeTitle').textContent = t('freezeTitle');
   document.getElementById('freezeDesc').textContent = t('freezeDesc');
   document.getElementById('freezeUnlockBtn').textContent = t('freezeUnlock');
@@ -1442,7 +1275,6 @@ function updateUILanguage() {
   document.getElementById('importTemplate').textContent = t('importTemplate');
   document.getElementById('importCloseBtn').textContent = t('importClose');
 
-  // ==== 筛选区 ====
   document.getElementById('msGroupLabel').textContent = t('filterGroup');
   document.getElementById('msBankLabel').textContent = t('filterBank');
   document.getElementById('statLabelMatched').textContent = t('matchedCount');
@@ -1453,90 +1285,102 @@ function updateUILanguage() {
   document.getElementById('msBankClear').textContent = t('btnClear');
 
   updateMSLabels();
-  // 空列表占位符也刷新
   document.querySelectorAll('.ms-empty').forEach(el => el.textContent = t('noOptions'));
 }
 
-// ================= 渲染表格 =================
-function renderTable() {
-  updateUILanguage();
+// ================= 构建单行 HTML =================
+function buildRowHTML(emp, idx) {
+  emp = recalcRow(emp);
 
-  const tbody = document.getElementById('tbody');
-  tbody.innerHTML = '';
+  const numInput = (field, readonly, extraCls = '') =>
+    `<input type="number" step="0.01" class="input num ${extraCls}" ${readonly ? 'readonly' : ''} data-idx="${idx}" data-field="${field}" value="${emp[field] ?? 0}">`;
 
-  if (!employees.length) {
-    tbody.innerHTML = `<tr><td colspan="33" style="text-align:center;padding:2.5rem;color:#a7b7c9;">${t('loading')}</td></tr>`;
-    buildFilterDropdowns();
-    updateStickyOffsets();
-    return;
-  }
+  const chkTd = (group, extraCls = '') => {
+    const key = 'manual' + group;
+    const checked = !!emp[key];
+    return `<td class="td-chk ${extraCls}"><input type="checkbox" class="manual-chk" data-idx="${idx}" data-group="${group}" ${checked ? 'checked' : ''}></td>`;
+  };
 
-  employees.forEach((emp, idx) => {
-    emp = recalcRow(emp);
-    const tr = document.createElement('tr');
+  const sitCls = (() => {
+    const s = String(emp.Situation || '').trim().toUpperCase();
+    if (s === 'PENDING') return 'sit-pending';
+    if (s === 'ACTIVE')  return 'sit-active';
+    return 'sit-default';
+  })();
 
-    const numInput = (field, readonly, extraCls = '') =>
-      `<input type="number" step="0.01" class="input num ${extraCls}" ${readonly ? 'readonly' : ''} data-idx="${idx}" data-field="${field}" value="${emp[field] ?? 0}">`;
+  const bankNamaDisplay = emp.SLRBankNama || emp.BankNama || '';
+  const slrEditable = !!emp.manualSLR;
 
-    const chkTd = (group, extraCls = '') => {
-      const key = 'manual' + group;
-      const checked = !!emp[key];
-      return `<td class="td-chk ${extraCls}"><input type="checkbox" class="manual-chk" data-idx="${idx}" data-group="${group}" ${checked ? 'checked' : ''}></td>`;
-    };
+  // Bank Nama（U 列）
+  const slrBankNamaCell = slrEditable
+    ? `<input type="text" class="input slr-edit" data-idx="${idx}" data-field="SLRBankNama" value="${escapeHtml(emp.SLRBankNama || emp.BankNama || '')}" placeholder="Bank Nama">`
+    : `<div class="text-cell">${escapeHtml(bankNamaDisplay)}</div>`;
 
-    const sitCls = (() => {
-      const s = String(emp.Situation || '').trim().toUpperCase();
-      if (s === 'PENDING') return 'sit-pending';
-      if (s === 'ACTIVE')  return 'sit-active';
-      return 'sit-default';
-    })();
+  // Bank Acc（V 列）
+  const slrBankAccCell = slrEditable
+    ? `<input type="text" class="input slr-edit" data-idx="${idx}" data-field="SLRBankAccountNo" value="${escapeHtml(emp.SLRBankAccountNo || emp.BankAccountNo || '')}" placeholder="Bank Acc">`
+    : `<div class="text-cell">${escapeHtml(emp.SLRBankAccountNo || emp.BankAccountNo || '')}</div>`;
 
-    const bankNama = emp.SLRBankNama || emp.BankNama || '';
+  // EPF (W) / SOCSO (X) / EIS (Y)
+  const slrEPFCell = slrEditable
+    ? `<input type="text" class="input slr-edit" data-idx="${idx}" data-field="SLREPF" value="${escapeHtml(emp.SLREPF || '')}" style="text-align:center;" placeholder="YES/NO">`
+    : (badgeStatus(emp.SLREPF) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>');
 
-    tr.innerHTML = `
-      <td class="td-text col-freeze col-0 ${sitCls}"><div class="text-cell">${escapeHtml(emp.Situation || '')}</div></td>
-      <td class="td-text col-freeze col-1"><div class="text-cell">${escapeHtml(emp.Code || '')}</div></td>
-      <td class="td-text col-freeze col-2"><div class="text-cell">${escapeHtml(emp.Name || '')}</div></td>
-      <td class="td-text col-freeze col-3"><div class="text-cell">${escapeHtml(emp.GroupName || '')}</div></td>
+  const slrSOCSOCell = slrEditable
+    ? `<input type="text" class="input slr-edit" data-idx="${idx}" data-field="SLRPERKESO" value="${escapeHtml(emp.SLRPERKESO || '')}" style="text-align:center;" placeholder="YES/NO">`
+    : (badgeStatus(emp.SLRPERKESO) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>');
 
-      <td class="divider-group">${numInput('Basic', false)}</td>
-      <td>${numInput('Allowance', false)}</td>
-      <td>${numInput('Deduction', false)}</td>
-      <td>${numInput('NormalOT', false)}</td>
-      <td>${numInput('RestOT', false)}</td>
-      <td>${numInput('PublicOT', false)}</td>
-      <td>${numInput('OtherOT', false)}</td>
-      <td>${numInput('Pinjaman', false)}</td>
-      <td>${numInput('Others', false)}</td>
+  const slrEISCell = slrEditable
+    ? `<input type="text" class="input slr-edit" data-idx="${idx}" data-field="SLREIS" value="${escapeHtml(emp.SLREIS || '')}" style="text-align:center;" placeholder="YES/NO">`
+    : (badgeStatus(emp.SLREIS) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>');
 
-      ${chkTd('EPF', 'divider-group')}
-      <td>${numInput('EPF_Employee', !emp.manualEPF)}</td>
-      <td>${numInput('EPF_Employer', !emp.manualEPF)}</td>
-      ${chkTd('SOCSO')}
-      <td>${numInput('SOCSO_Employee', !emp.manualSOCSO)}</td>
-      <td>${numInput('SOCSO_Employer', !emp.manualSOCSO)}</td>
-      ${chkTd('EIS')}
-      <td>${numInput('EIS_Employee', !emp.manualEIS)}</td>
-      <td>${numInput('EIS_Employer', !emp.manualEIS)}</td>
-      ${chkTd('24JAM')}
-      <td>${numInput('Lindung24Jam', !emp.manual24JAM)}</td>
+  return `
+    <td class="td-text col-freeze col-0 ${sitCls}"><div class="text-cell">${escapeHtml(emp.Situation || '')}</div></td>
+    <td class="td-text col-freeze col-1"><div class="text-cell">${escapeHtml(emp.Code || '')}</div></td>
+    <td class="td-text col-freeze col-2"><div class="text-cell">${escapeHtml(emp.Name || '')}</div></td>
+    <td class="td-text col-freeze col-3"><div class="text-cell">${escapeHtml(emp.GroupName || '')}</div></td>
 
-      <td class="td-text divider-group"><div class="text-cell">${escapeHtml(bankNama)}</div></td>
-      <td class="td-text"><div class="text-cell">${escapeHtml(emp.SLRBankAccountNo || emp.BankAccountNo || '')}</div></td>
-      <td class="td-text" style="text-align:center;">${badgeStatus(emp.SLREPF) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>'}</td>
-      <td class="td-text" style="text-align:center;">${badgeStatus(emp.SLRPERKESO) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>'}</td>
-      <td class="td-text" style="text-align:center;">${badgeStatus(emp.SLREIS) || '<div class="text-cell" style="color:#cbd5e1;text-align:center;">—</div>'}</td>
+    <td class="divider-group">${numInput('Basic', false)}</td>
+    <td>${numInput('Allowance', false)}</td>
+    <td>${numInput('Deduction', false)}</td>
+    <td>${numInput('NormalOT', false)}</td>
+    <td>${numInput('RestOT', false)}</td>
+    <td>${numInput('PublicOT', false)}</td>
+    <td>${numInput('OtherOT', false)}</td>
+    <td>${numInput('Pinjaman', false)}</td>
+    <td>${numInput('Others', false)}</td>
 
-      <td class="divider-group">${numInput('GrossPay', true)}</td>
-      <td>${numInput('TotalDeduction', true)}</td>
-      <td>${numInput('NetSalary', true)}</td>
+    ${chkTd('EPF', 'divider-group')}
+    <td>${numInput('EPF_Employee', !emp.manualEPF)}</td>
+    <td>${numInput('EPF_Employer', !emp.manualEPF)}</td>
+    ${chkTd('SOCSO')}
+    <td>${numInput('SOCSO_Employee', !emp.manualSOCSO)}</td>
+    <td>${numInput('SOCSO_Employer', !emp.manualSOCSO)}</td>
+    ${chkTd('EIS')}
+    <td>${numInput('EIS_Employee', !emp.manualEIS)}</td>
+    <td>${numInput('EIS_Employer', !emp.manualEIS)}</td>
+    ${chkTd('24JAM')}
+    <td>${numInput('Lindung24Jam', !emp.manual24JAM)}</td>
 
-      <td class="divider-group" style="text-align:center;"><button class="btn btn-sm" onclick="showPayslip('${escapeHtml(emp.Code)}')">${t('slip')}</button></td>
-    `;
-    tbody.appendChild(tr);
-  });
+    <td class="td-chk divider-group"><input type="checkbox" class="slr-chk" data-idx="${idx}" ${slrEditable ? 'checked' : ''}></td>
+    <td class="td-text">${slrBankNamaCell}</td>
+    <td class="td-text">${slrBankAccCell}</td>
+    <td class="td-text" style="text-align:center;">${slrEPFCell}</td>
+    <td class="td-text" style="text-align:center;">${slrSOCSOCell}</td>
+    <td class="td-text" style="text-align:center;">${slrEISCell}</td>
 
-  tbody.querySelectorAll('input.input:not([readonly])').forEach(inp => {
+    <td class="divider-group">${numInput('GrossPay', true)}</td>
+    <td>${numInput('TotalDeduction', true)}</td>
+    <td>${numInput('NetSalary', true)}</td>
+
+    <td class="divider-group" style="text-align:center;"><button class="btn btn-sm" onclick="showPayslip('${escapeHtml(emp.Code)}')">${t('slip')}</button></td>
+  `;
+}
+
+// ================= 绑定单行事件 =================
+function bindRowEvents(tr, idx) {
+  // 普通数值输入
+  tr.querySelectorAll('input.input:not([readonly]):not(.slr-edit)').forEach(inp => {
     inp.addEventListener('input', e => {
       const idx = Number(e.target.dataset.idx);
       const field = e.target.dataset.field;
@@ -1554,22 +1398,17 @@ function renderTable() {
     });
   });
 
-  tbody.querySelectorAll('.manual-chk').forEach(chk => {
+  // 缴款组的 manual 勾选
+  tr.querySelectorAll('.manual-chk').forEach(chk => {
     chk.addEventListener('change', e => {
       const idx = Number(e.target.dataset.idx);
       const group = e.target.dataset.group;
-      const manualKey = 'manual' + group;
-      employees[idx][manualKey] = e.target.checked;
-
+      employees[idx]['manual' + group] = e.target.checked;
       const updated = recalcRow(employees[idx]);
       const row = e.target.closest('tr');
-      const fields = GROUP_FIELDS[group];
-      fields.forEach(f => {
+      GROUP_FIELDS[group].forEach(f => {
         const inp = row.querySelector(`input[data-field="${f}"]`);
-        if (inp) {
-          inp.readOnly = !e.target.checked;
-          inp.value = updated[f];
-        }
+        if (inp) { inp.readOnly = !e.target.checked; inp.value = updated[f]; }
       });
       ['GrossPay','TotalDeduction','NetSalary'].forEach(f => {
         const inp = row.querySelector(`input[data-field="${f}"]`);
@@ -1579,12 +1418,96 @@ function renderTable() {
     });
   });
 
+  // SLR 组勾选：勾选后整组可编辑（重绘整行）
+  const slrChk = tr.querySelector('.slr-chk');
+  if (slrChk) {
+    slrChk.addEventListener('change', e => {
+      const idx = Number(e.target.dataset.idx);
+      employees[idx].manualSLR = e.target.checked;
+      rerenderRow(idx);
+    });
+  }
+
+  // SLR 编辑输入（Bank Nama / Bank Acc / EPF / SOCSO / EIS）
+  tr.querySelectorAll('.slr-edit').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const idx = Number(e.target.dataset.idx);
+      const field = e.target.dataset.field;
+      employees[idx][field] = e.target.value;
+
+      // 若编辑的是 Bank Nama，检测 CASH / MERCHANTRADE
+      if (field === 'SLRBankNama') {
+        const v = String(e.target.value || '').trim().toUpperCase();
+        if (v === 'CASH' || v.includes('MERCHANTRADE')) {
+          // 清空 W/X/Y 状态，并释放缴款 manual 标记
+          employees[idx].SLREPF = '';
+          employees[idx].SLRPERKESO = '';
+          employees[idx].SLREIS = '';
+          employees[idx].manualEPF = false;
+          employees[idx].manualSOCSO = false;
+          employees[idx].manualEIS = false;
+          employees[idx].manual24JAM = false;
+
+          // 更新同行的 3 个状态输入框
+          const rowNow = e.target.closest('tr');
+          ['SLREPF','SLRPERKESO','SLREIS'].forEach(f => {
+            const inp2 = rowNow.querySelector(`input.slr-edit[data-field="${f}"]`);
+            if (inp2) inp2.value = '';
+          });
+        }
+      }
+
+      // 重算所有相关值
+      const updated = recalcRow(employees[idx]);
+      const rowNow = e.target.closest('tr');
+      ['EPF_Employee','EPF_Employer','SOCSO_Employee','SOCSO_Employer',
+       'EIS_Employee','EIS_Employer','Lindung24Jam','GrossPay','TotalDeduction','NetSalary'
+      ].forEach(f => {
+        const cell = rowNow.querySelector(`input[data-field="${f}"]`);
+        if (cell) cell.value = updated[f];
+      });
+      updateFilterStats();
+    });
+  });
+}
+
+// 重绘单行（不重建整个表格）
+function rerenderRow(idx) {
+  const tbody = document.getElementById('tbody');
+  const tr = tbody.children[idx];
+  if (!tr) return;
+  tr.innerHTML = buildRowHTML(employees[idx], idx);
+  bindRowEvents(tr, idx);
+  updateStickyOffsets();
+  updateFilterStats();
+}
+
+// ================= 渲染表格 =================
+function renderTable() {
+  updateUILanguage();
+
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+
+  if (!employees.length) {
+    tbody.innerHTML = `<tr><td colspan="34" style="text-align:center;padding:2.5rem;color:#a7b7c9;">${t('loading')}</td></tr>`;
+    buildFilterDropdowns();
+    updateStickyOffsets();
+    return;
+  }
+
+  employees.forEach((emp, idx) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = buildRowHTML(employees[idx], idx);
+    tbody.appendChild(tr);
+    bindRowEvents(tr, idx);
+  });
+
   applyFilters();
   buildFilterDropdowns();
   updateStickyOffsets();
 }
 
-// ================= 表头筛选 =================
 function applyFilters() {
   const filters = [];
   document.querySelectorAll('.th-filter').forEach(inp => {
@@ -1595,7 +1518,6 @@ function applyFilters() {
   document.querySelectorAll('#tbody tr').forEach(row => {
     const firstCell = row.querySelector('td');
     if (!firstCell || firstCell.hasAttribute('colspan')) return;
-
     const cells = row.querySelectorAll('td');
     let show = true;
     for (const flt of filters) {
@@ -1649,12 +1571,10 @@ function checkOne(type) {
   });
   toast('Semakan ' + type.toUpperCase() + ' selesai');
 }
-
 function checkAll() {
   ['epf','socso','eis','lindung'].forEach(checkOne);
   toast('Semakan selesai');
 }
-
 function jumpToCheckPage(url) {
   if (!url) return;
   window.open(url, '_blank');
@@ -1728,7 +1648,6 @@ function parseCSVLine(line) {
   }
   cells.push(cur); return cells;
 }
-
 function parseTextFile(text) {
   const rows = []; const lines = text.split(/\r?\n/);
   for (const line of lines) {
@@ -1742,7 +1661,6 @@ function parseTextFile(text) {
   }
   return rows;
 }
-
 async function handleImportFile(file) {
   const name = file.name.toLowerCase();
   let rows = [];
@@ -1757,7 +1675,6 @@ async function handleImportFile(file) {
       const text = await file.text();
       rows = parseTextFile(text);
     } else { toast(t('importFormat'), false); return; }
-
     if (!rows || rows.length < 2) { toast(t('importFail'), false); return; }
 
     const headers = rows[0].map(h => String(h).trim());
@@ -1777,7 +1694,6 @@ async function handleImportFile(file) {
       const lh = h.toLowerCase();
       for (const w of WANTED) { if (lh === w.toLowerCase()) { idx[w] = i; break; } }
     });
-
     if (idx['Code'] === undefined) { toast('Fail mesti ada lajur "Code"', false); return; }
 
     const get = (row, key) => idx[key] !== undefined ? row[idx[key]] : '';
@@ -1821,7 +1737,8 @@ async function handleImportFile(file) {
         EIS_Employee: impEISE, EIS_Employer: impEISR, Lindung24Jam: impLindung,
         SLRBankNama: String(get(row, 'SLR Bank Nama') || get(row, 'Bank') || ''),
         SLRBankAccountNo: String(get(row, 'SLR Bank Account No') || ''),
-        SLREPF: String(get(row, 'SLR EPF') || ''), SLRPERKESO: String(get(row, 'SLR SOCSO') || ''),
+        SLREPF: String(get(row, 'SLR EPF') || ''),
+        SLRPERKESO: String(get(row, 'SLR SOCSO') || ''),
         SLREIS: String(get(row, 'SLR EIS') || ''),
         manualEPF:   Math.abs(impEPFE - autoEPF.employee) > 0.01 || Math.abs(impEPFR - autoEPF.employer) > 0.01,
         manualSOCSO: Math.abs(impSOCSOE - autoSOCSO.employee) > 0.01 || Math.abs(impSOCSOR - autoSOCSO.employer) > 0.01,
@@ -1839,7 +1756,6 @@ async function handleImportFile(file) {
   } catch (err) { console.error(err); toast('Import error: ' + err.message, false); }
 }
 
-// ================= 下载模板 =================
 function downloadTemplate(format) {
   const headers = getExportHeaders();
   const sample = [
@@ -1877,7 +1793,6 @@ function handleExport(val) {
   } catch (err) { console.error(err); toast('Export error: ' + err.message, false); }
   finally { document.getElementById('exportMenu').value = ''; }
 }
-
 function getExportHeaders() {
   return [
     'Situation', 'Code', 'Name', 'Group',
@@ -1892,7 +1807,6 @@ function getExportHeaders() {
     'Gross Pay', 'Total Deduction', 'Net Salary'
   ];
 }
-
 function getExportRows() {
   const rows = [];
   const trs = document.querySelectorAll('#tbody tr');
@@ -1919,7 +1833,6 @@ function getExportRows() {
   });
   return rows;
 }
-
 function downloadBlob(content, filename, mime) {
   const blob = new Blob(['\ufeff', content], { type: mime + ';charset=utf-8' });
   const url = URL.createObjectURL(blob);
@@ -1928,7 +1841,6 @@ function downloadBlob(content, filename, mime) {
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
-
 function buildExportTableHTML() {
   const headers = getExportHeaders();
   const rows = getExportRows();
@@ -1964,7 +1876,6 @@ function exportToPDF() {
   toast('Sedia untuk cetak / simpan PDF');
   setTimeout(() => window.print(), 100);
 }
-
 function exportToXLSX() {
   const rows = getExportRows();
   if (!rows.length) { toast(t('noData'), false); return; }
@@ -1988,7 +1899,6 @@ function exportToXLSX() {
   XLSX.writeFile(wb, 'payroll_' + todayStr() + '.xlsx');
   toast('Excel berjaya dieksport');
 }
-
 function exportToCSV() {
   const headers = getExportHeaders();
   const rows = getExportRows();
@@ -1997,7 +1907,6 @@ function exportToCSV() {
   rows.forEach(r => { out += r.map(esc).join(',') + '\n'; });
   downloadBlob(out, 'payroll_' + todayStr() + '.csv', 'text/csv');
 }
-
 function exportToTXT() {
   const headers = getExportHeaders();
   const rows = getExportRows();
@@ -2021,7 +1930,6 @@ function exportToTXT() {
   downloadBlob(out, 'payroll_' + todayStr() + '.txt', 'text/plain');
   toast('Text berjaya dieksport');
 }
-
 function exportToDOC() {
   const rows = getExportRows();
   if (!rows.length) { toast(t('noData'), false); return; }
@@ -2054,9 +1962,10 @@ async function loadEmployees() {
         Basic:3800, Allowance:450, Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
         OtherOT:0, Pinjaman:0, Others:0, Age:28, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES',
         SLRBankNama:'CIMB', SLRBankAccountNo:'9876543210', SLREPF:'YES', SLRPERKESO:'NO', SLREIS:'YES' },
-      { Situation:'UNACTIVE', Code:'EMP003', Name:'Ali Bakar', GroupName:'YZ UFO', BankNama:'Maybank',
+      { Situation:'ACTIVE', Code:'EMP003', Name:'Ali Bakar', GroupName:'YZ UFO', BankNama:'Cash',
         Basic:3000, Allowance:0, Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
-        OtherOT:0, Pinjaman:0, Others:0, Age:30, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES' }
+        OtherOT:0, Pinjaman:0, Others:0, Age:30, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES',
+        SLRBankNama:'CASH', SLRBankAccountNo:'-', SLREPF:'', SLRPERKESO:'', SLREIS:'' }
     ];
     renderTable();
     return;
@@ -2065,19 +1974,27 @@ async function loadEmployees() {
     const res = await fetch(APPS_SCRIPT_URL);
     const json = await res.json();
     if (json.status === 'success') {
-      employees = json.data.map(row => ({
-        Situation: String(row.Situation || 'ACTIVE').trim().toUpperCase(),
-        Code: row.Code, Name: row.Name, GroupName: row.GroupName || '',
-        BankNama: row.BankNama || row.Bank || '', Basic: Number(row.Salary) || 0,
-        Allowance: 0, Deduction: 0, NormalOT: 0, RestOT: 0, PublicOT: 0, OtherOT: 0,
-        Pinjaman: 0, Others: 0, Age: 30,
-        EPF: row.EPF, PERKESO: row.PERKESO, EIS: row.EIS, Lindungan: row.Lindungan,
-        SLRBankNama: row.SLRBankNama || row.BankNamaSLR || row.Bank || '',
-        SLRBankAccountNo: row.SLRBankAccountNo || row.BankAccountNo || row.BankAcc || '',
-        SLREPF: row.SLREPF || row.EPFStatus || '',
-        SLRPERKESO: row.SLRPERKESO || row.PERKESOStatus || '',
-        SLREIS: row.SLREIS || row.EISStatus || ''
-      })).filter(e => e.Situation !== 'UNACTIVE' && e.Situation !== 'INACTIVE');
+      employees = json.data.map(row => {
+        // 兼容多种字段名（包括 STAFF LOGIN RECORD sheet 的 U/V/W/X/Y 列）
+        const slrBankNama = row.SLRBankNama || row.BankNamaSLR || row['U'] || row.Bank || row.BankNama || '';
+        const slrBankAcc  = row.SLRBankAccountNo || row.BankAccountNo || row.BankAcc || row['V'] || '';
+        const slrEPF      = row.SLREPF   || row.EPFStatus     || row.SLR_EPF   || row['W'] || '';
+        const slrSOCSO    = row.SLRPERKESO || row.PERKESOStatus || row.SLR_SOCSO || row['X'] || '';
+        const slrEIS      = row.SLREIS   || row.EISStatus     || row.SLR_EIS   || row['Y'] || '';
+        return {
+          Situation: String(row.Situation || 'ACTIVE').trim().toUpperCase(),
+          Code: row.Code, Name: row.Name, GroupName: row.GroupName || '',
+          BankNama: row.BankNama || row.Bank || '', Basic: Number(row.Salary) || 0,
+          Allowance: 0, Deduction: 0, NormalOT: 0, RestOT: 0, PublicOT: 0, OtherOT: 0,
+          Pinjaman: 0, Others: 0, Age: 30,
+          EPF: row.EPF, PERKESO: row.PERKESO, EIS: row.EIS, Lindungan: row.Lindungan,
+          SLRBankNama: slrBankNama,
+          SLRBankAccountNo: slrBankAcc,
+          SLREPF: slrEPF,
+          SLRPERKESO: slrSOCSO,
+          SLREIS: slrEIS
+        };
+      }).filter(e => e.Situation !== 'UNACTIVE' && e.Situation !== 'INACTIVE');
       renderTable();
     } else { toast('Load error: ' + json.message, false); }
   } catch (err) { console.error(err); toast('Gagal muat data', false); }
@@ -2092,7 +2009,6 @@ function showPayslip(code) {
   printArea.innerHTML = buildPayslip(emp);
   window.print();
 }
-
 function showAllPayslips() {
   const groupFilterQ = prompt('Masukkan GroupName untuk cetak semua (kosongkan untuk semua):', '');
   let list = employees.map(e => recalcRow({ ...e }));
@@ -2104,7 +2020,6 @@ function showAllPayslips() {
   printArea.innerHTML = list.map(buildPayslip).join('');
   window.print();
 }
-
 function buildPayslip(emp) {
   const fmt = n => Number(n || 0).toFixed(2);
   const ot = num(emp.NormalOT) + num(emp.RestOT) + num(emp.PublicOT) + num(emp.OtherOT);
@@ -2157,7 +2072,6 @@ function buildPayslip(emp) {
   </div>`;
 }
 
-// ================= 语言切换 =================
 function switchLang(lang) {
   currentLang = lang;
   document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
@@ -2165,7 +2079,6 @@ function switchLang(lang) {
   setTimeout(updateStickyOffsets, 60);
 }
 
-// ================= 启动 =================
 window.addEventListener('DOMContentLoaded', () => {
   const langSelect = document.getElementById('langSelect');
   if (langSelect) langSelect.value = currentLang;
