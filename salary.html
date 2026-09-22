@@ -1,59 +1,1059 @@
-// ============================================================
-// PAYROLL SYSTEM — Apps Script 后端
-// 功能：
-//  - 从 STAFF LOGIN RECORD 表读取员工数据（含 U/V/W/X/Y 列）
-//  - doGet 返回给前端（含 SLRBankNama / SLRBankAccountNo / SLREPF / SLRPERKESO / SLREIS）
-//  - doPost 把薪资写入 PayrollData 表
-// ============================================================
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payroll System · 薪资系统</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-const CONFIG = {
-  STAFF_SHEET: 'STAFF LOGIN RECORD',   // 员工资料表
-  OUTPUT_SHEET: 'PayrollData',          // 薪资写入表
-  HEADERS: [
-    'Code','Name','GroupName','IC','Jawatan','BankNama',
-    'Basic','Allowance','Deduction',
-    'NormalOT','RestOT','PublicOT','OtherOT','Pinjaman','Others',
-    'EPF_Employee','EPF_Employer',
-    'SOCSO_Employee','SOCSO_Employer',
-    'EIS_Employee','EIS_Employer',
-    'Lindung24Jam',
-    'GrossPay','TotalDeduction','NetSalary',
-    // Section 4 的 SLR 字段（前端可手动编辑）
-    'SLRBankNama','SLRBankAccountNo','SLREPF','SLRPERKESO','SLREIS',
-    'Timestamp'
-  ]
+  :root {
+    --epf-blue: #1a4f8a;
+    --epf-blue-light: #e8f0fa;
+    --epf-blue-soft: #f4f8fd;
+    --epf-border: #d4e0ee;
+    --epf-border-soft: #e6eef7;
+    --epf-text: #1f2d3d;
+    --epf-muted: #64748b;
+    --epf-bg: #f7fafd;
+  }
+
+  body {
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--epf-bg); color: var(--epf-text);
+    padding: 0 0 3rem 0; min-height: 100vh; line-height: 1.5;
+    -webkit-font-smoothing: antialiased; font-size: 14px;
+  }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: #ffffff; border-bottom: 1px solid var(--epf-border);
+    padding: 0.65rem 1.75rem;
+    display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+    box-shadow: 0 1px 2px rgba(26, 79, 138, 0.04);
+  }
+  .topbar .spacer { flex: 1; }
+  .topbar .brand {
+    font-weight: 700; font-size: 0.95rem; color: var(--epf-blue);
+    display: flex; align-items: center; gap: 0.6rem;
+    margin-right: 0.5rem; letter-spacing: -0.01em;
+  }
+  .topbar .brand .logo {
+    width: 32px; height: 32px; background: var(--epf-blue);
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 0.95rem; font-weight: 800;
+  }
+
+  .btn {
+    background: #ffffff; border: 1px solid var(--epf-border);
+    padding: 0.42rem 0.9rem; border-radius: 5px;
+    font-size: 0.78rem; font-weight: 500; cursor: pointer; color: var(--epf-blue);
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    transition: all 0.15s ease; white-space: nowrap; font-family: inherit;
+  }
+  .btn:hover { background: var(--epf-blue-soft); border-color: #b8cfe8; }
+  .btn-primary { background: var(--epf-blue); border: 1px solid var(--epf-blue); color: #fff; }
+  .btn-primary:hover { background: #15406f; border-color: #15406f; }
+  .btn-success { background: #0f7a54; border: 1px solid #0f7a54; color: #fff; }
+  .btn-success:hover { background: #0c6a48; border-color: #0c6a48; }
+  .btn-sm { padding: 0.25rem 0.7rem; font-size: 0.72rem; border-radius: 4px; }
+  select.btn {
+    cursor: pointer; padding-right: 1.8rem; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%231a4f8a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 0.7rem center;
+  }
+
+  .container { max-width: 100%; margin: 0 auto; padding: 1.5rem 1.75rem; }
+
+  .page-header {
+    background: #ffffff; border: 1px solid var(--epf-border);
+    border-radius: 8px; padding: 1.4rem 1.75rem; margin-bottom: 1.25rem;
+    display: flex; flex-wrap: wrap; gap: 1rem;
+    align-items: center; justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(26, 79, 138, 0.04);
+  }
+  .page-header .info { flex: 1; min-width: 240px; }
+  .page-header h1 {
+    font-size: 1.45rem; font-weight: 700; margin-bottom: 0.35rem;
+    color: var(--epf-blue); letter-spacing: -0.015em;
+  }
+  .page-header p { font-size: 0.85rem; color: var(--epf-muted); line-height: 1.6; }
+  .page-header .badge {
+    display: inline-block; background: var(--epf-blue-light); color: var(--epf-blue);
+    padding: 0.25rem 0.85rem; border-radius: 4px;
+    font-size: 0.7rem; font-weight: 600; margin-top: 0.6rem;
+    border: 1px solid #cfe0f2;
+  }
+
+  .stat-badges { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: stretch; }
+  .stat-pill {
+    background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft);
+    border-radius: 6px; padding: 0.55rem 1rem;
+    font-size: 0.78rem; min-width: 110px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .stat-pill .label {
+    font-size: 0.62rem; color: var(--epf-muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    font-weight: 600; margin-bottom: 0.1rem;
+  }
+  .stat-pill .value {
+    font-size: 1.15rem; font-weight: 700;
+    font-variant-numeric: tabular-nums; color: var(--epf-blue);
+    white-space: nowrap;
+  }
+
+  .multiselect { position: relative; display: inline-flex; }
+  .ms-btn {
+    background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft);
+    border-radius: 6px; padding: 0.55rem 0.85rem 0.55rem 1rem;
+    min-width: 150px; font-size: 0.78rem; cursor: pointer;
+    color: var(--epf-text); display: flex; align-items: center; gap: 0.5rem;
+    justify-content: space-between; font-family: inherit; transition: 0.15s; text-align: left;
+  }
+  .ms-btn:hover { background: var(--epf-blue-light); border-color: #b8cfe8; }
+  .multiselect.open .ms-btn { background: var(--epf-blue-light); border-color: var(--epf-blue); }
+  .ms-btn-inner { display: flex; flex-direction: column; line-height: 1.25; }
+  .ms-btn-inner .ms-label {
+    font-size: 0.62rem; color: var(--epf-muted);
+    text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;
+  }
+  .ms-btn-inner .ms-text {
+    color: var(--epf-blue); font-weight: 600; font-size: 0.82rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;
+  }
+  .ms-arrow { color: var(--epf-blue); font-size: 0.7rem; transition: transform 0.15s; }
+  .multiselect.open .ms-arrow { transform: rotate(180deg); }
+
+  .ms-panel {
+    position: absolute; top: calc(100% + 4px); right: 0;
+    background: #ffffff; border: 1px solid var(--epf-border);
+    border-radius: 6px; box-shadow: 0 12px 32px -10px rgba(26, 79, 138, 0.28);
+    z-index: 300; min-width: 240px; display: none;
+    flex-direction: column; overflow: hidden;
+  }
+  .multiselect.open .ms-panel { display: flex; }
+  .ms-actions {
+    display: flex; gap: 0.35rem; padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid var(--epf-border-soft); background: var(--epf-blue-soft);
+  }
+  .ms-actions button {
+    background: #fff; border: 1px solid var(--epf-border);
+    padding: 0.22rem 0.6rem; border-radius: 4px;
+    font-size: 0.7rem; cursor: pointer; color: var(--epf-blue);
+    font-family: inherit; font-weight: 500;
+  }
+  .ms-actions button:hover { background: var(--epf-blue-light); }
+  .ms-list { overflow-y: auto; max-height: 260px; padding: 0.3rem 0; }
+  .ms-list::-webkit-scrollbar { width: 6px; }
+  .ms-list::-webkit-scrollbar-thumb { background: #c2d4e6; border-radius: 3px; }
+  .ms-item {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.4rem 0.75rem; font-size: 0.78rem;
+    cursor: pointer; color: var(--epf-text); user-select: none;
+  }
+  .ms-item:hover { background: var(--epf-blue-soft); }
+  .ms-item input[type="checkbox"] {
+    accent-color: var(--epf-blue); width: 14px; height: 14px; cursor: pointer; flex-shrink: 0;
+  }
+  .ms-item .ms-item-name {
+    flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .ms-item .ms-count {
+    font-size: 0.65rem; color: var(--epf-blue); background: var(--epf-blue-light);
+    padding: 0.1rem 0.45rem; border-radius: 3px;
+    font-weight: 600; font-variant-numeric: tabular-nums;
+  }
+  .ms-empty { padding: 1rem; text-align: center; color: #a7b7c9; font-size: 0.75rem; }
+
+  .section-legend { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .section-legend .item {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    background: #ffffff; border: 1px solid var(--epf-border-soft);
+    padding: 0.35rem 0.85rem; border-radius: 4px;
+    font-size: 0.72rem; color: var(--epf-muted); font-weight: 500;
+  }
+  .section-legend .dot {
+    width: 10px; height: 10px; border-radius: 2px;
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+
+  .card {
+    background: #ffffff; border-radius: 8px;
+    border: 1px solid var(--epf-border);
+    overflow: hidden; margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(26, 79, 138, 0.04);
+  }
+  .card-body { padding: 0; }
+
+  .table-wrap { overflow: auto; max-height: calc(100vh - 350px); background: #ffffff; }
+  table {
+    border-collapse: separate; border-spacing: 0;
+    font-size: 0.8rem; table-layout: fixed;
+    width: 2905px; min-width: 2905px;
+  }
+
+  th {
+    background: var(--epf-blue-soft); padding: 0.5rem 0.5rem;
+    text-align: left; font-weight: 600; color: var(--epf-blue);
+    border-bottom: 1px solid var(--epf-border);
+    white-space: normal; font-size: 0.7rem; vertical-align: middle;
+    word-break: break-word; overflow-wrap: anywhere;
+  }
+  th > div { word-break: break-word; overflow-wrap: anywhere; }
+
+  .bg-slate   { background: #f0f4f9 !important; color: var(--epf-blue) !important; }
+  .bg-emerald { background: #f0f9f4 !important; color: #14663f !important; }
+  .bg-violet  { background: #f4f1fb !important; color: #4a3a8a !important; }
+  .bg-amber   { background: #fdf8ec !important; color: #7a5a12 !important; }
+  .bg-blue    { background: #eef5fd !important; color: var(--epf-blue) !important; }
+  .bg-gray    { background: #f4f6f9 !important; color: var(--epf-muted) !important; }
+
+  .section-label-row th {
+    position: sticky; z-index: 15;
+    padding: 0.45rem 0.6rem; font-size: 0.68rem; font-weight: 700;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    border-bottom: 1px solid var(--epf-border); text-align: center;
+  }
+  .section-label-row th .sec-title {
+    display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+  }
+  .main-header-row th { position: sticky; z-index: 13; text-align: left; }
+  .sub-header-row th { position: sticky; z-index: 14; text-align: center; padding: 0.35rem 0.5rem; }
+  .filter-row th {
+    position: sticky; z-index: 12;
+    background: #ffffff; padding: 0.35rem 0.4rem;
+    border-bottom: 1px solid var(--epf-border); text-align: left;
+  }
+  .filter-row .th-filter {
+    display: block; width: 100%;
+    padding: 4px 8px 4px 24px; font-size: 0.7rem; font-weight: 400;
+    border: 1px solid var(--epf-border); border-radius: 4px;
+    background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%231a4f8a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E") no-repeat left 6px center;
+    background-size: 11px 11px; color: var(--epf-text);
+    font-family: inherit; transition: 0.15s; margin: 0;
+  }
+  .filter-row .th-filter:focus {
+    outline: none; border-color: var(--epf-blue);
+    box-shadow: 0 0 0 2px rgba(26, 79, 138, 0.10);
+  }
+  .filter-row .th-filter::placeholder { color: #a7b7c9; font-weight: 400; }
+  .filter-row th.no-filter { background: var(--epf-blue-soft); }
+
+  td {
+    padding: 0.4rem 0.45rem; border-bottom: 1px solid var(--epf-border-soft);
+    vertical-align: middle; background: #ffffff; transition: background 0.15s;
+  }
+  tr:nth-child(even) td { background: #fbfdff; }
+  tr:hover td { background: var(--epf-blue-soft); }
+
+  .divider-group { box-shadow: inset 1px 0 0 var(--epf-border) !important; }
+
+  body.freeze-on .col-freeze { position: sticky; z-index: 8; background: #ffffff; }
+  body.freeze-on tr:nth-child(even) td.col-freeze { background: #fbfdff; }
+  body.freeze-on tr:hover td.col-freeze { background: var(--epf-blue-soft); }
+  body.freeze-on .col-freeze.col-0 { left: 0px; }
+  body.freeze-on .col-freeze.col-1 { left: 80px; }
+  body.freeze-on .col-freeze.col-2 { left: 150px; }
+  body.freeze-on .col-freeze.col-3 { left: 310px; box-shadow: inset -2px 0 0 var(--epf-blue); }
+  body.freeze-on thead .col-freeze { z-index: 16; }
+  body.freeze-on thead .col-freeze.bg-slate   { background: #f0f4f9 !important; }
+  body.freeze-on thead .col-freeze.bg-amber   { background: #fdf8ec !important; }
+  body.freeze-on thead .col-freeze.bg-emerald { background: #f0f9f4 !important; }
+  body.freeze-on thead .col-freeze.bg-violet  { background: #f4f1fb !important; }
+  body.freeze-on thead .col-freeze.bg-blue    { background: #eef5fd !important; }
+  body.freeze-on thead .col-freeze.bg-gray    { background: #f4f6f9 !important; }
+  body.freeze-on thead .filter-row th.col-freeze { background: #ffffff !important; }
+  body.freeze-on thead .filter-row th.col-freeze.no-filter { background: var(--epf-blue-soft) !important; }
+  body.freeze-on .section-label-row th.col-freeze-group {
+    position: sticky !important; left: 0 !important; z-index: 17 !important;
+  }
+
+  .freeze-line {
+    position: absolute; top: 0; bottom: 0; right: 0; width: 14px;
+    background: linear-gradient(to right, rgba(26,79,138,0) 0%, rgba(26,79,138,0.05) 60%, rgba(26,79,138,0.12) 100%);
+    cursor: pointer; z-index: 20; pointer-events: auto; transition: 0.15s;
+  }
+  .freeze-line:hover {
+    background: linear-gradient(to right, rgba(26,79,138,0.04) 0%, rgba(26,79,138,0.16) 60%, rgba(26,79,138,0.24) 100%);
+  }
+  .freeze-line::before {
+    content: '⋮⋮'; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); color: var(--epf-blue);
+    font-size: 0.7rem; font-weight: 700; letter-spacing: -2px;
+    line-height: 1; opacity: 0.35; transition: 0.15s;
+  }
+  .freeze-line:hover::before { opacity: 0.9; }
+
+  .td-chk { text-align: center; vertical-align: middle; padding: 0.4rem 0.15rem !important; }
+  .td-chk input[type="checkbox"] {
+    width: 15px; height: 15px; cursor: pointer;
+    accent-color: var(--epf-blue); border-radius: 3px;
+  }
+  /* 新：Section 4 里的小勾选框 */
+  .td-chk-sm { text-align: center; vertical-align: middle; padding: 0.4rem 0.1rem !important; }
+  .td-chk-sm input[type="checkbox"] {
+    width: 14px; height: 14px; cursor: pointer;
+    accent-color: var(--epf-blue); border-radius: 3px;
+  }
+
+  .td-text { vertical-align: middle !important; padding: 0.4rem 0.45rem !important; }
+  .text-cell {
+    font-size: 0.78rem; line-height: 1.4;
+    white-space: normal; word-break: break-word;
+    overflow-wrap: anywhere; color: var(--epf-text);
+  }
+  .text-cell.center { text-align: center; }
+  .text-cell.badge-cell {
+    display: inline-block; font-size: 0.62rem; font-weight: 700;
+    padding: 0.15rem 0.6rem; border-radius: 4px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .badge-yes { background: #e3f5ea; color: #14663f; }
+  .badge-no  { background: #fdeaea; color: #a02020; }
+  .badge-other { background: #eef2f6; color: var(--epf-muted); }
+
+  .sit-pending { background: #fdf8ec !important; }
+  .sit-pending .text-cell { color: #7a5a12; font-weight: 700; }
+  .sit-active  { background: #f0f9f4 !important; }
+  .sit-active .text-cell { color: #14663f; font-weight: 700; }
+  .sit-default { background: #ffffff !important; }
+
+  .input {
+    width: 100%; min-width: 0;
+    border: 1px solid var(--epf-border); border-radius: 4px;
+    padding: 0.3rem 0.55rem; font-size: 0.78rem;
+    background: #ffffff; transition: 0.15s;
+    font-family: inherit; color: var(--epf-text);
+  }
+  .input:focus {
+    outline: none; border-color: var(--epf-blue);
+    box-shadow: 0 0 0 2px rgba(26, 79, 138, 0.10);
+  }
+  .input[readonly] { background: var(--epf-blue-soft); color: var(--epf-muted); border-color: var(--epf-border-soft); }
+  .input.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .input[readonly].num { background: #eef3f9; }
+  .cell-bad { background: #fdeaea !important; border-color: #f0b4b4 !important; }
+  .cell-ok  { background: #e3f5ea !important; }
+
+  /* 新：SLR 字段样式 */
+  .input.slr-plain {
+    background: transparent !important;
+    border-color: transparent !important;
+    padding: 0.3rem 0.3rem;
+    color: var(--epf-text);
+  }
+  .input.slr-plain[readonly] { color: var(--epf-text); }
+  .input.slr-plain:not([readonly]) {
+    background: #fff !important;
+    border-color: var(--epf-border) !important;
+  }
+  .input.slr-plain:not([readonly]):focus {
+    border-color: var(--epf-blue) !important;
+    box-shadow: 0 0 0 2px rgba(26, 79, 138, 0.10);
+  }
+
+  .legend { font-size: 0.75rem; color: var(--epf-muted); margin-top: 0.75rem; padding-left: 0.25rem; line-height: 1.7; }
+  .legend strong { color: var(--epf-text); }
+
+  .toast {
+    position: fixed; bottom: 1.8rem; right: 1.8rem;
+    background: var(--epf-blue); color: #fff;
+    padding: 0.85rem 1.5rem; border-radius: 6px;
+    font-size: 0.85rem; font-weight: 500;
+    z-index: 9999; opacity: 0; transform: translateY(12px);
+    transition: 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+    pointer-events: none; max-width: 380px;
+    box-shadow: 0 8px 24px -8px rgba(26, 79, 138, 0.35);
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.error { background: #a02020; }
+
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(26, 79, 138, 0.25);
+    z-index: 9998; display: flex; align-items: center; justify-content: center; padding: 1rem;
+  }
+  .modal-box {
+    background: #ffffff; border-radius: 8px; padding: 1.6rem;
+    width: 100%; max-width: 560px;
+    box-shadow: 0 20px 40px -12px rgba(26, 79, 138, 0.25);
+    display: flex; flex-direction: column; gap: 1.1rem;
+    border: 1px solid var(--epf-border);
+  }
+  .modal-box.compact { max-width: 400px; padding: 1.8rem; text-align: center; }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; }
+  .modal-header h3 { font-size: 1.1rem; font-weight: 700; color: var(--epf-blue); }
+  .modal-close {
+    background: none; border: none; font-size: 1.3rem; cursor: pointer;
+    color: var(--epf-muted); padding: 0.2rem 0.6rem; border-radius: 4px; line-height: 1; transition: 0.15s;
+  }
+  .modal-close:hover { background: var(--epf-blue-soft); color: var(--epf-blue); }
+  .modal-dropzone {
+    border: 2px dashed var(--epf-border); border-radius: 8px;
+    padding: 2.4rem 1.2rem; text-align: center;
+    cursor: pointer; transition: 0.2s; background: var(--epf-blue-soft);
+  }
+  .modal-dropzone:hover, .modal-dropzone.drag-over {
+    border-color: var(--epf-blue); background: var(--epf-blue-light);
+  }
+  .modal-dropzone p { font-size: 0.9rem; color: var(--epf-text); margin: 0.3rem 0; }
+  .modal-dropzone .hint { font-size: 0.72rem; color: var(--epf-muted); }
+  .modal-dropzone .icon { font-size: 2.4rem; margin-bottom: 0.4rem; opacity: 0.8; }
+  .modal-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 0.5rem; flex-wrap: wrap;
+    padding-top: 0.8rem; border-top: 1px solid var(--epf-border-soft);
+  }
+  .template-download {
+    display: flex; align-items: center; gap: 0.4rem;
+    flex-wrap: wrap; font-size: 0.75rem; color: var(--epf-muted);
+  }
+  .modal-actions { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+
+  #printArea { display: none; }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .topbar, .container, .toast, .modal-overlay, .section-legend { display: none !important; }
+    #printArea { display: block !important; }
+    .payslip { page-break-after: always; padding: 12mm; font-size: 10pt; font-family: Arial, sans-serif; color: #000; }
+    .payslip:last-child { page-break-after: auto; }
+    .ps-header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 4mm; margin-bottom: 4mm; }
+    .ps-title { font-size: 14pt; font-weight: bold; }
+    .ps-info { font-size: 9pt; line-height: 1.5; }
+    .ps-section { margin-bottom: 4mm; }
+    .ps-section h4 { font-size: 10pt; margin-bottom: 1.5mm; border-bottom: 1px solid #999; padding-bottom: 1mm; }
+    .ps-row { display: flex; justify-content: space-between; padding: 0.8mm 0; }
+    .ps-row.total { font-weight: bold; border-top: 1px solid #000; padding-top: 1.5mm; margin-top: 1.5mm; }
+    .ps-cols { display: flex; gap: 6mm; }
+    .ps-cols > div { flex: 1; }
+    .ps-sign { margin-top: 8mm; display: flex; justify-content: space-between; font-size: 9pt; }
+    .ps-sign div { border-top: 1px solid #000; padding-top: 1mm; width: 45%; text-align: center; }
+    .export-print { padding: 6mm; font-family: Arial, sans-serif; color: #000; }
+    .export-table { border-collapse: collapse; width: 100%; font-size: 8.5pt; }
+    .export-table th, .export-table td { border: 1px solid #999; padding: 3px 4px; }
+    .export-table th { background: #eef5fd; text-align: left; }
+    .export-table td.num { text-align: right; }
+    .export-table tr { page-break-inside: avoid; }
+  }
+
+  .table-wrap::-webkit-scrollbar { width: 8px; height: 8px; }
+  .table-wrap::-webkit-scrollbar-track { background: var(--epf-blue-soft); }
+  .table-wrap::-webkit-scrollbar-thumb { background: #c2d4e6; border-radius: 4px; }
+  .table-wrap::-webkit-scrollbar-thumb:hover { background: #9db8d2; }
+
+  @media (max-width: 768px) {
+    .topbar { padding: 0.6rem 1rem; }
+    .container { padding: 1rem; }
+    .page-header { padding: 1.2rem 1.2rem; }
+    .page-header h1 { font-size: 1.2rem; }
+    .section-legend .item { font-size: 0.65rem; padding: 0.25rem 0.6rem; }
+    .stat-pill { padding: 0.4rem 0.8rem; min-width: 90px; }
+    .stat-pill .value { font-size: 1rem; }
+    .ms-btn { min-width: 130px; }
+  }
+</style>
+</head>
+<body class="freeze-on">
+
+<div class="topbar">
+  <div class="brand">
+    <div class="logo">P</div>
+    Payroll System
+  </div>
+  <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
+
+  <button class="btn btn-success" onclick="saveToSheet()" id="btnSaveSheet">💾 Simpan ke Sheet</button>
+  <button class="btn" onclick="openImportModal()" id="btnImport">📥 Import / 导入</button>
+
+  <select id="exportMenu" class="btn" onchange="handleExport(this.value)">
+    <option value="">💾 Eksport / 导出…</option>
+    <option value="pdf">📄 PDF (.pdf)</option>
+    <option value="xlsx">📊 Excel (.xlsx)</option>
+    <option value="txt">📝 Text (.txt)</option>
+    <option value="doc">📘 Word (.doc)</option>
+  </select>
+
+  <button class="btn" onclick="showAllPayslips()" id="btnAllSlip">📄 Semua Slip Gaji</button>
+  <button class="btn" onclick="checkAll()" id="btnCheckAll">✅ Semak Semua</button>
+  <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
+
+  <select id="checkMenu" class="btn" onchange="jumpToCheckPage(this.value)">
+    <option value="">🔍 Semak / 检查…</option>
+    <option value="https://yzcorpsdk2-ctrl.github.io/salarysystem/epf.html">🔍 EPF</option>
+    <option value="https://yzcorpsdk2-ctrl.github.io/salarysystem/socso.html">🔍 SOCSO</option>
+    <option value="https://yzcorpsdk2-ctrl.github.io/salarysystem/eis.html">🔍 EIS</option>
+    <option value="https://yzcorpsdk2-ctrl.github.io/salarysystem/24jamlindungan.html">🔍 24 JAM Lindungan</option>
+  </select>
+
+  <span class="spacer"></span>
+  <select id="langSelect" class="btn" onchange="switchLang(this.value)">
+    <option value="ms">🇲🇾 Bahasa Melayu</option>
+    <option value="en">🇬🇧 English</option>
+    <option value="zh">🇨🇳 中文</option>
+  </select>
+</div>
+
+<div class="container">
+  <div class="page-header">
+    <div class="info">
+      <h1 id="pageTitle">Sistem Penggajian</h1>
+      <p id="pageDesc">Pengurusan gaji pekerja dengan pengiraan automatik EPF, SOCSO, EIS &amp; 24JAM Lindungan.</p>
+      <span class="badge" id="pageBadge">Auto kira caruman statutori · Manual override dengan kotak semak</span>
+    </div>
+
+    <div class="stat-badges">
+      <div class="multiselect" id="msGroup">
+        <button class="ms-btn" onclick="toggleMS('msGroup', event)">
+          <div class="ms-btn-inner">
+            <span class="ms-label" id="msGroupLabel">Kumpulan</span>
+            <span class="ms-text" id="msGroupText">Semua</span>
+          </div>
+          <span class="ms-arrow">▾</span>
+        </button>
+        <div class="ms-panel">
+          <div class="ms-actions">
+            <button onclick="selectAllMS('group', event)" id="msGroupSelAll">Semua</button>
+            <button onclick="clearMS('group', event)" id="msGroupClear">Kosong</button>
+          </div>
+          <div class="ms-list" id="msGroupList"></div>
+        </div>
+      </div>
+
+      <div class="multiselect" id="msBank">
+        <button class="ms-btn" onclick="toggleMS('msBank', event)">
+          <div class="ms-btn-inner">
+            <span class="ms-label" id="msBankLabel">Bank</span>
+            <span class="ms-text" id="msBankText">Semua</span>
+          </div>
+          <span class="ms-arrow">▾</span>
+        </button>
+        <div class="ms-panel">
+          <div class="ms-actions">
+            <button onclick="selectAllMS('bank', event)" id="msBankSelAll">Semua</button>
+            <button onclick="clearMS('bank', event)" id="msBankClear">Kosong</button>
+          </div>
+          <div class="ms-list" id="msBankList"></div>
+        </div>
+      </div>
+
+      <div class="stat-pill">
+        <div class="label" id="statLabelMatched">Padan</div>
+        <div class="value" id="filteredCount">0</div>
+      </div>
+
+      <div class="stat-pill" style="min-width: 150px;">
+        <div class="label" id="statLabelNetTotal">Jumlah Bersih</div>
+        <div class="value" id="filteredNet">RM 0.00</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-legend">
+    <span class="item"><span class="dot bg-slate" style="border:1px solid #cbd5e1;"></span> <span id="legend1">1. Maklumat Asas (Freeze)</span></span>
+    <span class="item"><span class="dot bg-emerald" style="border:1px solid #a7d7b8;"></span> <span id="legend2">2. Pendapatan</span></span>
+    <span class="item"><span class="dot bg-violet" style="border:1px solid #c4b8e8;"></span> <span id="legend3">3. Caruman Statutori</span></span>
+    <span class="item"><span class="dot bg-amber" style="border:1px solid #e8d48a;"></span> <span id="legend4">4. Staff Login Record (U-Y)</span></span>
+    <span class="item"><span class="dot bg-blue" style="border:1px solid #a8c4e8;"></span> <span id="legend5">5. Ringkasan Gaji</span></span>
+    <span class="item"><span class="dot bg-gray" style="border:1px solid #cbd5e1;"></span> <span id="legend6">6. Tindakan</span></span>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="table-wrap">
+        <table id="mainTable">
+          <colgroup>
+            <col class="col-freeze col-0" style="width:80px">
+            <col class="col-freeze col-1" style="width:70px">
+            <col class="col-freeze col-2" style="width:160px">
+            <col class="col-freeze col-3" style="width:110px">
+            <col style="width:85px"><col style="width:85px"><col style="width:85px">
+            <col style="width:70px"><col style="width:70px"><col style="width:70px"><col style="width:70px">
+            <col style="width:85px"><col style="width:85px">
+            <col style="width:40px"><col style="width:85px"><col style="width:85px">
+            <col style="width:40px"><col style="width:85px"><col style="width:85px">
+            <col style="width:40px"><col style="width:85px"><col style="width:85px">
+            <col style="width:40px"><col style="width:80px">
+            <!-- Section 4 新增勾选列 -->
+            <col style="width:40px"><col style="width:130px">
+            <col style="width:40px"><col style="width:130px">
+            <col style="width:40px"><col style="width:70px">
+            <col style="width:40px"><col style="width:70px">
+            <col style="width:40px"><col style="width:70px">
+            <col style="width:95px"><col style="width:95px"><col style="width:95px">
+            <col style="width:80px">
+          </colgroup>
+          <thead>
+            <tr class="section-label-row">
+              <th colspan="4" class="bg-slate col-freeze-group"><div class="sec-title" id="sec1">📌 1. MAKLUMAT ASAS (FREEZE)</div></th>
+              <th colspan="9" class="bg-emerald divider-group"><div class="sec-title" id="sec2">💰 2. PENDAPATAN / ELAUN</div></th>
+              <th colspan="11" class="bg-violet divider-group"><div class="sec-title" id="sec3">🏛️ 3. CARUMAN STATUTORI (EPF / SOCSO / EIS / 24JAM)</div></th>
+              <th colspan="10" class="bg-amber divider-group"><div class="sec-title" id="sec4">📋 4. STAFF LOGIN RECORD (U-Y)</div></th>
+              <th colspan="3" class="bg-blue divider-group"><div class="sec-title" id="sec5">🧮 5. RINGKASAN GAJI</div></th>
+              <th colspan="1" class="bg-gray divider-group"><div class="sec-title" id="sec6">⚙️ 6. TINDAKAN</div></th>
+            </tr>
+            <tr class="main-header-row">
+              <th class="col-freeze col-0 bg-slate" rowspan="2" id="thSituation">Situation</th>
+              <th class="col-freeze col-1 bg-slate" rowspan="2" id="thKod">Kod</th>
+              <th class="col-freeze col-2 bg-slate" rowspan="2" id="thNama">Nama</th>
+              <th class="col-freeze col-3 bg-slate" rowspan="2" id="thKumpulan" style="position: sticky;">
+                Kumpulan
+                <div class="freeze-line" onclick="openFreezeModal()" title="Toggle freeze"></div>
+              </th>
+              <th class="bg-emerald divider-group" rowspan="2" id="thBasic">Gaji Asas</th>
+              <th class="bg-emerald" rowspan="2" id="thAllowance">Elaun</th>
+              <th class="bg-emerald" rowspan="2" id="thDeduction">Potongan</th>
+              <th class="bg-emerald" rowspan="2" id="thNormalOT">OT Biasa</th>
+              <th class="bg-emerald" rowspan="2" id="thRestOT">OT Rehat</th>
+              <th class="bg-emerald" rowspan="2" id="thPublicOT">OT Awam</th>
+              <th class="bg-emerald" rowspan="2" id="thOtherOT">OT Lain</th>
+              <th class="bg-emerald" rowspan="2" id="thPinjaman">Pinjaman</th>
+              <th class="bg-emerald" rowspan="2" id="thOthers">Lain-lain</th>
+              <th class="bg-violet divider-group" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-violet" colspan="2" style="text-align:center;">EPF</th>
+              <th class="bg-violet" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-violet" colspan="2" style="text-align:center;">SOCSO</th>
+              <th class="bg-violet" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-violet" colspan="2" style="text-align:center;">EIS</th>
+              <th class="bg-violet" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-violet" rowspan="2" id="th24JAM">24JAM</th>
+
+              <!-- Section 4 - 每列前加勾选 -->
+              <th class="bg-amber divider-group" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-amber" rowspan="2"><div style="font-size:0.72rem;" id="thBankNama">Bank Nama<br><span style="font-weight:400;font-size:0.6rem;">(U)</span></div></th>
+              <th class="bg-amber" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-amber" rowspan="2"><div style="font-size:0.72rem;" id="thBankAcc">Bank Acc<br><span style="font-weight:400;font-size:0.6rem;">(V)</span></div></th>
+              <th class="bg-amber" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-amber" rowspan="2" style="text-align:center;"><div style="font-size:0.72rem;" id="thEPF">EPF<br><span style="font-weight:400;font-size:0.6rem;">(W)</span></div></th>
+              <th class="bg-amber" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-amber" rowspan="2" style="text-align:center;"><div style="font-size:0.72rem;" id="thSOCSO">SOCSO<br><span style="font-weight:400;font-size:0.6rem;">(X)</span></div></th>
+              <th class="bg-amber" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-amber" rowspan="2" style="text-align:center;"><div style="font-size:0.72rem;" id="thEIS">EIS<br><span style="font-weight:400;font-size:0.6rem;">(Y)</span></div></th>
+
+              <th class="bg-blue divider-group" rowspan="2" id="thGross">Gaji Kasar</th>
+              <th class="bg-blue" rowspan="2" id="thTotalDed">Total Potongan</th>
+              <th class="bg-blue" rowspan="2" id="thNet">Gaji Bersih</th>
+              <th class="bg-gray divider-group" rowspan="2" style="text-align:center;" id="thAction">Tindakan</th>
+            </tr>
+            <tr class="sub-header-row">
+              <th class="bg-violet" id="subEPFE">Pekerja</th>
+              <th class="bg-violet" id="subEPFR">Majikan</th>
+              <th class="bg-violet" id="subSOCSOE">Pekerja</th>
+              <th class="bg-violet" id="subSOCSOR">Majikan</th>
+              <th class="bg-violet" id="subEISE">Pekerja</th>
+              <th class="bg-violet" id="subEISR">Majikan</th>
+            </tr>
+            <tr class="filter-row">
+              <th class="col-freeze col-0 bg-slate"><input class="th-filter" data-col="0" placeholder="🔍"></th>
+              <th class="col-freeze col-1 bg-slate"><input class="th-filter" data-col="1" placeholder="🔍"></th>
+              <th class="col-freeze col-2 bg-slate"><input class="th-filter" data-col="2" placeholder="🔍"></th>
+              <th class="col-freeze col-3 bg-slate"><input class="th-filter" data-col="3" placeholder="🔍"></th>
+              <th class="bg-emerald divider-group"><input class="th-filter" data-col="4" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="5" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="6" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="7" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="8" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="9" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="10" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="11" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="12" placeholder="🔍"></th>
+              <th class="bg-violet divider-group no-filter"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="14" placeholder="🔍"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="15" placeholder="🔍"></th>
+              <th class="bg-violet no-filter"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="17" placeholder="🔍"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="18" placeholder="🔍"></th>
+              <th class="bg-violet no-filter"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="20" placeholder="🔍"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="21" placeholder="🔍"></th>
+              <th class="bg-violet no-filter"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="23" placeholder="🔍"></th>
+              <!-- Section 4 filter - 只有可读字段有筛选 -->
+              <th class="bg-amber divider-group no-filter"></th>
+              <th class="bg-amber"><input class="th-filter" data-col="25" placeholder="🔍"></th>
+              <th class="bg-amber no-filter"></th>
+              <th class="bg-amber"><input class="th-filter" data-col="27" placeholder="🔍"></th>
+              <th class="bg-amber no-filter"></th>
+              <th class="bg-amber"><input class="th-filter" data-col="29" placeholder="🔍"></th>
+              <th class="bg-amber no-filter"></th>
+              <th class="bg-amber"><input class="th-filter" data-col="31" placeholder="🔍"></th>
+              <th class="bg-amber no-filter"></th>
+              <th class="bg-amber"><input class="th-filter" data-col="33" placeholder="🔍"></th>
+              <th class="bg-blue divider-group"><input class="th-filter" data-col="34" placeholder="🔍"></th>
+              <th class="bg-blue"><input class="th-filter" data-col="35" placeholder="🔍"></th>
+              <th class="bg-blue"><input class="th-filter" data-col="36" placeholder="🔍"></th>
+              <th class="bg-gray divider-group no-filter"></th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend" id="legend"></div>
+</div>
+
+<div id="printArea"></div>
+<div id="toast" class="toast"></div>
+
+<div id="freezeModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box compact">
+    <h3 style="justify-content:center; font-size:1.05rem; margin-bottom:0.3rem; color:var(--epf-blue);" id="freezeTitle">🔒 Tetapan Freeze Kolum</h3>
+    <p style="color:var(--epf-muted); font-size:0.82rem; margin-bottom:1rem;" id="freezeDesc">
+      Pilih sama ada mahu kunci kolum pertama (Situation → Kumpulan) supaya sentiasa kelihatan semasa scroll, atau buka kunci sepenuhnya.
+    </p>
+    <div class="modal-actions">
+      <button class="btn" onclick="setFreeze(false)" id="freezeUnlockBtn">🔓 Buka Kunci</button>
+      <button class="btn btn-primary" onclick="setFreeze(true)" id="freezeLockBtn">🔒 Kunci Kolum</button>
+    </div>
+    <button class="btn btn-sm" style="margin-top:0.6rem;" onclick="closeFreezeModal()" id="freezeCancelBtn">Batal</button>
+  </div>
+</div>
+
+<div id="importModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="importTitle">📥 Import Data / 导入资料</h3>
+      <button class="modal-close" onclick="closeImportModal()">✕</button>
+    </div>
+    <div class="modal-dropzone" id="dropzone">
+      <div class="icon">📁</div>
+      <p><strong id="importDrop">拖入文件或点击选择</strong></p>
+      <p class="hint" id="importDropHint">Drag & drop file here, or click to browse</p>
+      <p class="hint" id="importFormatHint">格式：.xlsx / .csv / .txt</p>
+      <input type="file" id="importFile" accept=".xlsx,.xls,.csv,.txt" style="display:none;">
+    </div>
+    <div class="modal-footer">
+      <div class="template-download">
+        <span id="importTemplate">📥 Template:</span>
+        <button class="btn btn-sm" onclick="downloadTemplate('xlsx')">Excel (.xlsx)</button>
+        <button class="btn btn-sm" onclick="downloadTemplate('doc')">Word (.doc)</button>
+      </div>
+      <button class="btn" onclick="closeImportModal()" id="importCloseBtn">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<script>
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJQe5hNv7sC_Rmig6xZ0NP4nP_PqXQmgTHbG7Ou6_9JtWadETnVmVfFr7b3Cu5qidZ/exec';
+
+const GROUP_FIELDS = {
+  EPF:   ['EPF_Employee', 'EPF_Employer'],
+  SOCSO: ['SOCSO_Employee', 'SOCSO_Employer'],
+  EIS:   ['EIS_Employee', 'EIS_Employer'],
+  '24JAM': ['Lindung24Jam']
 };
 
-// ============================================================
-// 从 STAFF LOGIN RECORD 读取时，按列位置兜底映射
-// 如果表头名匹配不到，就按固定列位置读取
-// ============================================================
-const FALLBACK_COLS = {
-  SLRBankNama:       20,  // U 列
-  SLRBankAccountNo:  21,  // V 列
-  SLREPF:            22,  // W 列
-  SLRPERKESO:        23,  // X 列
-  SLREIS:            24   // Y 列
+const I18N = {
+  ms: {
+    title: 'Sistem Penggajian',
+    desc: 'Pengurusan gaji pekerja dengan pengiraan automatik EPF, SOCSO, EIS & 24JAM Lindungan.',
+    badge: 'Auto kira caruman statutori · Manual override dengan kotak semak',
+    save: 'Simpan ke Sheet', importBtn: 'Import / 导入',
+    exportMenu: 'Eksport', allSlip: 'Semua Slip Gaji', checkAll: 'Semak Semua',
+    statTotal: 'Jumlah Pekerja', statActive: 'Aktif', statPending: 'Pending',
+    legend1: '1. Maklumat Asas (Freeze)', legend2: '2. Pendapatan',
+    legend3: '3. Caruman Statutori', legend4: '4. Staff Login Record (U-Y)',
+    legend5: '5. Ringkasan Gaji', legend6: '6. Tindakan',
+    sec1: '📌 1. MAKLUMAT ASAS (FREEZE)', sec2: '💰 2. PENDAPATAN / ELAUN',
+    sec3: '🏛️ 3. CARUMAN STATUTORI (EPF / SOCSO / EIS / 24JAM)',
+    sec4: '📋 4. STAFF LOGIN RECORD (U-Y)', sec5: '🧮 5. RINGKASAN GAJI',
+    sec6: '⚙️ 6. TINDAKAN',
+    situation: 'Situation', kod: 'Kod', nama: 'Nama', kumpulan: 'Kumpulan',
+    basic: 'Gaji Asas', allowance: 'Elaun', deduction: 'Potongan',
+    normalOT: 'OT Biasa', restOT: 'OT Rehat', publicOT: 'OT Awam', otherOT: 'OT Lain',
+    pinjaman: 'Pinjaman', others: 'Lain-lain',
+    epfE: 'Pekerja', epfR: 'Majikan',
+    socsoE: 'Pekerja', socsoR: 'Majikan',
+    eisE: 'Pekerja', eisR: 'Majikan',
+    lindung: '24JAM', bankNama: 'Bank Nama', bankAcc: 'Bank Acc',
+    epf: 'EPF', socso: 'SOCSO', eis: 'EIS',
+    gross: 'Gaji Kasar', totalDed: 'Total Potongan', net: 'Gaji Bersih',
+    action: 'Tindakan', slip: 'Slip',
+    legend: 'Nota: Tandakan ✔ di hadapan EPF/SOCSO/EIS/24JAM untuk isi manual. Tidak ditanda = auto kira. Tandakan ✔ di Section 4 (U-Y) untuk edit Bank/EPF/SOCSO/EIS. Jika Bank Nama = CASH, EPF/SOCSO/EIS auto 0. Klik garisan biru di kanan kolum Kumpulan untuk toggle freeze.',
+    saved: 'Berjaya disimpan ke Sheet', failed: 'Gagal simpan',
+    loading: 'Memuatkan data...', importSuccess: 'Berjaya import {n} pekerja',
+    importFail: 'Fail tidak sah atau kosong', importFormat: 'Format fail tidak disokong',
+    noData: 'Tiada data untuk dieksport',
+    freezeLocked: 'Kolum dibekukan (freeze ON)', freezeUnlocked: 'Kolum dibuka (freeze OFF)',
+    freezeTitle: '🔒 Tetapan Freeze Kolum',
+    freezeDesc: 'Pilih sama ada mahu kunci kolum pertama (Situation → Kumpulan) supaya sentiasa kelihatan semasa scroll, atau buka kunci sepenuhnya.',
+    freezeUnlock: '🔓 Buka Kunci', freezeLock: '🔒 Kunci Kolum', freezeCancel: 'Batal',
+    importTitle: '📥 Import Data / 导入资料',
+    importDrop: 'Lepaskan fail di sini atau klik untuk pilih',
+    importDropHint: 'Drag & drop file here, or click to browse',
+    importFormatHint: 'Format: .xlsx / .csv / .txt',
+    importTemplate: '📥 Template:', importClose: 'Tutup',
+    filterGroup: 'Kumpulan', filterBank: 'Bank', all: 'Semua',
+    selectedSuffix: ' dipilih', matchedCount: 'Padan', netTotal: 'Jumlah Bersih',
+    btnSelectAll: 'Semua', btnClear: 'Kosong', noOptions: 'Tiada pilihan'
+  },
+  en: {
+    title: 'Payroll System',
+    desc: 'Employee payroll management with automatic EPF, SOCSO, EIS & 24JAM Lindungan calculation.',
+    badge: 'Auto-calculate statutory contributions · Manual override with checkbox',
+    save: 'Save to Sheet', importBtn: 'Import',
+    exportMenu: 'Export', allSlip: 'All Payslips', checkAll: 'Check All',
+    statTotal: 'Total Employees', statActive: 'Active', statPending: 'Pending',
+    legend1: '1. Basic Info (Freeze)', legend2: '2. Income',
+    legend3: '3. Statutory Contributions', legend4: '4. Staff Login Record (U-Y)',
+    legend5: '5. Salary Summary', legend6: '6. Actions',
+    sec1: '📌 1. BASIC INFO (FREEZE)', sec2: '💰 2. INCOME / ALLOWANCE',
+    sec3: '🏛️ 3. STATUTORY CONTRIBUTIONS (EPF / SOCSO / EIS / 24JAM)',
+    sec4: '📋 4. STAFF LOGIN RECORD (U-Y)', sec5: '🧮 5. SALARY SUMMARY',
+    sec6: '⚙️ 6. ACTIONS',
+    situation: 'Situation', kod: 'Code', nama: 'Name', kumpulan: 'Group',
+    basic: 'Basic', allowance: 'Allowance', deduction: 'Deduction',
+    normalOT: 'Normal OT', restOT: 'Rest OT', publicOT: 'Public OT', otherOT: 'Other OT',
+    pinjaman: 'Loan', others: 'Others',
+    epfE: 'Employee', epfR: 'Employer',
+    socsoE: 'Employee', socsoR: 'Employer',
+    eisE: 'Employee', eisR: 'Employer',
+    lindung: '24JAM', bankNama: 'Bank Name', bankAcc: 'Bank Acc',
+    epf: 'EPF', socso: 'SOCSO', eis: 'EIS',
+    gross: 'Gross', totalDed: 'Total Ded', net: 'Net',
+    action: 'Action', slip: 'Payslip',
+    legend: 'Note: Tick ✔ before EPF/SOCSO/EIS/24JAM to enter manually. Unticked = auto calc. Tick ✔ in Section 4 (U-Y) to edit Bank/EPF/SOCSO/EIS. If Bank Nama = CASH, EPF/SOCSO/EIS auto 0. Click the blue line right of Group column to toggle freeze.',
+    saved: 'Saved successfully', failed: 'Save failed',
+    loading: 'Loading data...', importSuccess: 'Imported {n} employees',
+    importFail: 'Invalid or empty file', importFormat: 'Unsupported file format',
+    noData: 'No data to export',
+    freezeLocked: 'Columns frozen (ON)', freezeUnlocked: 'Columns unfrozen (OFF)',
+    freezeTitle: '🔒 Freeze Column Setting',
+    freezeDesc: 'Choose whether to lock the first columns (Situation → Group) so they stay visible while scrolling, or unlock them completely.',
+    freezeUnlock: '🔓 Unlock', freezeLock: '🔒 Lock Columns', freezeCancel: 'Cancel',
+    importTitle: '📥 Import Data',
+    importDrop: 'Drop file here or click to select',
+    importDropHint: 'Drag & drop file here, or click to browse',
+    importFormatHint: 'Format: .xlsx / .csv / .txt',
+    importTemplate: '📥 Template:', importClose: 'Close',
+    filterGroup: 'Group', filterBank: 'Bank', all: 'All',
+    selectedSuffix: ' selected', matchedCount: 'Matched', netTotal: 'Net Total',
+    btnSelectAll: 'All', btnClear: 'Clear', noOptions: 'No options'
+  },
+  zh: {
+    title: '薪资系统',
+    desc: '员工薪资管理，自动计算 EPF、SOCSO、EIS 及 24JAM Lindungan。',
+    badge: '自动计算法定缴款 · 使用复选框手动覆盖',
+    save: '保存到 Sheet', importBtn: 'Import / 导入',
+    exportMenu: '导出', allSlip: '全部粮单', checkAll: '检查全部',
+    statTotal: '员工总数', statActive: '活跃', statPending: '待处理',
+    legend1: '1. 基本资料 (冻结)', legend2: '2. 收入',
+    legend3: '3. 法定缴款', legend4: '4. 员工登录记录 (U-Y)',
+    legend5: '5. 薪资汇总', legend6: '6. 操作',
+    sec1: '📌 1. 基本资料 (冻结)', sec2: '💰 2. 收入 / 津贴',
+    sec3: '🏛️ 3. 法定缴款 (EPF / SOCSO / EIS / 24JAM)',
+    sec4: '📋 4. 员工登录记录 (U-Y)', sec5: '🧮 5. 薪资汇总',
+    sec6: '⚙️ 6. 操作',
+    situation: '状态', kod: '编号', nama: '姓名', kumpulan: '分店',
+    basic: '基本薪资', allowance: '津贴', deduction: '扣款',
+    normalOT: '普通加班', restOT: '休息日加班', publicOT: '公假加班', otherOT: '其他加班',
+    pinjaman: '借粮', others: '其他',
+    epfE: '员工', epfR: '雇主',
+    socsoE: '员工', socsoR: '雇主',
+    eisE: '员工', eisR: '雇主',
+    lindung: '24JAM', bankNama: '银行名', bankAcc: '银行账号',
+    epf: 'EPF', socso: 'SOCSO', eis: 'EIS',
+    gross: '总薪资', totalDed: '总扣款', net: '净薪资',
+    action: '操作', slip: '粮单',
+    legend: '备注：勾选 EPF/SOCSO/EIS/24JAM 前的 ✔ 表示手动填写，不勾选则系统自动计算。勾选 Section 4 (U-Y) 前的 ✔ 可手动编辑银行/EPF/SOCSO/EIS。若银行名填 CASH，EPF/SOCSO/EIS 自动归零不计算。点击“分店”列右侧蓝线切换冻结。',
+    saved: '已成功保存到 Sheet', failed: '保存失败',
+    loading: '加载数据中...', importSuccess: '成功导入 {n} 位员工',
+    importFail: '文件无效或为空', importFormat: '不支持的文件格式',
+    noData: '没有可导出的数据',
+    freezeLocked: '列已冻结', freezeUnlocked: '列已解冻',
+    freezeTitle: '🔒 冻结列设置',
+    freezeDesc: '选择是否锁定前几列（状态 → 分店），让它们在滚动时保持可见，或完全解锁。',
+    freezeUnlock: '🔓 解锁', freezeLock: '🔒 锁定列', freezeCancel: '取消',
+    importTitle: '📥 导入资料',
+    importDrop: '拖入文件或点击选择',
+    importDropHint: '拖入文件或点击浏览',
+    importFormatHint: '格式：.xlsx / .csv / .txt',
+    importTemplate: '📥 模板：', importClose: '关闭',
+    filterGroup: '分店', filterBank: '银行', all: '全部',
+    selectedSuffix: ' 项', matchedCount: '符合人数', netTotal: '净薪资合计',
+    btnSelectAll: '全选', btnClear: '清除', noOptions: '暂无选项'
+  }
 };
+let currentLang = 'ms';
+function t(key) { return I18N[currentLang][key] || key; }
 
-// 兼容多个可能的表头名
-const HEADER_ALIAS = {
-  SLRBankNama:      ['SLRBankNama','Bank Nama','BankNama','Bank','Bank Name'],
-  SLRBankAccountNo: ['SLRBankAccountNo','Bank Acc','BankAccountNo','Bank Account No','Bank Account'],
-  SLREPF:           ['SLREPF','EPF','EPF Status','SLR EPF'],
-  SLRPERKESO:       ['SLRPERKESO','SOCSO','PERKESO','SOCSO Status','SLR SOCSO','SLRPERKESO'],
-  SLREIS:           ['SLREIS','EIS','EIS Status','SLR EIS']
-};
+let employees = [];
+const filterGroup = new Set();
+const filterBank = new Set();
 
-// ================= 计算表 =================
-function calcEPF(salary, age) {
-  if (!salary || salary <= 0) return { employee: 0, employer: 0 };
-  age = age || 30;
-  if (age >= 60) return { employee: 0, employer: Math.ceil(salary * 0.04) };
-  const erRate = salary <= 5000 ? 0.13 : 0.12;
-  return { employee: Math.ceil(salary * 0.11), employer: Math.ceil(salary * erRate) };
+function toast(msg, ok = true) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.background = ok ? '#1a4f8a' : '#a02020';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+function num(v) { return Number(v || 0); }
+function todayStr() {
+  const d = new Date();
+  const p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
 }
 
+function updateStickyOffsets() {
+  requestAnimationFrame(() => {
+    const thead = document.querySelector('#mainTable thead');
+    if (!thead) return;
+    const rows = thead.querySelectorAll('tr');
+    let top = 0;
+    rows.forEach(row => {
+      const h = Math.ceil(row.getBoundingClientRect().height);
+      row.querySelectorAll('th').forEach(th => { th.style.top = top + 'px'; });
+      top += h;
+    });
+  });
+}
+
+// ================= 多选 =================
+function toggleMS(id, e) {
+  if (e) e.stopPropagation();
+  const el = document.getElementById(id);
+  const wasOpen = el.classList.contains('open');
+  document.querySelectorAll('.multiselect.open').forEach(m => m.classList.remove('open'));
+  if (!wasOpen) el.classList.add('open');
+}
+function onFilterChange(type, cb) {
+  if (type === 'group') {
+    if (cb.checked) filterGroup.add(cb.dataset.value); else filterGroup.delete(cb.dataset.value);
+  } else {
+    if (cb.checked) filterBank.add(cb.dataset.value); else filterBank.delete(cb.dataset.value);
+  }
+  updateMSLabels();
+  updateFilterStats();
+}
+function selectAllMS(type, e) {
+  if (e) e.stopPropagation();
+  if (type === 'group') {
+    document.querySelectorAll('#msGroupList input[type=checkbox]').forEach(cb => {
+      cb.checked = true; filterGroup.add(cb.dataset.value);
+    });
+  } else {
+    document.querySelectorAll('#msBankList input[type=checkbox]').forEach(cb => {
+      cb.checked = true; filterBank.add(cb.dataset.value);
+    });
+  }
+  updateMSLabels();
+  updateFilterStats();
+}
+function clearMS(type, e) {
+  if (e) e.stopPropagation();
+  if (type === 'group') {
+    filterGroup.clear();
+    document.querySelectorAll('#msGroupList input[type=checkbox]').forEach(cb => cb.checked = false);
+  } else {
+    filterBank.clear();
+    document.querySelectorAll('#msBankList input[type=checkbox]').forEach(cb => cb.checked = false);
+  }
+  updateMSLabels();
+  updateFilterStats();
+}
+function updateMSLabels() {
+  const txtG = document.getElementById('msGroupText');
+  const txtB = document.getElementById('msBankText');
+  if (filterGroup.size === 0) txtG.textContent = t('all');
+  else if (filterGroup.size === 1) txtG.textContent = Array.from(filterGroup)[0];
+  else txtG.textContent = filterGroup.size + t('selectedSuffix');
+  if (filterBank.size === 0) txtB.textContent = t('all');
+  else if (filterBank.size === 1) txtB.textContent = Array.from(filterBank)[0];
+  else txtB.textContent = filterBank.size + t('selectedSuffix');
+}
+function getFilteredForStats() {
+  let list = employees.filter(e => {
+    const s = String(e.Situation || '').trim().toUpperCase();
+    return s !== 'UNACTIVE' && s !== 'INACTIVE';
+  });
+  if (filterGroup.size > 0) list = list.filter(e => filterGroup.has(String(e.GroupName || '').trim()));
+  if (filterBank.size > 0) list = list.filter(e => filterBank.has(String(e.SLRBankNama || e.BankNama || '').trim()));
+  return list;
+}
+function updateFilterStats() {
+  const list = getFilteredForStats();
+  const count = list.length;
+  const totalNet = list.reduce((sum, e) => sum + num(recalcRow({ ...e }).NetSalary), 0);
+  const countEl = document.getElementById('filteredCount');
+  const netEl = document.getElementById('filteredNet');
+  if (countEl) countEl.textContent = count;
+  if (netEl) netEl.textContent = 'RM ' + totalNet.toFixed(2);
+}
+function buildFilterDropdowns() {
+  const groups = new Map();
+  const banks = new Map();
+  employees.forEach(e => {
+    const s = String(e.Situation || '').trim().toUpperCase();
+    if (s === 'UNACTIVE' || s === 'INACTIVE') return;
+    const g = String(e.GroupName || '').trim();
+    const b = String(e.SLRBankNama || e.BankNama || '').trim();
+    if (g) groups.set(g, (groups.get(g) || 0) + 1);
+    if (b) banks.set(b, (banks.get(b) || 0) + 1);
+  });
+  Array.from(filterGroup).forEach(k => { if (!groups.has(k)) filterGroup.delete(k); });
+  Array.from(filterBank).forEach(k => { if (!banks.has(k)) filterBank.delete(k); });
+
+  const listG = document.getElementById('msGroupList');
+  const sortedGroups = Array.from(groups.keys()).sort();
+  if (sortedGroups.length === 0) {
+    listG.innerHTML = `<div class="ms-empty">${t('noOptions')}</div>`;
+  } else {
+    listG.innerHTML = sortedGroups.map(g => `
+      <label class="ms-item">
+        <input type="checkbox" data-value="${escapeHtml(g)}" ${filterGroup.has(g) ? 'checked' : ''}
+               onchange="onFilterChange('group', this)">
+        <span class="ms-item-name">${escapeHtml(g)}</span>
+        <span class="ms-count">${groups.get(g)}</span>
+      </label>
+    `).join('');
+  }
+
+  const listB = document.getElementById('msBankList');
+  const sortedBanks = Array.from(banks.keys()).sort();
+  if (sortedBanks.length === 0) {
+    listB.innerHTML = `<div class="ms-empty">${t('noOptions')}</div>`;
+  } else {
+    listB.innerHTML = sortedBanks.map(b => `
+      <label class="ms-item">
+        <input type="checkbox" data-value="${escapeHtml(b)}" ${filterBank.has(b) ? 'checked' : ''}
+               onchange="onFilterChange('bank', this)">
+        <span class="ms-item-name">${escapeHtml(b)}</span>
+        <span class="ms-count">${banks.get(b)}</span>
+      </label>
+    `).join('');
+  }
+  updateMSLabels();
+  updateFilterStats();
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.multiselect')) {
+    document.querySelectorAll('.multiselect.open').forEach(m => m.classList.remove('open'));
+  }
+});
+
+// ================= 冻结 =================
+function openFreezeModal() { document.getElementById('freezeModal').style.display = 'flex'; }
+function closeFreezeModal() { document.getElementById('freezeModal').style.display = 'none'; }
+function setFreeze(on) {
+  document.body.classList.toggle('freeze-on', on);
+  closeFreezeModal();
+  updateStickyOffsets();
+  toast(on ? t('freezeLocked') : t('freezeUnlocked'));
+}
+
+// ================= 计算 =================
 const SOCSO_TABLE = [
   [30,0.10,0.40],[50,0.20,0.70],[70,0.30,1.10],[100,0.40,1.50],
   [140,0.60,2.10],[200,0.85,2.95],[300,1.25,4.35],[400,1.75,6.15],
@@ -72,14 +1072,17 @@ const SOCSO_TABLE = [
   [5300,26.25,91.85],[5400,26.75,93.65],[5500,27.25,95.35],[5600,27.75,97.15],
   [5700,28.25,98.85],[5800,28.75,100.65],[5900,29.25,102.35],[6000,29.75,104.15]
 ];
+function calcEPF(salary, age) {
+  if (!salary || salary <= 0) return { employee: 0, employer: 0 };
+  age = age || 30;
+  if (age >= 60) return { employee: 0, employer: Math.ceil(salary * 0.04) };
+  const erRate = salary <= 5000 ? 0.13 : 0.12;
+  return { employee: Math.ceil(salary * 0.11), employer: Math.ceil(salary * erRate) };
+}
 function calcSOCSO(salary) {
   if (!salary || salary <= 0) return { employee: 0, employer: 0 };
   if (salary > 6000) salary = 6000;
-  for (let i = 0; i < SOCSO_TABLE.length; i++) {
-    if (salary <= SOCSO_TABLE[i][0]) {
-      return { employee: SOCSO_TABLE[i][1], employer: SOCSO_TABLE[i][2] };
-    }
-  }
+  for (const row of SOCSO_TABLE) if (salary <= row[0]) return { employee: row[1], employer: row[2] };
   return { employee: 29.75, employer: 104.15 };
 }
 function calcEIS(salary) {
@@ -95,9 +1098,14 @@ function calcLindung(salary) {
   return Math.round(salary * 0.007325 * 100) / 100;
 }
 
-// ================= 豁免判断 =================
+// 判断是否为 CASH / MERCHANTRADE
+function isCashBank(emp) {
+  const bank = String(emp.SLRBankNama || emp.BankNama || '').trim().toUpperCase();
+  return bank === 'CASH' || bank.includes('MERCHANTRADE');
+}
+
 function isExempt(staff) {
-  const bank = String(staff.SLRBankNama || staff.BankNama || '').toLowerCase();
+  const bank = (String(staff.SLRBankNama || '') + ' ' + String(staff.BankNama || '')).toLowerCase();
   if (bank.includes('cash') || bank.includes('merchantrade')) {
     return { epf: true, socso: true, eis: true, lindung: true };
   }
@@ -110,85 +1118,891 @@ function isExempt(staff) {
   };
 }
 
-// ================= GET =================
-function doGet(e) {
-  try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = ss.getSheetByName(CONFIG.STAFF_SHEET);
-    if (!sheet) return jsonResponse({ status: 'error', message: '找不到工作表: ' + CONFIG.STAFF_SHEET });
+function recalcRow(emp) {
+  const basic = num(emp.Basic);
+  const exempt = isExempt(emp);
+  const forceZero = isCashBank(emp); // 手动或原本就是 CASH
 
-    const values = sheet.getDataRange().getValues();
-    if (!values.length) return jsonResponse({ status: 'success', data: [] });
+  if (!emp.manualEPF || forceZero) {
+    const epf = (exempt.epf || forceZero) ? { employee: 0, employer: 0 } : calcEPF(basic, emp.Age || 30);
+    emp.EPF_Employee = epf.employee;
+    emp.EPF_Employer = epf.employer;
+  }
+  if (!emp.manualSOCSO || forceZero) {
+    const socso = (exempt.socso || forceZero) ? { employee: 0, employer: 0 } : calcSOCSO(basic);
+    emp.SOCSO_Employee = socso.employee;
+    emp.SOCSO_Employer = socso.employer;
+  }
+  if (!emp.manualEIS || forceZero) {
+    const eis = (exempt.eis || forceZero) ? { employee: 0, employer: 0 } : calcEIS(basic);
+    emp.EIS_Employee = eis.employee;
+    emp.EIS_Employer = eis.employer;
+  }
+  if (!emp.manual24JAM || forceZero) {
+    emp.Lindung24Jam = (exempt.lindung || forceZero) ? 0 : calcLindung(basic);
+  }
 
-    const headers = values[0].map(h => String(h).trim());
-    const rows = [];
+  const ot = num(emp.NormalOT) + num(emp.RestOT) + num(emp.PublicOT) + num(emp.OtherOT);
+  const gross = basic + num(emp.Allowance) + ot;
+  const totalDed = num(emp.Deduction) + num(emp.Pinjaman) + num(emp.Others)
+                 + num(emp.EPF_Employee) + num(emp.SOCSO_Employee) + num(emp.EIS_Employee)
+                 + num(emp.Lindung24Jam);
+  const net = gross - totalDed;
 
-    for (let i = 1; i < values.length; i++) {
-      const row = values[i];
-      if (!row[headers.indexOf('Code')] && !row[headers.indexOf('code')]) continue;
+  emp.GrossPay = gross;
+  emp.TotalDeduction = totalDed;
+  emp.NetSalary = net;
+  return emp;
+}
 
-      const obj = {};
-      headers.forEach((h, idx) => {
-        obj[h] = row[idx];
+function badgeStatus(val) {
+  const v = String(val || '').trim().toUpperCase();
+  if (!v) return '';
+  if (v === 'YES' || v === 'Y' || v === 'ACTIVE' || v === 'AKTIF' || v === 'TRUE') {
+    return `<span class="text-cell badge-cell badge-yes">${escapeHtml(v)}</span>`;
+  }
+  if (v === 'NO' || v === 'N' || v === 'FALSE') {
+    return `<span class="text-cell badge-cell badge-no">${escapeHtml(v)}</span>`;
+  }
+  return `<span class="text-cell badge-cell badge-other">${escapeHtml(v)}</span>`;
+}
+
+// ================= 语言 =================
+function updateUILanguage() {
+  document.getElementById('pageTitle').textContent = t('title');
+  document.getElementById('pageDesc').textContent = t('desc');
+  document.getElementById('pageBadge').textContent = t('badge');
+  document.getElementById('legend1').textContent = t('legend1');
+  document.getElementById('legend2').textContent = t('legend2');
+  document.getElementById('legend3').textContent = t('legend3');
+  document.getElementById('legend4').textContent = t('legend4');
+  document.getElementById('legend5').textContent = t('legend5');
+  document.getElementById('legend6').textContent = t('legend6');
+  document.getElementById('sec1').textContent = t('sec1');
+  document.getElementById('sec2').textContent = t('sec2');
+  document.getElementById('sec3').textContent = t('sec3');
+  document.getElementById('sec4').textContent = t('sec4');
+  document.getElementById('sec5').textContent = t('sec5');
+  document.getElementById('sec6').textContent = t('sec6');
+  document.getElementById('thSituation').textContent = t('situation');
+  document.getElementById('thKod').textContent = t('kod');
+  document.getElementById('thNama').textContent = t('nama');
+  document.getElementById('thKumpulan').childNodes[0].textContent = t('kumpulan');
+  document.getElementById('thBasic').textContent = t('basic');
+  document.getElementById('thAllowance').textContent = t('allowance');
+  document.getElementById('thDeduction').textContent = t('deduction');
+  document.getElementById('thNormalOT').textContent = t('normalOT');
+  document.getElementById('thRestOT').textContent = t('restOT');
+  document.getElementById('thPublicOT').textContent = t('publicOT');
+  document.getElementById('thOtherOT').textContent = t('otherOT');
+  document.getElementById('thPinjaman').textContent = t('pinjaman');
+  document.getElementById('thOthers').textContent = t('others');
+  document.getElementById('subEPFE').textContent = t('epfE');
+  document.getElementById('subEPFR').textContent = t('epfR');
+  document.getElementById('subSOCSOE').textContent = t('socsoE');
+  document.getElementById('subSOCSOR').textContent = t('socsoR');
+  document.getElementById('subEISE').textContent = t('eisE');
+  document.getElementById('subEISR').textContent = t('eisR');
+  document.getElementById('th24JAM').textContent = t('lindung');
+  document.getElementById('thBankNama').innerHTML = t('bankNama') + '<br><span style="font-weight:400;font-size:0.6rem;">(U)</span>';
+  document.getElementById('thBankAcc').innerHTML = t('bankAcc') + '<br><span style="font-weight:400;font-size:0.6rem;">(V)</span>';
+  document.getElementById('thEPF').innerHTML = t('epf') + '<br><span style="font-weight:400;font-size:0.6rem;">(W)</span>';
+  document.getElementById('thSOCSO').innerHTML = t('socso') + '<br><span style="font-weight:400;font-size:0.6rem;">(X)</span>';
+  document.getElementById('thEIS').innerHTML = t('eis') + '<br><span style="font-weight:400;font-size:0.6rem;">(Y)</span>';
+  document.getElementById('thGross').textContent = t('gross');
+  document.getElementById('thTotalDed').textContent = t('totalDed');
+  document.getElementById('thNet').textContent = t('net');
+  document.getElementById('thAction').textContent = t('action');
+  document.getElementById('legend').textContent = t('legend');
+  document.getElementById('btnSaveSheet').innerHTML = '💾 ' + t('save');
+  document.getElementById('btnImport').innerHTML = '📥 ' + t('importBtn');
+  document.getElementById('btnAllSlip').innerHTML = '📄 ' + t('allSlip');
+  document.getElementById('btnCheckAll').innerHTML = '✅ ' + t('checkAll');
+  document.getElementById('exportMenu').options[0].textContent = '💾 ' + t('exportMenu') + ' / 导出…';
+
+  document.getElementById('freezeTitle').textContent = t('freezeTitle');
+  document.getElementById('freezeDesc').textContent = t('freezeDesc');
+  document.getElementById('freezeUnlockBtn').textContent = t('freezeUnlock');
+  document.getElementById('freezeLockBtn').textContent = t('freezeLock');
+  document.getElementById('freezeCancelBtn').textContent = t('freezeCancel');
+
+  document.getElementById('importTitle').textContent = t('importTitle');
+  document.getElementById('importDrop').textContent = t('importDrop');
+  document.getElementById('importDropHint').textContent = t('importDropHint');
+  document.getElementById('importFormatHint').textContent = t('importFormatHint');
+  document.getElementById('importTemplate').textContent = t('importTemplate');
+  document.getElementById('importCloseBtn').textContent = t('importClose');
+
+  document.getElementById('msGroupLabel').textContent = t('filterGroup');
+  document.getElementById('msBankLabel').textContent = t('filterBank');
+  document.getElementById('statLabelMatched').textContent = t('matchedCount');
+  document.getElementById('statLabelNetTotal').textContent = t('netTotal');
+  document.getElementById('msGroupSelAll').textContent = t('btnSelectAll');
+  document.getElementById('msGroupClear').textContent = t('btnClear');
+  document.getElementById('msBankSelAll').textContent = t('btnSelectAll');
+  document.getElementById('msBankClear').textContent = t('btnClear');
+
+  updateMSLabels();
+  document.querySelectorAll('.ms-empty').forEach(el => el.textContent = t('noOptions'));
+}
+
+// ================= 渲染表格 =================
+function renderTable() {
+  updateUILanguage();
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+
+  if (!employees.length) {
+    tbody.innerHTML = `<tr><td colspan="38" style="text-align:center;padding:2.5rem;color:#a7b7c9;">${t('loading')}</td></tr>`;
+    buildFilterDropdowns();
+    updateStickyOffsets();
+    return;
+  }
+
+  employees.forEach((emp, idx) => {
+    emp = recalcRow(emp);
+    const tr = document.createElement('tr');
+
+    const numInput = (field, readonly, extraCls = '') =>
+      `<input type="number" step="0.01" class="input num ${extraCls}" ${readonly ? 'readonly' : ''} data-idx="${idx}" data-field="${field}" value="${emp[field] ?? 0}">`;
+
+    const chkTd = (group, extraCls = '') => {
+      const key = 'manual' + group;
+      const checked = !!emp[key];
+      return `<td class="td-chk ${extraCls}"><input type="checkbox" class="manual-chk" data-idx="${idx}" data-group="${group}" ${checked ? 'checked' : ''}></td>`;
+    };
+
+    // SLR 手动勾选 + 可编辑输入框
+    const slrChkTd = (key, extraCls = '') => {
+      const manual = !!emp['manual' + key];
+      return `<td class="td-chk-sm bg-amber ${extraCls}"><input type="checkbox" class="slr-manual-chk" data-idx="${idx}" data-key="${key}" ${manual ? 'checked' : ''}></td>`;
+    };
+    const slrInputTd = (key, extraCls = '') => {
+      const manual = !!emp['manual' + key];
+      const val = emp[key] || '';
+      return `<td class="bg-amber ${extraCls}"><input type="text" class="input slr-plain" data-idx="${idx}" data-slr-key="${key}" ${manual ? '' : 'readonly'} value="${escapeHtml(val)}"></td>`;
+    };
+
+    const sitCls = (() => {
+      const s = String(emp.Situation || '').trim().toUpperCase();
+      if (s === 'PENDING') return 'sit-pending';
+      if (s === 'ACTIVE')  return 'sit-active';
+      return 'sit-default';
+    })();
+
+    tr.innerHTML = `
+      <td class="td-text col-freeze col-0 ${sitCls}"><div class="text-cell">${escapeHtml(emp.Situation || '')}</div></td>
+      <td class="td-text col-freeze col-1"><div class="text-cell">${escapeHtml(emp.Code || '')}</div></td>
+      <td class="td-text col-freeze col-2"><div class="text-cell">${escapeHtml(emp.Name || '')}</div></td>
+      <td class="td-text col-freeze col-3"><div class="text-cell">${escapeHtml(emp.GroupName || '')}</div></td>
+
+      <td class="divider-group">${numInput('Basic', false)}</td>
+      <td>${numInput('Allowance', false)}</td>
+      <td>${numInput('Deduction', false)}</td>
+      <td>${numInput('NormalOT', false)}</td>
+      <td>${numInput('RestOT', false)}</td>
+      <td>${numInput('PublicOT', false)}</td>
+      <td>${numInput('OtherOT', false)}</td>
+      <td>${numInput('Pinjaman', false)}</td>
+      <td>${numInput('Others', false)}</td>
+
+      ${chkTd('EPF', 'divider-group')}
+      <td>${numInput('EPF_Employee', !emp.manualEPF)}</td>
+      <td>${numInput('EPF_Employer', !emp.manualEPF)}</td>
+      ${chkTd('SOCSO')}
+      <td>${numInput('SOCSO_Employee', !emp.manualSOCSO)}</td>
+      <td>${numInput('SOCSO_Employer', !emp.manualSOCSO)}</td>
+      ${chkTd('EIS')}
+      <td>${numInput('EIS_Employee', !emp.manualEIS)}</td>
+      <td>${numInput('EIS_Employer', !emp.manualEIS)}</td>
+      ${chkTd('24JAM')}
+      <td>${numInput('Lindung24Jam', !emp.manual24JAM)}</td>
+
+      ${slrChkTd('SLRBankNama', 'divider-group')}
+      ${slrInputTd('SLRBankNama')}
+      ${slrChkTd('SLRBankAccountNo')}
+      ${slrInputTd('SLRBankAccountNo')}
+      ${slrChkTd('SLREPF')}
+      ${slrInputTd('SLREPF')}
+      ${slrChkTd('SLRPERKESO')}
+      ${slrInputTd('SLRPERKESO')}
+      ${slrChkTd('SLREIS')}
+      ${slrInputTd('SLREIS')}
+
+      <td class="divider-group">${numInput('GrossPay', true)}</td>
+      <td>${numInput('TotalDeduction', true)}</td>
+      <td>${numInput('NetSalary', true)}</td>
+
+      <td class="divider-group" style="text-align:center;"><button class="btn btn-sm" onclick="showPayslip('${escapeHtml(emp.Code)}')">${t('slip')}</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // 数值输入监听
+  tbody.querySelectorAll('input.input.num:not([readonly])').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const idx = Number(e.target.dataset.idx);
+      const field = e.target.dataset.field;
+      employees[idx][field] = e.target.value;
+      const updated = recalcRow(employees[idx]);
+      const row = e.target.closest('tr');
+      ['EPF_Employee','EPF_Employer','SOCSO_Employee','SOCSO_Employer',
+       'EIS_Employee','EIS_Employer','Lindung24Jam','GrossPay','TotalDeduction','NetSalary'
+      ].forEach(f => {
+        if (f === field) return;
+        const cell = row.querySelector(`input[data-field="${f}"]`);
+        if (cell) cell.value = updated[f];
       });
+      updateFilterStats();
+    });
+  });
 
-      // ===== 用别名或列位置填充标准字段 =====
-      Object.keys(HEADER_ALIAS).forEach(stdKey => {
-        // 1) 若表头匹配到别名，就优先用表头值
-        let found = false;
-        for (const alias of HEADER_ALIAS[stdKey]) {
-          const idx = headers.findIndex(h => h.toLowerCase() === alias.toLowerCase());
-          if (idx >= 0) {
-            const v = row[idx];
-            if (v !== undefined && v !== null && String(v).trim() !== '') {
-              obj[stdKey] = String(v).trim();
-              found = true;
-              break;
-            }
-          }
-        }
-        // 2) 若表头匹配失败或值为空，用列位置兜底
-        if (!found || obj[stdKey] === undefined || String(obj[stdKey] || '').trim() === '') {
-          const colIdx = FALLBACK_COLS[stdKey];
-          if (colIdx !== undefined && row[colIdx] !== undefined && row[colIdx] !== null) {
-            obj[stdKey] = String(row[colIdx]).trim();
-          }
-        }
+  // Section 3 手动覆盖 EPF/SOCSO/EIS/24JAM 勾选
+  tbody.querySelectorAll('.manual-chk').forEach(chk => {
+    chk.addEventListener('change', e => {
+      const idx = Number(e.target.dataset.idx);
+      const group = e.target.dataset.group;
+      const manualKey = 'manual' + group;
+      employees[idx][manualKey] = e.target.checked;
+      const updated = recalcRow(employees[idx]);
+      const row = e.target.closest('tr');
+      const fields = GROUP_FIELDS[group];
+      fields.forEach(f => {
+        const inp = row.querySelector(`input[data-field="${f}"]`);
+        if (inp) { inp.readOnly = !e.target.checked; inp.value = updated[f]; }
       });
+      ['GrossPay','TotalDeduction','NetSalary'].forEach(f => {
+        const inp = row.querySelector(`input[data-field="${f}"]`);
+        if (inp) inp.value = updated[f];
+      });
+      updateFilterStats();
+    });
+  });
 
-      rows.push(obj);
+  // Section 4 SLR 勾选（Bank Nama / Bank Acc / EPF / SOCSO / EIS）
+  tbody.querySelectorAll('.slr-manual-chk').forEach(chk => {
+    chk.addEventListener('change', e => {
+      const idx = Number(e.target.dataset.idx);
+      const key = e.target.dataset.key;
+      const manualKey = 'manual' + key;
+      employees[idx][manualKey] = e.target.checked;
+      const row = e.target.closest('tr');
+      const inp = row.querySelector(`input[data-slr-key="${key}"]`);
+      if (inp) {
+        inp.readOnly = !e.target.checked;
+        if (e.target.checked) inp.focus();
+      }
+    });
+  });
+
+  // Section 4 SLR 输入框实时更新
+  tbody.querySelectorAll('input.slr-plain').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const idx = Number(e.target.dataset.idx);
+      const key = e.target.dataset.slrKey;
+      employees[idx][key] = e.target.value;
+
+      // 若改的是 Bank Nama，重新计算整行（CASH 判断）
+      if (key === 'SLRBankNama') {
+        const updated = recalcRow(employees[idx]);
+        const row = e.target.closest('tr');
+        ['EPF_Employee','EPF_Employer','SOCSO_Employee','SOCSO_Employer',
+         'EIS_Employee','EIS_Employer','Lindung24Jam','GrossPay','TotalDeduction','NetSalary'
+        ].forEach(f => {
+          const cell = row.querySelector(`input[data-field="${f}"]`);
+          if (cell) cell.value = updated[f];
+        });
+        updateFilterStats();
+      }
+    });
+    // 失焦时若值为空则恢复为 sheet 原值？这里不恢复，允许清空。
+  });
+
+  applyFilters();
+  buildFilterDropdowns();
+  updateStickyOffsets();
+}
+
+// ================= 表头筛选 =================
+function applyFilters() {
+  const filters = [];
+  document.querySelectorAll('.th-filter').forEach(inp => {
+    const val = inp.value.trim().toLowerCase();
+    if (val) filters.push({ col: Number(inp.dataset.col), val });
+  });
+  document.querySelectorAll('#tbody tr').forEach(row => {
+    const firstCell = row.querySelector('td');
+    if (!firstCell || firstCell.hasAttribute('colspan')) return;
+    const cells = row.querySelectorAll('td');
+    let show = true;
+    for (const flt of filters) {
+      const cell = cells[flt.col];
+      if (!cell) continue;
+      let text;
+      const inp = cell.querySelector('input');
+      if (inp) text = inp.value;
+      else text = cell.textContent;
+      if (!String(text).toLowerCase().includes(flt.val)) { show = false; break; }
     }
-
-    return jsonResponse({ status: 'success', data: rows });
-  } catch (err) {
-    return jsonResponse({ status: 'error', message: err.toString() });
+    row.style.display = show ? '' : 'none';
+  });
+}
+document.addEventListener('input', e => {
+  if (e.target && e.target.classList && e.target.classList.contains('th-filter')) {
+    applyFilters();
   }
+});
+
+// ================= 检查 =================
+function checkOne(type) {
+  const rows = document.querySelectorAll('#tbody tr');
+  rows.forEach((row, idx) => {
+    if (row.style.display === 'none') return;
+    const emp = recalcRow(employees[idx]);
+    if (!emp) return;
+    const exempt = isExempt(emp);
+    const basic = num(emp.Basic);
+    let correctValue, actualField;
+    if (type === 'epf') {
+      correctValue = exempt.epf ? 0 : calcEPF(basic, emp.Age || 30).employee;
+      actualField = 'EPF_Employee';
+    } else if (type === 'socso') {
+      correctValue = exempt.socso ? 0 : calcSOCSO(basic).employee;
+      actualField = 'SOCSO_Employee';
+    } else if (type === 'eis') {
+      correctValue = exempt.eis ? 0 : calcEIS(basic).employee;
+      actualField = 'EIS_Employee';
+    } else {
+      correctValue = exempt.lindung ? 0 : calcLindung(basic);
+      actualField = 'Lindung24Jam';
+    }
+    const cell = row.querySelector(`input[data-field="${actualField}"]`);
+    if (!cell) return;
+    const diff = Math.abs(Number(cell.value) - correctValue) > 0.01;
+    cell.classList.toggle('cell-bad', diff);
+    cell.classList.toggle('cell-ok', !diff);
+    if (diff) cell.title = `Sepatutnya: ${correctValue.toFixed(2)}`;
+  });
+  toast('Semakan ' + type.toUpperCase() + ' selesai');
+}
+function checkAll() {
+  ['epf','socso','eis','lindung'].forEach(checkOne);
+  toast('Semakan selesai');
+}
+function jumpToCheckPage(url) {
+  if (!url) return;
+  window.open(url, '_blank');
+  document.getElementById('checkMenu').value = '';
 }
 
-// ================= POST =================
-function doPost(e) {
+// ================= 保存 =================
+async function saveToSheet() {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
+    toast('Sila tetapkan APPS_SCRIPT_URL dahulu!', false); return;
+  }
+  const payload = employees.map(emp => {
+    recalcRow(emp);
+    const out = {};
+    Object.keys(emp).forEach(k => {
+      if (typeof emp[k] !== 'object' && typeof emp[k] !== 'function' && !k.startsWith('_')) {
+        out[k] = emp[k];
+      }
+    });
+    out.Timestamp = new Date().toISOString();
+    return out;
+  });
   try {
-    const body = JSON.parse(e.postData.contents);
-    const payroll = body.payroll || [];
-    if (!payroll.length) return jsonResponse({ status: 'error', message: '没有数据' });
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ payroll: payload })
+    });
+    toast(t('saved'));
+  } catch (err) { console.error(err); toast(t('failed'), false); }
+}
 
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    let sheet = ss.getSheetByName(CONFIG.OUTPUT_SHEET);
-    if (!sheet) sheet = ss.insertSheet(CONFIG.OUTPUT_SHEET);
-    sheet.clear();
+// ================= 导入 =================
+function openImportModal() { document.getElementById('importModal').style.display = 'flex'; }
+function closeImportModal() {
+  document.getElementById('importModal').style.display = 'none';
+  const fi = document.getElementById('importFile');
+  if (fi) fi.value = '';
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const dz = document.getElementById('dropzone');
+  const fi = document.getElementById('importFile');
+  if (dz && fi) {
+    dz.addEventListener('click', e => { if (e.target !== fi) fi.click(); });
+    fi.addEventListener('change', e => { if (e.target.files && e.target.files[0]) handleImportFile(e.target.files[0]); });
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault(); dz.classList.remove('drag-over');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) handleImportFile(e.dataTransfer.files[0]);
+    });
+  }
+  const modal = document.getElementById('importModal');
+  if (modal) modal.addEventListener('click', e => { if (e.target.id === 'importModal') closeImportModal(); });
+  const fm = document.getElementById('freezeModal');
+  if (fm) fm.addEventListener('click', e => { if (e.target.id === 'freezeModal') closeFreezeModal(); });
+});
 
-    const rows = payroll.map(r => CONFIG.HEADERS.map(h => r[h] !== undefined ? r[h] : ''));
-    sheet.getRange(1, 1, 1, CONFIG.HEADERS.length).setValues([CONFIG.HEADERS]).setFontWeight('bold');
-    sheet.getRange(2, 1, rows.length, CONFIG.HEADERS.length).setValues(rows);
-    sheet.setFrozenRows(1);
+function parseCSVLine(line) {
+  const cells = []; let cur = ''; let inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQ) {
+      if (ch === '"') { if (line[i+1] === '"') { cur += '"'; i++; } else inQ = false; }
+      else cur += ch;
+    } else {
+      if (ch === ',') { cells.push(cur); cur = ''; }
+      else if (ch === '"') inQ = true;
+      else cur += ch;
+    }
+  }
+  cells.push(cur); return cells;
+}
+function parseTextFile(text) {
+  const rows = []; const lines = text.split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    if (/^[=\-+\s]+$/.test(trimmed)) continue;
+    if (trimmed.startsWith('PAYROLL REPORT')) continue;
+    if (trimmed.startsWith('Total rows')) continue;
+    if (trimmed.includes('|')) rows.push(trimmed.split('|').map(s => s.trim()));
+    else rows.push(parseCSVLine(trimmed));
+  }
+  return rows;
+}
 
-    return jsonResponse({ status: 'success', message: 'Saved ' + rows.length + ' records' });
-  } catch (err) {
-    return jsonResponse({ status: 'error', message: err.toString() });
+async function handleImportFile(file) {
+  const name = file.name.toLowerCase();
+  let rows = [];
+  try {
+    if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
+      if (typeof XLSX === 'undefined') { toast('SheetJS tidak dimuat', false); return; }
+      const data = await file.arrayBuffer();
+      const wb = XLSX.read(data);
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+    } else if (name.endsWith('.csv') || name.endsWith('.txt')) {
+      const text = await file.text();
+      rows = parseTextFile(text);
+    } else { toast(t('importFormat'), false); return; }
+
+    if (!rows || rows.length < 2) { toast(t('importFail'), false); return; }
+    const headers = rows[0].map(h => String(h).trim());
+    const idx = {};
+    const WANTED = [
+      'Situation','Code','Name','Group','Bank',
+      'Basic','Allowance','Deduction',
+      'Normal OT','Rest OT','Public OT','Other OT',
+      'Pinjaman','Others',
+      'EPF (Employee)','EPF (Employer)',
+      'SOCSO (Employee)','SOCSO (Employer)',
+      'EIS (Employee)','EIS (Employer)',
+      '24JAM',
+      'SLR Bank Nama','SLR Bank Account No','SLR EPF','SLR SOCSO','SLR EIS'
+    ];
+    headers.forEach((h, i) => {
+      const lh = h.toLowerCase();
+      for (const w of WANTED) { if (lh === w.toLowerCase()) { idx[w] = i; break; } }
+    });
+    if (idx['Code'] === undefined) { toast('Fail mesti ada lajur "Code"', false); return; }
+    const get = (row, key) => idx[key] !== undefined ? row[idx[key]] : '';
+    const imported = [];
+    for (let r = 1; r < rows.length; r++) {
+      const row = rows[r];
+      if (!row || row.length === 0) continue;
+      const code = String(get(row, 'Code') || '').trim();
+      if (!code) continue;
+      const sit = String(get(row, 'Situation') || 'ACTIVE').trim().toUpperCase();
+      if (sit === 'UNACTIVE' || sit === 'INACTIVE') continue;
+
+      const basic = parseFloat(get(row, 'Basic')) || 0;
+      const autoEPF = calcEPF(basic, 30);
+      const autoSOCSO = calcSOCSO(basic);
+      const autoEIS = calcEIS(basic);
+      const autoLindung = calcLindung(basic);
+
+      const impEPFE = parseFloat(get(row, 'EPF (Employee)')) || 0;
+      const impEPFR = parseFloat(get(row, 'EPF (Employer)')) || 0;
+      const impSOCSOE = parseFloat(get(row, 'SOCSO (Employee)')) || 0;
+      const impSOCSOR = parseFloat(get(row, 'SOCSO (Employer)')) || 0;
+      const impEISE = parseFloat(get(row, 'EIS (Employee)')) || 0;
+      const impEISR = parseFloat(get(row, 'EIS (Employer)')) || 0;
+      const impLindung = parseFloat(get(row, '24JAM')) || 0;
+
+      const slrBankNama = String(get(row, 'SLR Bank Nama') || get(row, 'Bank') || '');
+      const slrBankAcc = String(get(row, 'SLR Bank Account No') || '');
+      const slrEPF = String(get(row, 'SLR EPF') || '');
+      const slrPERKESO = String(get(row, 'SLR SOCSO') || '');
+      const slrEIS = String(get(row, 'SLR EIS') || '');
+
+      imported.push({
+        Situation: sit, Code: code, Name: String(get(row, 'Name') || ''),
+        GroupName: String(get(row, 'Group') || ''), BankNama: String(get(row, 'Bank') || ''),
+        Basic: basic, Allowance: parseFloat(get(row, 'Allowance')) || 0,
+        Deduction: parseFloat(get(row, 'Deduction')) || 0,
+        NormalOT: parseFloat(get(row, 'Normal OT')) || 0,
+        RestOT: parseFloat(get(row, 'Rest OT')) || 0,
+        PublicOT: parseFloat(get(row, 'Public OT')) || 0,
+        OtherOT: parseFloat(get(row, 'Other OT')) || 0,
+        Pinjaman: parseFloat(get(row, 'Pinjaman')) || 0,
+        Others: parseFloat(get(row, 'Others')) || 0, Age: 30,
+        EPF: 'YES', PERKESO: 'YES', EIS: 'YES', Lindungan: 'YES',
+        EPF_Employee: impEPFE, EPF_Employer: impEPFR,
+        SOCSO_Employee: impSOCSOE, SOCSO_Employer: impSOCSOR,
+        EIS_Employee: impEISE, EIS_Employer: impEISR, Lindung24Jam: impLindung,
+        SLRBankNama: slrBankNama, SLRBankAccountNo: slrBankAcc,
+        SLREPF: slrEPF, SLRPERKESO: slrPERKESO, SLREIS: slrEIS,
+        manualEPF:   Math.abs(impEPFE - autoEPF.employee) > 0.01 || Math.abs(impEPFR - autoEPF.employer) > 0.01,
+        manualSOCSO: Math.abs(impSOCSOE - autoSOCSO.employee) > 0.01 || Math.abs(impSOCSOR - autoSOCSO.employer) > 0.01,
+        manualEIS:   Math.abs(impEISE - autoEIS.employee) > 0.01 || Math.abs(impEISR - autoEIS.employer) > 0.01,
+        manual24JAM: Math.abs(impLindung - autoLindung) > 0.01,
+        manualSLRBankNama: false, manualSLRBankAccountNo: false,
+        manualSLREPF: false, manualSLRPERKESO: false, manualSLREIS: false
+      });
+    }
+    if (!imported.length) { toast(t('importFail'), false); return; }
+    employees = imported;
+    filterGroup.clear();
+    filterBank.clear();
+    renderTable();
+    toast(t('importSuccess').replace('{n}', imported.length));
+    closeImportModal();
+  } catch (err) { console.error(err); toast('Import error: ' + err.message, false); }
+}
+
+// ================= 模板 =================
+function getExportHeaders() {
+  return [
+    'Situation','Code','Name','Group','Bank',
+    'Basic','Allowance','Deduction',
+    'Normal OT','Rest OT','Public OT','Other OT',
+    'Pinjaman','Others',
+    'EPF (Employee)','EPF (Employer)',
+    'SOCSO (Employee)','SOCSO (Employer)',
+    'EIS (Employee)','EIS (Employer)',
+    '24JAM',
+    'SLR Bank Nama','SLR Bank Account No','SLR EPF','SLR SOCSO','SLR EIS',
+    'Gross Pay','Total Deduction','Net Salary'
+  ];
+}
+function downloadTemplate(format) {
+  const headers = getExportHeaders();
+  const sample = [
+    ['ACTIVE','EMP001','Ahmad bin Ali','YZ UFO','Maybank',4500,600,0,0,0,0,0,0,0,495,585,22.25,77.85,9,9,32.96,'Maybank','1234567890','YES','YES','YES',5100,1125.06,3974.94],
+    ['PENDING','EMP002','Siti Nurhaliza','YZ CYBER','CIMB',3800,450,0,0,0,0,0,0,0,418,494,19.75,69.15,7.6,7.6,27.83,'CIMB','9876543210','YES','NO','YES',4250,930.93,3319.07]
+  ];
+  if (format === 'xlsx') {
+    if (typeof XLSX === 'undefined') { toast('SheetJS tidak dimuat', false); return; }
+    const aoa = [headers, ...sample];
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols'] = headers.map(() => ({ wch: 14 }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Payroll');
+    XLSX.writeFile(wb, 'payroll_template.xlsx');
+    toast('Template Excel dimuat turun');
+  } else if (format === 'doc') {
+    let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><title>Payroll Template</title><style>body{font-family:Arial;font-size:9pt;}table{border-collapse:collapse;}th,td{border:1px solid #999;padding:3px 5px;}th{background:#eef5fd;}</style></head><body><h2>Payroll Import Template</h2><table><thead><tr>';
+    headers.forEach(h => { html += '<th>' + escapeHtml(h) + '</th>'; });
+    html += '</tr></thead><tbody>';
+    sample.forEach(r => { html += '<tr>'; r.forEach(c => { html += '<td>' + escapeHtml(c) + '</td>'; }); html += '</tr>'; });
+    html += '</tbody></table></body></html>';
+    downloadBlob(html, 'payroll_template.doc', 'application/msword');
+    toast('Template Word dimuat turun');
   }
 }
 
-function jsonResponse(data) {
-  return ContentService.createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON);
+// ================= 导出 =================
+function handleExport(val) {
+  if (!val) return;
+  try {
+    if (val === 'pdf')  exportToPDF();
+    else if (val === 'xlsx') exportToXLSX();
+    else if (val === 'txt')  exportToTXT();
+    else if (val === 'doc')  exportToDOC();
+  } catch (err) { console.error(err); toast('Export error: ' + err.message, false); }
+  finally { document.getElementById('exportMenu').value = ''; }
 }
+function getExportRows() {
+  const rows = [];
+  const trs = document.querySelectorAll('#tbody tr');
+  trs.forEach((tr, idx) => {
+    if (tr.style.display === 'none') return;
+    const firstCell = tr.querySelector('td');
+    if (!firstCell || firstCell.hasAttribute('colspan')) return;
+    const emp = employees[idx];
+    if (!emp) return;
+    const e = recalcRow({ ...emp });
+    rows.push([
+      emp.Situation || '', emp.Code || '', emp.Name || '', emp.GroupName || '',
+      emp.BankNama || '',
+      num(e.Basic), num(e.Allowance), num(e.Deduction),
+      num(e.NormalOT), num(e.RestOT), num(e.PublicOT), num(e.OtherOT),
+      num(e.Pinjaman), num(e.Others),
+      num(e.EPF_Employee), num(e.EPF_Employer),
+      num(e.SOCSO_Employee), num(e.SOCSO_Employer),
+      num(e.EIS_Employee), num(e.EIS_Employer),
+      num(e.Lindung24Jam),
+      emp.SLRBankNama || '', emp.SLRBankAccountNo || '',
+      emp.SLREPF || '', emp.SLRPERKESO || '', emp.SLREIS || '',
+      num(e.GrossPay), num(e.TotalDeduction), num(e.NetSalary)
+    ]);
+  });
+  return rows;
+}
+function downloadBlob(content, filename, mime) {
+  const blob = new Blob(['\ufeff', content], { type: mime + ';charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function buildExportTableHTML() {
+  const headers = getExportHeaders();
+  const rows = getExportRows();
+  let html = '<table class="export-table"><thead><tr>';
+  headers.forEach(h => { html += `<th>${escapeHtml(h)}</th>`; });
+  html += '</tr></thead><tbody>';
+  rows.forEach(r => {
+    html += '<tr>';
+    r.forEach((c, i) => {
+      const cls = (i >= 5 && i <= 20) || i >= 26 ? ' class="num"' : '';
+      html += `<td${cls}>${escapeHtml(c)}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  return html;
+}
+let exportPrintCleanup = null;
+window.addEventListener('afterprint', () => {
+  if (exportPrintCleanup) { exportPrintCleanup(); exportPrintCleanup = null; }
+});
+function exportToPDF() {
+  const rows = getExportRows();
+  if (!rows.length) { toast(t('noData'), false); return; }
+  const printArea = document.getElementById('printArea');
+  printArea.innerHTML = `<div class="export-print"><h2 style="margin-bottom:6mm;font-size:14pt;color:#1a4f8a;">Payroll Report — ${new Date().toLocaleDateString('ms-MY')}</h2>${buildExportTableHTML()}</div>`;
+  const style = document.createElement('style');
+  style.textContent = '@page { size: A4 landscape; margin: 8mm; }';
+  document.head.appendChild(style);
+  exportPrintCleanup = () => { printArea.innerHTML = ''; style.remove(); };
+  toast('Sedia untuk cetak / simpan PDF');
+  setTimeout(() => window.print(), 100);
+}
+function exportToXLSX() {
+  const rows = getExportRows();
+  if (!rows.length) { toast(t('noData'), false); return; }
+  if (typeof XLSX === 'undefined') { exportToCSV(); toast('SheetJS tidak dimuat, dieksport sebagai CSV', false); return; }
+  const aoa = [getExportHeaders(), ...rows];
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = getExportHeaders().map(() => ({ wch: 14 }));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Payroll');
+  XLSX.writeFile(wb, 'payroll_' + todayStr() + '.xlsx');
+  toast('Excel berjaya dieksport');
+}
+function exportToCSV() {
+  const headers = getExportHeaders();
+  const rows = getExportRows();
+  const esc = v => { const s = String(v ?? ''); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  let out = headers.map(esc).join(',') + '\n';
+  rows.forEach(r => { out += r.map(esc).join(',') + '\n'; });
+  downloadBlob(out, 'payroll_' + todayStr() + '.csv', 'text/csv');
+}
+function exportToTXT() {
+  const headers = getExportHeaders();
+  const rows = getExportRows();
+  if (!rows.length) { toast(t('noData'), false); return; }
+  const widths = headers.map((h, i) => {
+    let w = String(h).length;
+    rows.forEach(r => { const len = String(r[i] ?? '').length; if (len > w) w = len; });
+    return Math.min(w, 28);
+  });
+  const pad = (v, w) => {
+    let s = String(v ?? '');
+    if (s.length > w) s = s.slice(0, w - 1) + '…';
+    return s + ' '.repeat(Math.max(0, w - s.length));
+  };
+  let out = 'PAYROLL REPORT — ' + new Date().toLocaleString('ms-MY') + '\n';
+  out += '='.repeat(widths.reduce((a, b) => a + b + 3, 0)) + '\n';
+  out += headers.map((h, i) => pad(h, widths[i])).join(' | ') + '\n';
+  out += widths.map(w => '-'.repeat(w)).join('-+-') + '\n';
+  rows.forEach(r => { out += r.map((c, i) => pad(c, widths[i])).join(' | ') + '\n'; });
+  out += '\nTotal rows: ' + rows.length + '\n';
+  downloadBlob(out, 'payroll_' + todayStr() + '.txt', 'text/plain');
+  toast('Text berjaya dieksport');
+}
+function exportToDOC() {
+  const rows = getExportRows();
+  if (!rows.length) { toast(t('noData'), false); return; }
+  const headers = getExportHeaders();
+  let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><title>Payroll Report</title><style>body{font-family:Arial,sans-serif;font-size:9pt;}table{border-collapse:collapse;width:100%;}th,td{border:1px solid #999;padding:3px 5px;}th{background:#eef5fd;text-align:left;}td.num{text-align:right;}</style></head><body><h2 style="color:#1a4f8a;">Payroll Report — ' + new Date().toLocaleDateString('ms-MY') + '</h2><table><thead><tr>';
+  headers.forEach(h => { html += `<th>${escapeHtml(h)}</th>`; });
+  html += '</tr></thead><tbody>';
+  rows.forEach(r => {
+    html += '<tr>';
+    r.forEach((c, i) => {
+      const cls = (i >= 5 && i <= 20) || i >= 26 ? ' class="num"' : '';
+      html += `<td${cls}>${escapeHtml(c)}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table></body></html>';
+  downloadBlob(html, 'payroll_' + todayStr() + '.doc', 'application/msword');
+  toast('Word berjaya dieksport');
+}
+
+// ================= 加载 =================
+async function loadEmployees() {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
+    employees = [
+      { Situation:'ACTIVE',  Code:'EMP001', Name:'Ahmad bin Ali', GroupName:'YZ UFO', BankNama:'Maybank',
+        Basic:4500, Allowance:600, Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
+        OtherOT:0, Pinjaman:0, Others:0, Age:30, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES',
+        SLRBankNama:'Maybank', SLRBankAccountNo:'1234567890', SLREPF:'YES', SLRPERKESO:'YES', SLREIS:'YES' },
+      { Situation:'PENDING', Code:'EMP002', Name:'Siti Nurhaliza', GroupName:'YZ CYBER', BankNama:'CIMB',
+        Basic:3800, Allowance:450, Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
+        OtherOT:0, Pinjaman:0, Others:0, Age:28, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES',
+        SLRBankNama:'CIMB', SLRBankAccountNo:'9876543210', SLREPF:'YES', SLRPERKESO:'NO', SLREIS:'YES' },
+      { Situation:'ACTIVE', Code:'EMP003', Name:'Cash Worker', GroupName:'YZ UFO', BankNama:'CASH',
+        Basic:2500, Allowance:0, Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
+        OtherOT:0, Pinjaman:0, Others:0, Age:30, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES',
+        SLRBankNama:'CASH', SLRBankAccountNo:'-', SLREPF:'NO', SLRPERKESO:'NO', SLREIS:'NO' }
+    ];
+    renderTable();
+    return;
+  }
+  try {
+    const res = await fetch(APPS_SCRIPT_URL);
+    const json = await res.json();
+    if (json.status === 'success') {
+      employees = json.data.map(row => ({
+        Situation: String(row.Situation || 'ACTIVE').trim().toUpperCase(),
+        Code: row.Code, Name: row.Name, GroupName: row.GroupName || '',
+        BankNama: row.BankNama || row.Bank || '',
+        Basic: Number(row.Salary || row.Basic) || 0,
+        Allowance: 0, Deduction: 0, NormalOT: 0, RestOT: 0, PublicOT: 0, OtherOT: 0,
+        Pinjaman: 0, Others: 0, Age: 30,
+        EPF: row.EPF || 'YES', PERKESO: row.PERKESO || 'YES',
+        EIS: row.EIS || 'YES', Lindungan: row.Lindungan || 'YES',
+        // ===== 关键：从 W/X/Y 列读到的数据（Apps Script 已重命名好） =====
+        SLRBankNama: String(row.SLRBankNama || row.BankNama || row.Bank || '').trim(),
+        SLRBankAccountNo: String(row.SLRBankAccountNo || row.BankAccountNo || row.BankAcc || '').trim(),
+        SLREPF: String(row.SLREPF || row.EPF || '').trim(),
+        SLRPERKESO: String(row.SLRPERKESO || row.SOCSO || row.PERKESO || '').trim(),
+        SLREIS: String(row.SLREIS || row.EIS || '').trim(),
+        // 手动标志默认 false
+        manualSLRBankNama: false, manualSLRBankAccountNo: false,
+        manualSLREPF: false, manualSLRPERKESO: false, manualSLREIS: false
+      })).filter(e => e.Situation !== 'UNACTIVE' && e.Situation !== 'INACTIVE');
+      renderTable();
+    } else { toast('Load error: ' + json.message, false); }
+  } catch (err) { console.error(err); toast('Gagal muat data', false); }
+}
+
+// ================= 粮单 =================
+function showPayslip(code) {
+  const emp = employees.find(e => e.Code === code);
+  if (!emp) return;
+  recalcRow(emp);
+  const printArea = document.getElementById('printArea');
+  printArea.innerHTML = buildPayslip(emp);
+  window.print();
+}
+function showAllPayslips() {
+  const groupFilterQ = prompt('Masukkan GroupName untuk cetak semua (kosongkan untuk semua):', '');
+  let list = employees.map(e => recalcRow({ ...e }));
+  if (groupFilterQ && groupFilterQ.trim()) {
+    list = list.filter(e => String(e.GroupName).toLowerCase().includes(groupFilterQ.trim().toLowerCase()));
+  }
+  if (!list.length) { toast('Tiada pekerja', false); return; }
+  const printArea = document.getElementById('printArea');
+  printArea.innerHTML = list.map(buildPayslip).join('');
+  window.print();
+}
+function buildPayslip(emp) {
+  const fmt = n => Number(n || 0).toFixed(2);
+  const ot = num(emp.NormalOT) + num(emp.RestOT) + num(emp.PublicOT) + num(emp.OtherOT);
+  const L = I18N[currentLang];
+  return `
+  <div class="payslip">
+    <div class="ps-header">
+      <div>
+        <div class="ps-title">SLIP GAJI</div>
+        <div class="ps-info">
+          ${emp.GroupName || ''}<br>${emp.Name || ''}<br>${emp.IC || ''} &nbsp;|&nbsp; ${emp.Jawatan || ''}<br>${emp.SLRBankNama || emp.BankNama || ''}
+        </div>
+      </div>
+      <div class="ps-info" style="text-align:right;"><strong>${emp.Code}</strong><br>${new Date().toLocaleDateString('ms-MY')}</div>
+    </div>
+    <div class="ps-cols">
+      <div class="ps-section">
+        <h4>PENDAPATAN</h4>
+        <div class="ps-row"><span>${L.basic}</span><span>${fmt(emp.Basic)}</span></div>
+        <div class="ps-row"><span>${L.allowance}</span><span>${fmt(emp.Allowance)}</span></div>
+        <div class="ps-row"><span>OT</span><span>${fmt(ot)}</span></div>
+        <div class="ps-row total"><span>${L.gross}</span><span>${fmt(emp.GrossPay)}</span></div>
+      </div>
+      <div class="ps-section">
+        <h4>POTONGAN</h4>
+        <div class="ps-row"><span>EPF</span><span>${fmt(emp.EPF_Employee)}</span></div>
+        <div class="ps-row"><span>SOCSO</span><span>${fmt(emp.SOCSO_Employee)}</span></div>
+        <div class="ps-row"><span>EIS</span><span>${fmt(emp.EIS_Employee)}</span></div>
+        <div class="ps-row"><span>${L.lindung}</span><span>${fmt(emp.Lindung24Jam)}</span></div>
+        <div class="ps-row"><span>${L.deduction}</span><span>${fmt(emp.Deduction)}</span></div>
+        <div class="ps-row"><span>${L.pinjaman}</span><span>${fmt(emp.Pinjaman)}</span></div>
+        <div class="ps-row"><span>${L.others}</span><span>${fmt(emp.Others)}</span></div>
+        <div class="ps-row total"><span>${L.totalDed}</span><span>${fmt(emp.TotalDeduction)}</span></div>
+      </div>
+    </div>
+    <div class="ps-section" style="margin-top:5mm;">
+      <div class="ps-row total" style="font-size:12pt;"><span>${L.net}</span><span>RM ${fmt(emp.NetSalary)}</span></div>
+    </div>
+    <div class="ps-section">
+      <h4>SUMBANGAN MAJIKAN (tidak ditolak)</h4>
+      <div class="ps-cols">
+        <div>
+          <div class="ps-row"><span>EPF (Majikan)</span><span>${fmt(emp.EPF_Employer)}</span></div>
+          <div class="ps-row"><span>SOCSO (Majikan)</span><span>${fmt(emp.SOCSO_Employer)}</span></div>
+          <div class="ps-row"><span>EIS (Majikan)</span><span>${fmt(emp.EIS_Employer)}</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="ps-sign"><div>Pekerja</div><div>Majikan</div></div>
+  </div>`;
+}
+
+// ================= 语言切换 =================
+function switchLang(lang) {
+  currentLang = lang;
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
+  renderTable();
+  setTimeout(updateStickyOffsets, 60);
+}
+
+// ================= 启动 =================
+window.addEventListener('DOMContentLoaded', () => {
+  const langSelect = document.getElementById('langSelect');
+  if (langSelect) langSelect.value = currentLang;
+  loadEmployees();
+  updateStickyOffsets();
+  setTimeout(updateStickyOffsets, 200);
+  setTimeout(updateStickyOffsets, 600);
+});
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+  if (resizeTimer) clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(updateStickyOffsets, 100);
+});
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => updateStickyOffsets());
+}
+</script>
+</body>
+</html>
