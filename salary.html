@@ -78,13 +78,8 @@
     border: 1px solid var(--epf-blue);
     color: #fff;
   }
-  .btn-primary:hover {
-    background: #15406f;
-    border-color: #15406f;
-  }
-  .btn-success {
-    background: #0f7a54; border: 1px solid #0f7a54; color: #fff;
-  }
+  .btn-primary:hover { background: #15406f; border-color: #15406f; }
+  .btn-success { background: #0f7a54; border: 1px solid #0f7a54; color: #fff; }
   .btn-success:hover { background: #0c6a48; border-color: #0c6a48; }
   .btn-sm { padding: 0.25rem 0.7rem; font-size: 0.72rem; border-radius: 4px; }
   select.btn {
@@ -96,7 +91,7 @@
   /* ===== 主容器 ===== */
   .container { max-width: 100%; margin: 0 auto; padding: 1.5rem 1.75rem; }
 
-  /* ===== 页面标题卡片 (EPF 风格) ===== */
+  /* ===== 页面标题卡片 ===== */
   .page-header {
     background: #ffffff;
     border: 1px solid var(--epf-border);
@@ -166,6 +161,7 @@
   .table-wrap {
     overflow: auto; max-height: calc(100vh - 350px);
     background: #ffffff;
+    position: relative;
   }
   table {
     border-collapse: separate; border-spacing: 0;
@@ -173,7 +169,7 @@
     width: 2650px; min-width: 2650px;
   }
 
-  /* ===== 表头 (EPF 文档表格风格) ===== */
+  /* ===== 表头 ===== */
   th {
     position: sticky; top: 0; z-index: 10;
     background: var(--epf-blue-soft);
@@ -199,19 +195,21 @@
     padding: 0.45rem 0.6rem; font-size: 0.68rem; font-weight: 700;
     letter-spacing: 0.05em; text-transform: uppercase;
     border-bottom: 1px solid var(--epf-border); text-align: center;
+    height: 34px;
   }
   .section-label-row th .sec-title {
     display: flex; align-items: center; justify-content: center; gap: 0.4rem;
   }
 
-  .main-header-row th { z-index: 11; vertical-align: middle; }
-  .sub-header-row th { z-index: 10; vertical-align: middle; text-align: center; }
+  .main-header-row th { z-index: 11; vertical-align: middle; height: 58px; }
+  .sub-header-row th { z-index: 10; vertical-align: middle; text-align: center; height: 26px; }
 
   /* 筛选行 */
   .filter-row th {
     position: sticky; z-index: 9;
     background: #ffffff; padding: 0.3rem 0.35rem;
     border-bottom: 1px solid var(--epf-border); vertical-align: middle;
+    height: 38px;
   }
   .filter-row .th-filter {
     display: block; width: 100%;
@@ -241,18 +239,20 @@
   /* ========== 分组分割线 ========== */
   .divider-group { border-left: 1px solid var(--epf-border) !important; }
 
-  /* ========== 冻结列 ========== */
+  /* ========== 冻结列 ==========
+     注意：left 值不再写死，改用 CSS 变量 --freeze-0/1/2 由 JS 动态设置
+     这样可以保证与 colgroup 实际渲染宽度完全一致，不会漂移 */
   body.freeze-on .col-freeze {
     position: sticky; z-index: 8; background: #ffffff;
   }
   body.freeze-on tr:nth-child(even) td.col-freeze { background: #fbfdff; }
   body.freeze-on tr:hover td.col-freeze { background: var(--epf-blue-soft); }
 
-  body.freeze-on .col-freeze.col-0 { left: 0px; }
-  body.freeze-on .col-freeze.col-1 { left: 80px; }
-  body.freeze-on .col-freeze.col-2 { left: 150px; }
+  body.freeze-on .col-freeze.col-0 { left: 0; }
+  body.freeze-on .col-freeze.col-1 { left: var(--freeze-0, 80px); }
+  body.freeze-on .col-freeze.col-2 { left: var(--freeze-1, 150px); }
   body.freeze-on .col-freeze.col-3 {
-    left: 310px;
+    left: var(--freeze-2, 310px);
     border-right: 2px solid var(--epf-blue) !important;
   }
 
@@ -273,9 +273,9 @@
     background: var(--epf-blue-soft) !important;
   }
 
-  /* 冻结列拖拽线 */
+  /* 冻结列拖拽线（放在 Kumpulan 表头右侧） */
   .freeze-line {
-    position: absolute; top: 0; bottom: 0; right: 0; width: 14px;
+    position: absolute; top: 0; bottom: 0; right: -1px; width: 14px;
     background: linear-gradient(to right, rgba(26,79,138,0) 0%, rgba(26,79,138,0.05) 60%, rgba(26,79,138,0.12) 100%);
     cursor: pointer; z-index: 20; pointer-events: auto; transition: 0.15s;
   }
@@ -314,14 +314,14 @@
   .badge-no  { background: #fdeaea; color: #a02020; }
   .badge-other { background: #eef2f6; color: var(--epf-muted); }
 
-  /* Situation 状态颜色 (EPF 浅底风格) */
+  /* Situation 状态颜色 */
   .sit-pending { background: #fdf8ec !important; }
   .sit-pending .text-cell { color: #7a5a12; font-weight: 700; }
   .sit-active  { background: #f0f9f4 !important; }
   .sit-active .text-cell { color: #14663f; font-weight: 700; }
   .sit-default { background: #ffffff !important; }
 
-  /* ===== 输入框 (EPF 风格) ===== */
+  /* ===== 输入框 ===== */
   .input {
     width: 100%; min-width: 0;
     border: 1px solid var(--epf-border); border-radius: 4px;
@@ -359,7 +359,7 @@
   .toast.show { opacity: 1; transform: translateY(0); }
   .toast.error { background: #a02020; }
 
-  /* ========== 弹窗 (EPF 风格) ========== */
+  /* ========== 弹窗 ========== */
   .modal-overlay {
     position: fixed; inset: 0;
     background: rgba(26, 79, 138, 0.25);
@@ -545,7 +545,7 @@
   <!-- ===== 表格卡片 ===== -->
   <div class="card">
     <div class="card-body">
-      <div class="table-wrap">
+      <div class="table-wrap" id="tableWrap">
         <table id="mainTable">
           <colgroup>
             <col class="col-freeze col-0" style="width:80px">
@@ -583,6 +583,7 @@
             <col style="width:80px">
           </colgroup>
           <thead>
+            <!-- 第一行：分区标题 -->
             <tr class="section-label-row">
               <th colspan="4" class="bg-slate"><div class="sec-title" id="sec1">📌 1. MAKLUMAT ASAS (FREEZE)</div></th>
               <th colspan="9" class="bg-emerald divider-group"><div class="sec-title" id="sec2">💰 2. PENDAPATAN / ELAUN</div></th>
@@ -591,6 +592,7 @@
               <th colspan="3" class="bg-blue divider-group"><div class="sec-title" id="sec5">🧮 5. RINGKASAN GAJI</div></th>
               <th colspan="1" class="bg-gray divider-group"><div class="sec-title" id="sec6">⚙️ 6. TINDAKAN</div></th>
             </tr>
+            <!-- 第二行：主表头（含 rowspan 与 colspan），Kumpulan 是冻结列 */
             <tr class="main-header-row">
               <th class="col-freeze col-0 bg-slate" rowspan="2" id="thSituation">Situation</th>
               <th class="col-freeze col-1 bg-slate" rowspan="2" id="thKod">Kod</th>
@@ -626,6 +628,7 @@
               <th class="bg-blue" rowspan="2" id="thNet">Gaji Bersih</th>
               <th class="bg-gray divider-group" rowspan="2" style="text-align:center;" id="thAction">Tindakan</th>
             </tr>
+            <!-- 第三行：副表头（EPF / SOCSO / EIS 的员工/雇主） -->
             <tr class="sub-header-row">
               <th class="bg-violet" id="subEPFE">Pekerja</th>
               <th class="bg-violet" id="subEPFR">Majikan</th>
@@ -634,6 +637,7 @@
               <th class="bg-violet" id="subEISE">Pekerja</th>
               <th class="bg-violet" id="subEISR">Majikan</th>
             </tr>
+            <!-- 第四行：放大镜筛选行 -->
             <tr class="filter-row">
               <th class="col-freeze col-0 bg-slate"><input class="th-filter" data-col="0" placeholder="🔍"></th>
               <th class="col-freeze col-1 bg-slate"><input class="th-filter" data-col="1" placeholder="🔍"></th>
@@ -892,12 +896,43 @@ function todayStr() {
   return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
 }
 
+// ================= 动态测量冻结列宽度 =================
+// 关键修复：不写死 left 偏移量，而是读取前 3 列实际渲染宽度，
+// 写入 CSS 变量 --freeze-0/1/2，保证 Kumpulan 的粘住位置永远
+// 紧贴 Nama 的右边界，不会漂移到 Gaji Asas 中间。
+function updateFreezeOffsets() {
+  const table = document.getElementById('mainTable');
+  if (!table) return;
+  const firstRow = table.querySelector('tbody tr') || table.querySelector('thead .main-header-row');
+  if (!firstRow) return;
+
+  // 优先从 tbody 第一行读取（数据行没有 rowspan/colspan，宽度最准）
+  let cells = [];
+  const bodyRow = table.querySelector('tbody tr');
+  if (bodyRow) {
+    cells = bodyRow.querySelectorAll('td');
+  } else {
+    cells = firstRow.querySelectorAll('th');
+  }
+  if (cells.length < 4) return;
+
+  const w0 = cells[0].getBoundingClientRect().width;
+  const w1 = cells[1].getBoundingClientRect().width;
+  const w2 = cells[2].getBoundingClientRect().width;
+
+  const root = document.documentElement;
+  root.style.setProperty('--freeze-0', w0 + 'px');
+  root.style.setProperty('--freeze-1', (w0 + w1) + 'px');
+  root.style.setProperty('--freeze-2', (w0 + w1 + w2) + 'px');
+}
+
 // ================= 冻结切换 =================
 function openFreezeModal() { document.getElementById('freezeModal').style.display = 'flex'; }
 function closeFreezeModal() { document.getElementById('freezeModal').style.display = 'none'; }
 function setFreeze(on) {
   document.body.classList.toggle('freeze-on', on);
   closeFreezeModal();
+  requestAnimationFrame(updateFreezeOffsets);
   toast(on ? t('freezeLocked') : t('freezeUnlocked'));
 }
 
@@ -1198,6 +1233,9 @@ function renderTable() {
     });
   });
 
+  // 渲染完成后立即测量一次冻结偏移量
+  requestAnimationFrame(updateFreezeOffsets);
+
   applyFilters();
   updateStats();
 }
@@ -1333,6 +1371,12 @@ window.addEventListener('DOMContentLoaded', () => {
   if (modal) modal.addEventListener('click', e => { if (e.target.id === 'importModal') closeImportModal(); });
   const fm = document.getElementById('freezeModal');
   if (fm) fm.addEventListener('click', e => { if (e.target.id === 'freezeModal') closeFreezeModal(); });
+
+  // 窗口大小变化 / 字体加载完成后重新测量冻结偏移量
+  window.addEventListener('resize', () => requestAnimationFrame(updateFreezeOffsets));
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => requestAnimationFrame(updateFreezeOffsets));
+  }
 });
 
 function parseCSVLine(line) {
