@@ -5,10 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Payroll System · 薪资系统</title>
 <style>
-  /* ============================================================
-     重新设计 · 参考 EPF 页面风格
-     干净白色卡片 + 浅蓝边框 + 文档式表格
-     ============================================================ */
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
@@ -57,7 +53,7 @@
     color: #fff; font-size: 0.95rem; font-weight: 800;
   }
 
-  /* ===== 按钮 (EPF 风格) ===== */
+  /* ===== 按钮 ===== */
   .btn {
     background: #ffffff;
     border: 1px solid var(--epf-border);
@@ -69,22 +65,10 @@
     transition: all 0.15s ease;
     white-space: nowrap; font-family: inherit;
   }
-  .btn:hover {
-    background: var(--epf-blue-soft);
-    border-color: #b8cfe8;
-  }
-  .btn-primary {
-    background: var(--epf-blue);
-    border: 1px solid var(--epf-blue);
-    color: #fff;
-  }
-  .btn-primary:hover {
-    background: #15406f;
-    border-color: #15406f;
-  }
-  .btn-success {
-    background: #0f7a54; border: 1px solid #0f7a54; color: #fff;
-  }
+  .btn:hover { background: var(--epf-blue-soft); border-color: #b8cfe8; }
+  .btn-primary { background: var(--epf-blue); border: 1px solid var(--epf-blue); color: #fff; }
+  .btn-primary:hover { background: #15406f; border-color: #15406f; }
+  .btn-success { background: #0f7a54; border: 1px solid #0f7a54; color: #fff; }
   .btn-success:hover { background: #0c6a48; border-color: #0c6a48; }
   .btn-sm { padding: 0.25rem 0.7rem; font-size: 0.72rem; border-radius: 4px; }
   select.btn {
@@ -96,16 +80,16 @@
   /* ===== 主容器 ===== */
   .container { max-width: 100%; margin: 0 auto; padding: 1.5rem 1.75rem; }
 
-  /* ===== 页面标题卡片 (EPF 风格) ===== */
+  /* ===== 页面标题卡片 ===== */
   .page-header {
     background: #ffffff;
     border: 1px solid var(--epf-border);
-    border-radius: 8px; padding: 1.6rem 2rem; margin-bottom: 1.25rem;
+    border-radius: 8px; padding: 1.4rem 1.75rem; margin-bottom: 1.25rem;
     display: flex; flex-wrap: wrap; gap: 1rem;
     align-items: center; justify-content: space-between;
     box-shadow: 0 1px 3px rgba(26, 79, 138, 0.04);
   }
-  .page-header .info { flex: 1; min-width: 260px; }
+  .page-header .info { flex: 1; min-width: 240px; }
   .page-header h1 {
     font-size: 1.45rem; font-weight: 700;
     margin-bottom: 0.35rem; color: var(--epf-blue);
@@ -120,21 +104,150 @@
     font-size: 0.7rem; font-weight: 600; margin-top: 0.6rem;
     border: 1px solid #cfe0f2;
   }
-  .page-header .stat-badges { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-  .page-header .stat-pill {
+
+  /* ===== 筛选 + 统计区 ===== */
+  .stat-badges {
+    display: flex; gap: 0.6rem; flex-wrap: wrap;
+    align-items: stretch;
+  }
+  .stat-pill {
     background: var(--epf-blue-soft);
     border: 1px solid var(--epf-border-soft);
-    border-radius: 6px; padding: 0.6rem 1.1rem;
+    border-radius: 6px; padding: 0.55rem 1rem;
     font-size: 0.78rem; min-width: 110px;
+    display: flex; flex-direction: column; justify-content: center;
   }
-  .page-header .stat-pill .label {
+  .stat-pill .label {
     font-size: 0.62rem; color: var(--epf-muted);
     text-transform: uppercase; letter-spacing: 0.06em;
     font-weight: 600; margin-bottom: 0.1rem;
   }
-  .page-header .stat-pill .value {
-    font-size: 1.2rem; font-weight: 700;
+  .stat-pill .value {
+    font-size: 1.15rem; font-weight: 700;
     font-variant-numeric: tabular-nums; color: var(--epf-blue);
+    white-space: nowrap;
+  }
+
+  /* ===== 多选下拉 ===== */
+  .multiselect {
+    position: relative;
+    display: inline-flex;
+  }
+  .ms-btn {
+    background: var(--epf-blue-soft);
+    border: 1px solid var(--epf-border-soft);
+    border-radius: 6px;
+    padding: 0.55rem 0.85rem 0.55rem 1rem;
+    min-width: 150px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    color: var(--epf-text);
+    display: flex; align-items: center; gap: 0.5rem;
+    justify-content: space-between;
+    font-family: inherit;
+    transition: 0.15s;
+    text-align: left;
+  }
+  .ms-btn:hover { background: var(--epf-blue-light); border-color: #b8cfe8; }
+  .multiselect.open .ms-btn { background: var(--epf-blue-light); border-color: var(--epf-blue); }
+  .ms-btn-inner { display: flex; flex-direction: column; line-height: 1.25; }
+  .ms-btn-inner .ms-label {
+    font-size: 0.62rem; color: var(--epf-muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+  .ms-btn-inner .ms-text {
+    color: var(--epf-blue); font-weight: 600;
+    font-size: 0.82rem;
+    white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+    max-width: 140px;
+  }
+  .ms-arrow {
+    color: var(--epf-blue);
+    font-size: 0.7rem;
+    transition: transform 0.15s;
+  }
+  .multiselect.open .ms-arrow { transform: rotate(180deg); }
+
+  .ms-panel {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    background: #ffffff;
+    border: 1px solid var(--epf-border);
+    border-radius: 6px;
+    box-shadow: 0 12px 32px -10px rgba(26, 79, 138, 0.28);
+    z-index: 300;
+    min-width: 240px;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .multiselect.open .ms-panel { display: flex; }
+  .ms-actions {
+    display: flex;
+    gap: 0.35rem;
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid var(--epf-border-soft);
+    background: var(--epf-blue-soft);
+  }
+  .ms-actions button {
+    background: #fff;
+    border: 1px solid var(--epf-border);
+    padding: 0.22rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    color: var(--epf-blue);
+    font-family: inherit;
+    font-weight: 500;
+  }
+  .ms-actions button:hover { background: var(--epf-blue-light); }
+  .ms-list {
+    overflow-y: auto;
+    max-height: 260px;
+    padding: 0.3rem 0;
+  }
+  .ms-list::-webkit-scrollbar { width: 6px; }
+  .ms-list::-webkit-scrollbar-thumb { background: #c2d4e6; border-radius: 3px; }
+  .ms-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.78rem;
+    cursor: pointer;
+    color: var(--epf-text);
+    user-select: none;
+  }
+  .ms-item:hover { background: var(--epf-blue-soft); }
+  .ms-item input[type="checkbox"] {
+    accent-color: var(--epf-blue);
+    width: 14px; height: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .ms-item .ms-item-name {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ms-item .ms-count {
+    font-size: 0.65rem;
+    color: var(--epf-blue);
+    background: var(--epf-blue-light);
+    padding: 0.1rem 0.45rem;
+    border-radius: 3px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .ms-empty {
+    padding: 1rem;
+    text-align: center;
+    color: #a7b7c9;
+    font-size: 0.75rem;
   }
 
   /* ===== 分区图例 ===== */
@@ -181,11 +294,9 @@
     border-bottom: 1px solid var(--epf-border);
     white-space: normal; font-size: 0.7rem; vertical-align: middle;
     word-break: break-word; overflow-wrap: anywhere;
-    /* 高度不写死，由内容 + JS 动态计算，避免被浏览器挤压 */
   }
   th > div { word-break: break-word; overflow-wrap: anywhere; }
 
-  /* ========== 分区颜色 (EPF 浅色系) ========== */
   .bg-slate   { background: #f0f4f9 !important; color: var(--epf-blue) !important; }
   .bg-emerald { background: #f0f9f4 !important; color: #14663f !important; }
   .bg-violet  { background: #f4f1fb !important; color: #4a3a8a !important; }
@@ -193,9 +304,6 @@
   .bg-blue    { background: #eef5fd !important; color: var(--epf-blue) !important; }
   .bg-gray    { background: #f4f6f9 !important; color: var(--epf-muted) !important; }
 
-  /* ==========================================================
-     表头行 - 全部 sticky，top 由 JS 动态计算
-     ========================================================== */
   .section-label-row th {
     position: sticky; z-index: 15;
     padding: 0.45rem 0.6rem; font-size: 0.68rem; font-weight: 700;
@@ -205,18 +313,11 @@
   .section-label-row th .sec-title {
     display: flex; align-items: center; justify-content: center; gap: 0.4rem;
   }
-
-  .main-header-row th {
-    position: sticky; z-index: 13;
-    text-align: left;
-  }
-
+  .main-header-row th { position: sticky; z-index: 13; text-align: left; }
   .sub-header-row th {
-    position: sticky; z-index: 14;
-    text-align: center;
+    position: sticky; z-index: 14; text-align: center;
     padding: 0.35rem 0.5rem;
   }
-
   .filter-row th {
     position: sticky; z-index: 12;
     background: #ffffff; padding: 0.35rem 0.4rem;
@@ -248,10 +349,7 @@
   tr:nth-child(even) td { background: #fbfdff; }
   tr:hover td { background: var(--epf-blue-soft); }
 
-  /* ========== 分组分割线 (box-shadow 不占宽度) ========== */
-  .divider-group {
-    box-shadow: inset 1px 0 0 var(--epf-border) !important;
-  }
+  .divider-group { box-shadow: inset 1px 0 0 var(--epf-border) !important; }
 
   /* ========== 冻结列 ========== */
   body.freeze-on .col-freeze {
@@ -259,7 +357,6 @@
   }
   body.freeze-on tr:nth-child(even) td.col-freeze { background: #fbfdff; }
   body.freeze-on tr:hover td.col-freeze { background: var(--epf-blue-soft); }
-
   body.freeze-on .col-freeze.col-0 { left: 0px; }
   body.freeze-on .col-freeze.col-1 { left: 80px; }
   body.freeze-on .col-freeze.col-2 { left: 150px; }
@@ -267,7 +364,6 @@
     left: 310px;
     box-shadow: inset -2px 0 0 var(--epf-blue);
   }
-
   body.freeze-on thead .col-freeze { z-index: 16; }
   body.freeze-on thead .col-freeze.bg-slate   { background: #f0f4f9 !important; }
   body.freeze-on thead .col-freeze.bg-amber   { background: #fdf8ec !important; }
@@ -275,21 +371,16 @@
   body.freeze-on thead .col-freeze.bg-violet  { background: #f4f1fb !important; }
   body.freeze-on thead .col-freeze.bg-blue    { background: #eef5fd !important; }
   body.freeze-on thead .col-freeze.bg-gray    { background: #f4f6f9 !important; }
-  body.freeze-on thead .filter-row th.col-freeze {
-    background: #ffffff !important;
-  }
+  body.freeze-on thead .filter-row th.col-freeze { background: #ffffff !important; }
   body.freeze-on thead .filter-row th.col-freeze.no-filter {
     background: var(--epf-blue-soft) !important;
   }
-
-  /* MAKLUMAT ASAS 大格子跟着第一组冻结 */
   body.freeze-on .section-label-row th.col-freeze-group {
     position: sticky !important;
     left: 0 !important;
     z-index: 17 !important;
   }
 
-  /* 冻结列拖拽线 */
   .freeze-line {
     position: absolute; top: 0; bottom: 0; right: 0; width: 14px;
     background: linear-gradient(to right, rgba(26,79,138,0) 0%, rgba(26,79,138,0.05) 60%, rgba(26,79,138,0.12) 100%);
@@ -306,14 +397,12 @@
   }
   .freeze-line:hover::before { opacity: 0.9; }
 
-  /* 复选框单元格 */
   .td-chk { text-align: center; vertical-align: middle; padding: 0.4rem 0.15rem !important; }
   .td-chk input[type="checkbox"] {
     width: 15px; height: 15px; cursor: pointer;
     accent-color: var(--epf-blue); border-radius: 3px;
   }
 
-  /* 只读文字单元格 */
   .td-text { vertical-align: middle !important; padding: 0.4rem 0.45rem !important; }
   .text-cell {
     font-size: 0.78rem; line-height: 1.4;
@@ -330,14 +419,12 @@
   .badge-no  { background: #fdeaea; color: #a02020; }
   .badge-other { background: #eef2f6; color: var(--epf-muted); }
 
-  /* Situation 状态颜色 */
   .sit-pending { background: #fdf8ec !important; }
   .sit-pending .text-cell { color: #7a5a12; font-weight: 700; }
   .sit-active  { background: #f0f9f4 !important; }
   .sit-active .text-cell { color: #14663f; font-weight: 700; }
   .sit-default { background: #ffffff !important; }
 
-  /* ===== 输入框 ===== */
   .input {
     width: 100%; min-width: 0;
     border: 1px solid var(--epf-border); border-radius: 4px;
@@ -466,9 +553,7 @@
 
   .table-wrap::-webkit-scrollbar { width: 8px; height: 8px; }
   .table-wrap::-webkit-scrollbar-track { background: var(--epf-blue-soft); }
-  .table-wrap::-webkit-scrollbar-thumb {
-    background: #c2d4e6; border-radius: 4px;
-  }
+  .table-wrap::-webkit-scrollbar-thumb { background: #c2d4e6; border-radius: 4px; }
   .table-wrap::-webkit-scrollbar-thumb:hover { background: #9db8d2; }
 
   @media (max-width: 768px) {
@@ -477,14 +562,14 @@
     .page-header { padding: 1.2rem 1.2rem; }
     .page-header h1 { font-size: 1.2rem; }
     .section-legend .item { font-size: 0.65rem; padding: 0.25rem 0.6rem; }
-    .page-header .stat-pill { padding: 0.4rem 0.8rem; min-width: 80px; }
-    .page-header .stat-pill .value { font-size: 1rem; }
+    .stat-pill { padding: 0.4rem 0.8rem; min-width: 90px; }
+    .stat-pill .value { font-size: 1rem; }
+    .ms-btn { min-width: 130px; }
   }
 </style>
 </head>
 <body class="freeze-on">
 
-<!-- ============ 顶部导航栏 ============ -->
 <div class="topbar">
   <div class="brand">
     <div class="logo">P</div>
@@ -530,18 +615,55 @@
       <p id="pageDesc">Pengurusan gaji pekerja dengan pengiraan automatik EPF, SOCSO, EIS &amp; 24JAM Lindungan.</p>
       <span class="badge" id="pageBadge">Auto kira caruman statutori · Manual override dengan kotak semak</span>
     </div>
+
+    <!-- ====== 多选筛选 + 统计 ====== -->
     <div class="stat-badges">
-      <div class="stat-pill">
-        <div class="label" id="statLabelTotal">Jumlah Pekerja</div>
-        <div class="value" id="statCount">0</div>
+      <!-- 分店多选 -->
+      <div class="multiselect" id="msGroup">
+        <button class="ms-btn" onclick="toggleMS('msGroup', event)">
+          <div class="ms-btn-inner">
+            <span class="ms-label" id="msGroupLabel">Kumpulan</span>
+            <span class="ms-text" id="msGroupText">Semua</span>
+          </div>
+          <span class="ms-arrow">▾</span>
+        </button>
+        <div class="ms-panel">
+          <div class="ms-actions">
+            <button onclick="selectAllMS('group', event)" id="msGroupSelAll">Semua</button>
+            <button onclick="clearMS('group', event)" id="msGroupClear">Kosong</button>
+          </div>
+          <div class="ms-list" id="msGroupList"></div>
+        </div>
       </div>
-      <div class="stat-pill">
-        <div class="label" id="statLabelActive">Aktif</div>
-        <div class="value" id="statActive">0</div>
+
+      <!-- Bank 多选 -->
+      <div class="multiselect" id="msBank">
+        <button class="ms-btn" onclick="toggleMS('msBank', event)">
+          <div class="ms-btn-inner">
+            <span class="ms-label" id="msBankLabel">Bank</span>
+            <span class="ms-text" id="msBankText">Semua</span>
+          </div>
+          <span class="ms-arrow">▾</span>
+        </button>
+        <div class="ms-panel">
+          <div class="ms-actions">
+            <button onclick="selectAllMS('bank', event)" id="msBankSelAll">Semua</button>
+            <button onclick="clearMS('bank', event)" id="msBankClear">Kosong</button>
+          </div>
+          <div class="ms-list" id="msBankList"></div>
+        </div>
       </div>
+
+      <!-- 符合人数 -->
       <div class="stat-pill">
-        <div class="label" id="statLabelPending">Pending</div>
-        <div class="value" id="statPending">0</div>
+        <div class="label" id="statLabelMatched">Padan</div>
+        <div class="value" id="filteredCount">0</div>
+      </div>
+
+      <!-- 净薪资合计 -->
+      <div class="stat-pill" style="min-width: 150px;">
+        <div class="label" id="statLabelNetTotal">Jumlah Bersih</div>
+        <div class="value" id="filteredNet">RM 0.00</div>
       </div>
     </div>
   </div>
@@ -694,7 +816,6 @@
 <div id="printArea"></div>
 <div id="toast" class="toast"></div>
 
-<!-- ============ 冻结确认弹窗 ============ -->
 <div id="freezeModal" class="modal-overlay" style="display:none;">
   <div class="modal-box compact">
     <h3 style="justify-content:center; font-size:1.05rem; margin-bottom:0.3rem; color:var(--epf-blue);" id="freezeTitle">🔒 Tetapan Freeze Kolum</h3>
@@ -709,7 +830,6 @@
   </div>
 </div>
 
-<!-- ============ 导入弹窗 ============ -->
 <div id="importModal" class="modal-overlay" style="display:none;">
   <div class="modal-box">
     <div class="modal-header">
@@ -746,7 +866,6 @@ const GROUP_FIELDS = {
   '24JAM': ['Lindung24Jam']
 };
 
-// ================= 语言包 (含弹窗文案) =================
 const I18N = {
   ms: {
     title: 'Sistem Penggajian',
@@ -789,7 +908,6 @@ const I18N = {
     noData: 'Tiada data untuk dieksport',
     freezeLocked: 'Kolum dibekukan (freeze ON)',
     freezeUnlocked: 'Kolum dibuka (freeze OFF)',
-    // ==== 弹窗文案 ====
     freezeTitle: '🔒 Tetapan Freeze Kolum',
     freezeDesc: 'Pilih sama ada mahu kunci kolum pertama (Situation → Kumpulan) supaya sentiasa kelihatan semasa scroll, atau buka kunci sepenuhnya.',
     freezeUnlock: '🔓 Buka Kunci',
@@ -800,7 +918,17 @@ const I18N = {
     importDropHint: 'Drag & drop file here, or click to browse',
     importFormatHint: 'Format: .xlsx / .csv / .txt',
     importTemplate: '📥 Template:',
-    importClose: 'Tutup'
+    importClose: 'Tutup',
+    // 筛选相关
+    filterGroup: 'Kumpulan',
+    filterBank: 'Bank',
+    all: 'Semua',
+    selectedSuffix: ' dipilih',
+    matchedCount: 'Padan',
+    netTotal: 'Jumlah Bersih',
+    btnSelectAll: 'Semua',
+    btnClear: 'Kosong',
+    noOptions: 'Tiada pilihan'
   },
   en: {
     title: 'Payroll System',
@@ -853,7 +981,16 @@ const I18N = {
     importDropHint: 'Drag & drop file here, or click to browse',
     importFormatHint: 'Format: .xlsx / .csv / .txt',
     importTemplate: '📥 Template:',
-    importClose: 'Close'
+    importClose: 'Close',
+    filterGroup: 'Group',
+    filterBank: 'Bank',
+    all: 'All',
+    selectedSuffix: ' selected',
+    matchedCount: 'Matched',
+    netTotal: 'Net Total',
+    btnSelectAll: 'All',
+    btnClear: 'Clear',
+    noOptions: 'No options'
   },
   zh: {
     title: '薪资系统',
@@ -906,13 +1043,26 @@ const I18N = {
     importDropHint: '拖入文件或点击浏览',
     importFormatHint: '格式：.xlsx / .csv / .txt',
     importTemplate: '📥 模板：',
-    importClose: '关闭'
+    importClose: '关闭',
+    filterGroup: '分店',
+    filterBank: '银行',
+    all: '全部',
+    selectedSuffix: ' 项',
+    matchedCount: '符合人数',
+    netTotal: '净薪资合计',
+    btnSelectAll: '全选',
+    btnClear: '清除',
+    noOptions: '暂无选项'
   }
 };
 let currentLang = 'ms';
 function t(key) { return I18N[currentLang][key] || key; }
 
 let employees = [];
+
+// ===== 多选筛选状态 =====
+const filterGroup = new Set();
+const filterBank = new Set();
 
 // ================= 工具 =================
 function toast(msg, ok = true) {
@@ -952,6 +1102,162 @@ function updateStickyOffsets() {
   });
 }
 
+// ================= 多选下拉逻辑 =================
+function toggleMS(id, e) {
+  if (e) e.stopPropagation();
+  const el = document.getElementById(id);
+  const wasOpen = el.classList.contains('open');
+  document.querySelectorAll('.multiselect.open').forEach(m => m.classList.remove('open'));
+  if (!wasOpen) el.classList.add('open');
+}
+
+function onFilterChange(type, cb) {
+  if (type === 'group') {
+    if (cb.checked) filterGroup.add(cb.dataset.value);
+    else filterGroup.delete(cb.dataset.value);
+  } else {
+    if (cb.checked) filterBank.add(cb.dataset.value);
+    else filterBank.delete(cb.dataset.value);
+  }
+  updateMSLabels();
+  updateFilterStats();
+}
+
+function selectAllMS(type, e) {
+  if (e) e.stopPropagation();
+  if (type === 'group') {
+    document.querySelectorAll('#msGroupList input[type=checkbox]').forEach(cb => {
+      cb.checked = true;
+      filterGroup.add(cb.dataset.value);
+    });
+  } else {
+    document.querySelectorAll('#msBankList input[type=checkbox]').forEach(cb => {
+      cb.checked = true;
+      filterBank.add(cb.dataset.value);
+    });
+  }
+  updateMSLabels();
+  updateFilterStats();
+}
+
+function clearMS(type, e) {
+  if (e) e.stopPropagation();
+  if (type === 'group') {
+    filterGroup.clear();
+    document.querySelectorAll('#msGroupList input[type=checkbox]').forEach(cb => cb.checked = false);
+  } else {
+    filterBank.clear();
+    document.querySelectorAll('#msBankList input[type=checkbox]').forEach(cb => cb.checked = false);
+  }
+  updateMSLabels();
+  updateFilterStats();
+}
+
+function updateMSLabels() {
+  const txtG = document.getElementById('msGroupText');
+  const txtB = document.getElementById('msBankText');
+
+  if (filterGroup.size === 0) {
+    txtG.textContent = t('all');
+  } else if (filterGroup.size === 1) {
+    txtG.textContent = Array.from(filterGroup)[0];
+  } else {
+    txtG.textContent = filterGroup.size + t('selectedSuffix');
+  }
+
+  if (filterBank.size === 0) {
+    txtB.textContent = t('all');
+  } else if (filterBank.size === 1) {
+    txtB.textContent = Array.from(filterBank)[0];
+  } else {
+    txtB.textContent = filterBank.size + t('selectedSuffix');
+  }
+}
+
+// 计算符合条件的员工
+function getFilteredForStats() {
+  let list = employees.filter(e => {
+    const s = String(e.Situation || '').trim().toUpperCase();
+    return s !== 'UNACTIVE' && s !== 'INACTIVE';
+  });
+  if (filterGroup.size > 0) {
+    list = list.filter(e => filterGroup.has(String(e.GroupName || '').trim()));
+  }
+  if (filterBank.size > 0) {
+    list = list.filter(e => filterBank.has(String(e.SLRBankNama || e.BankNama || '').trim()));
+  }
+  return list;
+}
+
+function updateFilterStats() {
+  const list = getFilteredForStats();
+  const count = list.length;
+  const totalNet = list.reduce((sum, e) => sum + num(recalcRow({ ...e }).NetSalary), 0);
+  const countEl = document.getElementById('filteredCount');
+  const netEl = document.getElementById('filteredNet');
+  if (countEl) countEl.textContent = count;
+  if (netEl) netEl.textContent = 'RM ' + totalNet.toFixed(2);
+}
+
+// 构建两个下拉列表的选项
+function buildFilterDropdowns() {
+  const groups = new Map(); // 名称 -> 计数
+  const banks = new Map();
+
+  employees.forEach(e => {
+    const s = String(e.Situation || '').trim().toUpperCase();
+    if (s === 'UNACTIVE' || s === 'INACTIVE') return;
+    const g = String(e.GroupName || '').trim();
+    const b = String(e.SLRBankNama || e.BankNama || '').trim();
+    if (g) groups.set(g, (groups.get(g) || 0) + 1);
+    if (b) banks.set(b, (banks.get(b) || 0) + 1);
+  });
+
+  // 清理 set 中已不存在的项
+  Array.from(filterGroup).forEach(k => { if (!groups.has(k)) filterGroup.delete(k); });
+  Array.from(filterBank).forEach(k => { if (!banks.has(k)) filterBank.delete(k); });
+
+  const listG = document.getElementById('msGroupList');
+  const sortedGroups = Array.from(groups.keys()).sort();
+  if (sortedGroups.length === 0) {
+    listG.innerHTML = `<div class="ms-empty">${t('noOptions')}</div>`;
+  } else {
+    listG.innerHTML = sortedGroups.map(g => `
+      <label class="ms-item">
+        <input type="checkbox" data-value="${escapeHtml(g)}" ${filterGroup.has(g) ? 'checked' : ''}
+               onchange="onFilterChange('group', this)">
+        <span class="ms-item-name">${escapeHtml(g)}</span>
+        <span class="ms-count">${groups.get(g)}</span>
+      </label>
+    `).join('');
+  }
+
+  const listB = document.getElementById('msBankList');
+  const sortedBanks = Array.from(banks.keys()).sort();
+  if (sortedBanks.length === 0) {
+    listB.innerHTML = `<div class="ms-empty">${t('noOptions')}</div>`;
+  } else {
+    listB.innerHTML = sortedBanks.map(b => `
+      <label class="ms-item">
+        <input type="checkbox" data-value="${escapeHtml(b)}" ${filterBank.has(b) ? 'checked' : ''}
+               onchange="onFilterChange('bank', this)">
+        <span class="ms-item-name">${escapeHtml(b)}</span>
+        <span class="ms-count">${banks.get(b)}</span>
+      </label>
+    `).join('');
+  }
+
+  updateMSLabels();
+  updateFilterStats();
+}
+
+// 点击外部关闭下拉
+document.addEventListener('click', e => {
+  if (!e.target.closest('.multiselect')) {
+    document.querySelectorAll('.multiselect.open').forEach(m => m.classList.remove('open'));
+  }
+});
+
 // ================= 冻结切换 =================
 function openFreezeModal() { document.getElementById('freezeModal').style.display = 'flex'; }
 function closeFreezeModal() { document.getElementById('freezeModal').style.display = 'none'; }
@@ -960,19 +1266,6 @@ function setFreeze(on) {
   closeFreezeModal();
   updateStickyOffsets();
   toast(on ? t('freezeLocked') : t('freezeUnlocked'));
-}
-
-// ================= 统计卡片 =================
-function updateStats() {
-  const total = employees.length;
-  const active = employees.filter(e => String(e.Situation || '').trim().toUpperCase() === 'ACTIVE').length;
-  const pending = employees.filter(e => String(e.Situation || '').trim().toUpperCase() === 'PENDING').length;
-  const s1 = document.getElementById('statCount');
-  const s2 = document.getElementById('statActive');
-  const s3 = document.getElementById('statPending');
-  if (s1) s1.textContent = total;
-  if (s2) s2.textContent = active;
-  if (s3) s3.textContent = pending;
 }
 
 // ================= 计算 =================
@@ -1069,7 +1362,6 @@ function recalcRow(emp) {
   return emp;
 }
 
-// ================= 徽章 =================
 function badgeStatus(val) {
   const v = String(val || '').trim().toUpperCase();
   if (!v) return '';
@@ -1082,14 +1374,11 @@ function badgeStatus(val) {
   return `<span class="text-cell badge-cell badge-other">${escapeHtml(v)}</span>`;
 }
 
-// ================= 更新所有 UI 文字 (含弹窗) =================
+// ================= 更新 UI 文字 (含弹窗 + 筛选) =================
 function updateUILanguage() {
   document.getElementById('pageTitle').textContent = t('title');
   document.getElementById('pageDesc').textContent = t('desc');
   document.getElementById('pageBadge').textContent = t('badge');
-  document.getElementById('statLabelTotal').textContent = t('statTotal');
-  document.getElementById('statLabelActive').textContent = t('statActive');
-  document.getElementById('statLabelPending').textContent = t('statPending');
   document.getElementById('legend1').textContent = t('legend1');
   document.getElementById('legend2').textContent = t('legend2');
   document.getElementById('legend3').textContent = t('legend3');
@@ -1139,7 +1428,7 @@ function updateUILanguage() {
   document.getElementById('btnCheckAll').innerHTML = '✅ ' + t('checkAll');
   document.getElementById('exportMenu').options[0].textContent = '💾 ' + t('exportMenu') + ' / 导出…';
 
-  // ==== 弹窗文案 ====
+  // ==== 弹窗 ====
   document.getElementById('freezeTitle').textContent = t('freezeTitle');
   document.getElementById('freezeDesc').textContent = t('freezeDesc');
   document.getElementById('freezeUnlockBtn').textContent = t('freezeUnlock');
@@ -1152,6 +1441,20 @@ function updateUILanguage() {
   document.getElementById('importFormatHint').textContent = t('importFormatHint');
   document.getElementById('importTemplate').textContent = t('importTemplate');
   document.getElementById('importCloseBtn').textContent = t('importClose');
+
+  // ==== 筛选区 ====
+  document.getElementById('msGroupLabel').textContent = t('filterGroup');
+  document.getElementById('msBankLabel').textContent = t('filterBank');
+  document.getElementById('statLabelMatched').textContent = t('matchedCount');
+  document.getElementById('statLabelNetTotal').textContent = t('netTotal');
+  document.getElementById('msGroupSelAll').textContent = t('btnSelectAll');
+  document.getElementById('msGroupClear').textContent = t('btnClear');
+  document.getElementById('msBankSelAll').textContent = t('btnSelectAll');
+  document.getElementById('msBankClear').textContent = t('btnClear');
+
+  updateMSLabels();
+  // 空列表占位符也刷新
+  document.querySelectorAll('.ms-empty').forEach(el => el.textContent = t('noOptions'));
 }
 
 // ================= 渲染表格 =================
@@ -1163,7 +1466,7 @@ function renderTable() {
 
   if (!employees.length) {
     tbody.innerHTML = `<tr><td colspan="33" style="text-align:center;padding:2.5rem;color:#a7b7c9;">${t('loading')}</td></tr>`;
-    updateStats();
+    buildFilterDropdowns();
     updateStickyOffsets();
     return;
   }
@@ -1247,6 +1550,7 @@ function renderTable() {
         const cell = row.querySelector(`input[data-field="${f}"]`);
         if (cell) cell.value = updated[f];
       });
+      updateFilterStats();
     });
   });
 
@@ -1271,11 +1575,12 @@ function renderTable() {
         const inp = row.querySelector(`input[data-field="${f}"]`);
         if (inp) inp.value = updated[f];
       });
+      updateFilterStats();
     });
   });
 
   applyFilters();
-  updateStats();
+  buildFilterDropdowns();
   updateStickyOffsets();
 }
 
@@ -1356,7 +1661,7 @@ function jumpToCheckPage(url) {
   document.getElementById('checkMenu').value = '';
 }
 
-// ================= 保存到 Google Sheet =================
+// ================= 保存 =================
 async function saveToSheet() {
   if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
     toast('Sila tetapkan APPS_SCRIPT_URL dahulu!', false);
@@ -1373,16 +1678,12 @@ async function saveToSheet() {
   });
   try {
     await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
+      method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ payroll: payload })
     });
     toast(t('saved'));
-  } catch (err) {
-    console.error(err);
-    toast(t('failed'), false);
-  }
+  } catch (err) { console.error(err); toast(t('failed'), false); }
 }
 
 // ================= 导入 =================
@@ -1417,9 +1718,8 @@ function parseCSVLine(line) {
   for (let i = 0; i < line.length; i++) {
     const ch = line[i];
     if (inQ) {
-      if (ch === '"') {
-        if (line[i+1] === '"') { cur += '"'; i++; } else inQ = false;
-      } else cur += ch;
+      if (ch === '"') { if (line[i+1] === '"') { cur += '"'; i++; } else inQ = false; }
+      else cur += ch;
     } else {
       if (ch === ',') { cells.push(cur); cur = ''; }
       else if (ch === '"') inQ = true;
@@ -1531,13 +1831,12 @@ async function handleImportFile(file) {
     }
     if (!imported.length) { toast(t('importFail'), false); return; }
     employees = imported;
+    filterGroup.clear();
+    filterBank.clear();
     renderTable();
     toast(t('importSuccess').replace('{n}', imported.length));
     closeImportModal();
-  } catch (err) {
-    console.error(err);
-    toast('Import error: ' + err.message, false);
-  }
+  } catch (err) { console.error(err); toast('Import error: ' + err.message, false); }
 }
 
 // ================= 下载模板 =================
@@ -1575,10 +1874,8 @@ function handleExport(val) {
     else if (val === 'xlsx') exportToXLSX();
     else if (val === 'txt')  exportToTXT();
     else if (val === 'doc')  exportToDOC();
-  } catch (err) {
-    console.error(err);
-    toast('Export error: ' + err.message, false);
-  } finally { document.getElementById('exportMenu').value = ''; }
+  } catch (err) { console.error(err); toast('Export error: ' + err.message, false); }
+  finally { document.getElementById('exportMenu').value = ''; }
 }
 
 function getExportHeaders() {
@@ -1797,10 +2094,10 @@ function showPayslip(code) {
 }
 
 function showAllPayslips() {
-  const groupFilter = prompt('Masukkan GroupName untuk cetak semua (kosongkan untuk semua):', '');
+  const groupFilterQ = prompt('Masukkan GroupName untuk cetak semua (kosongkan untuk semua):', '');
   let list = employees.map(e => recalcRow({ ...e }));
-  if (groupFilter && groupFilter.trim()) {
-    list = list.filter(e => String(e.GroupName).toLowerCase().includes(groupFilter.trim().toLowerCase()));
+  if (groupFilterQ && groupFilterQ.trim()) {
+    list = list.filter(e => String(e.GroupName).toLowerCase().includes(groupFilterQ.trim().toLowerCase()));
   }
   if (!list.length) { toast('Tiada pekerja', false); return; }
   const printArea = document.getElementById('printArea');
@@ -1865,7 +2162,6 @@ function switchLang(lang) {
   currentLang = lang;
   document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
   renderTable();
-  // 语言切换后，字号可能微变，重新计算 sticky top
   setTimeout(updateStickyOffsets, 60);
 }
 
@@ -1874,20 +2170,17 @@ window.addEventListener('DOMContentLoaded', () => {
   const langSelect = document.getElementById('langSelect');
   if (langSelect) langSelect.value = currentLang;
   loadEmployees();
-  // 首屏 + 字体加载后各跑一次
   updateStickyOffsets();
   setTimeout(updateStickyOffsets, 200);
   setTimeout(updateStickyOffsets, 600);
 });
 
-// 窗口 resize 时重新计算
 let resizeTimer = null;
 window.addEventListener('resize', () => {
   if (resizeTimer) clearTimeout(resizeTimer);
   resizeTimer = setTimeout(updateStickyOffsets, 100);
 });
 
-// 字体加载完成后重算一次（避免字体变化导致表头行高微变）
 if (document.fonts && document.fonts.ready) {
   document.fonts.ready.then(() => updateStickyOffsets());
 }
