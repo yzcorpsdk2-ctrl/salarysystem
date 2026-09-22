@@ -186,16 +186,11 @@
   }
   .card-body { padding: 0; }
 
-  .table-wrap {
-    overflow: auto;
-    max-height: calc(100vh - 350px);
-    background: #ffffff;
-    position: relative;
-  }
-  table#mainTable {
+  .table-wrap { overflow: auto; max-height: calc(100vh - 350px); background: #ffffff; }
+  table {
     border-collapse: separate; border-spacing: 0;
     font-size: 0.8rem; table-layout: fixed;
-    width: max-content;
+    width: 4380px; min-width: 4380px;
   }
 
   th {
@@ -204,6 +199,7 @@
     border-bottom: 1px solid var(--epf-border);
     white-space: normal; font-size: 0.7rem; vertical-align: middle;
     word-break: break-word; overflow-wrap: anywhere;
+    position: relative;
   }
   th > div { word-break: break-word; overflow-wrap: anywhere; }
 
@@ -250,6 +246,7 @@
   td {
     padding: 0.4rem 0.45rem; border-bottom: 1px solid var(--epf-border-soft);
     vertical-align: middle; background: #ffffff; transition: background 0.15s;
+    position: relative;
   }
   tr:nth-child(even) td { background: #fbfdff; }
   tr:hover td { background: var(--epf-blue-soft); }
@@ -257,12 +254,17 @@
   .divider-group { box-shadow: inset 1px 0 0 var(--epf-border) !important; }
 
   /* ==========================================================
-     冻结列：col-0 ~ col-4（Situation / Kod / Nama / Kumpulan / Basic）
-     left 值由 JS 动态设置（基于实际列宽），不用硬编码
+     锁定列：Situation / Kod / Nama / Kumpulan / Gaji Asas(Basic)
+     Basic 是 col-4，left:420px
      ========================================================== */
   body.freeze-on .col-freeze { position: sticky; z-index: 8; background: #ffffff; }
   body.freeze-on tr:nth-child(even) td.col-freeze { background: #fbfdff; }
   body.freeze-on tr:hover td.col-freeze { background: var(--epf-blue-soft); }
+  body.freeze-on .col-freeze.col-0 { left: 0px; }
+  body.freeze-on .col-freeze.col-1 { left: 80px; }
+  body.freeze-on .col-freeze.col-2 { left: 150px; }
+  body.freeze-on .col-freeze.col-3 { left: 310px; }
+  body.freeze-on .col-freeze.col-4 { left: 420px; }
 
   body.freeze-on thead .col-freeze { z-index: 16; }
   body.freeze-on thead .col-freeze.bg-slate   { background: #f0f4f9 !important; }
@@ -274,40 +276,15 @@
   body.freeze-on thead .filter-row th.col-freeze { background: #ffffff !important; }
   body.freeze-on thead .filter-row th.col-freeze.no-filter { background: var(--epf-blue-soft) !important; }
   body.freeze-on .section-label-row th.col-freeze-group {
-    position: sticky !important; z-index: 17 !important;
+    position: sticky !important; left: 0 !important; z-index: 17 !important;
   }
 
   /* ==========================================================
-     深蓝锁定分隔线：画在每个 tr 的 ::after 伪元素上，
-     位于 Gaji Asas 列的右边界。left 由 JS 动态设置。
+     深蓝锁定分隔线：只在 Gaji Asas 列的外边界画一条 border-right
+     这样 4 行（标题 / 表头 / 筛选 / 数据）对齐不会有偏差
      ========================================================== */
-  #mainTable tbody tr::after,
-  #mainTable thead tr.section-label-row::after,
-  #mainTable thead tr.main-header-row::after,
-  #mainTable thead tr.sub-header-row::after,
-  #mainTable thead tr.filter-row::after {
-    content: '';
-    position: sticky;
-    top: 0; bottom: 0;
-    width: 0;
-    height: 0;
-    pointer-events: none;
-  }
-  /* 用 tbody 里每个 td 自带的锁边来画更稳 */
-  body.freeze-on .lock-cell {
-    position: sticky;
-    z-index: 9;
-  }
-  body.freeze-on .lock-cell::after {
-    content: '';
-    position: absolute;
-    top: 0; right: 0; bottom: 0;
-    width: 2px;
-    background: var(--epf-blue);
-    pointer-events: none;
-  }
-  body.freeze-on thead .lock-cell::after {
-    top: 0; bottom: 0;
+  .lock-edge-right {
+    border-right: 2px solid var(--epf-blue) !important;
   }
 
   /* 折叠竖线按钮 */
@@ -328,24 +305,24 @@
     line-height: 1; opacity: 0.5; transition: 0.15s;
   }
   .fold-line:hover::before { opacity: 1; }
+  body.salary-folded .fold-line::before { content: '▾'; }
 
-  /* 折叠 GAJI UNTUK CARUMAN：整组隐藏 */
+  /* 折叠 GAJI UNTUK CARUMAN：整组隐藏（含 colgroup） */
   body.salary-folded .foldable-col { display: none !important; }
 
   /* ==========================================================
-     展开把手：嵌在 PINJAMAN 列右侧内部（不越界、不挤筛选框）
-     只在折叠状态显示，且只在表头/筛选行显示
+     展开把手：悬在 PINJAMAN 列右边界上（不占单元格空间）
      ========================================================== */
   .unfold-handle {
     display: none;
     position: absolute;
     top: 50%;
-    right: 3px;
+    right: -6px;
     transform: translateY(-50%);
-    width: 14px; height: 20px;
+    width: 14px; height: 22px;
     background: linear-gradient(135deg, #e6f4f8 0%, #c7e6ef 100%);
     border: 1px solid #a3d8e3;
-    border-radius: 3px;
+    border-radius: 3px 0 0 3px;
     cursor: pointer; z-index: 40;
     transition: 0.15s;
     align-items: center; justify-content: center;
@@ -361,9 +338,10 @@
     background: linear-gradient(135deg, #c7e6ef 0%, #a3d8e3 100%);
     border-color: #6fbcd0;
   }
-  body.salary-folded .unfold-handle.thead-only { display: flex; }
-  body.salary-folded thead .unfold-handle.thead-only { display: flex; }
-  body.salary-folded tbody .unfold-handle.thead-only { display: none; }
+  body.salary-folded .unfold-handle { display: flex; }
+  /* 数据行不需要每行都显示，只在表头/筛选行的 PINJAMAN 里显示 */
+  body.salary-folded .unfold-handle.in-cell { display: none; }
+  body.salary-folded thead .unfold-handle.in-cell { display: flex; }
 
   .freeze-line {
     position: absolute; top: 0; bottom: 0; right: 0; width: 14px;
@@ -398,6 +376,7 @@
     white-space: normal; word-break: break-word;
     overflow-wrap: anywhere; color: var(--epf-text);
   }
+  .text-cell.center { text-align: center; }
   .text-cell.badge-cell {
     display: inline-block; font-size: 0.62rem; font-weight: 700;
     padding: 0.15rem 0.6rem; border-radius: 4px;
@@ -695,52 +674,51 @@
     <div class="card-body">
       <div class="table-wrap">
         <table id="mainTable">
-          <colgroup id="mainColgroup">
-            <!-- 1. Maklumat Asas -->
-            <col class="col-freeze col-0" data-w="80">
-            <col class="col-freeze col-1" data-w="70">
-            <col class="col-freeze col-2" data-w="160">
-            <col class="col-freeze col-3" data-w="110">
+          <colgroup>
+            <!-- 1. Maklumat Asas (冻结) -->
+            <col class="col-freeze col-0" style="width:80px">
+            <col class="col-freeze col-1" style="width:70px">
+            <col class="col-freeze col-2" style="width:160px">
+            <col class="col-freeze col-3" style="width:110px">
             <!-- BASIC SALARY (col-freeze col-4) -->
-            <col class="col-freeze col-4 lock-col" data-w="110">
-            <!-- 2. OT -->
-            <col data-w="85"><col data-w="85"><col data-w="85"><col data-w="85">
-            <!-- ADDITIONAL INCOME -->
-            <col data-w="130"><col data-w="130"><col data-w="130"><col data-w="130">
-            <!-- POTONGAN -->
-            <col data-w="130"><col data-w="130"><col data-w="130"><col data-w="130">
-            <col data-w="110">
-            <!-- SALARY FOR CONTRIBUTIONS (折叠) -->
-            <col class="foldable-col" data-w="130">
-            <col class="foldable-col" data-w="130">
-            <col class="foldable-col" data-w="130">
-            <col class="foldable-col" data-w="130">
-            <!-- Section 3 -->
-            <col data-w="40"><col data-w="85"><col data-w="85">
-            <col data-w="40"><col data-w="85"><col data-w="85">
-            <col data-w="40"><col data-w="85"><col data-w="85">
-            <col data-w="40"><col data-w="80">
-            <!-- Section 4 -->
-            <col data-w="40"><col data-w="130">
-            <col data-w="40"><col data-w="130">
-            <col data-w="40"><col data-w="130">
-            <col data-w="40"><col data-w="130">
-            <col data-w="40"><col data-w="130">
-            <!-- Section 5 -->
-            <col data-w="95"><col data-w="95"><col data-w="95">
-            <!-- Section 6 -->
-            <col data-w="80">
+            <col class="col-freeze col-4" style="width:110px">
+            <!-- 2. Pendapatan (OT) 4 列 -->
+            <col style="width:85px"><col style="width:85px"><col style="width:85px"><col style="width:85px">
+            <!-- ADDITIONAL INCOME 4 列 -->
+            <col style="width:130px"><col style="width:130px"><col style="width:130px"><col style="width:130px">
+            <!-- POTONGAN 5 列 -->
+            <col style="width:130px"><col style="width:130px"><col style="width:130px"><col style="width:130px">
+            <col style="width:110px">
+            <!-- SALARY FOR CONTRIBUTIONS 4 列（折叠时也要隐藏 col） -->
+            <col class="foldable-col" style="width:130px"><col class="foldable-col" style="width:130px">
+            <col class="foldable-col" style="width:130px"><col class="foldable-col" style="width:130px">
+            <!-- Section 3 (11) -->
+            <col style="width:40px"><col style="width:85px"><col style="width:85px">
+            <col style="width:40px"><col style="width:85px"><col style="width:85px">
+            <col style="width:40px"><col style="width:85px"><col style="width:85px">
+            <col style="width:40px"><col style="width:80px">
+            <!-- Section 4 (10) -->
+            <col style="width:40px"><col style="width:130px">
+            <col style="width:40px"><col style="width:130px">
+            <col style="width:40px"><col style="width:130px">
+            <col style="width:40px"><col style="width:130px">
+            <col style="width:40px"><col style="width:130px">
+            <!-- Section 5 (3) -->
+            <col style="width:95px"><col style="width:95px"><col style="width:95px">
+            <!-- Section 6 (1) -->
+            <col style="width:80px">
           </colgroup>
           <thead>
             <tr class="section-label-row">
-              <th colspan="5" class="bg-slate col-freeze-group lock-cell">
+              <!-- 第一组包含 Gaji Asas: colspan 5 -->
+              <th colspan="5" class="bg-slate col-freeze-group lock-edge-right">
                 <div class="sec-title" id="sec1">📌 1. MAKLUMAT ASAS + 💵 BASIC SALARY (FREEZE)</div>
               </th>
               <th colspan="4" class="bg-emerald divider-group"><div class="sec-title" id="sec2">💰 2. PENDAPATAN / ELAUN (OT)</div></th>
               <th colspan="4" class="bg-emerald divider-group"><div class="sec-title" id="sec2b">➕ PENDAPATAN TAMBAHAN</div></th>
               <th colspan="5" class="bg-rose divider-group" style="position: relative;">
                 <div class="sec-title" id="sec2d">➖ POTONGAN (ON LEAVE + PINJAMAN)</div>
-                <div class="unfold-handle thead-only" onclick="toggleSalaryFold(event)" title="Unfold / Expand"></div>
+                <div class="unfold-handle in-cell" onclick="toggleSalaryFold(event)" title="Unfold / Expand"></div>
               </th>
               <th colspan="4" class="bg-cyan divider-group foldable-col" style="position: relative;">
                 <div class="fold-line left" onclick="toggleSalaryFold(event)" title="Fold / Unfold"></div>
@@ -758,7 +736,8 @@
               <th class="col-freeze col-2 bg-slate" rowspan="2" id="thNama">Nama</th>
               <th class="col-freeze col-3 bg-slate" rowspan="2" id="thKumpulan">Kumpulan</th>
 
-              <th class="col-freeze col-4 bg-slate lock-cell" rowspan="2" id="thBasic">
+              <!-- BASIC SALARY：冻结的最后一列，用 border-right 画深蓝锁定线 -->
+              <th class="col-freeze col-4 bg-slate lock-edge-right" rowspan="2" id="thBasic">
                 Gaji Asas
                 <div class="freeze-line" onclick="openFreezeModal()" title="Toggle freeze"></div>
               </th>
@@ -779,7 +758,7 @@
               <th class="bg-rose" rowspan="2" id="thHalfDays">HALF DAYS LEAVE (HOURS)</th>
               <th class="bg-rose" rowspan="2" id="thPinjaman" style="position: relative;">
                 PINJAMAN
-                <div class="unfold-handle thead-only" onclick="toggleSalaryFold(event)" title="Unfold / Expand"></div>
+                <div class="unfold-handle in-cell" onclick="toggleSalaryFold(event)" title="Unfold / Expand"></div>
               </th>
 
               <th class="bg-cyan divider-group foldable-col" rowspan="2" id="thEPFSalary">Salary for EPF Contributions<br><span style="font-weight:400;font-size:0.6rem;">(Gaji untuk caruman KWSP)</span></th>
@@ -826,29 +805,35 @@
               <th class="col-freeze col-1 bg-slate"><input class="th-filter" data-col="1" placeholder="🔍"></th>
               <th class="col-freeze col-2 bg-slate"><input class="th-filter" data-col="2" placeholder="🔍"></th>
               <th class="col-freeze col-3 bg-slate"><input class="th-filter" data-col="3" placeholder="🔍"></th>
-              <th class="col-freeze col-4 bg-slate lock-cell">
+              <!-- BASIC SALARY：筛选行也用 lock-edge-right -->
+              <th class="col-freeze col-4 bg-slate lock-edge-right">
                 <input class="th-filter" data-col="4" placeholder="🔍">
               </th>
+              <!-- OT -->
               <th class="bg-emerald divider-group"><input class="th-filter" data-col="5" placeholder="🔍"></th>
               <th class="bg-emerald"><input class="th-filter" data-col="6" placeholder="🔍"></th>
               <th class="bg-emerald"><input class="th-filter" data-col="7" placeholder="🔍"></th>
               <th class="bg-emerald"><input class="th-filter" data-col="8" placeholder="🔍"></th>
+              <!-- ADDITIONAL INCOME -->
               <th class="bg-emerald divider-group"><input class="th-filter" data-col="9" placeholder="🔍"></th>
               <th class="bg-emerald"><input class="th-filter" data-col="10" placeholder="🔍"></th>
               <th class="bg-emerald"><input class="th-filter" data-col="11" placeholder="🔍"></th>
               <th class="bg-emerald"><input class="th-filter" data-col="12" placeholder="🔍"></th>
+              <!-- POTONGAN -->
               <th class="bg-rose divider-group"><input class="th-filter" data-col="13" placeholder="🔍"></th>
               <th class="bg-rose"><input class="th-filter" data-col="14" placeholder="🔍"></th>
               <th class="bg-rose"><input class="th-filter" data-col="15" placeholder="🔍"></th>
               <th class="bg-rose"><input class="th-filter" data-col="16" placeholder="🔍"></th>
               <th class="bg-rose" style="position: relative;">
                 <input class="th-filter" data-col="17" placeholder="🔍">
-                <div class="unfold-handle thead-only" onclick="toggleSalaryFold(event)" title="Unfold / Expand"></div>
+                <div class="unfold-handle in-cell" onclick="toggleSalaryFold(event)" title="Unfold / Expand"></div>
               </th>
+              <!-- SALARY FOR CONTRIBUTIONS（筛选行也折叠） -->
               <th class="bg-cyan divider-group foldable-col"><input class="th-filter" data-col="18" placeholder="🔍"></th>
               <th class="bg-cyan foldable-col"><input class="th-filter" data-col="19" placeholder="🔍"></th>
               <th class="bg-cyan foldable-col"><input class="th-filter" data-col="20" placeholder="🔍"></th>
               <th class="bg-cyan foldable-col"><input class="th-filter" data-col="21" placeholder="🔍"></th>
+              <!-- Section 3 -->
               <th class="bg-violet divider-group no-filter"></th>
               <th class="bg-violet"><input class="th-filter" data-col="23" placeholder="🔍"></th>
               <th class="bg-violet"><input class="th-filter" data-col="24" placeholder="🔍"></th>
@@ -860,6 +845,7 @@
               <th class="bg-violet"><input class="th-filter" data-col="30" placeholder="🔍"></th>
               <th class="bg-violet no-filter"></th>
               <th class="bg-violet"><input class="th-filter" data-col="32" placeholder="🔍"></th>
+              <!-- Section 4 -->
               <th class="bg-amber divider-group no-filter"></th>
               <th class="bg-amber"><input class="th-filter" data-col="34" placeholder="🔍"></th>
               <th class="bg-amber no-filter"></th>
@@ -870,6 +856,7 @@
               <th class="bg-amber"><input class="th-filter" data-col="40" placeholder="🔍"></th>
               <th class="bg-amber no-filter"></th>
               <th class="bg-amber"><input class="th-filter" data-col="42" placeholder="🔍"></th>
+              <!-- Section 5 -->
               <th class="bg-blue divider-group"><input class="th-filter" data-col="43" placeholder="🔍"></th>
               <th class="bg-blue"><input class="th-filter" data-col="44" placeholder="🔍"></th>
               <th class="bg-blue"><input class="th-filter" data-col="45" placeholder="🔍"></th>
@@ -938,9 +925,6 @@ const GROUP_FIELDS = {
   '24JAM': ['Lindung24Jam']
 };
 
-/* 冻结列数：Situation, Kod, Nama, Kumpulan, Basic = 5 列 */
-const FREEZE_COUNT = 5;
-
 const I18N = {
   ms: {
     title: 'Sistem Penggajian',
@@ -980,7 +964,7 @@ const I18N = {
     epf: 'EPF', socso: 'SOCSO', eis: 'EIS',
     gross: 'Gaji Kasar', totalDed: 'Total Potongan', net: 'Gaji Bersih',
     action: 'Tindakan', slip: 'Slip',
-    legend: 'Nota: Tandakan ✔ di hadapan EPF/SOCSO/EIS/24JAM untuk isi manual. Section 4 (U-Y) juga boleh edit. Jika Bank Nama = CASH, EPF/SOCSO/EIS auto 0. FIRST CALCULATION TOTAL = pendapatan − potongan (On Leave + Pinjaman), sebelum EPF/SOCSO/EIS/24JAM. Klik ikon anak panah untuk lipat/buka GAJI UNTUK CARUMAN.',
+    legend: 'Nota: Tandakan ✔ di hadapan EPF/SOCSO/EIS/24JAM untuk isi manual. Section 4 (U-Y) juga boleh edit. Jika Bank Nama = CASH, EPF/SOCSO/EIS auto 0. FIRST CALCULATION TOTAL = pendapatan − potongan (On Leave + Pinjaman), sebelum EPF/SOCSO/EIS/24JAM. GAJI UNTUK CARUMAN boleh dilipat; selepas lipat klik ikon biru kecil di kanan PINJAMAN untuk buka semula.',
     saved: 'Berjaya disimpan ke Sheet', failed: 'Gagal simpan',
     loading: 'Memuatkan data...', importSuccess: 'Berjaya import {n} pekerja',
     importFail: 'Fail tidak sah atau kosong', importFormat: 'Format fail tidak disokong',
@@ -1037,7 +1021,7 @@ const I18N = {
     epf: 'EPF', socso: 'SOCSO', eis: 'EIS',
     gross: 'Gross', totalDed: 'Total Ded', net: 'Net',
     action: 'Action', slip: 'Payslip',
-    legend: 'Note: Tick ✔ before EPF/SOCSO/EIS/24JAM to enter manually. Section 4 (U-Y) is also editable. If Bank Nama = CASH, EPF/SOCSO/EIS auto 0. FIRST CALCULATION TOTAL = income − deductions (On Leave + Loan), before EPF/SOCSO/EIS/24JAM. Click the arrow icons to fold/unfold SALARY FOR CONTRIBUTIONS.',
+    legend: 'Note: Tick ✔ before EPF/SOCSO/EIS/24JAM to enter manually. Section 4 (U-Y) is also editable. If Bank Nama = CASH, EPF/SOCSO/EIS auto 0. FIRST CALCULATION TOTAL = income − deductions (On Leave + Loan), before EPF/SOCSO/EIS/24JAM. SALARY FOR CONTRIBUTIONS can be collapsed; after folding, click the small blue icon on the right of LOAN to reopen.',
     saved: 'Saved successfully', failed: 'Save failed',
     loading: 'Loading data...', importSuccess: 'Imported {n} employees',
     importFail: 'Invalid or empty file', importFormat: 'Unsupported file format',
@@ -1094,7 +1078,7 @@ const I18N = {
     epf: 'EPF', socso: 'SOCSO', eis: 'EIS',
     gross: '总薪资', totalDed: '总扣款', net: '净薪资',
     action: '操作', slip: '粮单',
-    legend: '备注：勾选 EPF/SOCSO/EIS/24JAM 前的 ✔ 手动填写。Section 4 (U-Y) 也可编辑。若银行名填 CASH，EPF/SOCSO/EIS 自动归零。首次计算总额 = 收入 − 扣款（请假 + 借粮），在 EPF/SOCSO/EIS/24JAM 之前。点击箭头图标折叠/展开缴款薪资。',
+    legend: '备注：勾选 EPF/SOCSO/EIS/24JAM 前的 ✔ 手动填写。Section 4 (U-Y) 也可编辑。若银行名填 CASH，EPF/SOCSO/EIS 自动归零。首次计算总额 = 收入 − 扣款（请假 + 借粮），在 EPF/SOCSO/EIS/24JAM 之前。缴款薪资可折叠；折叠后点击借粮列右侧的蓝色小图标可重新展开。',
     saved: '已成功保存到 Sheet', failed: '保存失败',
     loading: '加载数据中...', importSuccess: '成功导入 {n} 位员工',
     importFail: '文件无效或为空', importFormat: '不支持的文件格式',
@@ -1147,34 +1131,6 @@ function contribBase(emp, field, fallback) {
   return isNaN(n) ? fallback : n;
 }
 
-/* =========================================================
-   动态列宽 & 冻结列 left 计算
-   ========================================================= */
-function applyColWidths() {
-  const cols = document.querySelectorAll('#mainColgroup col');
-  cols.forEach(col => {
-    const w = col.dataset.w;
-    if (w) col.style.width = w + 'px';
-  });
-}
-function updateFreezeLefts() {
-  const cols = document.querySelectorAll('#mainColgroup col');
-  const widths = [];
-  cols.forEach((col, i) => {
-    if (i < FREEZE_COUNT) widths.push(parseFloat(col.dataset.w) || 0);
-  });
-  let acc = 0;
-  for (let i = 0; i < FREEZE_COUNT; i++) {
-    document.querySelectorAll('.col-' + i).forEach(el => {
-      el.style.left = acc + 'px';
-    });
-    acc += widths[i];
-  }
-}
-
-/* =========================================================
-   动态 sticky top 偏移
-   ========================================================= */
 function updateStickyOffsets() {
   requestAnimationFrame(() => {
     const thead = document.querySelector('#mainTable thead');
@@ -1326,7 +1282,6 @@ function closeFreezeModal() { document.getElementById('freezeModal').style.displ
 function setFreeze(on) {
   document.body.classList.toggle('freeze-on', on);
   closeFreezeModal();
-  updateFreezeLefts();
   updateStickyOffsets();
   toast(on ? t('freezeLocked') : t('freezeUnlocked'));
 }
@@ -1375,10 +1330,12 @@ function calcLindung(salary) {
   if (salary > 6000) salary = 6000;
   return Math.round(salary * 0.007325 * 100) / 100;
 }
+
 function isCashBank(emp) {
   const bank = String(emp.SLRBankNama || emp.BankNama || '').trim().toUpperCase();
   return bank === 'CASH' || bank.includes('MERCHANTRADE');
 }
+
 function isExempt(staff) {
   const bank = (String(staff.SLRBankNama || '') + ' ' + String(staff.BankNama || '')).toLowerCase();
   if (bank.includes('cash') || bank.includes('merchantrade')) {
@@ -1392,6 +1349,7 @@ function isExempt(staff) {
     lindung: isNo(staff.Lindungan)
   };
 }
+
 function totalNonStatutoryDeduction(emp) {
   return num(emp.Deduction)
        + num(emp.AnnualLeave)
@@ -1400,6 +1358,7 @@ function totalNonStatutoryDeduction(emp) {
        + num(emp.HalfDays)
        + num(emp.Pinjaman);
 }
+
 function recalcRow(emp) {
   const basic = num(emp.Basic);
   const exempt = isExempt(emp);
@@ -1430,6 +1389,7 @@ function recalcRow(emp) {
   }
 
   const ot = num(emp.NormalOT) + num(emp.RestOT) + num(emp.PublicOT) + num(emp.OtherOT);
+
   const gross = basic
     + num(emp.Allowance)
     + num(emp.Allowance2)
@@ -1438,6 +1398,7 @@ function recalcRow(emp) {
     + ot;
 
   const nonStatDed = totalNonStatutoryDeduction(emp);
+
   const firstCalcTotal = gross - nonStatDed;
   emp.FirstCalcTotal = firstCalcTotal;
 
@@ -1450,6 +1411,18 @@ function recalcRow(emp) {
   emp.TotalDeduction = totalDed;
   emp.NetSalary = net;
   return emp;
+}
+
+function badgeStatus(val) {
+  const v = String(val || '').trim().toUpperCase();
+  if (!v) return '';
+  if (v === 'YES' || v === 'Y' || v === 'ACTIVE' || v === 'AKTIF' || v === 'TRUE') {
+    return `<span class="text-cell badge-cell badge-yes">${escapeHtml(v)}</span>`;
+  }
+  if (v === 'NO' || v === 'N' || v === 'FALSE') {
+    return `<span class="text-cell badge-cell badge-no">${escapeHtml(v)}</span>`;
+  }
+  return `<span class="text-cell badge-cell badge-other">${escapeHtml(v)}</span>`;
 }
 
 // ================= 语言 =================
@@ -1479,6 +1452,7 @@ function updateUILanguage() {
   document.getElementById('thKod').textContent = t('kod');
   document.getElementById('thNama').textContent = t('nama');
   document.getElementById('thKumpulan').textContent = t('kumpulan');
+  // Basic 表头保留了冻结尾节点，需要保护
   const thBasic = document.getElementById('thBasic');
   thBasic.childNodes[0].textContent = t('basic') + ' ';
   document.getElementById('thNormalOT').textContent = t('normalOT');
@@ -1550,14 +1524,12 @@ function updateUILanguage() {
 // ================= 渲染表格 =================
 function renderTable() {
   updateUILanguage();
-  applyColWidths();
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
 
   if (!employees.length) {
     tbody.innerHTML = `<tr><td colspan="49" style="text-align:center;padding:2.5rem;color:#a7b7c9;">${t('loading')}</td></tr>`;
     buildFilterDropdowns();
-    updateFreezeLefts();
     updateStickyOffsets();
     return;
   }
@@ -1597,7 +1569,9 @@ function renderTable() {
       <td class="td-text col-freeze col-1"><div class="text-cell">${escapeHtml(emp.Code || '')}</div></td>
       <td class="td-text col-freeze col-2"><div class="text-cell">${escapeHtml(emp.Name || '')}</div></td>
       <td class="td-text col-freeze col-3"><div class="text-cell">${escapeHtml(emp.GroupName || '')}</div></td>
-      <td class="col-freeze col-4 bg-slate-basic lock-cell">${numInput('Basic', false)}</td>
+
+      <!-- BASIC SALARY (col-freeze col-4) —— lock edge right -->
+      <td class="col-freeze col-4 bg-slate-basic lock-edge-right">${numInput('Basic', false)}</td>
 
       <td class="divider-group">${numInput('NormalOT', false)}</td>
       <td>${numInput('RestOT', false)}</td>
@@ -1615,6 +1589,7 @@ function renderTable() {
       <td class="bg-rose">${numInput('HalfDays', false)}</td>
       <td class="bg-rose" style="position: relative;">
         ${numInput('Pinjaman', false)}
+        <div class="unfold-handle in-cell" onclick="toggleSalaryFold(event)" title="Unfold / Expand"></div>
       </td>
 
       <td class="bg-cyan divider-group foldable-col">${numInput('EPFSalary', false)}</td>
@@ -1732,7 +1707,6 @@ function renderTable() {
 
   applyFilters();
   buildFilterDropdowns();
-  updateFreezeLefts();
   updateStickyOffsets();
 }
 
@@ -2361,27 +2335,17 @@ window.addEventListener('DOMContentLoaded', () => {
   const langSelect = document.getElementById('langSelect');
   if (langSelect) langSelect.value = currentLang;
   loadEmployees();
-  applyColWidths();
-  updateFreezeLefts();
   updateStickyOffsets();
-  setTimeout(() => { applyColWidths(); updateFreezeLefts(); updateStickyOffsets(); }, 200);
-  setTimeout(() => { applyColWidths(); updateFreezeLefts(); updateStickyOffsets(); }, 600);
+  setTimeout(updateStickyOffsets, 200);
+  setTimeout(updateStickyOffsets, 600);
 });
 let resizeTimer = null;
 window.addEventListener('resize', () => {
   if (resizeTimer) clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => {
-    applyColWidths();
-    updateFreezeLefts();
-    updateStickyOffsets();
-  }, 100);
+  resizeTimer = setTimeout(updateStickyOffsets, 100);
 });
 if (document.fonts && document.fonts.ready) {
-  document.fonts.ready.then(() => {
-    applyColWidths();
-    updateFreezeLefts();
-    updateStickyOffsets();
-  });
+  document.fonts.ready.then(() => updateStickyOffsets());
 }
 </script>
 </body>
