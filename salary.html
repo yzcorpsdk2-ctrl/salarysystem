@@ -173,14 +173,15 @@
     width: 2650px; min-width: 2650px;
   }
 
-  /* ===== 表头 (EPF 文档表格风格) ===== */
+  /* ===== 表头 ===== */
   th {
     background: var(--epf-blue-soft);
-    padding: 0.55rem 0.5rem;
+    padding: 0.5rem 0.5rem;
     text-align: left; font-weight: 600; color: var(--epf-blue);
     border-bottom: 1px solid var(--epf-border);
-    white-space: normal; font-size: 0.7rem; vertical-align: top;
+    white-space: normal; font-size: 0.7rem; vertical-align: middle;
     word-break: break-word; overflow-wrap: anywhere;
+    /* 高度不写死，由内容 + JS 动态计算，避免被浏览器挤压 */
   }
   th > div { word-break: break-word; overflow-wrap: anywhere; }
 
@@ -193,43 +194,33 @@
   .bg-gray    { background: #f4f6f9 !important; color: var(--epf-muted) !important; }
 
   /* ==========================================================
-     表头粘性堆叠顺序 (从顶部到底部)
-     1. section-label-row   top: 0     高度 34px
-     2. main-header-row     top: 34px  高度 36px
-     3. sub-header-row      top: 70px  高度 28px
-     4. filter-row          top: 98px  高度 34px
+     表头行 - 全部 sticky，top 由 JS 动态计算
      ========================================================== */
   .section-label-row th {
-    position: sticky; top: 0; z-index: 15;
-    height: 34px;
-    padding: 0.35rem 0.6rem; font-size: 0.68rem; font-weight: 700;
+    position: sticky; z-index: 15;
+    padding: 0.45rem 0.6rem; font-size: 0.68rem; font-weight: 700;
     letter-spacing: 0.05em; text-transform: uppercase;
     border-bottom: 1px solid var(--epf-border); text-align: center;
-    vertical-align: middle;
   }
   .section-label-row th .sec-title {
     display: flex; align-items: center; justify-content: center; gap: 0.4rem;
   }
 
   .main-header-row th {
-    position: sticky; top: 34px; z-index: 13;
-    height: 36px;
-    vertical-align: middle;
+    position: sticky; z-index: 13;
+    text-align: left;
   }
 
   .sub-header-row th {
-    position: sticky; top: 70px; z-index: 14;
-    height: 28px;
-    vertical-align: middle; text-align: center;
+    position: sticky; z-index: 14;
+    text-align: center;
+    padding: 0.35rem 0.5rem;
   }
 
-  /* 筛选行 (恢复到原来的位置：在表头最底部) */
   .filter-row th {
-    position: sticky; top: 98px; z-index: 12;
-    height: 34px;
-    background: #ffffff; padding: 0.3rem 0.35rem;
+    position: sticky; z-index: 12;
+    background: #ffffff; padding: 0.35rem 0.4rem;
     border-bottom: 1px solid var(--epf-border);
-    vertical-align: middle;
     text-align: left;
   }
   .filter-row .th-filter {
@@ -257,12 +248,12 @@
   tr:nth-child(even) td { background: #fbfdff; }
   tr:hover td { background: var(--epf-blue-soft); }
 
-  /* ========== 分组分割线 (用 box-shadow 避免影响宽度) ========== */
+  /* ========== 分组分割线 (box-shadow 不占宽度) ========== */
   .divider-group {
     box-shadow: inset 1px 0 0 var(--epf-border) !important;
   }
 
-  /* ========== 冻结列 (水平 + 垂直一起固定) ========== */
+  /* ========== 冻结列 ========== */
   body.freeze-on .col-freeze {
     position: sticky; z-index: 8; background: #ffffff;
   }
@@ -277,7 +268,6 @@
     box-shadow: inset -2px 0 0 var(--epf-blue);
   }
 
-  /* thead 里的冻结列 (保持背景色一致) */
   body.freeze-on thead .col-freeze { z-index: 16; }
   body.freeze-on thead .col-freeze.bg-slate   { background: #f0f4f9 !important; }
   body.freeze-on thead .col-freeze.bg-amber   { background: #fdf8ec !important; }
@@ -292,9 +282,7 @@
     background: var(--epf-blue-soft) !important;
   }
 
-  /* ==========================================================
-     关键修复：让 MAKLUMAT ASAS 大格子也跟着第一组冻结列一起锁住
-     ========================================================== */
+  /* MAKLUMAT ASAS 大格子跟着第一组冻结 */
   body.freeze-on .section-label-row th.col-freeze-group {
     position: sticky !important;
     left: 0 !important;
@@ -326,7 +314,7 @@
   }
 
   /* 只读文字单元格 */
-  .td-text { vertical-align: top !important; padding: 0.4rem 0.45rem !important; }
+  .td-text { vertical-align: middle !important; padding: 0.4rem 0.45rem !important; }
   .text-cell {
     font-size: 0.78rem; line-height: 1.4;
     white-space: normal; word-break: break-word;
@@ -342,14 +330,14 @@
   .badge-no  { background: #fdeaea; color: #a02020; }
   .badge-other { background: #eef2f6; color: var(--epf-muted); }
 
-  /* Situation 状态颜色 (EPF 浅底风格) */
+  /* Situation 状态颜色 */
   .sit-pending { background: #fdf8ec !important; }
   .sit-pending .text-cell { color: #7a5a12; font-weight: 700; }
   .sit-active  { background: #f0f9f4 !important; }
   .sit-active .text-cell { color: #14663f; font-weight: 700; }
   .sit-default { background: #ffffff !important; }
 
-  /* ===== 输入框 (EPF 风格) ===== */
+  /* ===== 输入框 ===== */
   .input {
     width: 100%; min-width: 0;
     border: 1px solid var(--epf-border); border-radius: 4px;
@@ -387,7 +375,7 @@
   .toast.show { opacity: 1; transform: translateY(0); }
   .toast.error { background: #a02020; }
 
-  /* ========== 弹窗 (EPF 风格) ========== */
+  /* ========== 弹窗 ========== */
   .modal-overlay {
     position: fixed; inset: 0;
     background: rgba(26, 79, 138, 0.25);
@@ -476,7 +464,6 @@
     .export-table tr { page-break-inside: avoid; }
   }
 
-  /* 滚动条美化 */
   .table-wrap::-webkit-scrollbar { width: 8px; height: 8px; }
   .table-wrap::-webkit-scrollbar-track { background: var(--epf-blue-soft); }
   .table-wrap::-webkit-scrollbar-thumb {
@@ -537,7 +524,6 @@
 </div>
 
 <div class="container">
-  <!-- ===== 页面标题卡片 ===== -->
   <div class="page-header">
     <div class="info">
       <h1 id="pageTitle">Sistem Penggajian</h1>
@@ -560,7 +546,6 @@
     </div>
   </div>
 
-  <!-- ===== 分区图例 ===== -->
   <div class="section-legend">
     <span class="item"><span class="dot bg-slate" style="border:1px solid #cbd5e1;"></span> <span id="legend1">1. Maklumat Asas (Freeze)</span></span>
     <span class="item"><span class="dot bg-emerald" style="border:1px solid #a7d7b8;"></span> <span id="legend2">2. Pendapatan</span></span>
@@ -570,7 +555,6 @@
     <span class="item"><span class="dot bg-gray" style="border:1px solid #cbd5e1;"></span> <span id="legend6">6. Tindakan</span></span>
   </div>
 
-  <!-- ===== 表格卡片 ===== -->
   <div class="card">
     <div class="card-body">
       <div class="table-wrap">
@@ -611,9 +595,7 @@
             <col style="width:80px">
           </colgroup>
           <thead>
-            <!-- ========== 1. 分区标题行 (MAKLUMAT ASAS / PENDAPATAN / ...) ========== -->
             <tr class="section-label-row">
-              <!-- 关键修复：加 col-freeze-group，让它在 freeze 时跟着第一组锁定 -->
               <th colspan="4" class="bg-slate col-freeze-group"><div class="sec-title" id="sec1">📌 1. MAKLUMAT ASAS (FREEZE)</div></th>
               <th colspan="9" class="bg-emerald divider-group"><div class="sec-title" id="sec2">💰 2. PENDAPATAN / ELAUN</div></th>
               <th colspan="11" class="bg-violet divider-group"><div class="sec-title" id="sec3">🏛️ 3. CARUMAN STATUTORI (EPF / SOCSO / EIS / 24JAM)</div></th>
@@ -621,15 +603,13 @@
               <th colspan="3" class="bg-blue divider-group"><div class="sec-title" id="sec5">🧮 5. RINGKASAN GAJI</div></th>
               <th colspan="1" class="bg-gray divider-group"><div class="sec-title" id="sec6">⚙️ 6. TINDAKAN</div></th>
             </tr>
-
-            <!-- ========== 2. 主表头行 ========== -->
             <tr class="main-header-row">
               <th class="col-freeze col-0 bg-slate" rowspan="2" id="thSituation">Situation</th>
               <th class="col-freeze col-1 bg-slate" rowspan="2" id="thKod">Kod</th>
               <th class="col-freeze col-2 bg-slate" rowspan="2" id="thNama">Nama</th>
               <th class="col-freeze col-3 bg-slate" rowspan="2" id="thKumpulan" style="position: sticky;">
                 Kumpulan
-                <div class="freeze-line" onclick="openFreezeModal()" title="Klik untuk toggle freeze"></div>
+                <div class="freeze-line" onclick="openFreezeModal()" title="Toggle freeze"></div>
               </th>
               <th class="bg-emerald divider-group" rowspan="2" id="thBasic">Gaji Asas</th>
               <th class="bg-emerald" rowspan="2" id="thAllowance">Elaun</th>
@@ -658,8 +638,6 @@
               <th class="bg-blue" rowspan="2" id="thNet">Gaji Bersih</th>
               <th class="bg-gray divider-group" rowspan="2" style="text-align:center;" id="thAction">Tindakan</th>
             </tr>
-
-            <!-- ========== 3. 子表头行 (EPF/SOCSO/EIS 的 Pekerja/Majikan) ========== -->
             <tr class="sub-header-row">
               <th class="bg-violet" id="subEPFE">Pekerja</th>
               <th class="bg-violet" id="subEPFR">Majikan</th>
@@ -668,8 +646,6 @@
               <th class="bg-violet" id="subEISE">Pekerja</th>
               <th class="bg-violet" id="subEISR">Majikan</th>
             </tr>
-
-            <!-- ========== 4. 搜索筛选行 (恢复原来位置：最底部) ========== -->
             <tr class="filter-row">
               <th class="col-freeze col-0 bg-slate"><input class="th-filter" data-col="0" placeholder="🔍"></th>
               <th class="col-freeze col-1 bg-slate"><input class="th-filter" data-col="1" placeholder="🔍"></th>
@@ -721,15 +697,15 @@
 <!-- ============ 冻结确认弹窗 ============ -->
 <div id="freezeModal" class="modal-overlay" style="display:none;">
   <div class="modal-box compact">
-    <h3 style="justify-content:center; font-size:1.05rem; margin-bottom:0.3rem; color:var(--epf-blue);">🔒 Tetapan Freeze Kolum</h3>
-    <p style="color:var(--epf-muted); font-size:0.82rem; margin-bottom:1rem;">
+    <h3 style="justify-content:center; font-size:1.05rem; margin-bottom:0.3rem; color:var(--epf-blue);" id="freezeTitle">🔒 Tetapan Freeze Kolum</h3>
+    <p style="color:var(--epf-muted); font-size:0.82rem; margin-bottom:1rem;" id="freezeDesc">
       Pilih sama ada mahu kunci kolum pertama (Situation → Kumpulan) supaya sentiasa kelihatan semasa scroll, atau buka kunci sepenuhnya.
     </p>
     <div class="modal-actions">
-      <button class="btn" onclick="setFreeze(false)">🔓 Buka Kunci</button>
-      <button class="btn btn-primary" onclick="setFreeze(true)">🔒 Kunci Kolum</button>
+      <button class="btn" onclick="setFreeze(false)" id="freezeUnlockBtn">🔓 Buka Kunci</button>
+      <button class="btn btn-primary" onclick="setFreeze(true)" id="freezeLockBtn">🔒 Kunci Kolum</button>
     </div>
-    <button class="btn btn-sm" style="margin-top:0.6rem;" onclick="closeFreezeModal()">Batal</button>
+    <button class="btn btn-sm" style="margin-top:0.6rem;" onclick="closeFreezeModal()" id="freezeCancelBtn">Batal</button>
   </div>
 </div>
 
@@ -737,23 +713,23 @@
 <div id="importModal" class="modal-overlay" style="display:none;">
   <div class="modal-box">
     <div class="modal-header">
-      <h3>📥 Import Data / 导入资料</h3>
+      <h3 id="importTitle">📥 Import Data / 导入资料</h3>
       <button class="modal-close" onclick="closeImportModal()">✕</button>
     </div>
     <div class="modal-dropzone" id="dropzone">
       <div class="icon">📁</div>
-      <p><strong>拖入文件或点击选择</strong></p>
-      <p class="hint">Drag & drop file here, or click to browse</p>
-      <p class="hint">格式：.xlsx / .csv / .txt</p>
+      <p><strong id="importDrop">拖入文件或点击选择</strong></p>
+      <p class="hint" id="importDropHint">Drag & drop file here, or click to browse</p>
+      <p class="hint" id="importFormatHint">格式：.xlsx / .csv / .txt</p>
       <input type="file" id="importFile" accept=".xlsx,.xls,.csv,.txt" style="display:none;">
     </div>
     <div class="modal-footer">
       <div class="template-download">
-        <span>📥 Template:</span>
+        <span id="importTemplate">📥 Template:</span>
         <button class="btn btn-sm" onclick="downloadTemplate('xlsx')">Excel (.xlsx)</button>
         <button class="btn btn-sm" onclick="downloadTemplate('doc')">Word (.doc)</button>
       </div>
-      <button class="btn" onclick="closeImportModal()">Tutup</button>
+      <button class="btn" onclick="closeImportModal()" id="importCloseBtn">Tutup</button>
     </div>
   </div>
 </div>
@@ -761,9 +737,6 @@
 <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <script>
-// =====================================================
-// ⚠️ 把下面这行换成你的 Apps Script Web App URL
-// =====================================================
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJQe5hNv7sC_Rmig6xZ0NP4nP_PqXQmgTHbG7Ou6_9JtWadETnVmVfFr7b3Cu5qidZ/exec';
 
 const GROUP_FIELDS = {
@@ -773,7 +746,7 @@ const GROUP_FIELDS = {
   '24JAM': ['Lindung24Jam']
 };
 
-// ================= 语言包 =================
+// ================= 语言包 (含弹窗文案) =================
 const I18N = {
   ms: {
     title: 'Sistem Penggajian',
@@ -815,7 +788,19 @@ const I18N = {
     importFormat: 'Format fail tidak disokong',
     noData: 'Tiada data untuk dieksport',
     freezeLocked: 'Kolum dibekukan (freeze ON)',
-    freezeUnlocked: 'Kolum dibuka (freeze OFF)'
+    freezeUnlocked: 'Kolum dibuka (freeze OFF)',
+    // ==== 弹窗文案 ====
+    freezeTitle: '🔒 Tetapan Freeze Kolum',
+    freezeDesc: 'Pilih sama ada mahu kunci kolum pertama (Situation → Kumpulan) supaya sentiasa kelihatan semasa scroll, atau buka kunci sepenuhnya.',
+    freezeUnlock: '🔓 Buka Kunci',
+    freezeLock: '🔒 Kunci Kolum',
+    freezeCancel: 'Batal',
+    importTitle: '📥 Import Data / 导入资料',
+    importDrop: 'Lepaskan fail di sini atau klik untuk pilih',
+    importDropHint: 'Drag & drop file here, or click to browse',
+    importFormatHint: 'Format: .xlsx / .csv / .txt',
+    importTemplate: '📥 Template:',
+    importClose: 'Tutup'
   },
   en: {
     title: 'Payroll System',
@@ -857,7 +842,18 @@ const I18N = {
     importFormat: 'Unsupported file format',
     noData: 'No data to export',
     freezeLocked: 'Columns frozen (ON)',
-    freezeUnlocked: 'Columns unfrozen (OFF)'
+    freezeUnlocked: 'Columns unfrozen (OFF)',
+    freezeTitle: '🔒 Freeze Column Setting',
+    freezeDesc: 'Choose whether to lock the first columns (Situation → Group) so they stay visible while scrolling, or unlock them completely.',
+    freezeUnlock: '🔓 Unlock',
+    freezeLock: '🔒 Lock Columns',
+    freezeCancel: 'Cancel',
+    importTitle: '📥 Import Data',
+    importDrop: 'Drop file here or click to select',
+    importDropHint: 'Drag & drop file here, or click to browse',
+    importFormatHint: 'Format: .xlsx / .csv / .txt',
+    importTemplate: '📥 Template:',
+    importClose: 'Close'
   },
   zh: {
     title: '薪资系统',
@@ -899,7 +895,18 @@ const I18N = {
     importFormat: '不支持的文件格式',
     noData: '没有可导出的数据',
     freezeLocked: '列已冻结',
-    freezeUnlocked: '列已解冻'
+    freezeUnlocked: '列已解冻',
+    freezeTitle: '🔒 冻结列设置',
+    freezeDesc: '选择是否锁定前几列（状态 → 分店），让它们在滚动时保持可见，或完全解锁。',
+    freezeUnlock: '🔓 解锁',
+    freezeLock: '🔒 锁定列',
+    freezeCancel: '取消',
+    importTitle: '📥 导入资料',
+    importDrop: '拖入文件或点击选择',
+    importDropHint: '拖入文件或点击浏览',
+    importFormatHint: '格式：.xlsx / .csv / .txt',
+    importTemplate: '📥 模板：',
+    importClose: '关闭'
   }
 };
 let currentLang = 'ms';
@@ -928,12 +935,30 @@ function todayStr() {
   return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
 }
 
+// ================= 动态计算表头 sticky top 偏移 =================
+function updateStickyOffsets() {
+  requestAnimationFrame(() => {
+    const thead = document.querySelector('#mainTable thead');
+    if (!thead) return;
+    const rows = thead.querySelectorAll('tr');
+    let top = 0;
+    rows.forEach(row => {
+      const h = Math.ceil(row.getBoundingClientRect().height);
+      row.querySelectorAll('th').forEach(th => {
+        th.style.top = top + 'px';
+      });
+      top += h;
+    });
+  });
+}
+
 // ================= 冻结切换 =================
 function openFreezeModal() { document.getElementById('freezeModal').style.display = 'flex'; }
 function closeFreezeModal() { document.getElementById('freezeModal').style.display = 'none'; }
 function setFreeze(on) {
   document.body.classList.toggle('freeze-on', on);
   closeFreezeModal();
+  updateStickyOffsets();
   toast(on ? t('freezeLocked') : t('freezeUnlocked'));
 }
 
@@ -1057,7 +1082,7 @@ function badgeStatus(val) {
   return `<span class="text-cell badge-cell badge-other">${escapeHtml(v)}</span>`;
 }
 
-// ================= 更新所有 UI 文字 =================
+// ================= 更新所有 UI 文字 (含弹窗) =================
 function updateUILanguage() {
   document.getElementById('pageTitle').textContent = t('title');
   document.getElementById('pageDesc').textContent = t('desc');
@@ -1113,6 +1138,20 @@ function updateUILanguage() {
   document.getElementById('btnAllSlip').innerHTML = '📄 ' + t('allSlip');
   document.getElementById('btnCheckAll').innerHTML = '✅ ' + t('checkAll');
   document.getElementById('exportMenu').options[0].textContent = '💾 ' + t('exportMenu') + ' / 导出…';
+
+  // ==== 弹窗文案 ====
+  document.getElementById('freezeTitle').textContent = t('freezeTitle');
+  document.getElementById('freezeDesc').textContent = t('freezeDesc');
+  document.getElementById('freezeUnlockBtn').textContent = t('freezeUnlock');
+  document.getElementById('freezeLockBtn').textContent = t('freezeLock');
+  document.getElementById('freezeCancelBtn').textContent = t('freezeCancel');
+
+  document.getElementById('importTitle').textContent = t('importTitle');
+  document.getElementById('importDrop').textContent = t('importDrop');
+  document.getElementById('importDropHint').textContent = t('importDropHint');
+  document.getElementById('importFormatHint').textContent = t('importFormatHint');
+  document.getElementById('importTemplate').textContent = t('importTemplate');
+  document.getElementById('importCloseBtn').textContent = t('importClose');
 }
 
 // ================= 渲染表格 =================
@@ -1125,6 +1164,7 @@ function renderTable() {
   if (!employees.length) {
     tbody.innerHTML = `<tr><td colspan="33" style="text-align:center;padding:2.5rem;color:#a7b7c9;">${t('loading')}</td></tr>`;
     updateStats();
+    updateStickyOffsets();
     return;
   }
 
@@ -1236,6 +1276,7 @@ function renderTable() {
 
   applyFilters();
   updateStats();
+  updateStickyOffsets();
 }
 
 // ================= 表头筛选 =================
@@ -1824,6 +1865,8 @@ function switchLang(lang) {
   currentLang = lang;
   document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
   renderTable();
+  // 语言切换后，字号可能微变，重新计算 sticky top
+  setTimeout(updateStickyOffsets, 60);
 }
 
 // ================= 启动 =================
@@ -1831,7 +1874,23 @@ window.addEventListener('DOMContentLoaded', () => {
   const langSelect = document.getElementById('langSelect');
   if (langSelect) langSelect.value = currentLang;
   loadEmployees();
+  // 首屏 + 字体加载后各跑一次
+  updateStickyOffsets();
+  setTimeout(updateStickyOffsets, 200);
+  setTimeout(updateStickyOffsets, 600);
 });
+
+// 窗口 resize 时重新计算
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+  if (resizeTimer) clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(updateStickyOffsets, 100);
+});
+
+// 字体加载完成后重算一次（避免字体变化导致表头行高微变）
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => updateStickyOffsets());
+}
 </script>
 </body>
 </html>
