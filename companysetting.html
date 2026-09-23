@@ -5,290 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KEDAI DATA - 公司信息管理</title>
   <style>
-    /* 基于参考页面 (detail.html) 的风格调整 */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    }
-
-    body {
-      background-color: #f0f4f8;
-      color: #2c3e50;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 1100px;
-      background-color: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      padding: 30px;
-    }
-
-    h1 {
-      font-size: 1.8rem;
-      font-weight: 600;
-      color: #1a3a5c;
-      margin-bottom: 5px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    h1 span {
-      font-size: 0.9rem;
-      font-weight: 400;
-      color: #7f8c8d;
-      background: #ecf0f1;
-      padding: 2px 10px;
-      border-radius: 20px;
-    }
-
-    .sub-header {
-      font-size: 0.9rem;
-      color: #7f8c8d;
-      margin-bottom: 25px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #eaeef3;
-    }
-
-    /* 表单区域 */
-    .form-section {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 25px;
-    }
-
-    .form-section h2 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #34495e;
-      margin-bottom: 15px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .form-group.full-width {
-      grid-column: 1 / -1;
-    }
-
-    label {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #5d6d7e;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-    }
-
-    input, textarea, select {
-      padding: 10px 12px;
-      border: 1px solid #dce4ec;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      transition: all 0.2s;
-      background: #ffffff;
-      color: #2c3e50;
-    }
-
-    input:focus, textarea:focus, select:focus {
-      outline: none;
-      border-color: #4a86c8;
-      box-shadow: 0 0 0 3px rgba(74, 134, 200, 0.15);
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 60px;
-    }
-
-    .btn-group {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    button {
-      padding: 10px 24px;
-      border: none;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .btn-primary {
-      background-color: #4a86c8;
-      color: #ffffff;
-    }
-
-    .btn-primary:hover {
-      background-color: #3a6ea5;
-      box-shadow: 0 4px 12px rgba(74, 134, 200, 0.3);
-    }
-
-    .btn-secondary {
-      background-color: #e2e8f0;
-      color: #2c3e50;
-    }
-
-    .btn-secondary:hover {
-      background-color: #cbd5e1;
-    }
-
-    .btn-warning {
-      background-color: #f39c12;
-      color: #ffffff;
-    }
-
-    .btn-warning:hover {
-      background-color: #e67e22;
-    }
-
-    .btn-danger {
-      background-color: #e74c3c;
-      color: #ffffff;
-    }
-
-    .btn-danger:hover {
-      background-color: #c0392b;
-    }
-
-    .btn-sm {
-      padding: 5px 12px;
-      font-size: 0.75rem;
-    }
-
-    /* 表格区域 */
-    .table-section {
-      margin-top: 10px;
-    }
-
-    .table-section h2 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #34495e;
-      margin-bottom: 15px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .table-wrapper {
-      overflow-x: auto;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-    }
-
-    thead {
-      background-color: #f1f5f9;
-    }
-
-    th {
-      padding: 12px 15px;
-      text-align: left;
-      font-weight: 600;
-      color: #475569;
-      text-transform: uppercase;
-      font-size: 0.75rem;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
-      border-bottom: 2px solid #e2e8f0;
-    }
-
-    td {
-      padding: 12px 15px;
-      border-bottom: 1px solid #eaeef3;
-      color: #334155;
-      vertical-align: middle;
-    }
-
-    tbody tr:hover {
-      background-color: #f8fafc;
-    }
-
-    tbody tr:last-child td {
-      border-bottom: none;
-    }
-
-    .action-btns {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: #94a3b8;
-      font-style: italic;
-    }
-
-    /* 提示消息 */
-    .toast {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 12px 20px;
-      border-radius: 8px;
-      color: #ffffff;
-      font-size: 0.9rem;
-      font-weight: 500;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-      z-index: 9999;
-      display: none;
-      animation: slideIn 0.3s ease;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+    body { background-color: #f0f4f8; color: #2c3e50; padding: 20px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 1100px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); padding: 30px; }
+    h1 { font-size: 1.8rem; font-weight: 600; color: #1a3a5c; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
+    h1 span { font-size: 0.9rem; font-weight: 400; color: #7f8c8d; background: #ecf0f1; padding: 2px 10px; border-radius: 20px; }
+    .sub-header { font-size: 0.9rem; color: #7f8c8d; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #eaeef3; }
+    .form-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin-bottom: 25px; }
+    .form-section h2 { font-size: 1rem; font-weight: 600; color: #34495e; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.full-width { grid-column: 1 / -1; }
+    label { font-size: 0.8rem; font-weight: 600; color: #5d6d7e; text-transform: uppercase; letter-spacing: 0.3px; }
+    input, textarea, select { padding: 10px 12px; border: 1px solid #dce4ec; border-radius: 6px; font-size: 0.9rem; transition: all 0.2s; background: #ffffff; color: #2c3e50; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: #4a86c8; box-shadow: 0 0 0 3px rgba(74, 134, 200, 0.15); }
+    textarea { resize: vertical; min-height: 60px; }
+    .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+    button { padding: 10px 24px; border: none; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-primary { background-color: #4a86c8; color: #ffffff; }
+    .btn-primary:hover { background-color: #3a6ea5; box-shadow: 0 4px 12px rgba(74, 134, 200, 0.3); }
+    .btn-secondary { background-color: #e2e8f0; color: #2c3e50; }
+    .btn-secondary:hover { background-color: #cbd5e1; }
+    .btn-danger { background-color: #e74c3c; color: #ffffff; }
+    .btn-danger:hover { background-color: #c0392b; }
+    .btn-sm { padding: 5px 12px; font-size: 0.75rem; }
+    .table-section { margin-top: 10px; }
+    .table-section h2 { font-size: 1rem; font-weight: 600; color: #34495e; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .table-wrapper { overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    thead { background-color: #f1f5f9; }
+    th { padding: 12px 15px; text-align: left; font-weight: 600; color: #475569; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; white-space: nowrap; border-bottom: 2px solid #e2e8f0; }
+    td { padding: 12px 15px; border-bottom: 1px solid #eaeef3; color: #334155; vertical-align: middle; word-break: break-all; }
+    tbody tr:hover { background-color: #f8fafc; }
+    .action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .empty-state { text-align: center; padding: 40px 20px; color: #94a3b8; font-style: italic; }
+    .toast { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; color: #ffffff; font-size: 0.9rem; font-weight: 500; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); z-index: 9999; display: none; animation: slideIn 0.3s ease; }
     .toast.success { background-color: #27ae60; }
     .toast.error { background-color: #e74c3c; }
     .toast.info { background-color: #4a86c8; }
-
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-
-    .loading {
-      text-align: center;
-      padding: 30px;
-      color: #7f8c8d;
-    }
-
-    /* 响应式 */
-    @media (max-width: 768px) {
-      .container { padding: 20px; }
-      .form-grid { grid-template-columns: 1fr; }
-      h1 { font-size: 1.4rem; }
-      th, td { padding: 8px 10px; font-size: 0.8rem; }
-    }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .loading { text-align: center; padding: 30px; color: #7f8c8d; }
+    @media (max-width: 768px) { .container { padding: 20px; } .form-grid { grid-template-columns: 1fr; } h1 { font-size: 1.4rem; } th, td { padding: 8px 10px; font-size: 0.8rem; } }
   </style>
 </head>
 <body>
@@ -297,11 +54,11 @@
   <h1>KEDAI DATA <span>公司信息管理系统</span></h1>
   <div class="sub-header">管理公司信息、电子印章与签名资料</div>
 
-  <!-- 表单区域 -->
   <div class="form-section">
     <h2 id="formTitle">➕ 新增公司信息</h2>
     <form id="companyForm">
       <input type="hidden" id="rowIndex" value="">
+      <input type="hidden" id="existingCorp" value="">
       <div class="form-grid">
         <div class="form-group">
           <label for="situation">SITUATION</label>
@@ -316,10 +73,14 @@
           <input type="text" id="adress" placeholder="例如：Sandakan, Sabah">
         </div>
         <div class="form-group">
-          <label for="corp">CORP</label>
-          <input type="text" id="corp" placeholder="例如：R54455/2025">
+          <label for="corpText">CORP (文本输入)</label>
+          <input type="text" id="corpText" placeholder="例如：R54455/2025">
         </div>
         <div class="form-group">
+          <label for="corpFile">CORP 图片/PDF 上传 (覆盖文本)</label>
+          <input type="file" id="corpFile" accept=".jpg,.jpeg,.png,.pdf">
+        </div>
+        <div class="form-group full-width">
           <label for="remark">REMARK</label>
           <input type="text" id="remark" placeholder="备注信息">
         </div>
@@ -331,7 +92,6 @@
     </form>
   </div>
 
-  <!-- 数据表格区域 -->
   <div class="table-section">
     <h2>📋 公司信息列表</h2>
     <div class="table-wrapper">
@@ -346,9 +106,7 @@
             <th style="text-align:center;">操作</th>
           </tr>
         </thead>
-        <tbody id="tableBody">
-          <!-- 数据通过 JS 动态加载 -->
-        </tbody>
+        <tbody id="tableBody"></tbody>
       </table>
     </div>
     <div id="loadingIndicator" class="loading" style="display:none;">加载中...</div>
@@ -356,36 +114,32 @@
   </div>
 </div>
 
-<!-- 提示消息 -->
 <div id="toast" class="toast"></div>
 
 <script>
-  // ============================================================
-  // 配置：请替换为你的 Apps Script Web 应用 URL
-  // ============================================================
+  // ⚠️ 确认这是你最新部署的 Web App URL
   const API_URL = 'https://script.google.com/macros/s/AKfycbwJQe5hNv7sC_Rmig6xZ0NP4nP_PqXQmgTHbG7Ou6_9JtWadETnVmVfFr7b3Cu5qidZ/exec'; 
-  // 例如：'https://script.google.com/macros/s/AKfycb.../exec'
 
-  // 全局变量
   let allData = [];
+  let hasSeeded = false; // 防止重复预填
 
-  // ============================================================
-  // 工具函数
-  // ============================================================
-  
   function showToast(message, type = 'info') {
     const toast = document.getElementById('toast');
     toast.textContent = message;
     toast.className = `toast ${type}`;
     toast.style.display = 'block';
-    setTimeout(() => {
-      toast.style.display = 'none';
-    }, 3000);
+    setTimeout(() => { toast.style.display = 'none'; }, 3000);
   }
 
-  // ============================================================
-  // 数据加载与渲染
-  // ============================================================
+  // 将文件转为 Base64
+  function getBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+  }
 
   async function loadData() {
     const loading = document.getElementById('loadingIndicator');
@@ -404,10 +158,15 @@
         allData = result.data;
         renderTable(allData);
         empty.style.display = 'none';
+        hasSeeded = true;
       } else {
         allData = [];
         empty.style.display = 'block';
         tbody.innerHTML = '';
+        // 如果是第一次且表格为空，自动填入图一到图七的数据
+        if (!hasSeeded) {
+          await seedInitialData();
+        }
       }
     } catch (error) {
       console.error('加载数据失败:', error);
@@ -418,18 +177,52 @@
     }
   }
 
+  // 自动填入图一到图七的数据
+  async function seedInitialData() {
+    hasSeeded = true;
+    const initialData = [
+      { SITUATION: 'SIANG SIANG RESTAURANT', NAME: 'BANDAR', ADRESS: 'Sandakan, Sabah', CORP: 'R54455/2025', REMARK: '图一' },
+      { SITUATION: 'SIANG SIANG RESTAURANT', NAME: 'BATU 4', ADRESS: 'Sandakan, Sabah', CORP: 'R22099/2012', REMARK: '图二' },
+      { SITUATION: 'YZ CYBER CAFE', NAME: 'BANDAR', ADRESS: 'Sandakan, Sabah', CORP: 'R50376/2024', REMARK: '图三' },
+      { SITUATION: 'YZ CYBER CAFE', NAME: 'SEJATI', ADRESS: 'Sandakan, Sabah', CORP: 'R53493/2025', REMARK: '图四' },
+      { SITUATION: 'YZ UFO', NAME: 'SANDAKAN', ADRESS: 'Sandakan, Sabah', CORP: 'R48991/2023', REMARK: '图五' },
+      { SITUATION: 'CC TELESHOP', NAME: 'KIMFUNG', ADRESS: 'Sandakan, Sabah', CORP: 'R52459/2025', REMARK: '图六' },
+      { SITUATION: 'CC TELESHOP', NAME: 'MESRA', ADRESS: 'Sandakan, Sabah', CORP: 'R53302/2025', REMARK: '图七' }
+    ];
+
+    for (const item of initialData) {
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // 解决 CORS 问题
+          body: JSON.stringify({ action: 'save', ...item })
+        });
+      } catch (e) {
+        console.error('预填数据失败:', e);
+      }
+    }
+    showToast('已成功预填图一到图七的资料！', 'success');
+    await loadData(); // 重新加载
+  }
+
   function renderTable(data) {
     const tbody = document.getElementById('tableBody');
     tbody.innerHTML = '';
     
-    data.forEach((item, index) => {
+    data.forEach((item) => {
       const tr = document.createElement('tr');
+      
+      // 判断 CORP 是否为链接
+      let corpHtml = escapeHtml(item.CORP) || '-';
+      if (item.CORP && (item.CORP.startsWith('http://') || item.CORP.startsWith('https://'))) {
+        corpHtml = `<a href="${escapeHtml(item.CORP)}" target="_blank" style="color:#4a86c8; text-decoration:underline;">📄 查看文件</a>`;
+      }
       
       tr.innerHTML = `
         <td>${escapeHtml(item.SITUATION) || '-'}</td>
         <td>${escapeHtml(item.NAME) || '-'}</td>
         <td>${escapeHtml(item.ADRESS) || '-'}</td>
-        <td>${escapeHtml(item.CORP) || '-'}</td>
+        <td>${corpHtml}</td>
         <td>${escapeHtml(item.REMARK) || '-'}</td>
         <td>
           <div class="action-btns">
@@ -438,7 +231,6 @@
           </div>
         </td>
       `;
-      
       tbody.appendChild(tr);
     });
   }
@@ -450,22 +242,19 @@
     return div.innerHTML;
   }
 
-  // ============================================================
-  // 表单提交（新增 / 更新）
-  // ============================================================
-
   document.getElementById('companyForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
     const rowIndex = document.getElementById('rowIndex').value;
     const isEdit = rowIndex !== '';
+    const fileInput = document.getElementById('corpFile');
     
     const payload = {
       action: isEdit ? 'update' : 'save',
       SITUATION: document.getElementById('situation').value.trim(),
       NAME: document.getElementById('name').value.trim(),
       ADRESS: document.getElementById('adress').value.trim(),
-      CORP: document.getElementById('corp').value.trim(),
+      CORP: document.getElementById('corpText').value.trim(),
       REMARK: document.getElementById('remark').value.trim()
     };
     
@@ -473,7 +262,6 @@
       payload.rowIndex = parseInt(rowIndex);
     }
     
-    // 简单校验
     if (!payload.SITUATION || !payload.NAME) {
       showToast('SITUATION 和 NAME 为必填项', 'error');
       return;
@@ -484,9 +272,20 @@
     submitBtn.textContent = '⏳ 处理中...';
     
     try {
+      // 如果选择了文件，将其转为 Base64 发送
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        if (file.size > 5 * 1024 * 1024) {
+          throw new Error('文件大小不能超过 5MB');
+        }
+        const base64Data = await getBase64(file);
+        payload.fileData = base64Data;
+        payload.fileName = file.name;
+      }
+      
       const response = await fetch(API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // 关键：避免 CORS
         body: JSON.stringify(payload)
       });
       
@@ -501,16 +300,12 @@
       }
     } catch (error) {
       console.error('提交失败:', error);
-      showToast('提交失败，请重试', 'error');
+      showToast(error.message || '提交失败，请重试', 'error');
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = '💾 保存';
     }
   });
-
-  // ============================================================
-  // 编辑
-  // ============================================================
 
   function editRow(rowIndex) {
     const item = allData.find(d => d.rowIndex === rowIndex);
@@ -520,44 +315,44 @@
     document.getElementById('situation').value = item.SITUATION || '';
     document.getElementById('name').value = item.NAME || '';
     document.getElementById('adress').value = item.ADRESS || '';
-    document.getElementById('corp').value = item.CORP || '';
     document.getElementById('remark').value = item.REMARK || '';
+    
+    // 如果是链接，填入隐藏字段，否则填入文本框
+    if (item.CORP && item.CORP.startsWith('http')) {
+      document.getElementById('corpText').value = ''; // 清空文本
+      document.getElementById('existingCorp').value = item.CORP; // 保留原有链接
+      document.getElementById('corpText').placeholder = '已有上传文件，若需替换请上传新文件';
+    } else {
+      document.getElementById('corpText').value = item.CORP || '';
+      document.getElementById('existingCorp').value = '';
+      document.getElementById('corpText').placeholder = '例如：R54455/2025';
+    }
     
     document.getElementById('formTitle').textContent = '✏️ 编辑公司信息';
     document.getElementById('cancelEditBtn').style.display = 'inline-flex';
     document.getElementById('submitBtn').textContent = '💾 更新';
-    
-    // 滚动到表单
     document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
   }
 
   function resetForm() {
     document.getElementById('companyForm').reset();
     document.getElementById('rowIndex').value = '';
+    document.getElementById('existingCorp').value = '';
+    document.getElementById('corpText').placeholder = '例如：R54455/2025';
     document.getElementById('formTitle').textContent = '➕ 新增公司信息';
     document.getElementById('cancelEditBtn').style.display = 'none';
     document.getElementById('submitBtn').textContent = '💾 保存';
   }
 
-  // ============================================================
-  // 删除
-  // ============================================================
-
   async function deleteRow(rowIndex) {
     if (!confirm('确定要删除这条记录吗？此操作不可恢复。')) return;
-    
     try {
       const response = await fetch(API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'delete',
-          rowIndex: rowIndex
-        })
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'delete', rowIndex: rowIndex })
       });
-      
       const result = await response.json();
-      
       if (result.success) {
         showToast('删除成功！', 'success');
         await loadData();
@@ -570,47 +365,7 @@
     }
   }
 
-  // ============================================================
-  // 初始化
-  // ============================================================
-
-  document.addEventListener('DOMContentLoaded', function() {
-    loadData();
-  });
-
-  // 初始数据（预填你提供的图一到图七信息）
-  // 注意：这些数据会在页面加载后自动加载到表格中。
-  // 如果你希望第一次打开页面时自动写入这些数据，可以取消注释下面的函数调用。
-  // 但更推荐手动在表格中通过表单添加，或直接编辑 Google Sheet 后刷新。
-
-  /*
-  async function seedInitialData() {
-    const initialData = [
-      { SITUATION: 'SIANG SIANG RESTAURANT', NAME: 'BANDAR', ADRESS: 'Sandakan, Sabah', CORP: 'R54455/2025', REMARK: '图一' },
-      { SITUATION: 'SIANG SIANG RESTAURANT', NAME: 'BATU 4', ADRESS: 'Sandakan, Sabah', CORP: 'R22099/2012', REMARK: '图二' },
-      { SITUATION: 'YZ CYBER CAFE', NAME: 'BANDAR', ADRESS: 'Sandakan, Sabah', CORP: 'R50376/2024', REMARK: '图三' },
-      { SITUATION: 'YZ CYBER CAFE', NAME: 'SEJATI', ADRESS: 'Sandakan, Sabah', CORP: 'R53493/2025', REMARK: '图四' },
-      { SITUATION: 'YZ UFO', NAME: 'SAND AKAN', ADRESS: 'Sandakan, Sabah', CORP: 'R48991/2023', REMARK: '图五' },
-      { SITUATION: 'CC TELESHOP', NAME: 'KIMFUNG', ADRESS: 'Sandakan, Sabah', CORP: 'R52459/2025', REMARK: '图六' },
-      { SITUATION: 'CC TELESHOP', NAME: 'MESRA', ADRESS: 'Sandakan, Sabah', CORP: 'R53302/2025', REMARK: '图七' }
-    ];
-
-    for (const item of initialData) {
-      try {
-        await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'save', ...item })
-        });
-      } catch (e) {
-        console.error('预填数据失败:', e);
-      }
-    }
-    console.log('初始数据预填完成');
-  }
-  */
-
+  document.addEventListener('DOMContentLoaded', loadData);
 </script>
-
 </body>
 </html>
