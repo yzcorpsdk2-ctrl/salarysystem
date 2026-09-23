@@ -1610,9 +1610,8 @@ function updateStickyOffsets() {
     mainRow.querySelectorAll('th').forEach(th =>   { th.style.top = topMain + 'px'; });
     subRow.querySelectorAll('th').forEach(th =>    { th.style.top = topSub + 'px'; });
     filterRow.querySelectorAll('th').forEach(th => { th.style.top = topFilter + 'px'; });
-    document.querySelectorAll('#tbody td.col-freeze').forEach(td => {
-      td.style.top = topFilter + 'px';
-    });
+    // ⚠️ 此处原本给 tbody 的 .col-freeze 强设 top，导致「搜索筛选行飘走」，
+    //    已删除。冻结列只做横向 sticky（只设 left），不做纵向吸附。
   });
 }
 
