@@ -224,7 +224,9 @@
        thead filter th ........ 16
        thead sub th ........... 17
        thead main th .......... 18
-       thead 锁定列 ........... 19
+       thead filter 锁定 th ... 20
+       thead sub 锁定 th ...... 21
+       thead main 锁定 th ..... 22
        section-label-row th ... 22
        section-label-row 锁定组 24
        .lock-edge-right ....... 25
@@ -308,7 +310,7 @@
   body.freeze-on tbody td.col-freeze.col-1 { background: #ffffff; }
   body.freeze-on tbody td.col-freeze.col-2 { background: #ffffff; }
   body.freeze-on tbody td.col-freeze.col-3 { background: #ffffff; }
-  body.freeze-on tbody td.col-freeze.col-4 { background: #f0f4f9; }   /* Gaji Asas 底色 */
+  body.freeze-on tbody td.col-freeze.col-4 { background: #f0f4f9; }
   body.freeze-on tbody tr:nth-child(even) td.col-freeze.col-0,
   body.freeze-on tbody tr:nth-child(even) td.col-freeze.col-1,
   body.freeze-on tbody tr:nth-child(even) td.col-freeze.col-2,
@@ -316,8 +318,18 @@
   body.freeze-on tbody tr:nth-child(even) td.col-freeze.col-4 { background: #f5f7fb; }
   body.freeze-on tbody tr:hover td.col-freeze { background: var(--epf-blue-soft); }
 
-  /* thead 里的锁定列：水平锁 + 层级高于同层普通 th */
-  body.freeze-on thead .col-freeze { z-index: 19; }
+  /* ==========================================================
+     修复：thead 里的锁定列，按所在行分别提级到比同层普通 th 高一级
+     —— 这样 Gaji Asas 表头的 ⋮⋮ 和 filter 行的放大镜不会被
+        OT Biasa 等普通 th 穿过覆盖。
+     ========================================================== */
+  body.freeze-on .main-header-row th.col-freeze { z-index: 22 !important; }
+  body.freeze-on .sub-header-row  th.col-freeze { z-index: 21 !important; }
+  body.freeze-on .filter-row      th.col-freeze { z-index: 20 !important; }
+
+  /* 锁定列里的小装饰也一起提级 */
+  body.freeze-on th.col-freeze .freeze-line { z-index: 30 !important; }
+  body.freeze-on th.col-freeze .th-filter   { position: relative; z-index: 3; }
 
   body.freeze-on thead .col-freeze.bg-slate   { background: #f0f4f9 !important; }
   body.freeze-on thead .col-freeze.bg-amber   { background: #fdf8ec !important; }
@@ -1154,10 +1166,7 @@ function contribBase(emp, field, fallback) {
 }
 
 /* =========================================================
-   修复版：表头 sticky 偏移计算 + 数据行锁定列垂直贴合
-   - thead 每行按 offsetHeight 累积设 top
-   - 数据行锁定列（tbody td.col-freeze）额外设 top = 表头总高
-     这样垂直滚动时它们紧贴表头下方，不会"向上穿"
+   表头 sticky 偏移计算 + 数据行锁定列垂直贴合
    ========================================================= */
 function updateStickyOffsets() {
   requestAnimationFrame(() => {
