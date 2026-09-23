@@ -157,7 +157,7 @@
   .table-wrap { overflow: auto; max-height: calc(100vh - 350px); background: #ffffff; }
   table {
     border-collapse: separate; border-spacing: 0; font-size: 0.8rem;
-    table-layout: fixed; width: 4380px; min-width: 4380px;
+    table-layout: fixed; width: 4690px; min-width: 4690px;
   }
   th {
     background: var(--epf-blue-soft); padding: 0.5rem 0.5rem; text-align: left;
@@ -174,6 +174,9 @@
   .bg-amber   { background: #fdf8ec !important; color: #7a5a12 !important; }
   .bg-blue    { background: #eef5fd !important; color: var(--epf-blue) !important; }
   .bg-gray    { background: #f4f6f9 !important; color: var(--epf-muted) !important; }
+  /* === 新增：PINJAMAN 专属底色（与 LEAVE 系列区分） === */
+  .bg-rose-deep { background: #f7d4e0 !important; color: #7a1f3d !important; }
+  .col-split-left { border-left: 2px solid #c97a9b !important; }
   td { z-index: 1; }
   .section-label-row th {
     position: sticky !important; top: 0 !important; z-index: 22 !important;
@@ -359,6 +362,17 @@
   }
   td.bg-rose .input.num { background: #fff8fa; border-color: #f0c7d3; }
   td.bg-rose .input.num:focus {
+    background: #ffffff; border-color: #8b2b48;
+    box-shadow: 0 0 0 2px rgba(139, 43, 72, 0.12);
+  }
+  td.bg-rose-deep .input.num { background: #fdf0f5; border-color: #e3b0c6; }
+  td.bg-rose-deep .input.num:focus {
+    background: #ffffff; border-color: #7a1f3d;
+    box-shadow: 0 0 0 2px rgba(122, 31, 61, 0.14);
+  }
+  /* 天数格（D）用较浅的底，和金额格区分 */
+  td.leave-days .input.num { background: #fffafc; border-color: #f0c7d3; }
+  td.leave-days .input.num:focus {
     background: #ffffff; border-color: #8b2b48;
     box-shadow: 0 0 0 2px rgba(139, 43, 72, 0.12);
   }
@@ -569,7 +583,11 @@
             <col class="col-freeze col-4" style="width:110px">
             <col style="width:85px"><col style="width:85px"><col style="width:85px"><col style="width:85px">
             <col style="width:130px"><col style="width:130px"><col style="width:130px"><col style="width:130px">
-            <col style="width:130px"><col style="width:130px"><col style="width:130px"><col style="width:130px">
+            <!-- LEAVE：各拆成 DAYS / AMOUNT 两小格 -->
+            <col style="width:80px"><col style="width:95px">
+            <col style="width:80px"><col style="width:95px">
+            <col style="width:80px"><col style="width:95px">
+            <col style="width:80px"><col style="width:95px">
             <col style="width:110px">
             <col style="width:130px"><col style="width:130px">
             <col style="width:130px"><col style="width:130px">
@@ -592,7 +610,8 @@
               </th>
               <th colspan="4" class="bg-emerald divider-group"><div class="sec-title" id="sec2">💰 2. PENDAPATAN / ELAUN (OT)</div></th>
               <th colspan="4" class="bg-emerald divider-group"><div class="sec-title" id="sec2b">➕ PENDAPATAN TAMBAHAN</div></th>
-              <th colspan="5" class="bg-rose divider-group" style="position: relative;">
+              <!-- 原本 colspan=5 → 现在 4 个 LEAVE x 2 子格 + PINJAMAN = 9 -->
+              <th colspan="9" class="bg-rose divider-group" style="position: relative;">
                 <div class="sec-title" id="sec2d">➖ POTONGAN (ON LEAVE + PINJAMAN)</div>
                 <div class="unfold-handle" onclick="toggleSalaryFold(event)" title="Unfold / Expand"></div>
               </th>
@@ -623,11 +642,13 @@
               <th class="bg-emerald" rowspan="2" id="thCommission">COMMISION</th>
               <th class="bg-emerald" rowspan="2" id="thIncentives">INCENTIVES</th>
               <th class="bg-emerald" rowspan="2" id="thFirstCalcTotal">FIRST CALCULATION TOTAL</th>
-              <th class="bg-rose divider-group" rowspan="2" id="thAnnualLeave">ANNUAL LEAVE</th>
-              <th class="bg-rose" rowspan="2" id="thUnpaidLeave">UNPAID LEAVE</th>
-              <th class="bg-rose" rowspan="2" id="thSickLeave">SICK LEAVE</th>
-              <th class="bg-rose" rowspan="2" id="thHalfDays">HALF DAYS LEAVE (HOURS)</th>
-              <th class="bg-rose" rowspan="2" id="thPinjaman">PINJAMAN</th>
+              <!-- LEAVE 系列：每个主栏 colspan=2 -->
+              <th class="bg-rose divider-group" colspan="2" id="thAnnualLeave">ANNUAL LEAVE</th>
+              <th class="bg-rose" colspan="2" id="thUnpaidLeave">UNPAID LEAVE</th>
+              <th class="bg-rose" colspan="2" id="thSickLeave">SICK LEAVE</th>
+              <th class="bg-rose" colspan="2" id="thHalfDays">HALF DAYS LEAVE (HOURS)</th>
+              <!-- PINJAMAN：独立底色 + 左侧分割线 -->
+              <th class="bg-rose-deep col-split-left" rowspan="2" id="thPinjaman">PINJAMAN</th>
               <th class="bg-cyan divider-group foldable-col" rowspan="2" id="thEPFSalary">Salary for EPF Contributions<br><span style="font-weight:400;font-size:0.6rem;">(Gaji untuk caruman KWSP)</span></th>
               <th class="bg-cyan foldable-col" rowspan="2" id="thSOCSOSalary">Salary for SOCSO Contributions<br><span style="font-weight:400;font-size:0.6rem;">(Gaji untuk caruman PERKESO)</span></th>
               <th class="bg-cyan foldable-col" rowspan="2" id="thEISSalary">Salary for EIS Contributions<br><span style="font-weight:400;font-size:0.6rem;">(Gaji untuk caruman EIS)</span></th>
@@ -656,6 +677,15 @@
               <th class="bg-gray divider-group" rowspan="2" style="text-align:center;" id="thAction">Tindakan</th>
             </tr>
             <tr class="sub-header-row">
+              <!-- LEAVE 子表头：DAYS / AMOUNT -->
+              <th class="bg-rose" id="subALDays">DAYS (D)</th>
+              <th class="bg-rose" id="subALAmt">AMOUNT (-RM)</th>
+              <th class="bg-rose" id="subULDays">DAYS (D)</th>
+              <th class="bg-rose" id="subULAmt">AMOUNT (-RM)</th>
+              <th class="bg-rose" id="subSLDays">DAYS (D)</th>
+              <th class="bg-rose" id="subSLAmt">AMOUNT (-RM)</th>
+              <th class="bg-rose" id="subHDDays">DAYS (D)</th>
+              <th class="bg-rose" id="subHDAmt">AMOUNT (-RM)</th>
               <th class="bg-violet" id="subEPFE">Pekerja</th>
               <th class="bg-violet" id="subEPFR">Majikan</th>
               <th class="bg-violet" id="subSOCSOE">Pekerja</th>
@@ -677,39 +707,46 @@
               <th class="bg-emerald"><input class="th-filter" data-col="10" placeholder="🔍"></th>
               <th class="bg-emerald"><input class="th-filter" data-col="11" placeholder="🔍"></th>
               <th class="bg-emerald"><input class="th-filter" data-col="12" placeholder="🔍"></th>
+              <!-- LEAVE 8 格 -->
               <th class="bg-rose divider-group"><input class="th-filter" data-col="13" placeholder="🔍"></th>
               <th class="bg-rose"><input class="th-filter" data-col="14" placeholder="🔍"></th>
               <th class="bg-rose"><input class="th-filter" data-col="15" placeholder="🔍"></th>
               <th class="bg-rose"><input class="th-filter" data-col="16" placeholder="🔍"></th>
               <th class="bg-rose"><input class="th-filter" data-col="17" placeholder="🔍"></th>
-              <th class="bg-cyan divider-group foldable-col"><input class="th-filter" data-col="18" placeholder="🔍"></th>
-              <th class="bg-cyan foldable-col"><input class="th-filter" data-col="19" placeholder="🔍"></th>
-              <th class="bg-cyan foldable-col"><input class="th-filter" data-col="20" placeholder="🔍"></th>
-              <th class="bg-cyan foldable-col"><input class="th-filter" data-col="21" placeholder="🔍"></th>
+              <th class="bg-rose"><input class="th-filter" data-col="18" placeholder="🔍"></th>
+              <th class="bg-rose"><input class="th-filter" data-col="19" placeholder="🔍"></th>
+              <th class="bg-rose"><input class="th-filter" data-col="20" placeholder="🔍"></th>
+              <!-- PINJAMAN -->
+              <th class="bg-rose-deep col-split-left"><input class="th-filter" data-col="21" placeholder="🔍"></th>
+              <!-- 以下全部 +4 -->
+              <th class="bg-cyan divider-group foldable-col"><input class="th-filter" data-col="22" placeholder="🔍"></th>
+              <th class="bg-cyan foldable-col"><input class="th-filter" data-col="23" placeholder="🔍"></th>
+              <th class="bg-cyan foldable-col"><input class="th-filter" data-col="24" placeholder="🔍"></th>
+              <th class="bg-cyan foldable-col"><input class="th-filter" data-col="25" placeholder="🔍"></th>
               <th class="bg-violet divider-group no-filter"></th>
-              <th class="bg-violet"><input class="th-filter" data-col="23" placeholder="🔍"></th>
-              <th class="bg-violet"><input class="th-filter" data-col="24" placeholder="🔍"></th>
-              <th class="bg-violet no-filter"></th>
-              <th class="bg-violet"><input class="th-filter" data-col="26" placeholder="🔍"></th>
               <th class="bg-violet"><input class="th-filter" data-col="27" placeholder="🔍"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="28" placeholder="🔍"></th>
               <th class="bg-violet no-filter"></th>
-              <th class="bg-violet"><input class="th-filter" data-col="29" placeholder="🔍"></th>
               <th class="bg-violet"><input class="th-filter" data-col="30" placeholder="🔍"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="31" placeholder="🔍"></th>
               <th class="bg-violet no-filter"></th>
-              <th class="bg-violet"><input class="th-filter" data-col="32" placeholder="🔍"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="33" placeholder="🔍"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="34" placeholder="🔍"></th>
+              <th class="bg-violet no-filter"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="36" placeholder="🔍"></th>
               <th class="bg-amber divider-group no-filter"></th>
-              <th class="bg-amber"><input class="th-filter" data-col="34" placeholder="🔍"></th>
-              <th class="bg-amber no-filter"></th>
-              <th class="bg-amber"><input class="th-filter" data-col="36" placeholder="🔍"></th>
-              <th class="bg-amber no-filter"></th>
               <th class="bg-amber"><input class="th-filter" data-col="38" placeholder="🔍"></th>
               <th class="bg-amber no-filter"></th>
               <th class="bg-amber"><input class="th-filter" data-col="40" placeholder="🔍"></th>
               <th class="bg-amber no-filter"></th>
               <th class="bg-amber"><input class="th-filter" data-col="42" placeholder="🔍"></th>
-              <th class="bg-blue divider-group"><input class="th-filter" data-col="43" placeholder="🔍"></th>
-              <th class="bg-blue"><input class="th-filter" data-col="44" placeholder="🔍"></th>
-              <th class="bg-blue"><input class="th-filter" data-col="45" placeholder="🔍"></th>
+              <th class="bg-amber no-filter"></th>
+              <th class="bg-amber"><input class="th-filter" data-col="44" placeholder="🔍"></th>
+              <th class="bg-amber no-filter"></th>
+              <th class="bg-amber"><input class="th-filter" data-col="46" placeholder="🔍"></th>
+              <th class="bg-blue divider-group"><input class="th-filter" data-col="47" placeholder="🔍"></th>
+              <th class="bg-blue"><input class="th-filter" data-col="48" placeholder="🔍"></th>
+              <th class="bg-blue"><input class="th-filter" data-col="49" placeholder="🔍"></th>
               <th class="bg-gray divider-group no-filter"></th>
             </tr>
           </thead>
@@ -1195,7 +1232,7 @@ function renderTable() {
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
   if (!employees.length) {
-    tbody.innerHTML = `<tr><td colspan="49" style="text-align:center;padding:2.5rem;color:#a7b7c9;">${t('loading')}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="51" style="text-align:center;padding:2.5rem;color:#a7b7c9;">${t('loading')}</td></tr>`;
     buildFilterDropdowns();
     updateStickyOffsets();
     return;
@@ -1239,11 +1276,17 @@ function renderTable() {
       <td>${numInput('Commission', false)}</td>
       <td>${numInput('Incentives', false)}</td>
       <td>${numInput('FirstCalcTotal', true, 'first-total')}</td>
-      <td class="divider-group bg-rose">${numInput('AnnualLeave', false)}</td>
+      <!-- LEAVE：DAYS / AMOUNT 拆分为两小格 -->
+      <td class="bg-rose divider-group leave-days">${numInput('AnnualLeaveDays', false)}</td>
+      <td class="bg-rose">${numInput('AnnualLeave', false)}</td>
+      <td class="bg-rose leave-days">${numInput('UnpaidLeaveDays', false)}</td>
       <td class="bg-rose">${numInput('UnpaidLeave', false)}</td>
+      <td class="bg-rose leave-days">${numInput('SickLeaveDays', false)}</td>
       <td class="bg-rose">${numInput('SickLeave', false)}</td>
+      <td class="bg-rose leave-days">${numInput('HalfDaysDays', false)}</td>
       <td class="bg-rose">${numInput('HalfDays', false)}</td>
-      <td class="bg-rose">${numInput('Pinjaman', false)}</td>
+      <!-- PINJAMAN：不同底色 + 左侧分割线 -->
+      <td class="bg-rose-deep col-split-left">${numInput('Pinjaman', false)}</td>
       <td class="bg-cyan divider-group foldable-col">${numInput('EPFSalary', false)}</td>
       <td class="bg-cyan foldable-col">${numInput('SOCSOSalary', false)}</td>
       <td class="bg-cyan foldable-col">${numInput('EISSalary', false)}</td>
@@ -1442,7 +1485,6 @@ async function saveToSheet() {
     return out;
   });
   try {
-    // 顺便存 localStorage
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
     await fetch(APPS_SCRIPT_URL, {
       method: 'POST', mode: 'no-cors',
@@ -1534,7 +1576,9 @@ async function handleImportFile(file) {
     if (!rows || rows.length < 2) { toast(t('importFail'), false); return; }
     const headers = rows[0].map(h => String(h).trim());
     const idx = {};
-    const WANTED = ['Situation','Code','Name','Group','Bank','Basic','Allowance','Deduction','Normal OT','Rest OT','Public OT','Other OT','Pinjaman','Others','Annual Leave','Unpaid Leave','Sick Leave','Half Days Leave','Allowance2','Commission','Incentives','FirstCalcTotal','Salary for EPF Contributions','Salary for SOCSO Contributions','Salary for EIS Contributions','Salary for 24JAM Lindungan Contributions','EPF (Employee)','EPF (Employer)','SOCSO (Employee)','SOCSO (Employer)','EIS (Employee)','EIS (Employer)','24JAM','SLR Bank Nama','SLR Bank Account No','SLR EPF','SLR SOCSO','SLR EIS'];
+    const WANTED = ['Situation','Code','Name','Group','Bank','Basic','Allowance','Deduction','Normal OT','Rest OT','Public OT','Other OT','Pinjaman','Others',
+      'Annual Leave Days','Annual Leave','Unpaid Leave Days','Unpaid Leave','Sick Leave Days','Sick Leave','Half Days Leave Days','Half Days Leave',
+      'Allowance2','Commission','Incentives','FirstCalcTotal','Salary for EPF Contributions','Salary for SOCSO Contributions','Salary for EIS Contributions','Salary for 24JAM Lindungan Contributions','EPF (Employee)','EPF (Employer)','SOCSO (Employee)','SOCSO (Employer)','EIS (Employee)','EIS (Employer)','24JAM','SLR Bank Nama','SLR Bank Account No','SLR EPF','SLR SOCSO','SLR EIS'];
     headers.forEach((h, i) => {
       const lh = h.toLowerCase();
       for (const w of WANTED) { if (lh === w.toLowerCase()) { idx[w] = i; break; } }
@@ -1588,9 +1632,13 @@ async function handleImportFile(file) {
         Commission: parseFloat(get(row, 'Commission')) || 0,
         Incentives: parseFloat(get(row, 'Incentives')) || 0,
         EPFSalary: epfSalary, SOCSOSalary: socsoSalary, EISSalary: eisSalary, LindungSalary: lindungSalary,
+        AnnualLeaveDays: parseFloat(get(row, 'Annual Leave Days')) || 0,
         AnnualLeave: parseFloat(get(row, 'Annual Leave')) || 0,
+        UnpaidLeaveDays: parseFloat(get(row, 'Unpaid Leave Days')) || 0,
         UnpaidLeave: parseFloat(get(row, 'Unpaid Leave')) || 0,
+        SickLeaveDays: parseFloat(get(row, 'Sick Leave Days')) || 0,
         SickLeave: parseFloat(get(row, 'Sick Leave')) || 0,
+        HalfDaysDays: parseFloat(get(row, 'Half Days Leave Days')) || 0,
         HalfDays: parseFloat(get(row, 'Half Days Leave')) || 0,
         Deduction: parseFloat(get(row, 'Deduction')) || 0,
         NormalOT: parseFloat(get(row, 'Normal OT')) || 0,
@@ -1625,13 +1673,15 @@ async function handleImportFile(file) {
 }
 
 function getExportHeaders() {
-  return ['Situation','Code','Name','Group','Bank','Basic','Normal OT','Rest OT','Public OT','Other OT','Allowance2','Commission','Incentives','FirstCalcTotal','Annual Leave','Unpaid Leave','Sick Leave','Half Days Leave','Pinjaman','Salary for EPF Contributions','Salary for SOCSO Contributions','Salary for EIS Contributions','Salary for 24JAM Lindungan Contributions','EPF (Employee)','EPF (Employer)','SOCSO (Employee)','SOCSO (Employer)','EIS (Employee)','EIS (Employer)','24JAM','SLR Bank Nama','SLR Bank Account No','SLR EPF','SLR SOCSO','SLR EIS','Gross Pay','Total Deduction','Net Salary'];
+  return ['Situation','Code','Name','Group','Bank','Basic','Normal OT','Rest OT','Public OT','Other OT','Allowance2','Commission','Incentives','FirstCalcTotal',
+    'Annual Leave Days','Annual Leave','Unpaid Leave Days','Unpaid Leave','Sick Leave Days','Sick Leave','Half Days Leave Days','Half Days Leave','Pinjaman',
+    'Salary for EPF Contributions','Salary for SOCSO Contributions','Salary for EIS Contributions','Salary for 24JAM Lindungan Contributions','EPF (Employee)','EPF (Employer)','SOCSO (Employee)','SOCSO (Employer)','EIS (Employee)','EIS (Employer)','24JAM','SLR Bank Nama','SLR Bank Account No','SLR EPF','SLR SOCSO','SLR EIS','Gross Pay','Total Deduction','Net Salary'];
 }
 function downloadTemplate(format) {
   const headers = getExportHeaders();
   const sample = [
-    ['ACTIVE','EMP001','Ahmad bin Ali','YZ UFO','Maybank',4500,0,0,0,0,0,0,0,5100,0,0,0,0,0,4500,4500,4500,4500,495,585,22.25,77.85,9,9,32.96,'Maybank','1234567890','YES','YES','YES',5100,1125.06,3974.94],
-    ['PENDING','EMP002','Siti Nurhaliza','YZ CYBER','CIMB',3800,0,0,0,0,200,150,100,4700,0,0,0,0,0,3800,3800,3800,3800,418,494,19.75,69.15,7.6,7.6,27.83,'CIMB','9876543210','YES','NO','YES',4700,930.93,3769.07]
+    ['ACTIVE','EMP001','Ahmad bin Ali','YZ UFO','Maybank',4500,0,0,0,0,0,0,0,5100,0,0,0,0,0,0,0,0,0,4500,4500,4500,4500,495,585,22.25,77.85,9,9,32.96,'Maybank','1234567890','YES','YES','YES',5100,1125.06,3974.94],
+    ['PENDING','EMP002','Siti Nurhaliza','YZ CYBER','CIMB',3800,0,0,0,0,200,150,100,4700,0,0,0,0,0,0,0,0,0,3800,3800,3800,3800,418,494,19.75,69.15,7.6,7.6,27.83,'CIMB','9876543210','YES','NO','YES',4700,930.93,3769.07]
   ];
   if (format === 'xlsx') {
     if (typeof XLSX === 'undefined') { toast('SheetJS tidak dimuat', false); return; }
@@ -1677,7 +1727,11 @@ function getExportRows() {
       emp.BankNama || '', num(e.Basic),
       num(e.NormalOT), num(e.RestOT), num(e.PublicOT), num(e.OtherOT),
       num(e.Allowance2), num(e.Commission), num(e.Incentives), num(e.FirstCalcTotal),
-      num(e.AnnualLeave), num(e.UnpaidLeave), num(e.SickLeave), num(e.HalfDays), num(e.Pinjaman),
+      num(e.AnnualLeaveDays), num(e.AnnualLeave),
+      num(e.UnpaidLeaveDays), num(e.UnpaidLeave),
+      num(e.SickLeaveDays), num(e.SickLeave),
+      num(e.HalfDaysDays), num(e.HalfDays),
+      num(e.Pinjaman),
       emp.EPFSalary === '' || emp.EPFSalary === undefined ? '' : num(emp.EPFSalary),
       emp.SOCSOSalary === '' || emp.SOCSOSalary === undefined ? '' : num(emp.SOCSOSalary),
       emp.EISSalary === '' || emp.EISSalary === undefined ? '' : num(emp.EISSalary),
@@ -1710,7 +1764,7 @@ function buildExportTableHTML() {
   rows.forEach(r => {
     html += '<tr>';
     r.forEach((c, i) => {
-      const cls = (i >= 5 && i <= 30) ? ' class="num"' : '';
+      const cls = (i >= 5 && i <= 33) ? ' class="num"' : '';
       html += `<td${cls}>${escapeHtml(c)}</td>`;
     });
     html += '</tr>';
@@ -1787,7 +1841,7 @@ function exportToDOC() {
   rows.forEach(r => {
     html += '<tr>';
     r.forEach((c, i) => {
-      const cls = (i >= 5 && i <= 30) ? ' class="num"' : '';
+      const cls = (i >= 5 && i <= 33) ? ' class="num"' : '';
       html += `<td${cls}>${escapeHtml(c)}</td>`;
     });
     html += '</tr>';
@@ -1804,7 +1858,6 @@ async function loadEmployees(opts = {}) {
   const forceRemote = !!opts.forceRemote;
   const useRemote = APPS_SCRIPT_URL && !APPS_SCRIPT_URL.includes('PASTE_YOUR');
 
-  // 1. 优先从 Google Sheet 拉取（若已配置且非强制跳过）
   if (useRemote) {
     try {
       const res = await fetch(APPS_SCRIPT_URL);
@@ -1823,9 +1876,13 @@ async function loadEmployees(opts = {}) {
           SOCSOSalary: row.SOCSOSalary !== undefined && row.SOCSOSalary !== null && row.SOCSOSalary !== '' ? Number(row.SOCSOSalary) : '',
           EISSalary: row.EISSalary !== undefined && row.EISSalary !== null && row.EISSalary !== '' ? Number(row.EISSalary) : '',
           LindungSalary: row.LindungSalary !== undefined && row.LindungSalary !== null && row.LindungSalary !== '' ? Number(row.LindungSalary) : '',
+          AnnualLeaveDays: Number(row.AnnualLeaveDays) || 0,
           AnnualLeave: Number(row.AnnualLeave) || 0,
+          UnpaidLeaveDays: Number(row.UnpaidLeaveDays) || 0,
           UnpaidLeave: Number(row.UnpaidLeave) || 0,
+          SickLeaveDays: Number(row.SickLeaveDays) || 0,
           SickLeave: Number(row.SickLeave) || 0,
+          HalfDaysDays: Number(row.HalfDaysDays) || 0,
           HalfDays: Number(row.HalfDays) || 0,
           Deduction: Number(row.Deduction) || 0,
           NormalOT: Number(row.NormalOT) || 0,
@@ -1855,7 +1912,6 @@ async function loadEmployees(opts = {}) {
           manualSLREPF: false, manualSLRPERKESO: false, manualSLREIS: false
         })).filter(e => e.Situation !== 'UNACTIVE' && e.Situation !== 'INACTIVE');
 
-        // 拉取成功 → 用 Sheet 覆盖 localStorage（保持与 detail.html 一致）
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
         renderTable();
         toast('已从 Google Sheet 载入 ' + employees.length + ' 位员工');
@@ -1871,7 +1927,6 @@ async function loadEmployees(opts = {}) {
     }
   }
 
-  // 2. Fallback: localStorage
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
@@ -1886,26 +1941,28 @@ async function loadEmployees(opts = {}) {
     }
   } catch (err) { console.error('localStorage load failed', err); }
 
-  // 3. Fallback: 内置示例
   employees = [
     { Situation:'ACTIVE',  Code:'EMP001', Name:'Ahmad bin Ali', GroupName:'YZ UFO', BankNama:'Maybank',
       Basic:4500, Allowance:0, Allowance2:0, Commission:0, Incentives:0,
       EPFSalary:4500, SOCSOSalary:4500, EISSalary:4500, LindungSalary:4500,
-      AnnualLeave:0, UnpaidLeave:0, SickLeave:0, HalfDays:0,
+      AnnualLeaveDays:0, AnnualLeave:0, UnpaidLeaveDays:0, UnpaidLeave:0,
+      SickLeaveDays:0, SickLeave:0, HalfDaysDays:0, HalfDays:0,
       Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
       OtherOT:0, Pinjaman:0, Others:0, Age:30, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES',
       SLRBankNama:'Maybank', SLRBankAccountNo:'1234567890', SLREPF:'YES', SLRPERKESO:'YES', SLREIS:'YES' },
     { Situation:'PENDING', Code:'EMP002', Name:'Siti Nurhaliza', GroupName:'YZ CYBER', BankNama:'CIMB',
       Basic:3800, Allowance:0, Allowance2:200, Commission:150, Incentives:100,
       EPFSalary:3800, SOCSOSalary:3800, EISSalary:3800, LindungSalary:3800,
-      AnnualLeave:0, UnpaidLeave:0, SickLeave:0, HalfDays:0,
+      AnnualLeaveDays:1, AnnualLeave:126.67, UnpaidLeaveDays:0, UnpaidLeave:0,
+      SickLeaveDays:0, SickLeave:0, HalfDaysDays:0, HalfDays:0,
       Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
       OtherOT:0, Pinjaman:0, Others:0, Age:28, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES',
       SLRBankNama:'CIMB', SLRBankAccountNo:'9876543210', SLREPF:'YES', SLRPERKESO:'NO', SLREIS:'YES' },
     { Situation:'ACTIVE', Code:'EMP003', Name:'Cash Worker', GroupName:'YZ UFO', BankNama:'CASH',
       Basic:2500, Allowance:0, Allowance2:0, Commission:0, Incentives:0,
       EPFSalary:'', SOCSOSalary:'', EISSalary:'', LindungSalary:'',
-      AnnualLeave:0, UnpaidLeave:0, SickLeave:0, HalfDays:0,
+      AnnualLeaveDays:0, AnnualLeave:0, UnpaidLeaveDays:0, UnpaidLeave:0,
+      SickLeaveDays:0, SickLeave:0, HalfDaysDays:0, HalfDays:0,
       Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
       OtherOT:0, Pinjaman:0, Others:0, Age:30, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES',
       SLRBankNama:'CASH', SLRBankAccountNo:'-', SLREPF:'NO', SLRPERKESO:'NO', SLREIS:'NO' }
