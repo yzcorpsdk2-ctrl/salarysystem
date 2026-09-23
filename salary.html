@@ -214,11 +214,26 @@
 
   /* ==========================================================
      表头 sticky 分层（从顶到底）：
-       1. section-label-row → top:0        （粘顶，最高 z）
+       1. section-label-row → top:0        （粘顶）
        2. main-header-row   → 由 JS 测量
        3. sub-header-row    → 由 JS 测量
        4. filter-row        → 由 JS 测量
+     z-index 分层（从低到高）：
+       普通 td ................ 1
+       数据行锁定列 ............ 9
+       thead filter th ........ 16
+       thead sub th ........... 17
+       thead main th .......... 18
+       thead 锁定列 ........... 19
+       section-label-row th ... 22
+       section-label-row 锁定组 24
+       .lock-edge-right ....... 25
+       unfold-handle .......... 40
      ========================================================== */
+
+  /* 普通单元格显式压在锁定列之下，避免滚动时穿过覆盖 */
+  td { z-index: 1; }
+
   .section-label-row th {
     position: sticky !important; top: 0 !important; z-index: 22 !important;
     padding: 0.45rem 0.6rem; font-size: 0.68rem; font-weight: 700;
@@ -276,16 +291,24 @@
   /* ==========================================================
      锁定列：Situation / Kod / Nama / Kumpulan / Gaji Asas
      ========================================================== */
-  body.freeze-on .col-freeze { position: sticky; z-index: 8; background: #ffffff; }
+  body.freeze-on .col-freeze {
+    position: sticky;
+    z-index: 9;                  /* ← 高于普通 td (1)，5 列整体锁定 */
+    background: #ffffff;
+  }
   body.freeze-on tr:nth-child(even) td.col-freeze { background: #fbfdff; }
   body.freeze-on tr:hover td.col-freeze { background: var(--epf-blue-soft); }
+
   body.freeze-on .col-freeze.col-0 { left: 0px; }
   body.freeze-on .col-freeze.col-1 { left: 80px; }
   body.freeze-on .col-freeze.col-2 { left: 150px; }
   body.freeze-on .col-freeze.col-3 { left: 310px; }
   body.freeze-on .col-freeze.col-4 { left: 420px; }
 
+  /* thead 里的锁定列高于同层普通 th */
   body.freeze-on thead .col-freeze { z-index: 19; }
+
+  /* 锁定列背景色（thead） */
   body.freeze-on thead .col-freeze.bg-slate   { background: #f0f4f9 !important; }
   body.freeze-on thead .col-freeze.bg-amber   { background: #fdf8ec !important; }
   body.freeze-on thead .col-freeze.bg-emerald { background: #f0f9f4 !important; }
@@ -294,20 +317,25 @@
   body.freeze-on thead .col-freeze.bg-gray    { background: #f4f6f9 !important; }
   body.freeze-on thead .filter-row th.col-freeze { background: #ffffff !important; }
   body.freeze-on thead .filter-row th.col-freeze.no-filter { background: var(--epf-blue-soft) !important; }
+
+  /* section 行里的锁定组最高，盖住所有 */
   body.freeze-on .section-label-row th.col-freeze-group {
-    position: sticky !important; left: 0 !important; z-index: 24 !important;
+    position: sticky !important;
+    left: 0 !important;
+    z-index: 24 !important;
   }
 
-  /* 深蓝锁定分隔线 */
+  /* 深蓝锁定分隔线始终在最上面（右边缘） */
   .lock-edge-right {
     border-right: 2px solid var(--epf-blue) !important;
+    z-index: 25 !important;
   }
 
   /* 折叠竖线按钮（放在 GAJI UNTUK CARUMAN 表头内） */
   .fold-line {
     position: absolute; top: 0; bottom: 0; width: 12px;
     background: linear-gradient(to right, rgba(14,92,110,0) 0%, rgba(14,92,110,0.06) 60%, rgba(14,92,110,0.15) 100%);
-    cursor: pointer; z-index: 22; pointer-events: auto; transition: 0.15s;
+    cursor: pointer; z-index: 26; pointer-events: auto; transition: 0.15s;
   }
   .fold-line:hover {
     background: linear-gradient(to right, rgba(14,92,110,0.05) 0%, rgba(14,92,110,0.20) 60%, rgba(14,92,110,0.30) 100%);
@@ -327,9 +355,7 @@
   body.salary-folded .foldable-col { display: none !important; }
 
   /* ==========================================================
-     展开把手：唯一挂在 PINJAMAN 的 section-label-row 上，
-     并悬在 PINJAMAN 的 section 右边界上。
-     不放在数据行、不放在 filter-row（避免压住筛选框）。
+     展开把手：唯一挂在 PINJAMAN 的 section-label-row 上
      ========================================================== */
   .unfold-handle {
     display: none;
@@ -705,7 +731,7 @@
             <!-- POTONGAN 5 列 -->
             <col style="width:130px"><col style="width:130px"><col style="width:130px"><col style="width:130px">
             <col style="width:110px">
-            <!-- SALARY FOR CONTRIBUTIONS 4 列 —— col 保留宽度（不隐藏），只隐藏 th/td -->
+            <!-- SALARY FOR CONTRIBUTIONS 4 列 -->
             <col style="width:130px"><col style="width:130px">
             <col style="width:130px"><col style="width:130px">
             <!-- Section 3 (11) -->
@@ -726,13 +752,11 @@
           </colgroup>
           <thead>
             <tr class="section-label-row">
-              <!-- 第一组包含 Gaji Asas: colspan 5 -->
               <th colspan="5" class="bg-slate col-freeze-group lock-edge-right">
                 <div class="sec-title" id="sec1">📌 1. MAKLUMAT ASAS + 💵 BASIC SALARY (FREEZE)</div>
               </th>
               <th colspan="4" class="bg-emerald divider-group"><div class="sec-title" id="sec2">💰 2. PENDAPATAN / ELAUN (OT)</div></th>
               <th colspan="4" class="bg-emerald divider-group"><div class="sec-title" id="sec2b">➕ PENDAPATAN TAMBAHAN</div></th>
-              <!-- POTONGAN 分区标题：展开把手在这里（唯一位置） -->
               <th colspan="5" class="bg-rose divider-group" style="position: relative;">
                 <div class="sec-title" id="sec2d">➖ POTONGAN (ON LEAVE + PINJAMAN)</div>
                 <div class="unfold-handle" onclick="toggleSalaryFold(event)" title="Unfold / Expand"></div>
@@ -772,7 +796,6 @@
               <th class="bg-rose" rowspan="2" id="thUnpaidLeave">UNPAID LEAVE</th>
               <th class="bg-rose" rowspan="2" id="thSickLeave">SICK LEAVE</th>
               <th class="bg-rose" rowspan="2" id="thHalfDays">HALF DAYS LEAVE (HOURS)</th>
-              <!-- PINJAMAN 表头（不挂把手） -->
               <th class="bg-rose" rowspan="2" id="thPinjaman">PINJAMAN</th>
 
               <th class="bg-cyan divider-group foldable-col" rowspan="2" id="thEPFSalary">Salary for EPF Contributions<br><span style="font-weight:400;font-size:0.6rem;">(Gaji untuk caruman KWSP)</span></th>
@@ -834,7 +857,6 @@
               <th class="bg-rose"><input class="th-filter" data-col="14" placeholder="🔍"></th>
               <th class="bg-rose"><input class="th-filter" data-col="15" placeholder="🔍"></th>
               <th class="bg-rose"><input class="th-filter" data-col="16" placeholder="🔍"></th>
-              <!-- PINJAMAN 筛选（干净，无把手） -->
               <th class="bg-rose"><input class="th-filter" data-col="17" placeholder="🔍"></th>
               <th class="bg-cyan divider-group foldable-col"><input class="th-filter" data-col="18" placeholder="🔍"></th>
               <th class="bg-cyan foldable-col"><input class="th-filter" data-col="19" placeholder="🔍"></th>
@@ -1138,8 +1160,7 @@ function contribBase(emp, field, fallback) {
 /* =========================================================
    修复版：表头 sticky 偏移计算
    - 用 offsetHeight 逐行测量（避免 rowspan 干扰）
-   - 显式写死 top 累积值与 z-index
-   - section-label-row 永远 top:0，最高层
+   - 只设 top，z-index 完全交给 CSS
    ========================================================= */
 function updateStickyOffsets() {
   requestAnimationFrame(() => {
@@ -1161,22 +1182,10 @@ function updateStickyOffsets() {
     const topSub     = hSection + hMain;
     const topFilter  = hSection + hMain + hSub;
 
-    sectionRow.querySelectorAll('th').forEach(th => {
-      th.style.top = topSection + 'px';
-      th.style.zIndex = '22';
-    });
-    mainRow.querySelectorAll('th').forEach(th => {
-      th.style.top = topMain + 'px';
-      th.style.zIndex = '18';
-    });
-    subRow.querySelectorAll('th').forEach(th => {
-      th.style.top = topSub + 'px';
-      th.style.zIndex = '17';
-    });
-    filterRow.querySelectorAll('th').forEach(th => {
-      th.style.top = topFilter + 'px';
-      th.style.zIndex = '16';
-    });
+    sectionRow.querySelectorAll('th').forEach(th => { th.style.top = topSection + 'px'; });
+    mainRow.querySelectorAll('th').forEach(th =>   { th.style.top = topMain + 'px'; });
+    subRow.querySelectorAll('th').forEach(th =>    { th.style.top = topSub + 'px'; });
+    filterRow.querySelectorAll('th').forEach(th => { th.style.top = topFilter + 'px'; });
   });
 }
 
