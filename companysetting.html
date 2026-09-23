@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+        background: #eef2f7;
+        margin: 0;
+        padding: 16px;
+        color: #22303f;
+      }
+      .container {
+        max-width: 640px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        padding: 24px;
+      }
+      h1 { font-size: 20px; text-align: center; margin: 0 0 4px; color: #1a4f8a; }
+      .subtitle { text-align: center; font-size: 12px; color: #8b98a8; margin-bottom: 20px; }
+
+      .field { margin-bottom: 16px; }
+      label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #35485c; }
+      .req { color: #e0483c; }
+
+      input, select, textarea {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 14px;
+        border: 1px solid #cfd8e3;
+        border-radius: 8px;
+        background: #fbfcfe;
+        font-family: inherit;
+        transition: border-color .15s, box-shadow .15s;
+      }
+      input:focus, select:focus, textarea:focus {
+        outline: none;
+        border-color: #2f7fe0;
+        box-shadow: 0 0 0 3px rgba(47,127,224,0.15);
+        background: #fff;
+      }
+      textarea { resize: vertical; min-height: 70px; }
+
+      .stamp-box {
+        margin: 14px 0 20px;
+        padding: 12px;
+        border: 2px dashed #c3d3e6;
+        border-radius: 10px;
+        background: #f7faff;
+        text-align: center;
+        min-height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .stamp-box img { max-width: 100%; max-height: 190px; }
+      .placeholder { font-size: 13px; color: #9fb0c4; line-height: 1.6; }
+
+      button {
+        width: 100%;
+        padding: 13px;
+        font-size: 15px;
+        font-weight: 700;
+        color: #fff;
+        background: linear-gradient(135deg,#2f7fe0,#1a4f8a);
+        border: none;
+        border-radius: 9px;
+        cursor: pointer;
+        letter-spacing: .5px;
+        margin-top: 6px;
+      }
+      button:disabled { opacity: .55; cursor: not-allowed; }
+
+      .msg { margin-top: 14px; padding: 11px; border-radius: 8px; font-size: 13px;
+             text-align: center; display: none; }
+      .msg.ok  { background:#e3f6e9; color:#1e7a3c; border:1px solid #b6e3c5; display:block; }
+      .msg.err { background:#fdeceb; color:#b32b20; border:1px solid #f5c2be; display:block; }
+
+      .hidden { display: none !important; }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>商家资料录入</h1>
+      <div class="subtitle">KEDAI DATA 系统</div>
+
+      <form id="myForm">
+
+        <!-- 选择公司 -->
+        <div class="field">
+          <label>选择公司 / 店铺 <span class="req">*</span></label>
+          <select id="shopSelect" required>
+            <option value="">-- 载入中，请稍候 --</option>
+          </select>
+        </div>
+
+        <!-- 电子印章预览 -->
+        <div class="stamp-box" id="stampBox">
+          <div class="placeholder" id="stampPlaceholder">
+            请先选择公司<br>系统将自动显示电子印章与签名
+          </div>
+          <img id="stampImg" class="hidden" alt="电子印章">
+        </div>
+
+        <!-- 五个字段 -->
+        <div class="field">
+          <label for="situation">SITUATION</label>
+          <input type="text" id="situation" placeholder="请输入 SITUATION">
+        </div>
+
+        <div class="field">
+          <label for="name">NAME</label>
+          <input type="text" id="name" placeholder="请输入 NAME">
+        </div>
+
+        <div class="field">
+          <label for="adress">ADRESS</label>
+          <input type="text" id="adress" placeholder="请输入 ADRESS">
+        </div>
+
+        <div class="field">
+          <label for="corp">CORP</label>
+          <input type="text" id="corp" placeholder="请输入 CORP">
+        </div>
+
+        <div class="field">
+          <label for="remark">REMARK</label>
+          <textarea id="remark" placeholder="请输入 REMARK"></textarea>
+        </div>
+
+        <button type="submit" id="submitBtn">保存资料</button>
+        <div class="msg" id="msg"></div>
+      </form>
+    </div>
+
+    <script>
+      var SHOPS  = [];
+      var STAMPS = {};
+
+      var $ = function (id) { return document.getElementById(id); };
+      var shopSelect = $('shopSelect');
+      var stampBox   = $('stampBox');
+      var stampImg   = $('stampImg');
+      var stampPh    = $('stampPlaceholder');
+      var msgBox     = $('msg');
+      var submitBtn  = $('submitBtn');
+      var form       = $('myForm');
+
+      /* ---------- 显示讯息 ---------- */
+      function showMsg(text, type) {
+        msgBox.textContent = text;
+        msgBox.className = 'msg ' + type;
+      }
+      function clearMsg() {
+        msgBox.className = 'msg';
+        msgBox.textContent = '';
+      }
+
+      /* ---------- 页面载入：取得公司列表 + 印章图片 ---------- */
+      google.script.run
+        .withSuccessHandler(function (data) {
+          SHOPS  = data.shops  || [];
+          STAMPS = data.stamps || {};
+
+          shopSelect.innerHTML = '<option value="">-- 请选择公司 / 店铺 --</option>';
+          SHOPS.forEach(function (s) {
+            var opt = document.createElement('option');
+            opt.value = s.id;
+            opt.textContent = s.name;
+            shopSelect.appendChild(opt);
+          });
+        })
+        .withFailureHandler(function (err) {
+          shopSelect.innerHTML = '<option value="">载入失败</option>';
+          showMsg('载入资料失败：' + err.message, 'err');
+        })
+        .getInitData();
+
+      /* ---------- 选择公司 → 换印章 ---------- */
+      shopSelect.addEventListener('change', function () {
+        var id = this.value;
+        var dataUrl = id ? STAMPS[id] : '';
+
+        if (dataUrl) {
+          stampImg.src = dataUrl;
+          stampImg.classList.remove('hidden');
+          stampPh.classList.add('hidden');
+        } else {
+          stampImg.src = '';
+          stampImg.classList.add('hidden');
+          stampPh.classList.remove('hidden');
+          stampPh.innerHTML = id
+            ? '找不到此公司的印章图片'
+            : '请先选择公司<br>系统将自动显示电子印章与签名';
+        }
+      });
+
+      /* ---------- 提交 ---------- */
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        clearMsg();
+
+        if (!shopSelect.value) {
+          showMsg('请先选择公司 / 店铺', 'err');
+          return;
+        }
+
+        var payload = {
+          shopId   : shopSelect.value,
+          shopName : shopSelect.options[shopSelect.selectedIndex].textContent,
+          situation: $('situation').value.trim(),
+          name     : $('name').value.trim(),
+          adress   : $('adress').value.trim(),
+          corp     : $('corp').value.trim(),
+          remark   : $('remark').value.trim()
+        };
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = '保存中…';
+
+        google.script.run
+          .withSuccessHandler(function (res) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '保存资料';
+
+            if (res && res.ok) {
+              showMsg('✅ ' + res.message, 'ok');
+              form.reset();
+              shopSelect.value = '';
+              stampImg.src = '';
+              stampImg.classList.add('hidden');
+              stampPh.classList.remove('hidden');
+              stampPh.innerHTML = '请先选择公司<br>系统将自动显示电子印章与签名';
+            } else {
+              showMsg('❌ 保存失败：' + (res && res.message ? res.message : '未知错误'), 'err');
+            }
+          })
+          .withFailureHandler(function (err) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '保存资料';
+            showMsg('❌ 保存失败：' + err.message, 'err');
+          })
+          .saveData(payload);
+      });
+    </script>
+  </body>
+</html>
