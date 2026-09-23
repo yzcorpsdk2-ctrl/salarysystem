@@ -76,7 +76,7 @@
   .nav-dropdown.open > .nav-item { background: var(--nav-hover); color: #fff; }
 
   .nav-dropdown-menu {
-    position: absolute; top: 100%; left: 0; min-width: 215px;
+    position: absolute; top: 100%; left: 0; min-width: 220px;
     background: #ffffff; border: 1px solid var(--epf-border);
     border-radius: 0 0 9px 9px;
     box-shadow: 0 18px 36px -12px rgba(11, 27, 48, 0.42);
@@ -102,6 +102,12 @@
     padding-left: 1rem;
   }
   .nav-dropdown-menu a:hover .dot { opacity: 1; transform: scale(1.35); }
+  .nav-menu-label {
+    padding: 0.5rem 0.8rem 0.2rem; font-size: 0.62rem;
+    color: var(--epf-muted); text-transform: uppercase;
+    letter-spacing: 0.08em; font-weight: 700;
+    border-top: 1px solid var(--epf-border-soft); margin-top: 0.25rem;
+  }
 
   .nav-chat {
     margin-left: auto; align-self: center;
@@ -273,6 +279,37 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%231a4f8a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat; background-position: right 0.7rem center;
   }
+
+  /* Toolbar Dropdown (PRINT) */
+  .toolbar-dropdown { position: relative; display: inline-flex; }
+  .toolbar-dropdown > .btn { cursor: pointer; }
+  .toolbar-dropdown .caret {
+    font-size: 0.6rem; margin-left: 0.15rem; opacity: 0.8;
+    transition: transform 0.18s; display: inline-block;
+  }
+  .toolbar-dropdown.open .caret { transform: rotate(180deg); }
+  .toolbar-dropdown-menu {
+    position: absolute; top: calc(100% + 5px); left: 0;
+    background: #ffffff; border: 1px solid var(--epf-border);
+    border-radius: 8px;
+    box-shadow: 0 14px 36px -12px rgba(26, 79, 138, 0.35);
+    min-width: 220px; padding: 0.35rem;
+    display: none; flex-direction: column; z-index: 400;
+  }
+  .toolbar-dropdown.open .toolbar-dropdown-menu { display: flex; }
+  .toolbar-dropdown-menu button {
+    display: flex; align-items: center; gap: 0.55rem;
+    padding: 0.55rem 0.85rem; border: none; background: transparent;
+    border-radius: 5px; font-size: 0.79rem; text-align: left;
+    cursor: pointer; font-family: inherit; color: var(--epf-text);
+    font-weight: 500; transition: background 0.13s, color 0.13s, padding-left 0.13s;
+    white-space: nowrap;
+  }
+  .toolbar-dropdown-menu button:hover {
+    background: var(--epf-blue-light); color: var(--epf-blue);
+    padding-left: 1rem;
+  }
+
   .container { max-width: 100%; margin: 0 auto; padding: 1.5rem 1.75rem; }
   .page-header {
     background: #ffffff; border: 1px solid var(--epf-border); border-radius: 8px;
@@ -653,6 +690,36 @@
     flex-wrap: wrap; font-size: 0.75rem; color: var(--epf-muted);
   }
   .modal-actions { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+
+  /* 打印选择弹窗 */
+  .print-list {
+    max-height: 340px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 0.3rem;
+    border: 1px solid var(--epf-border-soft); border-radius: 6px;
+    padding: 0.5rem; background: #fbfdff;
+  }
+  .print-list::-webkit-scrollbar { width: 6px; }
+  .print-list::-webkit-scrollbar-thumb { background: #c2d4e6; border-radius: 3px; }
+  .print-list-item {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.5rem 0.75rem; border: 1px solid var(--epf-border-soft);
+    border-radius: 5px; background: #fff; font-size: 0.78rem;
+    cursor: pointer; transition: 0.13s; user-select: none;
+  }
+  .print-list-item:hover { background: var(--epf-blue-soft); border-color: var(--epf-border); }
+  .print-list-item input[type="checkbox"] {
+    accent-color: var(--epf-blue); width: 15px; height: 15px; cursor: pointer; flex-shrink: 0;
+  }
+  .print-list-item .pl-name { flex: 1; }
+  .print-list-item .pl-badge {
+    font-size: 0.65rem; color: var(--epf-blue); background: var(--epf-blue-light);
+    padding: 0.12rem 0.5rem; border-radius: 3px; font-weight: 600;
+  }
+  .print-modal-hint {
+    font-size: 0.72rem; color: var(--epf-muted);
+    padding: 0.4rem 0.2rem;
+  }
+
   #printArea { display: none; }
   @media print {
     body { background: #fff; padding: 0; }
@@ -715,7 +782,19 @@
   <div class="nav-links">
     <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/.github.io/staffinfo.html">👥 Employees</a>
 
-    <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/salarysystem/salary.html">📊 Payroll View</a>
+    <!-- ===== BACKUP（替代原 PAYROLL VIEW） ===== -->
+    <div class="nav-dropdown">
+      <button class="nav-item" type="button">💾 Backup <span class="caret">▾</span></button>
+      <div class="nav-dropdown-menu">
+        <a href="#" onclick="reloadFromSheet(); closeAllNavDropdowns(); return false;"><span class="dot"></span>🔄 Muat dari Sheet</a>
+        <a href="#" onclick="openImportModal(); closeAllNavDropdowns(); return false;"><span class="dot"></span>📥 Import</a>
+        <div class="nav-menu-label">Eksport</div>
+        <a href="#" onclick="exportToPDF(); closeAllNavDropdowns(); return false;"><span class="dot"></span>📄 PDF</a>
+        <a href="#" onclick="exportToXLSX(); closeAllNavDropdowns(); return false;"><span class="dot"></span>📊 Excel (.xlsx)</a>
+        <a href="#" onclick="exportToTXT(); closeAllNavDropdowns(); return false;"><span class="dot"></span>📝 Text (.txt)</a>
+        <a href="#" onclick="exportToDOC(); closeAllNavDropdowns(); return false;"><span class="dot"></span>📘 Word (.doc)</a>
+      </div>
+    </div>
 
     <div class="nav-dropdown">
       <button class="nav-item" type="button">➖ Deduction <span class="caret">▾</span></button>
@@ -779,29 +858,26 @@
   </div>
 </div>
 
+<!-- ==================== 工具栏（精简后） ==================== -->
 <div class="topbar">
   <div class="brand"><div class="logo">P</div> Payroll System</div>
   <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
+
   <button class="btn btn-success" onclick="saveToSheet()" id="btnSaveSheet">💾 Simpan ke Sheet</button>
-  <button class="btn" onclick="reloadFromSheet()" id="btnReloadSheet" title="Tarik semula data terbaru dari Google Sheet">🔄 Muat dari Sheet</button>
-  <button class="btn" onclick="openImportModal()" id="btnImport">📥 Import / 导入</button>
-  <select id="exportMenu" class="btn" onchange="handleExport(this.value)">
-    <option value="">💾 Eksport / 导出…</option>
-    <option value="pdf">📄 PDF (.pdf)</option>
-    <option value="xlsx">📊 Excel (.xlsx)</option>
-    <option value="txt">📝 Text (.txt)</option>
-    <option value="doc">📘 Word (.doc)</option>
-  </select>
-  <button class="btn" onclick="showAllPayslips()" id="btnAllSlip">📄 Semua Slip Gaji</button>
   <button class="btn" onclick="checkAll()" id="btnCheckAll">✅ Semak Semua</button>
-  <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
-  <select id="checkMenu" class="btn" onchange="jumpToCheckPage(this.value)">
-    <option value="">🔍 Semak / 检查…</option>
-    <option value="https://yzcorpsdk2-ctrl.github.io/salarysystem/epf.html">🔍 EPF</option>
-    <option value="https://yzcorpsdk2-ctrl.github.io/salarysystem/socso.html">🔍 SOCSO</option>
-    <option value="https://yzcorpsdk2-ctrl.github.io/salarysystem/eis.html">🔍 EIS</option>
-    <option value="https://yzcorpsdk2-ctrl.github.io/salarysystem/24jamlindungan.html">🔍 24 JAM Lindungan</option>
-  </select>
+
+  <!-- PRINT 下拉菜单 -->
+  <div class="toolbar-dropdown" id="printDropdown">
+    <button class="btn" type="button" onclick="toggleToolbarDropdown('printDropdown', event)">
+      🖨️ Print <span class="caret">▾</span>
+    </button>
+    <div class="toolbar-dropdown-menu">
+      <button type="button" onclick="printAll()">📄 全部复印</button>
+      <button type="button" onclick="printByGroup()">📁 根据 Group 复印</button>
+      <button type="button" onclick="printBatch()">☑️ 批量复印</button>
+    </div>
+  </div>
+
   <span class="spacer"></span>
   <select id="langSelect" class="btn" onchange="switchLang(this.value)">
     <option value="ms">🇲🇾 Bahasa Melayu</option>
@@ -1055,6 +1131,7 @@
 <div id="printArea"></div>
 <div id="toast" class="toast"></div>
 
+<!-- ============ 冻结列弹窗 ============ -->
 <div id="freezeModal" class="modal-overlay" style="display:none;">
   <div class="modal-box compact">
     <h3 style="justify-content:center; font-size:1.05rem; margin-bottom:0.3rem; color:var(--epf-blue);" id="freezeTitle">🔒 Tetapan Freeze Kolum</h3>
@@ -1067,6 +1144,7 @@
   </div>
 </div>
 
+<!-- ============ 导入弹窗 ============ -->
 <div id="importModal" class="modal-overlay" style="display:none;">
   <div class="modal-box">
     <div class="modal-header">
@@ -1091,6 +1169,46 @@
   </div>
 </div>
 
+<!-- ============ 按 Group 复印 - 选择分店弹窗 ============ -->
+<div id="groupSelectModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>📁 选择 Group / 分店 复印</h3>
+      <button class="modal-close" onclick="closeGroupSelectModal()">✕</button>
+    </div>
+    <div style="display:flex; gap:0.5rem; margin-bottom:0.4rem;">
+      <button class="btn btn-sm" onclick="groupSelectAll(true)">全选</button>
+      <button class="btn btn-sm" onclick="groupSelectAll(false)">取消全选</button>
+    </div>
+    <p class="print-modal-hint">勾选想要复印的分店（可多选）：</p>
+    <div class="print-list" id="groupSelectList"></div>
+    <div class="modal-footer" style="justify-content:flex-end;">
+      <button class="btn" onclick="closeGroupSelectModal()">Batal</button>
+      <button class="btn btn-primary" onclick="confirmGroupPrint()">🖨️ Cetak</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 批量复印 - 选择员工弹窗 ============ -->
+<div id="batchPrintModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>☑️ 批量复印 - 选择员工</h3>
+      <button class="modal-close" onclick="closeBatchPrintModal()">✕</button>
+    </div>
+    <div style="display:flex; gap:0.5rem; margin-bottom:0.4rem;">
+      <button class="btn btn-sm" onclick="batchSelectAll(true)">全选</button>
+      <button class="btn btn-sm" onclick="batchSelectAll(false)">取消全选</button>
+    </div>
+    <p class="print-modal-hint">勾选想要复印的员工（可多选）：</p>
+    <div class="print-list" id="batchPrintList"></div>
+    <div class="modal-footer" style="justify-content:flex-end;">
+      <button class="btn" onclick="closeBatchPrintModal()">Batal</button>
+      <button class="btn btn-primary" onclick="confirmBatchPrint()">🖨️ Cetak</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 /* ============================================================
@@ -1100,6 +1218,9 @@ function syncNavHeight() {
   const nav = document.getElementById('mainNav');
   if (!nav) return;
   document.documentElement.style.setProperty('--nav-h', nav.offsetHeight + 'px');
+}
+function closeAllNavDropdowns() {
+  document.querySelectorAll('.nav-dropdown.open').forEach(x => x.classList.remove('open'));
 }
 
 document.querySelectorAll('.nav-dropdown').forEach(dd => {
@@ -1117,7 +1238,28 @@ document.addEventListener('click', e => {
   if (!e.target.closest('.nav-dropdown')) {
     document.querySelectorAll('.nav-dropdown.open').forEach(x => x.classList.remove('open'));
   }
+  if (!e.target.closest('.toolbar-dropdown')) {
+    document.querySelectorAll('.toolbar-dropdown.open').forEach(x => x.classList.remove('open'));
+  }
 });
+
+/* ============================================================
+   Toolbar 下拉菜单（PRINT）
+   ============================================================ */
+function toggleToolbarDropdown(id, e) {
+  if (e) e.stopPropagation();
+  const el = document.getElementById(id);
+  const wasOpen = el.classList.contains('open');
+  document.querySelectorAll('.toolbar-dropdown.open').forEach(x => x.classList.remove('open'));
+  if (!wasOpen) el.classList.add('open');
+}
+function closeToolbarDropdown(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('open');
+}
+function closeAllToolbarDropdowns() {
+  document.querySelectorAll('.toolbar-dropdown.open').forEach(x => x.classList.remove('open'));
+}
 
 /* ============================================================
    REQUEST CHAT · 在线 AI 助手
@@ -1202,7 +1344,6 @@ function aiReply(q) {
   if (has('你好', 'hi', 'hello', 'halo', '嗨')) {
     return '你好！👋 我可以帮你解答薪资系统的问题。\n试试问我：EPF 怎么算？/ OT 如何计算？/ 如何保存到 Sheet？';
   }
-
   if (has('epf', 'kwsp')) {
     return '【EPF / KWSP 计算】\n' +
       '• 55 岁以下：员工 11%，雇主 12%（月薪 ≤ RM5,000 时雇主 13%）\n' +
@@ -1276,19 +1417,22 @@ function aiReply(q) {
   if (has('保存', 'sheet', 'simpan', 'google')) {
     return '【保存资料到 Google Sheet】\n' +
       '• 点顶部「💾 Simpan ke Sheet」→ 把当前所有资料写入 Sheet\n' +
-      '• 点「🔄 Muat dari Sheet」→ 重新拉取最新数据\n' +
+      '• 点导航栏「Backup ▾ → Muat dari Sheet」→ 重新拉取最新数据\n' +
       '（页面载入时会自动先从 Sheet 获取资料）';
   }
   if (has('导入', 'import', '导出', 'eksport', 'export')) {
     return '【导入 / 导出】\n' +
-      '📥 Import：支持 .xlsx / .csv / .txt，可先下载 Excel 或 Word 模板\n' +
-      '💾 Eksport：支持 PDF、Excel (.xlsx)、Text (.txt)、Word (.doc)\n' +
+      '📥 Import：Backup ▾ → Import，支持 .xlsx / .csv / .txt\n' +
+      '💾 Eksport：Backup ▾ → 选择 PDF / Excel / Text / Word\n' +
       '导出会依照当前筛选结果输出。';
   }
-  if (has('粮单', 'slip', 'payslip', '打印')) {
-    return '【粮单 Payslip】\n' +
-      '• 点每行最右侧「Slip」按钮 → 打印单张粮单\n' +
-      '• 点顶部「📄 Semua Slip Gaji」→ 批量打印（可输入 GroupName 过滤）';
+  if (has('粮单', 'slip', 'payslip', '打印', 'print', '复印')) {
+    return '【粮单 PRINT 功能】\n' +
+      '点顶部「🖨️ Print ▾」可选择：\n' +
+      '• 📄 全部复印 → 打印所有在职员工\n' +
+      '• 📁 根据 Group 复印 → 弹窗勾选分店后打印\n' +
+      '• ☑️ 批量复印 → 弹窗勾选员工后打印\n' +
+      '表格内每行右侧「Slip」按钮也可单独打印一张。';
   }
   if (has('筛选', 'filter', '搜索', '过滤')) {
     return '【筛选功能】\n' +
@@ -1314,7 +1458,7 @@ function aiReply(q) {
   if (has('借粮页面', 'leave 页面', '跳转', '导航', 'menu', '菜单')) {
     return '【顶部导航栏】\n' +
       '• EMPLOYEES → 员工资料\n' +
-      '• PAYROLL VIEW → 薪资总览\n' +
+      '• BACKUP ▾ → Muat dari Sheet / Import / Eksport\n' +
       '• DEDUCTION ▾ → Leave / Pinjaman / EPF / SOCSO / EIS / 24 Jam Lindungan\n' +
       '• ADDITIONAL ▾ → Over Time / Pendapatan Tambahan\n' +
       '• SETTING ▾ → Company / Payslip / HTML';
@@ -1756,11 +1900,10 @@ function updateUILanguage() {
   document.getElementById('thNet').textContent = t('net');
   document.getElementById('thAction').textContent = t('action');
   document.getElementById('legend').textContent = t('legend');
-  document.getElementById('btnSaveSheet').innerHTML = '💾 ' + t('save');
-  document.getElementById('btnImport').innerHTML = '📥 ' + t('importBtn');
-  document.getElementById('btnAllSlip').innerHTML = '📄 ' + t('allSlip');
-  document.getElementById('btnCheckAll').innerHTML = '✅ ' + t('checkAll');
-  document.getElementById('exportMenu').options[0].textContent = '💾 ' + t('exportMenu') + ' / 导出…';
+  const btnSaveSheet = document.getElementById('btnSaveSheet');
+  if (btnSaveSheet) btnSaveSheet.innerHTML = '💾 ' + t('save');
+  const btnCheckAll = document.getElementById('btnCheckAll');
+  if (btnCheckAll) btnCheckAll.innerHTML = '✅ ' + t('checkAll');
   document.getElementById('freezeTitle').textContent = t('freezeTitle');
   document.getElementById('freezeDesc').textContent = t('freezeDesc');
   document.getElementById('freezeUnlockBtn').textContent = t('freezeUnlock');
@@ -2018,11 +2161,6 @@ function checkAll() {
   ['epf','socso','eis','lindung'].forEach(checkOne);
   toast('Semakan selesai');
 }
-function jumpToCheckPage(url) {
-  if (!url) return;
-  window.open(url, '_blank');
-  document.getElementById('checkMenu').value = '';
-}
 
 /* ============ 保存到 Google Sheet ============ */
 async function saveToSheet() {
@@ -2084,6 +2222,10 @@ window.addEventListener('DOMContentLoaded', () => {
   if (modal) modal.addEventListener('click', e => { if (e.target.id === 'importModal') closeImportModal(); });
   const fm = document.getElementById('freezeModal');
   if (fm) fm.addEventListener('click', e => { if (e.target.id === 'freezeModal') closeFreezeModal(); });
+  const gm = document.getElementById('groupSelectModal');
+  if (gm) gm.addEventListener('click', e => { if (e.target.id === 'groupSelectModal') closeGroupSelectModal(); });
+  const bm = document.getElementById('batchPrintModal');
+  if (bm) bm.addEventListener('click', e => { if (e.target.id === 'batchPrintModal') closeBatchPrintModal(); });
 });
 
 function parseCSVLine(line) {
@@ -2257,16 +2399,6 @@ function downloadTemplate(format) {
     downloadBlob(html, 'payroll_template.doc', 'application/msword');
     toast('Template Word dimuat turun');
   }
-}
-function handleExport(val) {
-  if (!val) return;
-  try {
-    if (val === 'pdf')  exportToPDF();
-    else if (val === 'xlsx') exportToXLSX();
-    else if (val === 'txt')  exportToTXT();
-    else if (val === 'doc')  exportToDOC();
-  } catch (err) { console.error(err); toast('Export error: ' + err.message, false); }
-  finally { document.getElementById('exportMenu').value = ''; }
 }
 function getExportRows() {
   const rows = [];
@@ -2527,6 +2659,9 @@ async function loadEmployees(opts = {}) {
   renderTable();
 }
 
+/* ============================================================
+   单张粮单打印
+   ============================================================ */
 function showPayslip(code) {
   const emp = employees.find(e => e.Code === code);
   if (!emp) return;
@@ -2535,17 +2670,124 @@ function showPayslip(code) {
   printArea.innerHTML = buildPayslip(emp);
   window.print();
 }
-function showAllPayslips() {
-  const groupFilterQ = prompt('Masukkan GroupName untuk cetak semua (kosongkan untuk semua):', '');
-  let list = employees.map(e => recalcRow({ ...e }));
-  if (groupFilterQ && groupFilterQ.trim()) {
-    list = list.filter(e => String(e.GroupName).toLowerCase().includes(groupFilterQ.trim().toLowerCase()));
-  }
+
+/* ============================================================
+   PRINT 下拉：全部复印
+   ============================================================ */
+function printAll() {
+  closeAllToolbarDropdowns();
+  const list = employees.map(e => recalcRow({ ...e })).filter(e => {
+    const s = String(e.Situation || '').trim().toUpperCase();
+    return s !== 'UNACTIVE' && s !== 'INACTIVE';
+  });
   if (!list.length) { toast('Tiada pekerja', false); return; }
   const printArea = document.getElementById('printArea');
   printArea.innerHTML = list.map(buildPayslip).join('');
-  window.print();
+  toast('Sedia cetak ' + list.length + ' slip');
+  setTimeout(() => window.print(), 120);
 }
+
+/* ============================================================
+   PRINT 下拉：根据 Group 复印 —— 弹窗选择分店
+   ============================================================ */
+function printByGroup() {
+  closeAllToolbarDropdowns();
+  const activeList = employees.filter(e => {
+    const s = String(e.Situation || '').trim().toUpperCase();
+    return s !== 'UNACTIVE' && s !== 'INACTIVE';
+  });
+  if (!activeList.length) { toast('Tiada pekerja', false); return; }
+
+  // 按 GroupName 分组，统计每个分店人数
+  const map = new Map();
+  activeList.forEach(e => {
+    const g = String(e.GroupName || '(Tiada Group)').trim() || '(Tiada Group)';
+    map.set(g, (map.get(g) || 0) + 1);
+  });
+  const sorted = Array.from(map.keys()).sort();
+
+  const listEl = document.getElementById('groupSelectList');
+  listEl.innerHTML = sorted.map(g => `
+    <label class="print-list-item">
+      <input type="checkbox" class="group-print-chk" value="${escapeHtml(g)}">
+      <span class="pl-name">📁 ${escapeHtml(g)}</span>
+      <span class="pl-badge">${map.get(g)}</span>
+    </label>
+  `).join('');
+
+  document.getElementById('groupSelectModal').style.display = 'flex';
+}
+function closeGroupSelectModal() {
+  document.getElementById('groupSelectModal').style.display = 'none';
+}
+function groupSelectAll(checked) {
+  document.querySelectorAll('.group-print-chk').forEach(cb => cb.checked = checked);
+}
+function confirmGroupPrint() {
+  const selected = new Set();
+  document.querySelectorAll('.group-print-chk:checked').forEach(cb => selected.add(cb.value));
+  if (selected.size === 0) { toast('请至少选择一个 Group / 分店', false); return; }
+  const list = employees.map(e => recalcRow({ ...e })).filter(e => {
+    const s = String(e.Situation || '').trim().toUpperCase();
+    if (s === 'UNACTIVE' || s === 'INACTIVE') return false;
+    const g = String(e.GroupName || '(Tiada Group)').trim() || '(Tiada Group)';
+    return selected.has(g);
+  });
+  if (!list.length) { toast('Tiada pekerja dalam pilihan', false); return; }
+  closeGroupSelectModal();
+  const printArea = document.getElementById('printArea');
+  printArea.innerHTML = list.map(buildPayslip).join('');
+  toast('Sedia cetak ' + list.length + ' slip');
+  setTimeout(() => window.print(), 120);
+}
+
+/* ============================================================
+   PRINT 下拉：批量复印 —— 弹窗勾选员工
+   ============================================================ */
+function printBatch() {
+  closeAllToolbarDropdowns();
+  const activeList = employees.filter(e => {
+    const s = String(e.Situation || '').trim().toUpperCase();
+    return s !== 'UNACTIVE' && s !== 'INACTIVE';
+  });
+  if (!activeList.length) { toast('Tiada pekerja', false); return; }
+
+  const listEl = document.getElementById('batchPrintList');
+  listEl.innerHTML = activeList.map(e => {
+    const idx = employees.indexOf(e);
+    return `
+      <label class="print-list-item">
+        <input type="checkbox" class="batch-print-chk" value="${idx}" checked>
+        <span class="pl-name">${escapeHtml(e.Code || '')} · ${escapeHtml(e.Name || '')}</span>
+        <span class="pl-badge">${escapeHtml(e.GroupName || '-')}</span>
+      </label>
+    `;
+  }).join('');
+
+  document.getElementById('batchPrintModal').style.display = 'flex';
+}
+function closeBatchPrintModal() {
+  document.getElementById('batchPrintModal').style.display = 'none';
+}
+function batchSelectAll(checked) {
+  document.querySelectorAll('.batch-print-chk').forEach(cb => cb.checked = checked);
+}
+function confirmBatchPrint() {
+  const idxs = [];
+  document.querySelectorAll('.batch-print-chk:checked').forEach(cb => idxs.push(Number(cb.value)));
+  if (idxs.length === 0) { toast('请至少选择一位员工', false); return; }
+  const list = idxs.map(i => recalcRow({ ...employees[i] })).filter(Boolean);
+  if (!list.length) { toast('Tiada pekerja', false); return; }
+  closeBatchPrintModal();
+  const printArea = document.getElementById('printArea');
+  printArea.innerHTML = list.map(buildPayslip).join('');
+  toast('Sedia cetak ' + list.length + ' slip');
+  setTimeout(() => window.print(), 120);
+}
+
+/* ============================================================
+   构建粮单
+   ============================================================ */
 function buildPayslip(emp) {
   const fmt = n => Number(n || 0).toFixed(2);
   const ot = num(emp.NormalOT) + num(emp.RestOT) + num(emp.PublicOT) + num(emp.OtherOT);
