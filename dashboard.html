@@ -3,24 +3,20 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Payroll Dashboard</title>
-    <!-- Google Fonts -->
+    <title>Payroll Dashboard · PP PAY</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        /* ---------- CSS Variables (Design Tokens) ---------- */
         :root {
             --sidebar-bg: #1a1d23;
             --sidebar-hover: #2a2e35;
             --sidebar-active-bg: #e63946;
             --sidebar-active-text: #ffffff;
             --sidebar-text: #9ca3af;
-            --sidebar-width: 240px;
+            --sidebar-width: 250px;
 
             --content-bg: #f5f6fa;
             --card-bg: #ffffff;
@@ -52,12 +48,7 @@
             --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
-        /* ---------- Reset & Base ---------- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: var(--font-family);
@@ -75,8 +66,7 @@
             display: flex;
             flex-direction: column;
             position: fixed;
-            top: 0;
-            left: 0;
+            top: 0; left: 0;
             height: 100vh;
             z-index: 100;
             overflow-y: auto;
@@ -98,10 +88,7 @@
             font-size: 22px;
         }
 
-        .sidebar-nav {
-            padding: 16px 12px;
-            flex: 1;
-        }
+        .sidebar-nav { padding: 16px 12px; flex: 1; }
 
         .nav-item {
             display: flex;
@@ -118,38 +105,37 @@
             text-decoration: none;
         }
 
-        .nav-item i {
-            width: 18px;
-            text-align: center;
-            font-size: 15px;
-        }
-
-        .nav-item:hover {
-            background: var(--sidebar-hover);
-            color: #e5e7eb;
-        }
-
-        .nav-item.active {
-            background: var(--sidebar-active-bg);
-            color: var(--sidebar-active-text);
-            font-weight: 600;
-        }
+        .nav-item i { width: 18px; text-align: center; font-size: 15px; }
+        .nav-item:hover { background: var(--sidebar-hover); color: #e5e7eb; }
+        .nav-item.active { background: var(--sidebar-active-bg); color: var(--sidebar-active-text); font-weight: 600; }
 
         .nav-item .chevron {
             margin-left: auto;
             font-size: 11px;
             opacity: 0.6;
+            transition: transform 0.2s;
         }
 
+        .nav-item.open .chevron { transform: rotate(180deg); }
+
+        /* Submenu */
         .nav-sub {
-            padding-left: 44px;
-            display: none;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding-left: 0;
         }
+
+        .nav-sub.open { max-height: 400px; }
 
         .nav-sub .nav-item {
             font-size: 13px;
-            padding: 8px 14px;
+            padding: 9px 14px 9px 44px;
+            font-weight: 400;
+            color: var(--sidebar-text);
         }
+
+        .nav-sub .nav-item:hover { color: #e5e7eb; }
 
         /* ---------- Main Content ---------- */
         .main-content {
@@ -169,23 +155,10 @@
             gap: 16px;
         }
 
-        .topbar-left h1 {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
+        .topbar-left h1 { font-size: 22px; font-weight: 700; color: var(--text-primary); }
+        .topbar-left p { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
 
-        .topbar-left p {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-top: 2px;
-        }
-
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
+        .topbar-right { display: flex; align-items: center; gap: 14px; }
 
         .btn {
             display: inline-flex;
@@ -201,18 +174,11 @@
             font-family: var(--font-family);
         }
 
-        .btn-primary {
-            background: var(--sidebar-bg);
-            color: #ffffff;
-        }
-
-        .btn-primary:hover {
-            background: #2a2e35;
-        }
+        .btn-primary { background: var(--sidebar-bg); color: #ffffff; }
+        .btn-primary:hover { background: #2a2e35; }
 
         .btn-icon {
-            width: 38px;
-            height: 38px;
+            width: 38px; height: 38px;
             border-radius: 50%;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -226,24 +192,19 @@
             transition: background 0.2s;
         }
 
-        .btn-icon:hover {
-            background: #f3f4f6;
-        }
+        .btn-icon:hover { background: #f3f4f6; }
 
         .btn-icon .badge-dot {
             position: absolute;
-            top: 7px;
-            right: 8px;
-            width: 7px;
-            height: 7px;
+            top: 7px; right: 8px;
+            width: 7px; height: 7px;
             border-radius: 50%;
             background: var(--accent-red);
             border: 2px solid var(--card-bg);
         }
 
         .avatar {
-            width: 38px;
-            height: 38px;
+            width: 38px; height: 38px;
             border-radius: 50%;
             background: linear-gradient(135deg, #f59e0b, #e63946);
             display: flex;
@@ -265,15 +226,9 @@
             gap: 12px;
         }
 
-        .section-header h2 {
-            font-size: 18px;
-            font-weight: 700;
-        }
+        .section-header h2 { font-size: 18px; font-weight: 700; }
 
-        .section-filters {
-            display: flex;
-            gap: 10px;
-        }
+        .section-filters { display: flex; gap: 10px; }
 
         .filter-select {
             padding: 8px 14px;
@@ -305,8 +260,7 @@
         }
 
         .kpi-icon {
-            width: 46px;
-            height: 46px;
+            width: 46px; height: 46px;
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -315,24 +269,13 @@
             margin-bottom: 14px;
         }
 
-        .kpi-icon.red   { background: var(--accent-red-light);    color: var(--accent-red); }
-        .kpi-icon.blue  { background: var(--accent-blue-light);   color: var(--accent-blue); }
-        .kpi-icon.green { background: var(--accent-green-light);  color: var(--accent-green); }
-        .kpi-icon.yellow{ background: var(--accent-yellow-light); color: var(--accent-yellow); }
+        .kpi-icon.red    { background: var(--accent-red-light);    color: var(--accent-red); }
+        .kpi-icon.blue   { background: var(--accent-blue-light);   color: var(--accent-blue); }
+        .kpi-icon.green  { background: var(--accent-green-light);  color: var(--accent-green); }
+        .kpi-icon.yellow { background: var(--accent-yellow-light); color: var(--accent-yellow); }
 
-        .kpi-label {
-            font-size: 13px;
-            color: var(--text-secondary);
-            font-weight: 500;
-            margin-bottom: 6px;
-        }
-
-        .kpi-value {
-            font-size: 26px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            margin-bottom: 8px;
-        }
+        .kpi-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; margin-bottom: 6px; }
+        .kpi-value { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; }
 
         .kpi-change {
             font-size: 12px;
@@ -344,15 +287,8 @@
             border-radius: 20px;
         }
 
-        .kpi-change.positive {
-            background: var(--accent-green-light);
-            color: var(--accent-green);
-        }
-
-        .kpi-change.negative {
-            background: var(--accent-red-light);
-            color: var(--accent-red);
-        }
+        .kpi-change.positive { background: var(--accent-green-light); color: var(--accent-green); }
+        .kpi-change.negative { background: var(--accent-red-light); color: var(--accent-red); }
 
         /* ---------- Charts Row ---------- */
         .charts-row {
@@ -362,11 +298,7 @@
             margin-bottom: 24px;
         }
 
-        @media (max-width: 900px) {
-            .charts-row {
-                grid-template-columns: 1fr;
-            }
-        }
+        @media (max-width: 900px) { .charts-row { grid-template-columns: 1fr; } }
 
         .card {
             background: var(--card-bg);
@@ -375,44 +307,14 @@
             box-shadow: var(--card-shadow);
         }
 
-        .card-title {
-            font-size: 15px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
+        .card-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+        .card-subtitle { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; }
 
-        .card-subtitle {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 18px;
-        }
+        .chart-container { position: relative; width: 100%; height: 220px; }
 
-        .chart-container {
-            position: relative;
-            width: 100%;
-            height: 220px;
-        }
-
-        .chart-legend-inline {
-            display: flex;
-            gap: 18px;
-            margin-top: 14px;
-            flex-wrap: wrap;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .legend-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 3px;
-        }
+        .chart-legend-inline { display: flex; gap: 18px; margin-top: 14px; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+        .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
 
         .view-report {
             display: inline-flex;
@@ -426,14 +328,9 @@
             text-decoration: none;
         }
 
-        .view-report:hover {
-            text-decoration: underline;
-        }
+        .view-report:hover { text-decoration: underline; }
 
-        /* Requests chart card */
-        .requests-card .chart-container {
-            height: 200px;
-        }
+        .requests-card .chart-container { height: 200px; }
 
         /* ---------- Table ---------- */
         .table-card {
@@ -453,20 +350,10 @@
             border-bottom: 1px solid var(--border-color);
         }
 
-        .table-header h3 {
-            font-size: 15px;
-            font-weight: 700;
-        }
+        .table-header h3 { font-size: 15px; font-weight: 700; }
+        .table-wrapper { overflow-x: auto; }
 
-        .table-wrapper {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
 
         thead th {
             text-align: left;
@@ -488,23 +375,13 @@
             white-space: nowrap;
         }
 
-        tbody tr:last-child td {
-            border-bottom: none;
-        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #fafbfc; }
 
-        tbody tr:hover {
-            background: #fafbfc;
-        }
-
-        .employee-cell {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .employee-cell { display: flex; align-items: center; gap: 10px; }
 
         .employee-avatar {
-            width: 34px;
-            height: 34px;
+            width: 34px; height: 34px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -515,15 +392,8 @@
             flex-shrink: 0;
         }
 
-        .employee-name {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .employee-role {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
+        .employee-name { font-weight: 600; color: var(--text-primary); }
+        .employee-role { font-size: 11px; color: var(--text-muted); }
 
         .status-badge {
             display: inline-flex;
@@ -535,20 +405,9 @@
             font-weight: 600;
         }
 
-        .status-badge.paid {
-            background: var(--status-success-bg);
-            color: var(--status-success-text);
-        }
-
-        .status-badge.pending {
-            background: var(--status-pending-bg);
-            color: var(--status-pending-text);
-        }
-
-        .status-badge.aborted {
-            background: var(--status-aborted-bg);
-            color: var(--status-aborted-text);
-        }
+        .status-badge.paid { background: var(--status-success-bg); color: var(--status-success-text); }
+        .status-badge.pending { background: var(--status-pending-bg); color: var(--status-pending-text); }
+        .status-badge.aborted { background: var(--status-aborted-bg); color: var(--status-aborted-text); }
 
         .action-btn {
             padding: 6px 14px;
@@ -563,39 +422,18 @@
             transition: background 0.2s, border-color 0.2s;
         }
 
-        .action-btn:hover {
-            background: #f3f4f6;
-            border-color: #d1d5db;
-        }
+        .action-btn:hover { background: #f3f4f6; border-color: #d1d5db; }
 
         /* ---------- Responsive ---------- */
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s;
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .main-content {
-                margin-left: 0;
-                padding: 18px 16px 32px;
-            }
-            .kpi-grid {
-                grid-template-columns: 1fr 1fr;
-            }
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 18px 16px 32px; }
+            .kpi-grid { grid-template-columns: 1fr 1fr; }
         }
 
-        @media (max-width: 480px) {
-            .kpi-grid {
-                grid-template-columns: 1fr;
-            }
-            .topbar-left h1 {
-                font-size: 18px;
-            }
-        }
+        @media (max-width: 480px) { .kpi-grid { grid-template-columns: 1fr; } .topbar-left h1 { font-size: 18px; } }
 
-        /* Mobile toggle */
         .mobile-toggle {
             display: none;
             background: none;
@@ -606,11 +444,10 @@
             padding: 4px;
         }
 
-        @media (max-width: 768px) {
-            .mobile-toggle {
-                display: block;
-            }
-        }
+        @media (max-width: 768px) { .mobile-toggle { display: block; } }
+
+        /* Loading state */
+        .loading-text { text-align: center; padding: 40px; color: var(--text-muted); font-size: 14px; }
     </style>
 </head>
 <body>
@@ -619,38 +456,92 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <i class="fa-solid fa-bolt"></i>
-            Quickrill
+            PP PAY
         </div>
 
         <nav class="sidebar-nav">
+            <!-- Dashboard (active) -->
             <a class="nav-item active" href="#">
                 <i class="fa-solid fa-gauge-high"></i>
                 Dashboard
             </a>
-            <a class="nav-item" href="#">
+
+            <!-- Employees -->
+            <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/.github.io/staffinfo.html" target="_blank">
                 <i class="fa-solid fa-users"></i>
                 Employees
             </a>
-            <a class="nav-item" href="#">
-                <i class="fa-solid fa-circle-check"></i>
-                Approvals
+
+            <!-- Payroll View -->
+            <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/salarysystem/salary.html" target="_blank">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                Payroll View
+            </a>
+
+            <!-- Deduction (with submenu) -->
+            <a class="nav-item" href="javascript:void(0)" onclick="toggleSub('subDeduction', this)">
+                <i class="fa-solid fa-chart-line"></i>
+                Deduction
                 <i class="fa-solid fa-chevron-down chevron"></i>
             </a>
-            <a class="nav-item" href="#">
-                <i class="fa-solid fa-chart-line"></i>
-                Reports
+            <div class="nav-sub" id="subDeduction">
+                <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/salarysystem/leave.html" target="_blank">
+                    <i class="fa-solid fa-calendar-minus"></i> Leave
+                </a>
+                <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/salarysystem/pinjaman.html" target="_blank">
+                    <i class="fa-solid fa-hand-holding-dollar"></i> Pinjaman
+                </a>
+                <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/salarysystem/epf.html" target="_blank">
+                    <i class="fa-solid fa-building-columns"></i> EPF
+                </a>
+                <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/salarysystem/socso.html" target="_blank">
+                    <i class="fa-solid fa-shield-heart"></i> SOCSO
+                </a>
+                <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/salarysystem/eis.html" target="_blank">
+                    <i class="fa-solid fa-briefcase"></i> EIS
+                </a>
+                <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/salarysystem/lindungan.html" target="_blank">
+                    <i class="fa-solid fa-clock"></i> 24 Jam Lindungan
+                </a>
+            </div>
+
+            <!-- Additional (with submenu) -->
+            <a class="nav-item" href="javascript:void(0)" onclick="toggleSub('subAdditional', this)">
+                <i class="fa-solid fa-plus-circle"></i>
+                Additional
+                <i class="fa-solid fa-chevron-down chevron"></i>
             </a>
-            <a class="nav-item" href="#">
-                <i class="fa-solid fa-hand-holding-dollar"></i>
-                Loans
+            <div class="nav-sub" id="subAdditional">
+                <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/salarysystem/salary.html#overtime" target="_blank">
+                    <i class="fa-solid fa-clock"></i> Over Time
+                </a>
+                <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/salarysystem/salary.html#additional" target="_blank">
+                    <i class="fa-solid fa-sack-dollar"></i> Pendapatan Tambahan
+                </a>
+            </div>
+
+            <!-- Setting (with submenu) -->
+            <a class="nav-item" href="javascript:void(0)" onclick="toggleSub('subSetting', this)">
+                <i class="fa-solid fa-gear"></i>
+                Setting
+                <i class="fa-solid fa-chevron-down chevron"></i>
             </a>
-            <a class="nav-item" href="#">
-                <i class="fa-solid fa-file-invoice"></i>
-                Invoices
-            </a>
-            <a class="nav-item" href="#">
-                <i class="fa-solid fa-circle-question"></i>
-                Requests
+            <div class="nav-sub" id="subSetting">
+                <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/salarysystem/company.html" target="_blank">
+                    <i class="fa-solid fa-building"></i> Company
+                </a>
+                <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/salarysystem/payslip.html" target="_blank">
+                    <i class="fa-solid fa-receipt"></i> Payslip
+                </a>
+                <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/salarysystem/htmlshow.html" target="_blank">
+                    <i class="fa-solid fa-code"></i> HTML
+                </a>
+            </div>
+
+            <!-- Request Chat -->
+            <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/salarysystem/requestchat.html" target="_blank">
+                <i class="fa-solid fa-comments"></i>
+                Request Chat
             </a>
         </nav>
     </aside>
@@ -665,7 +556,7 @@
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 <h1>Welcome, Dibbendol!</h1>
-                <p>08 March, 2026</p>
+                <p id="todayDate">08 March, 2026</p>
             </div>
             <div class="topbar-right">
                 <button class="btn btn-primary">
@@ -705,7 +596,7 @@
                     <i class="fa-solid fa-users"></i>
                 </div>
                 <div class="kpi-label">Total Employees</div>
-                <div class="kpi-value">256</div>
+                <div class="kpi-value" id="kpiTotalEmployees">—</div>
                 <span class="kpi-change positive">
                     <i class="fa-solid fa-arrow-up"></i> +5.4% last month
                 </span>
@@ -715,8 +606,8 @@
                 <div class="kpi-icon red">
                     <i class="fa-solid fa-money-bill-wave"></i>
                 </div>
-                <div class="kpi-label">Average Salary</div>
-                <div class="kpi-value">$3,256</div>
+                <div class="kpi-label">Average Basic Salary</div>
+                <div class="kpi-value" id="kpiAvgSalary">—</div>
                 <span class="kpi-change negative">
                     <i class="fa-solid fa-arrow-down"></i> -2.85% last month
                 </span>
@@ -726,8 +617,8 @@
                 <div class="kpi-icon green">
                     <i class="fa-solid fa-wallet"></i>
                 </div>
-                <div class="kpi-label">Total Outstanding</div>
-                <div class="kpi-value">$89,235</div>
+                <div class="kpi-label">Total Net Payout</div>
+                <div class="kpi-value" id="kpiTotalNet">—</div>
                 <span class="kpi-change positive">
                     <i class="fa-solid fa-arrow-up"></i> +2.8% last month
                 </span>
@@ -737,8 +628,8 @@
                 <div class="kpi-icon yellow">
                     <i class="fa-solid fa-clipboard-list"></i>
                 </div>
-                <div class="kpi-label">Total Requests</div>
-                <div class="kpi-value">35</div>
+                <div class="kpi-label">Total Deductions</div>
+                <div class="kpi-value" id="kpiTotalDed">—</div>
                 <span class="kpi-change positive">
                     <i class="fa-solid fa-arrow-up"></i> +6.2% last month
                 </span>
@@ -747,16 +638,13 @@
 
         <!-- ==================== CHARTS ROW ==================== -->
         <div class="charts-row">
-
             <!-- Payroll History Bar Chart -->
             <div class="card">
                 <div class="card-title">Payroll History</div>
                 <div class="card-subtitle">Check out the total payroll as requested amount</div>
-
                 <div class="chart-container">
                     <canvas id="payrollChart"></canvas>
                 </div>
-
                 <div class="chart-legend-inline">
                     <div class="legend-item">
                         <span class="legend-dot" style="background:#e63946;"></span> Paid
@@ -765,8 +653,7 @@
                         <span class="legend-dot" style="background:#9ca3af;"></span> Unpaid
                     </div>
                 </div>
-
-                <a class="view-report" href="#">
+                <a class="view-report" href="https://yzcorpsdk2-ctrl.github.io/salarysystem/salary.html" target="_blank">
                     View Full Report <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>
@@ -775,18 +662,16 @@
             <div class="card requests-card">
                 <div class="card-title">Requests</div>
                 <div class="card-subtitle">Check the requested from employees</div>
-
                 <div class="chart-container">
                     <canvas id="requestsChart"></canvas>
                 </div>
             </div>
-
         </div>
 
         <!-- ==================== RECENT EMPLOYEES TABLE ==================== -->
         <div class="table-card">
             <div class="table-header">
-                <h3>Recent <span style="color:var(--text-muted); font-weight:500;">36 Employees</span></h3>
+                <h3>Recent <span style="color:var(--text-muted); font-weight:500;" id="recentCount">Employees</span></h3>
                 <select class="filter-select">
                     <option selected>All Department</option>
                     <option>Engineering</option>
@@ -794,89 +679,21 @@
                     <option>Finance</option>
                 </select>
             </div>
-
             <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
                             <th>Name</th>
                             <th>Position</th>
-                            <th>Gross pay</th>
-                            <th>Tax</th>
+                            <th>Gross Pay</th>
+                            <th>Tax / Deduction</th>
                             <th>Total</th>
                             <th>Status</th>
-                            <th>Status</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <div class="employee-cell">
-                                    <div class="employee-avatar" style="background:#e63946;">MR</div>
-                                    <div>
-                                        <div class="employee-name">Maria Roselia</div>
-                                        <div class="employee-role">25/4/2026</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>Sr. Engineer/Marketing</td>
-                            <td>$3,600.00</td>
-                            <td>$825.00</td>
-                            <td>$2,995.00</td>
-                            <td><span class="status-badge pending"><i class="fa-solid fa-clock"></i> Pending</span></td>
-                            <td><button class="action-btn">Action</button></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="employee-cell">
-                                    <div class="employee-avatar" style="background:#3b82f6;">MR</div>
-                                    <div>
-                                        <div class="employee-name">Maria Roselia</div>
-                                        <div class="employee-role">26/4/2026</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>Sr. Engineer/Marketing</td>
-                            <td>$3,600.00</td>
-                            <td>$825.00</td>
-                            <td>$2,995.00</td>
-                            <td><span class="status-badge pending"><i class="fa-solid fa-clock"></i> Pending</span></td>
-                            <td><button class="action-btn">Action</button></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="employee-cell">
-                                    <div class="employee-avatar" style="background:#10b981;">JC</div>
-                                    <div>
-                                        <div class="employee-name">James Carter</div>
-                                        <div class="employee-role">27/4/2026</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>Product Designer</td>
-                            <td>$4,200.00</td>
-                            <td>$980.00</td>
-                            <td>$3,220.00</td>
-                            <td><span class="status-badge paid"><i class="fa-solid fa-check"></i> Paid</span></td>
-                            <td><button class="action-btn">Action</button></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="employee-cell">
-                                    <div class="employee-avatar" style="background:#f59e0b;">SK</div>
-                                    <div>
-                                        <div class="employee-name">Sarah Kim</div>
-                                        <div class="employee-role">28/4/2026</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>Frontend Developer</td>
-                            <td>$3,800.00</td>
-                            <td>$870.00</td>
-                            <td>$2,930.00</td>
-                            <td><span class="status-badge aborted"><i class="fa-solid fa-xmark"></i> Aborted</span></td>
-                            <td><button class="action-btn">Action</button></td>
-                        </tr>
+                    <tbody id="recentTableBody">
+                        <tr><td colspan="7" class="loading-text">Loading payroll data…</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -884,150 +701,421 @@
 
     </div>
 
-    <!-- ==================== CHART.JS CONFIGURATION ==================== -->
+    <!-- ==================== SCRIPT ==================== -->
     <script>
-        // ---- Payroll History Bar Chart ----
-        const payrollCtx = document.getElementById('payrollChart').getContext('2d');
+        /* ============================================================
+           1. 数据同步核心逻辑
+           salary.html 使用 localStorage 键名 'payrollEmployees'
+           存储员工数组，每个对象包含 Basic、EPF_Employee 等字段
+           ============================================================ */
+        const STORAGE_KEY = 'payrollEmployees';
+        const SALARY_URL = 'https://yzcorpsdk2-ctrl.github.io/salarysystem/salary.html';
 
-        // Create gradient for paid bars
-        const paidGradient = payrollCtx.createLinearGradient(0, 0, 0, 220);
-        paidGradient.addColorStop(0, '#e63946');
-        paidGradient.addColorStop(1, '#f08a93');
+        // 当前数据
+        let employees = [];
 
-        new Chart(payrollCtx, {
-            type: 'bar',
-            data: {
-                labels: ['01 Mar', '02 Mar', '03 Mar', '04 Mar', '05 Mar', '06 Mar', '07 Mar'],
-                datasets: [
-                    {
-                        label: 'Paid',
-                        data: [42, 55, 48, 65, 58, 72, 68],
-                        backgroundColor: paidGradient,
-                        borderRadius: 6,
-                        borderSkipped: false,
-                        barPercentage: 0.6,
-                        categoryPercentage: 0.7
-                    },
-                    {
-                        label: 'Unpaid',
-                        data: [18, 22, 15, 28, 20, 25, 30],
-                        backgroundColor: '#e5e7eb',
-                        borderRadius: 6,
-                        borderSkipped: false,
-                        barPercentage: 0.6,
-                        categoryPercentage: 0.7
+        /* ---------- 1.1 从 localStorage 读取数据 ---------- */
+        function loadEmployeesFromStorage() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return [];
+                const parsed = JSON.parse(raw);
+                if (!Array.isArray(parsed)) return [];
+                // 过滤掉 UNACTIVE / INACTIVE
+                return parsed.filter(e => {
+                    const s = String(e.Situation || 'ACTIVE').trim().toUpperCase();
+                    return s !== 'UNACTIVE' && s !== 'INACTIVE';
+                });
+            } catch (err) {
+                console.warn('读取 localStorage 失败:', err);
+                return [];
+            }
+        }
+
+        /* ---------- 1.2 保存数据回 localStorage ---------- */
+        function saveEmployeesToStorage(list) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+            } catch (err) {
+                console.warn('写入 localStorage 失败:', err);
+            }
+        }
+
+        /* ---------- 1.3 监听跨页面 storage 事件 ---------- */
+        // 当 salary.html 保存数据时，会触发本页面的 storage 事件
+        window.addEventListener('storage', (e) => {
+            if (e.key === STORAGE_KEY && e.newValue) {
+                try {
+                    const updated = JSON.parse(e.newValue);
+                    if (Array.isArray(updated) && updated.length > 0) {
+                        employees = updated.filter(x => {
+                            const s = String(x.Situation || 'ACTIVE').trim().toUpperCase();
+                            return s !== 'UNACTIVE' && s !== 'INACTIVE';
+                        });
+                        console.log('[Dashboard] storage 事件触发，已同步 ' + employees.length + ' 位员工');
+                        renderDashboard();
                     }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: '#1f2937',
-                        titleFont: { family: 'Inter', size: 12, weight: '600' },
-                        bodyFont: { family: 'Inter', size: 12 },
-                        padding: 10,
-                        cornerRadius: 8,
-                        callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': ' + context.parsed.y + ' hrs';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: { display: false },
-                        ticks: {
-                            font: { family: 'Inter', size: 11 },
-                            color: '#9ca3af'
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        grid: {
-                            color: '#f3f4f6',
-                            drawBorder: false
-                        },
-                        ticks: {
-                            font: { family: 'Inter', size: 11 },
-                            color: '#9ca3af',
-                            stepSize: 25
-                        }
-                    }
-                }
+                } catch (err) { console.warn('storage 解析失败:', err); }
             }
         });
 
-        // ---- Requests Line Chart ----
-        const reqCtx = document.getElementById('requestsChart').getContext('2d');
+        /* ---------- 1.4 监听来自 salary.html 的 postMessage ---------- */
+        // 如果 salary.html 支持 postMessage，则额外监听
+        window.addEventListener('message', (e) => {
+            if (e.data && e.data.type === 'PAYROLL_UPDATE' && Array.isArray(e.data.employees)) {
+                employees = e.data.employees.filter(x => {
+                    const s = String(x.Situation || 'ACTIVE').trim().toUpperCase();
+                    return s !== 'UNACTIVE' && s !== 'INACTIVE';
+                });
+                renderDashboard();
+            }
+        });
 
-        const reqGradient = reqCtx.createLinearGradient(0, 0, 0, 200);
-        reqGradient.addColorStop(0, 'rgba(230, 57, 70, 0.25)');
-        reqGradient.addColorStop(1, 'rgba(230, 57, 70, 0.0)');
+        /* ---------- 1.5 定时轮询（作为 storage 事件的补充） ---------- */
+        // 某些浏览器在页面不活跃时可能不触发 storage 事件，定时检查作为兜底
+        let lastSnapshot = '';
+        setInterval(() => {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw && raw !== lastSnapshot) {
+                lastSnapshot = raw;
+                try {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed)) {
+                        employees = parsed.filter(x => {
+                            const s = String(x.Situation || 'ACTIVE').trim().toUpperCase();
+                            return s !== 'UNACTIVE' && s !== 'INACTIVE';
+                        });
+                        renderDashboard();
+                    }
+                } catch (_) {}
+            }
+        }, 3000); // 每 3 秒检查一次
 
-        new Chart(reqCtx, {
-            type: 'line',
-            data: {
-                labels: ['10 Mar', '11 Mar', '12 Mar', '13 Mar', '14 Mar'],
-                datasets: [{
-                    label: 'Requests',
-                    data: [28, 42, 35, 58, 48],
-                    borderColor: '#e63946',
-                    backgroundColor: reqGradient,
-                    fill: true,
-                    tension: 0.4,
-                    borderWidth: 2.5,
-                    pointRadius: 0,
-                    pointHoverRadius: 6,
-                    pointHoverBackgroundColor: '#e63946',
-                    pointHoverBorderColor: '#fff',
-                    pointHoverBorderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: '#1f2937',
-                        titleFont: { family: 'Inter', size: 12, weight: '600' },
-                        bodyFont: { family: 'Inter', size: 12 },
-                        padding: 10,
-                        cornerRadius: 8,
-                        callbacks: {
-                            label: function(context) {
-                                return 'Requests: ' + context.parsed.y;
+        /* ============================================================
+           2. 计算逻辑（与 salary.html 的 recalcRow 保持一致）
+           ============================================================ */
+        function num(v) { return Number(v || 0) || 0; }
+
+        function recalcRow(emp) {
+            const basic = num(emp.Basic);
+
+            // 使用 salary.html 已计算好的值（如果存在）
+            // 若不存在则用 basic 做简单估算
+            const epfEmployee = num(emp.EPF_Employee) || Math.ceil(basic * 0.11);
+            const socsoEmployee = num(emp.SOCSO_Employee) || 0;
+            const eisEmployee = num(emp.EIS_Employee) || 0;
+            const lindung = num(emp.Lindung24Jam) || 0;
+
+            // 收入
+            const ot = num(emp.NormalOT) + num(emp.RestOT) + num(emp.PublicOT) + num(emp.OtherOT);
+            const gross = basic + num(emp.Allowance) + num(emp.Allowance2)
+                + num(emp.Commission) + num(emp.Incentives) + ot;
+
+            // 扣款
+            const leaveDed = num(emp.AnnualLeave) + num(emp.UnpaidLeave)
+                + num(emp.SickLeave) + num(emp.HalfDays);
+            const pinjaman = num(emp.Pinjaman);
+            const totalDed = leaveDed + pinjaman + epfEmployee + socsoEmployee + eisEmployee + lindung;
+
+            const net = gross - totalDed;
+
+            return {
+                ...emp,
+                _gross: gross,
+                _totalDed: totalDed,
+                _net: net,
+                _epfEmployee: epfEmployee,
+                _socsoEmployee: socsoEmployee,
+                _eisEmployee: eisEmployee,
+                _lindung: lindung,
+            };
+        }
+
+        /* ============================================================
+           3. 渲染 Dashboard
+           ============================================================ */
+        function renderDashboard() {
+            const list = employees.map(recalcRow);
+
+            // ---------- KPI ----------
+            const totalEmp = list.length;
+            const avgBasic = totalEmp > 0
+                ? list.reduce((s, e) => s + num(e.Basic), 0) / totalEmp
+                : 0;
+            const totalNet = list.reduce((s, e) => s + e._net, 0);
+            const totalDed = list.reduce((s, e) => s + e._totalDed, 0);
+
+            setText('kpiTotalEmployees', totalEmp);
+            setText('kpiAvgSalary', 'RM ' + formatMoney(avgBasic));
+            setText('kpiTotalNet', 'RM ' + formatMoney(totalNet));
+            setText('kpiTotalDed', 'RM ' + formatMoney(totalDed));
+
+            // ---------- 图表 ----------
+            updatePayrollChart(list);
+            updateRequestsChart(list);
+
+            // ---------- 最近员工表格 ----------
+            renderRecentTable(list);
+
+            // ---------- 日期 ----------
+            const d = new Date();
+            const months = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+            setText('todayDate', d.getDate() + ' ' + months[d.getMonth()] + ', ' + d.getFullYear());
+        }
+
+        function setText(id, val) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = val;
+        }
+
+        function formatMoney(n) {
+            return Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+
+        /* ---------- 3.1 Payroll History 柱状图 ---------- */
+        let payrollChartInstance = null;
+        function updatePayrollChart(list) {
+            const ctx = document.getElementById('payrollChart');
+            if (!ctx) return;
+
+            // 按日分组（若无日期字段则按员工分组模拟）
+            // salary.html 无日期字段，这里用员工数据聚合演示
+            const labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+            const paidData = [0, 0, 0, 0];
+            const unpaidData = [0, 0, 0, 0];
+
+            list.forEach((e, i) => {
+                const idx = i % 4;
+                if (e._net > 0) paidData[idx] += e._net;
+                else unpaidData[idx] += Math.abs(e._net);
+            });
+
+            if (payrollChartInstance) payrollChartInstance.destroy();
+
+            const grad = ctx.getContext('2d').createLinearGradient(0, 0, 0, 220);
+            grad.addColorStop(0, '#e63946');
+            grad.addColorStop(1, '#f08a93');
+
+            payrollChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Paid',
+                            data: paidData.map(v => Math.round(v * 100) / 100),
+                            backgroundColor: grad,
+                            borderRadius: 6,
+                            borderSkipped: false,
+                            barPercentage: 0.6,
+                            categoryPercentage: 0.7
+                        },
+                        {
+                            label: 'Unpaid',
+                            data: unpaidData.map(v => Math.round(v * 100) / 100),
+                            backgroundColor: '#e5e7eb',
+                            borderRadius: 6,
+                            borderSkipped: false,
+                            barPercentage: 0.6,
+                            categoryPercentage: 0.7
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1f2937',
+                            titleFont: { family: 'Inter', size: 12, weight: '600' },
+                            bodyFont: { family: 'Inter', size: 12 },
+                            padding: 10,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(c) {
+                                    return c.dataset.label + ': RM ' + formatMoney(c.parsed.y);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11 }, color: '#9ca3af' } },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f3f4f6', drawBorder: false },
+                            ticks: {
+                                font: { family: 'Inter', size: 11 },
+                                color: '#9ca3af',
+                                callback: v => 'RM' + v
                             }
                         }
                     }
+                }
+            });
+        }
+
+        /* ---------- 3.2 Requests 折线图 ---------- */
+        let requestsChartInstance = null;
+        function updateRequestsChart(list) {
+            const ctx = document.getElementById('requestsChart');
+            if (!ctx) return;
+
+            // 统计各类扣款人数
+            const labels = ['Leave', 'Pinjaman', 'EPF', 'SOCSO', 'EIS', '24JAM'];
+            const counts = [
+                list.filter(e => num(e.AnnualLeave) + num(e.UnpaidLeave) + num(e.SickLeave) + num(e.HalfDays) > 0).length,
+                list.filter(e => num(e.Pinjaman) > 0).length,
+                list.filter(e => e._epfEmployee > 0).length,
+                list.filter(e => e._socsoEmployee > 0).length,
+                list.filter(e => e._eisEmployee > 0).length,
+                list.filter(e => e._lindung > 0).length,
+            ];
+
+            if (requestsChartInstance) requestsChartInstance.destroy();
+
+            const grad = ctx.getContext('2d').createLinearGradient(0, 0, 0, 200);
+            grad.addColorStop(0, 'rgba(230, 57, 70, 0.25)');
+            grad.addColorStop(1, 'rgba(230, 57, 70, 0.0)');
+
+            requestsChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Employees',
+                        data: counts,
+                        borderColor: '#e63946',
+                        backgroundColor: grad,
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2.5,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#e63946',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
                 },
-                scales: {
-                    x: {
-                        grid: { display: false },
-                        ticks: {
-                            font: { family: 'Inter', size: 11 },
-                            color: '#9ca3af'
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1f2937',
+                            titleFont: { family: 'Inter', size: 12, weight: '600' },
+                            bodyFont: { family: 'Inter', size: 12 },
+                            padding: 10,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(c) { return 'Employees: ' + c.parsed.y; }
+                            }
                         }
                     },
-                    y: {
-                        beginAtZero: true,
-                        max: 80,
-                        grid: {
-                            color: '#f3f4f6',
-                            drawBorder: false
-                        },
-                        ticks: {
-                            font: { family: 'Inter', size: 11 },
-                            color: '#9ca3af',
-                            stepSize: 20
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11 }, color: '#9ca3af' } },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f3f4f6', drawBorder: false },
+                            ticks: { font: { family: 'Inter', size: 11 }, color: '#9ca3af', stepSize: 1 }
                         }
                     }
                 }
+            });
+        }
+
+        /* ---------- 3.3 最近员工表格 ---------- */
+        function renderRecentTable(list) {
+            const tbody = document.getElementById('recentTableBody');
+            if (!tbody) return;
+
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="loading-text">No employee data found. Open Payroll View to load data.</td></tr>';
+                setText('recentCount', 'Employees');
+                return;
+            }
+
+            // 按净薪资降序，取前 5 条
+            const sorted = [...list].sort((a, b) => b._net - a._net).slice(0, 5);
+            setText('recentCount', list.length + ' Employees');
+
+            const colors = ['#e63946', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
+
+            tbody.innerHTML = sorted.map((e, i) => {
+                const initials = (e.Name || '?')
+                    .split(' ')
+                    .map(w => w[0])
+                    .slice(0, 2)
+                    .join('')
+                    .toUpperCase();
+                const color = colors[i % colors.length];
+                const status = e._net > 0
+                    ? '<span class="status-badge paid"><i class="fa-solid fa-check"></i> Calculated</span>'
+                    : '<span class="status-badge pending"><i class="fa-solid fa-clock"></i> Pending</span>';
+
+                return `<tr>
+                    <td>
+                        <div class="employee-cell">
+                            <div class="employee-avatar" style="background:${color};">${initials}</div>
+                            <div>
+                                <div class="employee-name">${esc(e.Name || 'Unknown')}</div>
+                                <div class="employee-role">${esc(e.Code || '')}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${esc(e.GroupName || '—')}</td>
+                    <td>RM ${formatMoney(e._gross)}</td>
+                    <td>RM ${formatMoney(e._totalDed)}</td>
+                    <td>RM ${formatMoney(e._net)}</td>
+                    <td>${status}</td>
+                    <td>
+                        <button class="action-btn" onclick="window.open('${SALARY_URL}','_blank')">View</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function esc(s) {
+            if (!s) return '';
+            return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+        }
+
+        /* ============================================================
+           4. 侧边栏子菜单切换
+           ============================================================ */
+        function toggleSub(id, el) {
+            const sub = document.getElementById(id);
+            if (!sub) return;
+            const isOpen = sub.classList.contains('open');
+            // 关闭所有其他子菜单
+            document.querySelectorAll('.nav-sub.open').forEach(s => {
+                s.classList.remove('open');
+                const p = s.previousElementSibling;
+                if (p) p.classList.remove('open');
+            });
+            if (!isOpen) {
+                sub.classList.add('open');
+                el.classList.add('open');
+            }
+        }
+
+        /* ============================================================
+           5. 初始化
+           ============================================================ */
+        document.addEventListener('DOMContentLoaded', () => {
+            // 首次加载数据
+            employees = loadEmployeesFromStorage();
+            console.log('[Dashboard] 初始加载 ' + employees.length + ' 位员工');
+            renderDashboard();
+
+            // 记录初始快照
+            lastSnapshot = localStorage.getItem(STORAGE_KEY) || '';
+
+            // 如果 localStorage 为空，尝试从 salary.html 获取（通过 iframe 或提示）
+            if (employees.length === 0) {
+                console.log('[Dashboard] localStorage 为空，请先打开 Payroll View 页面加载数据');
             }
         });
     </script>
