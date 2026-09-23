@@ -217,9 +217,7 @@
   tr:nth-child(even) td { background: #fbfdff; }
   tr:hover td { background: var(--epf-blue-soft); }
   .divider-group { box-shadow: inset 1px 0 0 var(--epf-border) !important; }
-  body.freeze-on .col-freeze {
-    position: sticky; z-index: 9; background: #ffffff;
-  }
+  body.freeze-on .col-freeze { position: sticky; z-index: 9; background: #ffffff; }
   body.freeze-on .col-freeze.col-0 { left: 0px; }
   body.freeze-on .col-freeze.col-1 { left: 80px; }
   body.freeze-on .col-freeze.col-2 { left: 150px; }
@@ -252,9 +250,7 @@
   body.freeze-on .section-label-row th.col-freeze-group {
     position: sticky !important; left: 0 !important; z-index: 24 !important;
   }
-  .lock-edge-right {
-    border-right: 2px solid var(--epf-blue) !important; z-index: 25 !important;
-  }
+  .lock-edge-right { border-right: 2px solid var(--epf-blue) !important; z-index: 25 !important; }
   .fold-line {
     position: absolute; top: 0; bottom: 0; width: 12px;
     background: linear-gradient(to right, rgba(14,92,110,0) 0%, rgba(14,92,110,0.06) 60%, rgba(14,92,110,0.15) 100%);
@@ -282,9 +278,7 @@
     align-items: center; justify-content: center;
     box-shadow: 0 1px 3px rgba(14, 92, 110, 0.15);
   }
-  .unfold-handle::before {
-    content: '▸'; color: #0e5c6e; font-size: 0.66rem; font-weight: 700; line-height: 1;
-  }
+  .unfold-handle::before { content: '▸'; color: #0e5c6e; font-size: 0.66rem; font-weight: 700; line-height: 1; }
   .unfold-handle:hover {
     background: linear-gradient(135deg, #c7e6ef 0%, #a3d8e3 100%);
     border-color: #6fbcd0;
@@ -321,7 +315,6 @@
     word-break: break-word; overflow-wrap: anywhere; color: var(--epf-text);
   }
   .text-cell.center { text-align: center; }
-  /* ============ 可点击员工名链接 ============ */
   .emp-link {
     color: var(--epf-blue); text-decoration: none; font-weight: 600;
     border-bottom: 1px dashed rgba(26, 79, 138, 0.35);
@@ -474,6 +467,7 @@
   <div class="brand"><div class="logo">P</div> Payroll System</div>
   <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
   <button class="btn btn-success" onclick="saveToSheet()" id="btnSaveSheet">💾 Simpan ke Sheet</button>
+  <button class="btn" onclick="reloadFromSheet()" id="btnReloadSheet" title="Tarik semula data terbaru dari Google Sheet">🔄 Muat dari Sheet</button>
   <button class="btn" onclick="openImportModal()" id="btnImport">📥 Import / 导入</button>
   <select id="exportMenu" class="btn" onchange="handleExport(this.value)">
     <option value="">💾 Eksport / 导出…</option>
@@ -830,7 +824,7 @@ function openDetail(e, idx) {
   window.open(DETAIL_URL, '_blank');
   return false;
 }
-window.openDetail = openDetail; // 暴露给 inline onclick
+window.openDetail = openDetail;
 
 /* ============ 跨页面同步 ============ */
 window.addEventListener('storage', (ev) => {
@@ -838,7 +832,10 @@ window.addEventListener('storage', (ev) => {
     try {
       const updated = JSON.parse(ev.newValue);
       if (Array.isArray(updated) && updated.length > 0) {
-        employees = updated;
+        employees = updated.map(e => ({
+          ...e,
+          Situation: String(e.Situation || 'ACTIVE').trim().toUpperCase()
+        })).filter(e => e.Situation !== 'UNACTIVE' && e.Situation !== 'INACTIVE');
         renderTable();
         toast('已从详情页面同步数据');
       }
@@ -1428,7 +1425,7 @@ function jumpToCheckPage(url) {
   document.getElementById('checkMenu').value = '';
 }
 
-/* ============ 保存 ============ */
+/* ============ 保存到 Google Sheet ============ */
 async function saveToSheet() {
   if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
     toast('Sila tetapkan APPS_SCRIPT_URL dahulu!', false); return;
@@ -1454,6 +1451,15 @@ async function saveToSheet() {
     });
     toast(t('saved'));
   } catch (err) { console.error(err); toast(t('failed'), false); }
+}
+
+/* ============ 从 Google Sheet 手动重新拉取 ============ */
+async function reloadFromSheet() {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
+    toast('Sila tetapkan APPS_SCRIPT_URL dahulu!', false); return;
+  }
+  toast('Memuat semula dari Sheet...');
+  await loadEmployees({ forceRemote: true });
 }
 
 /* ============ 导入 ============ */
@@ -1791,9 +1797,81 @@ function exportToDOC() {
   toast('Word berjaya dieksport');
 }
 
-/* ============ 加载 ============ */
-async function loadEmployees() {
-  // 1. 优先从 localStorage 读取（跨页面同步后的最新数据）
+/* ============================================================
+   加载：优先从 Google Sheet 拉取 → 失败则 localStorage → 再失败用示例
+   ============================================================ */
+async function loadEmployees(opts = {}) {
+  const forceRemote = !!opts.forceRemote;
+  const useRemote = APPS_SCRIPT_URL && !APPS_SCRIPT_URL.includes('PASTE_YOUR');
+
+  // 1. 优先从 Google Sheet 拉取（若已配置且非强制跳过）
+  if (useRemote) {
+    try {
+      const res = await fetch(APPS_SCRIPT_URL);
+      const json = await res.json();
+      if (json.status === 'success' && Array.isArray(json.data)) {
+        employees = json.data.map(row => ({
+          Situation: String(row.Situation || 'ACTIVE').trim().toUpperCase(),
+          Code: row.Code, Name: row.Name, GroupName: row.GroupName || '',
+          BankNama: row.BankNama || row.Bank || '',
+          Basic: Number(row.Salary || row.Basic) || 0,
+          Allowance: Number(row.Allowance) || 0,
+          Allowance2: Number(row.Allowance2) || 0,
+          Commission: Number(row.Commission) || 0,
+          Incentives: Number(row.Incentives) || 0,
+          EPFSalary: row.EPFSalary !== undefined && row.EPFSalary !== null && row.EPFSalary !== '' ? Number(row.EPFSalary) : '',
+          SOCSOSalary: row.SOCSOSalary !== undefined && row.SOCSOSalary !== null && row.SOCSOSalary !== '' ? Number(row.SOCSOSalary) : '',
+          EISSalary: row.EISSalary !== undefined && row.EISSalary !== null && row.EISSalary !== '' ? Number(row.EISSalary) : '',
+          LindungSalary: row.LindungSalary !== undefined && row.LindungSalary !== null && row.LindungSalary !== '' ? Number(row.LindungSalary) : '',
+          AnnualLeave: Number(row.AnnualLeave) || 0,
+          UnpaidLeave: Number(row.UnpaidLeave) || 0,
+          SickLeave: Number(row.SickLeave) || 0,
+          HalfDays: Number(row.HalfDays) || 0,
+          Deduction: Number(row.Deduction) || 0,
+          NormalOT: Number(row.NormalOT) || 0,
+          RestOT: Number(row.RestOT) || 0,
+          PublicOT: Number(row.PublicOT) || 0,
+          OtherOT: Number(row.OtherOT) || 0,
+          Pinjaman: Number(row.Pinjaman) || 0, Others: 0, Age: 30,
+          EPF: row.EPF || 'YES', PERKESO: row.PERKESO || 'YES',
+          EIS: row.EIS || 'YES', Lindungan: row.Lindungan || 'YES',
+          EPF_Employee: Number(row.EPF_Employee) || 0,
+          EPF_Employer: Number(row.EPF_Employer) || 0,
+          SOCSO_Employee: Number(row.SOCSO_Employee) || 0,
+          SOCSO_Employer: Number(row.SOCSO_Employer) || 0,
+          EIS_Employee: Number(row.EIS_Employee) || 0,
+          EIS_Employer: Number(row.EIS_Employer) || 0,
+          Lindung24Jam: Number(row.Lindung24Jam) || 0,
+          manualEPF: !!row.manualEPF,
+          manualSOCSO: !!row.manualSOCSO,
+          manualEIS: !!row.manualEIS,
+          manual24JAM: !!row.manual24JAM,
+          SLRBankNama: String(row.SLRBankNama || row.BankNama || row.Bank || '').trim(),
+          SLRBankAccountNo: String(row.SLRBankAccountNo || row.BankAccountNo || row.BankAcc || '').trim(),
+          SLREPF: String(row.SLREPF || row.EPF || '').trim(),
+          SLRPERKESO: String(row.SLRPERKESO || row.SOCSO || row.PERKESO || '').trim(),
+          SLREIS: String(row.SLREIS || row.EIS || '').trim(),
+          manualSLRBankNama: false, manualSLRBankAccountNo: false,
+          manualSLREPF: false, manualSLRPERKESO: false, manualSLREIS: false
+        })).filter(e => e.Situation !== 'UNACTIVE' && e.Situation !== 'INACTIVE');
+
+        // 拉取成功 → 用 Sheet 覆盖 localStorage（保持与 detail.html 一致）
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
+        renderTable();
+        toast('已从 Google Sheet 载入 ' + employees.length + ' 位员工');
+        return;
+      } else {
+        console.warn('Sheet returned non-success:', json);
+        if (!forceRemote) toast('Sheet 载入失败，改用本地缓存', false);
+      }
+    } catch (err) {
+      console.error('Google Sheet fetch failed:', err);
+      if (!forceRemote) toast('无法从 Sheet 获取数据，改用本地缓存', false);
+      else toast('无法从 Sheet 获取数据', false);
+    }
+  }
+
+  // 2. Fallback: localStorage
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
@@ -1808,72 +1886,32 @@ async function loadEmployees() {
     }
   } catch (err) { console.error('localStorage load failed', err); }
 
-  // 2. 内置 fallback
-  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
-    employees = [
-      { Situation:'ACTIVE',  Code:'EMP001', Name:'Ahmad bin Ali', GroupName:'YZ UFO', BankNama:'Maybank',
-        Basic:4500, Allowance:0, Allowance2:0, Commission:0, Incentives:0,
-        EPFSalary:4500, SOCSOSalary:4500, EISSalary:4500, LindungSalary:4500,
-        AnnualLeave:0, UnpaidLeave:0, SickLeave:0, HalfDays:0,
-        Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
-        OtherOT:0, Pinjaman:0, Others:0, Age:30, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES',
-        SLRBankNama:'Maybank', SLRBankAccountNo:'1234567890', SLREPF:'YES', SLRPERKESO:'YES', SLREIS:'YES' },
-      { Situation:'PENDING', Code:'EMP002', Name:'Siti Nurhaliza', GroupName:'YZ CYBER', BankNama:'CIMB',
-        Basic:3800, Allowance:0, Allowance2:200, Commission:150, Incentives:100,
-        EPFSalary:3800, SOCSOSalary:3800, EISSalary:3800, LindungSalary:3800,
-        AnnualLeave:0, UnpaidLeave:0, SickLeave:0, HalfDays:0,
-        Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
-        OtherOT:0, Pinjaman:0, Others:0, Age:28, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES',
-        SLRBankNama:'CIMB', SLRBankAccountNo:'9876543210', SLREPF:'YES', SLRPERKESO:'NO', SLREIS:'YES' },
-      { Situation:'ACTIVE', Code:'EMP003', Name:'Cash Worker', GroupName:'YZ UFO', BankNama:'CASH',
-        Basic:2500, Allowance:0, Allowance2:0, Commission:0, Incentives:0,
-        EPFSalary:'', SOCSOSalary:'', EISSalary:'', LindungSalary:'',
-        AnnualLeave:0, UnpaidLeave:0, SickLeave:0, HalfDays:0,
-        Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
-        OtherOT:0, Pinjaman:0, Others:0, Age:30, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES',
-        SLRBankNama:'CASH', SLRBankAccountNo:'-', SLREPF:'NO', SLRPERKESO:'NO', SLREIS:'NO' }
-    ];
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
-    renderTable();
-    return;
-  }
-  try {
-    const res = await fetch(APPS_SCRIPT_URL);
-    const json = await res.json();
-    if (json.status === 'success') {
-      employees = json.data.map(row => ({
-        Situation: String(row.Situation || 'ACTIVE').trim().toUpperCase(),
-        Code: row.Code, Name: row.Name, GroupName: row.GroupName || '',
-        BankNama: row.BankNama || row.Bank || '',
-        Basic: Number(row.Salary || row.Basic) || 0,
-        Allowance: Number(row.Allowance) || 0,
-        Allowance2: Number(row.Allowance2) || 0,
-        Commission: Number(row.Commission) || 0,
-        Incentives: Number(row.Incentives) || 0,
-        EPFSalary: row.EPFSalary !== undefined && row.EPFSalary !== null && row.EPFSalary !== '' ? Number(row.EPFSalary) : '',
-        SOCSOSalary: row.SOCSOSalary !== undefined && row.SOCSOSalary !== null && row.SOCSOSalary !== '' ? Number(row.SOCSOSalary) : '',
-        EISSalary: row.EISSalary !== undefined && row.EISSalary !== null && row.EISSalary !== '' ? Number(row.EISSalary) : '',
-        LindungSalary: row.LindungSalary !== undefined && row.LindungSalary !== null && row.LindungSalary !== '' ? Number(row.LindungSalary) : '',
-        AnnualLeave: Number(row.AnnualLeave) || 0,
-        UnpaidLeave: Number(row.UnpaidLeave) || 0,
-        SickLeave: Number(row.SickLeave) || 0,
-        HalfDays: Number(row.HalfDays) || 0,
-        Deduction: 0, NormalOT: 0, RestOT: 0, PublicOT: 0, OtherOT: 0,
-        Pinjaman: Number(row.Pinjaman) || 0, Others: 0, Age: 30,
-        EPF: row.EPF || 'YES', PERKESO: row.PERKESO || 'YES',
-        EIS: row.EIS || 'YES', Lindungan: row.Lindungan || 'YES',
-        SLRBankNama: String(row.SLRBankNama || row.BankNama || row.Bank || '').trim(),
-        SLRBankAccountNo: String(row.SLRBankAccountNo || row.BankAccountNo || row.BankAcc || '').trim(),
-        SLREPF: String(row.SLREPF || row.EPF || '').trim(),
-        SLRPERKESO: String(row.SLRPERKESO || row.SOCSO || row.PERKESO || '').trim(),
-        SLREIS: String(row.SLREIS || row.EIS || '').trim(),
-        manualSLRBankNama: false, manualSLRBankAccountNo: false,
-        manualSLREPF: false, manualSLRPERKESO: false, manualSLREIS: false
-      })).filter(e => e.Situation !== 'UNACTIVE' && e.Situation !== 'INACTIVE');
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
-      renderTable();
-    } else { toast('Load error: ' + json.message, false); }
-  } catch (err) { console.error(err); toast('Gagal muat data', false); }
+  // 3. Fallback: 内置示例
+  employees = [
+    { Situation:'ACTIVE',  Code:'EMP001', Name:'Ahmad bin Ali', GroupName:'YZ UFO', BankNama:'Maybank',
+      Basic:4500, Allowance:0, Allowance2:0, Commission:0, Incentives:0,
+      EPFSalary:4500, SOCSOSalary:4500, EISSalary:4500, LindungSalary:4500,
+      AnnualLeave:0, UnpaidLeave:0, SickLeave:0, HalfDays:0,
+      Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
+      OtherOT:0, Pinjaman:0, Others:0, Age:30, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES',
+      SLRBankNama:'Maybank', SLRBankAccountNo:'1234567890', SLREPF:'YES', SLRPERKESO:'YES', SLREIS:'YES' },
+    { Situation:'PENDING', Code:'EMP002', Name:'Siti Nurhaliza', GroupName:'YZ CYBER', BankNama:'CIMB',
+      Basic:3800, Allowance:0, Allowance2:200, Commission:150, Incentives:100,
+      EPFSalary:3800, SOCSOSalary:3800, EISSalary:3800, LindungSalary:3800,
+      AnnualLeave:0, UnpaidLeave:0, SickLeave:0, HalfDays:0,
+      Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
+      OtherOT:0, Pinjaman:0, Others:0, Age:28, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES',
+      SLRBankNama:'CIMB', SLRBankAccountNo:'9876543210', SLREPF:'YES', SLRPERKESO:'NO', SLREIS:'YES' },
+    { Situation:'ACTIVE', Code:'EMP003', Name:'Cash Worker', GroupName:'YZ UFO', BankNama:'CASH',
+      Basic:2500, Allowance:0, Allowance2:0, Commission:0, Incentives:0,
+      EPFSalary:'', SOCSOSalary:'', EISSalary:'', LindungSalary:'',
+      AnnualLeave:0, UnpaidLeave:0, SickLeave:0, HalfDays:0,
+      Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
+      OtherOT:0, Pinjaman:0, Others:0, Age:30, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES',
+      SLRBankNama:'CASH', SLRBankAccountNo:'-', SLREPF:'NO', SLRPERKESO:'NO', SLREIS:'NO' }
+  ];
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
+  renderTable();
 }
 
 function showPayslip(code) {
