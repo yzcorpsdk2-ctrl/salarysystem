@@ -1,253 +1,616 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <base target="_top">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-      * { box-sizing: border-box; }
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-        background: #eef2f7;
-        margin: 0;
-        padding: 16px;
-        color: #22303f;
-      }
-      .container {
-        max-width: 640px;
-        margin: 0 auto;
-        background: #fff;
-        border-radius: 14px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        padding: 24px;
-      }
-      h1 { font-size: 20px; text-align: center; margin: 0 0 4px; color: #1a4f8a; }
-      .subtitle { text-align: center; font-size: 12px; color: #8b98a8; margin-bottom: 20px; }
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KEDAI DATA - 公司信息管理</title>
+  <style>
+    /* 基于参考页面 (detail.html) 的风格调整 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
 
-      .field { margin-bottom: 16px; }
-      label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #35485c; }
-      .req { color: #e0483c; }
+    body {
+      background-color: #f0f4f8;
+      color: #2c3e50;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
 
-      input, select, textarea {
-        width: 100%;
-        padding: 10px 12px;
-        font-size: 14px;
-        border: 1px solid #cfd8e3;
-        border-radius: 8px;
-        background: #fbfcfe;
-        font-family: inherit;
-        transition: border-color .15s, box-shadow .15s;
-      }
-      input:focus, select:focus, textarea:focus {
-        outline: none;
-        border-color: #2f7fe0;
-        box-shadow: 0 0 0 3px rgba(47,127,224,0.15);
-        background: #fff;
-      }
-      textarea { resize: vertical; min-height: 70px; }
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      padding: 30px;
+    }
 
-      .stamp-box {
-        margin: 14px 0 20px;
-        padding: 12px;
-        border: 2px dashed #c3d3e6;
-        border-radius: 10px;
-        background: #f7faff;
-        text-align: center;
-        min-height: 150px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .stamp-box img { max-width: 100%; max-height: 190px; }
-      .placeholder { font-size: 13px; color: #9fb0c4; line-height: 1.6; }
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #1a3a5c;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-      button {
-        width: 100%;
-        padding: 13px;
-        font-size: 15px;
-        font-weight: 700;
-        color: #fff;
-        background: linear-gradient(135deg,#2f7fe0,#1a4f8a);
-        border: none;
-        border-radius: 9px;
-        cursor: pointer;
-        letter-spacing: .5px;
-        margin-top: 6px;
-      }
-      button:disabled { opacity: .55; cursor: not-allowed; }
+    h1 span {
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: #7f8c8d;
+      background: #ecf0f1;
+      padding: 2px 10px;
+      border-radius: 20px;
+    }
 
-      .msg { margin-top: 14px; padding: 11px; border-radius: 8px; font-size: 13px;
-             text-align: center; display: none; }
-      .msg.ok  { background:#e3f6e9; color:#1e7a3c; border:1px solid #b6e3c5; display:block; }
-      .msg.err { background:#fdeceb; color:#b32b20; border:1px solid #f5c2be; display:block; }
+    .sub-header {
+      font-size: 0.9rem;
+      color: #7f8c8d;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eaeef3;
+    }
 
-      .hidden { display: none !important; }
-    </style>
-  </head>
+    /* 表单区域 */
+    .form-section {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 25px;
+    }
 
-  <body>
-    <div class="container">
-      <h1>商家资料录入</h1>
-      <div class="subtitle">KEDAI DATA 系统</div>
+    .form-section h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #34495e;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
-      <form id="myForm">
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
 
-        <!-- 选择公司 -->
-        <div class="field">
-          <label>选择公司 / 店铺 <span class="req">*</span></label>
-          <select id="shopSelect" required>
-            <option value="">-- 载入中，请稍候 --</option>
-          </select>
-        </div>
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
 
-        <!-- 电子印章预览 -->
-        <div class="stamp-box" id="stampBox">
-          <div class="placeholder" id="stampPlaceholder">
-            请先选择公司<br>系统将自动显示电子印章与签名
-          </div>
-          <img id="stampImg" class="hidden" alt="电子印章">
-        </div>
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
 
-        <!-- 五个字段 -->
-        <div class="field">
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #5d6d7e;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    input, textarea, select {
+      padding: 10px 12px;
+      border: 1px solid #dce4ec;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      background: #ffffff;
+      color: #2c3e50;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #4a86c8;
+      box-shadow: 0 0 0 3px rgba(74, 134, 200, 0.15);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    button {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background-color: #4a86c8;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #3a6ea5;
+      box-shadow: 0 4px 12px rgba(74, 134, 200, 0.3);
+    }
+
+    .btn-secondary {
+      background-color: #e2e8f0;
+      color: #2c3e50;
+    }
+
+    .btn-secondary:hover {
+      background-color: #cbd5e1;
+    }
+
+    .btn-warning {
+      background-color: #f39c12;
+      color: #ffffff;
+    }
+
+    .btn-warning:hover {
+      background-color: #e67e22;
+    }
+
+    .btn-danger {
+      background-color: #e74c3c;
+      color: #ffffff;
+    }
+
+    .btn-danger:hover {
+      background-color: #c0392b;
+    }
+
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: 0.75rem;
+    }
+
+    /* 表格区域 */
+    .table-section {
+      margin-top: 10px;
+    }
+
+    .table-section h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #34495e;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    thead {
+      background-color: #f1f5f9;
+    }
+
+    th {
+      padding: 12px 15px;
+      text-align: left;
+      font-weight: 600;
+      color: #475569;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eaeef3;
+      color: #334155;
+      vertical-align: middle;
+    }
+
+    tbody tr:hover {
+      background-color: #f8fafc;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .action-btns {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    /* 提示消息 */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 0.9rem;
+      font-weight: 500;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      z-index: 9999;
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+
+    .toast.success { background-color: #27ae60; }
+    .toast.error { background-color: #e74c3c; }
+    .toast.info { background-color: #4a86c8; }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .loading {
+      text-align: center;
+      padding: 30px;
+      color: #7f8c8d;
+    }
+
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .container { padding: 20px; }
+      .form-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 1.4rem; }
+      th, td { padding: 8px 10px; font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>KEDAI DATA <span>公司信息管理系统</span></h1>
+  <div class="sub-header">管理公司信息、电子印章与签名资料</div>
+
+  <!-- 表单区域 -->
+  <div class="form-section">
+    <h2 id="formTitle">➕ 新增公司信息</h2>
+    <form id="companyForm">
+      <input type="hidden" id="rowIndex" value="">
+      <div class="form-grid">
+        <div class="form-group">
           <label for="situation">SITUATION</label>
-          <input type="text" id="situation" placeholder="请输入 SITUATION">
+          <input type="text" id="situation" placeholder="例如：SIANG SIANG RESTAURANT" required>
         </div>
-
-        <div class="field">
+        <div class="form-group">
           <label for="name">NAME</label>
-          <input type="text" id="name" placeholder="请输入 NAME">
+          <input type="text" id="name" placeholder="例如：BANDAR" required>
         </div>
-
-        <div class="field">
+        <div class="form-group full-width">
           <label for="adress">ADRESS</label>
-          <input type="text" id="adress" placeholder="请输入 ADRESS">
+          <input type="text" id="adress" placeholder="例如：Sandakan, Sabah">
         </div>
-
-        <div class="field">
+        <div class="form-group">
           <label for="corp">CORP</label>
-          <input type="text" id="corp" placeholder="请输入 CORP">
+          <input type="text" id="corp" placeholder="例如：R54455/2025">
         </div>
-
-        <div class="field">
+        <div class="form-group">
           <label for="remark">REMARK</label>
-          <textarea id="remark" placeholder="请输入 REMARK"></textarea>
+          <input type="text" id="remark" placeholder="备注信息">
         </div>
+      </div>
+      <div class="btn-group">
+        <button type="submit" class="btn-primary" id="submitBtn">💾 保存</button>
+        <button type="button" class="btn-secondary" id="cancelEditBtn" style="display:none;" onclick="resetForm()">取消编辑</button>
+      </div>
+    </form>
+  </div>
 
-        <button type="submit" id="submitBtn">保存资料</button>
-        <div class="msg" id="msg"></div>
-      </form>
+  <!-- 数据表格区域 -->
+  <div class="table-section">
+    <h2>📋 公司信息列表</h2>
+    <div class="table-wrapper">
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th>SITUATION</th>
+            <th>NAME</th>
+            <th>ADRESS</th>
+            <th>CORP</th>
+            <th>REMARK</th>
+            <th style="text-align:center;">操作</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- 数据通过 JS 动态加载 -->
+        </tbody>
+      </table>
     </div>
+    <div id="loadingIndicator" class="loading" style="display:none;">加载中...</div>
+    <div id="emptyState" class="empty-state" style="display:none;">暂无数据，请添加第一条记录。</div>
+  </div>
+</div>
 
-    <script>
-      var SHOPS  = [];
-      var STAMPS = {};
+<!-- 提示消息 -->
+<div id="toast" class="toast"></div>
 
-      var $ = function (id) { return document.getElementById(id); };
-      var shopSelect = $('shopSelect');
-      var stampBox   = $('stampBox');
-      var stampImg   = $('stampImg');
-      var stampPh    = $('stampPlaceholder');
-      var msgBox     = $('msg');
-      var submitBtn  = $('submitBtn');
-      var form       = $('myForm');
+<script>
+  // ============================================================
+  // 配置：请替换为你的 Apps Script Web 应用 URL
+  // ============================================================
+  const API_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL'; 
+  // 例如：'https://script.google.com/macros/s/AKfycb.../exec'
 
-      /* ---------- 显示讯息 ---------- */
-      function showMsg(text, type) {
-        msgBox.textContent = text;
-        msgBox.className = 'msg ' + type;
+  // 全局变量
+  let allData = [];
+
+  // ============================================================
+  // 工具函数
+  // ============================================================
+  
+  function showToast(message, type = 'info') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `toast ${type}`;
+    toast.style.display = 'block';
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 3000);
+  }
+
+  // ============================================================
+  // 数据加载与渲染
+  // ============================================================
+
+  async function loadData() {
+    const loading = document.getElementById('loadingIndicator');
+    const empty = document.getElementById('emptyState');
+    const tbody = document.getElementById('tableBody');
+    
+    loading.style.display = 'block';
+    empty.style.display = 'none';
+    tbody.innerHTML = '';
+    
+    try {
+      const response = await fetch(API_URL);
+      const result = await response.json();
+      
+      if (result.success && result.data.length > 0) {
+        allData = result.data;
+        renderTable(allData);
+        empty.style.display = 'none';
+      } else {
+        allData = [];
+        empty.style.display = 'block';
+        tbody.innerHTML = '';
       }
-      function clearMsg() {
-        msgBox.className = 'msg';
-        msgBox.textContent = '';
+    } catch (error) {
+      console.error('加载数据失败:', error);
+      showToast('加载数据失败，请检查网络连接', 'error');
+      empty.style.display = 'block';
+    } finally {
+      loading.style.display = 'none';
+    }
+  }
+
+  function renderTable(data) {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+    
+    data.forEach((item, index) => {
+      const tr = document.createElement('tr');
+      
+      tr.innerHTML = `
+        <td>${escapeHtml(item.SITUATION) || '-'}</td>
+        <td>${escapeHtml(item.NAME) || '-'}</td>
+        <td>${escapeHtml(item.ADRESS) || '-'}</td>
+        <td>${escapeHtml(item.CORP) || '-'}</td>
+        <td>${escapeHtml(item.REMARK) || '-'}</td>
+        <td>
+          <div class="action-btns">
+            <button class="btn-primary btn-sm" onclick="editRow(${item.rowIndex})">✏️ 编辑</button>
+            <button class="btn-danger btn-sm" onclick="deleteRow(${item.rowIndex})">🗑️ 删除</button>
+          </div>
+        </td>
+      `;
+      
+      tbody.appendChild(tr);
+    });
+  }
+
+  function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // ============================================================
+  // 表单提交（新增 / 更新）
+  // ============================================================
+
+  document.getElementById('companyForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const rowIndex = document.getElementById('rowIndex').value;
+    const isEdit = rowIndex !== '';
+    
+    const payload = {
+      action: isEdit ? 'update' : 'save',
+      SITUATION: document.getElementById('situation').value.trim(),
+      NAME: document.getElementById('name').value.trim(),
+      ADRESS: document.getElementById('adress').value.trim(),
+      CORP: document.getElementById('corp').value.trim(),
+      REMARK: document.getElementById('remark').value.trim()
+    };
+    
+    if (isEdit) {
+      payload.rowIndex = parseInt(rowIndex);
+    }
+    
+    // 简单校验
+    if (!payload.SITUATION || !payload.NAME) {
+      showToast('SITUATION 和 NAME 为必填项', 'error');
+      return;
+    }
+    
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = '⏳ 处理中...';
+    
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        showToast(isEdit ? '更新成功！' : '保存成功！', 'success');
+        resetForm();
+        await loadData();
+      } else {
+        showToast('操作失败: ' + result.message, 'error');
       }
+    } catch (error) {
+      console.error('提交失败:', error);
+      showToast('提交失败，请重试', 'error');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = '💾 保存';
+    }
+  });
 
-      /* ---------- 页面载入：取得公司列表 + 印章图片 ---------- */
-      google.script.run
-        .withSuccessHandler(function (data) {
-          SHOPS  = data.shops  || [];
-          STAMPS = data.stamps || {};
+  // ============================================================
+  // 编辑
+  // ============================================================
 
-          shopSelect.innerHTML = '<option value="">-- 请选择公司 / 店铺 --</option>';
-          SHOPS.forEach(function (s) {
-            var opt = document.createElement('option');
-            opt.value = s.id;
-            opt.textContent = s.name;
-            shopSelect.appendChild(opt);
-          });
+  function editRow(rowIndex) {
+    const item = allData.find(d => d.rowIndex === rowIndex);
+    if (!item) return;
+    
+    document.getElementById('rowIndex').value = item.rowIndex;
+    document.getElementById('situation').value = item.SITUATION || '';
+    document.getElementById('name').value = item.NAME || '';
+    document.getElementById('adress').value = item.ADRESS || '';
+    document.getElementById('corp').value = item.CORP || '';
+    document.getElementById('remark').value = item.REMARK || '';
+    
+    document.getElementById('formTitle').textContent = '✏️ 编辑公司信息';
+    document.getElementById('cancelEditBtn').style.display = 'inline-flex';
+    document.getElementById('submitBtn').textContent = '💾 更新';
+    
+    // 滚动到表单
+    document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function resetForm() {
+    document.getElementById('companyForm').reset();
+    document.getElementById('rowIndex').value = '';
+    document.getElementById('formTitle').textContent = '➕ 新增公司信息';
+    document.getElementById('cancelEditBtn').style.display = 'none';
+    document.getElementById('submitBtn').textContent = '💾 保存';
+  }
+
+  // ============================================================
+  // 删除
+  // ============================================================
+
+  async function deleteRow(rowIndex) {
+    if (!confirm('确定要删除这条记录吗？此操作不可恢复。')) return;
+    
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'delete',
+          rowIndex: rowIndex
         })
-        .withFailureHandler(function (err) {
-          shopSelect.innerHTML = '<option value="">载入失败</option>';
-          showMsg('载入资料失败：' + err.message, 'err');
-        })
-        .getInitData();
-
-      /* ---------- 选择公司 → 换印章 ---------- */
-      shopSelect.addEventListener('change', function () {
-        var id = this.value;
-        var dataUrl = id ? STAMPS[id] : '';
-
-        if (dataUrl) {
-          stampImg.src = dataUrl;
-          stampImg.classList.remove('hidden');
-          stampPh.classList.add('hidden');
-        } else {
-          stampImg.src = '';
-          stampImg.classList.add('hidden');
-          stampPh.classList.remove('hidden');
-          stampPh.innerHTML = id
-            ? '找不到此公司的印章图片'
-            : '请先选择公司<br>系统将自动显示电子印章与签名';
-        }
       });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        showToast('删除成功！', 'success');
+        await loadData();
+      } else {
+        showToast('删除失败: ' + result.message, 'error');
+      }
+    } catch (error) {
+      console.error('删除失败:', error);
+      showToast('删除失败，请重试', 'error');
+    }
+  }
 
-      /* ---------- 提交 ---------- */
-      form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        clearMsg();
+  // ============================================================
+  // 初始化
+  // ============================================================
 
-        if (!shopSelect.value) {
-          showMsg('请先选择公司 / 店铺', 'err');
-          return;
-        }
+  document.addEventListener('DOMContentLoaded', function() {
+    loadData();
+  });
 
-        var payload = {
-          shopId   : shopSelect.value,
-          shopName : shopSelect.options[shopSelect.selectedIndex].textContent,
-          situation: $('situation').value.trim(),
-          name     : $('name').value.trim(),
-          adress   : $('adress').value.trim(),
-          corp     : $('corp').value.trim(),
-          remark   : $('remark').value.trim()
-        };
+  // 初始数据（预填你提供的图一到图七信息）
+  // 注意：这些数据会在页面加载后自动加载到表格中。
+  // 如果你希望第一次打开页面时自动写入这些数据，可以取消注释下面的函数调用。
+  // 但更推荐手动在表格中通过表单添加，或直接编辑 Google Sheet 后刷新。
 
-        submitBtn.disabled = true;
-        submitBtn.textContent = '保存中…';
+  /*
+  async function seedInitialData() {
+    const initialData = [
+      { SITUATION: 'SIANG SIANG RESTAURANT', NAME: 'BANDAR', ADRESS: 'Sandakan, Sabah', CORP: 'R54455/2025', REMARK: '图一' },
+      { SITUATION: 'SIANG SIANG RESTAURANT', NAME: 'BATU 4', ADRESS: 'Sandakan, Sabah', CORP: 'R22099/2012', REMARK: '图二' },
+      { SITUATION: 'YZ CYBER CAFE', NAME: 'BANDAR', ADRESS: 'Sandakan, Sabah', CORP: 'R50376/2024', REMARK: '图三' },
+      { SITUATION: 'YZ CYBER CAFE', NAME: 'SEJATI', ADRESS: 'Sandakan, Sabah', CORP: 'R53493/2025', REMARK: '图四' },
+      { SITUATION: 'YZ UFO', NAME: 'SAND AKAN', ADRESS: 'Sandakan, Sabah', CORP: 'R48991/2023', REMARK: '图五' },
+      { SITUATION: 'CC TELESHOP', NAME: 'KIMFUNG', ADRESS: 'Sandakan, Sabah', CORP: 'R52459/2025', REMARK: '图六' },
+      { SITUATION: 'CC TELESHOP', NAME: 'MESRA', ADRESS: 'Sandakan, Sabah', CORP: 'R53302/2025', REMARK: '图七' }
+    ];
 
-        google.script.run
-          .withSuccessHandler(function (res) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = '保存资料';
+    for (const item of initialData) {
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'save', ...item })
+        });
+      } catch (e) {
+        console.error('预填数据失败:', e);
+      }
+    }
+    console.log('初始数据预填完成');
+  }
+  */
 
-            if (res && res.ok) {
-              showMsg('✅ ' + res.message, 'ok');
-              form.reset();
-              shopSelect.value = '';
-              stampImg.src = '';
-              stampImg.classList.add('hidden');
-              stampPh.classList.remove('hidden');
-              stampPh.innerHTML = '请先选择公司<br>系统将自动显示电子印章与签名';
-            } else {
-              showMsg('❌ 保存失败：' + (res && res.message ? res.message : '未知错误'), 'err');
-            }
-          })
-          .withFailureHandler(function (err) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = '保存资料';
-            showMsg('❌ 保存失败：' + err.message, 'err');
-          })
-          .saveData(payload);
-      });
-    </script>
-  </body>
+</script>
+
+</body>
 </html>
