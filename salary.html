@@ -213,17 +213,29 @@
   .bg-gray    { background: #f4f6f9 !important; color: var(--epf-muted) !important; }
 
   /* ==========================================================
-     表头 sticky 分层
+     表头 sticky 分层：
+       1. section-label-row → top:0
+       2. main-header-row   → JS 测
+       3. sub-header-row    → JS 测
+       4. filter-row        → JS 测
+     z-index 分层（从低到高）：
+       普通 td ................ 1
+       数据行锁定列 ............ 9
+       thead filter th ........ 16
+       thead sub th ........... 17
+       thead main th .......... 18
+       thead 锁定列 ........... 19
+       section-label-row th ... 22
+       section-label-row 锁定组 24
+       .lock-edge-right ....... 25
+       unfold-handle .......... 40
      ========================================================== */
 
-  /* 普通数据单元格压在最低层，禁止垂直吸附 */
+  /* 普通单元格显式压在锁定列之下 */
   td { z-index: 1; }
 
   .section-label-row th {
-    position: sticky !important;
-    top: 0 !important;
-    left: auto;                          /* ← 非锁定 section th 不参与水平吸附 */
-    z-index: 22 !important;
+    position: sticky !important; top: 0 !important; z-index: 22 !important;
     padding: 0.45rem 0.6rem; font-size: 0.68rem; font-weight: 700;
     letter-spacing: 0.05em; text-transform: uppercase;
     border-bottom: 1px solid var(--epf-border); text-align: center;
@@ -276,23 +288,14 @@
 
   /* ==========================================================
      锁定列：Situation / Kod / Nama / Kumpulan / Gaji Asas
-     - 数据行锁定列：只做水平 sticky，禁止垂直吸附
-     - thead 锁定列：正常参与垂直 sticky
+     - 水平方向：left 锁定
+     - 垂直方向：由 JS 给 #tbody td.col-freeze 设 top = 表头总高
      ========================================================== */
   body.freeze-on .col-freeze {
     position: sticky;
-    top: auto !important;          /* ← 关键：数据行锁定列禁止垂直吸附 */
-    z-index: 9;
+    z-index: 9;                  /* 高于普通 td (1) */
     background: #ffffff;
   }
-  body.freeze-on td.col-freeze {
-    top: auto !important;          /* ← 双重保险 */
-  }
-  body.freeze-on td:not(.col-freeze) {
-    top: auto !important;          /* ← 普通 td 也禁止垂直吸附 */
-  }
-  body.freeze-on tr:nth-child(even) td.col-freeze { background: #fbfdff; }
-  body.freeze-on tr:hover td.col-freeze { background: var(--epf-blue-soft); }
 
   body.freeze-on .col-freeze.col-0 { left: 0px; }
   body.freeze-on .col-freeze.col-1 { left: 80px; }
@@ -300,19 +303,22 @@
   body.freeze-on .col-freeze.col-3 { left: 310px; }
   body.freeze-on .col-freeze.col-4 { left: 420px; }
 
-  /* thead 锁定列：恢复垂直吸附，且高于同层普通 th */
-  body.freeze-on thead .col-freeze {
-    top: inherit;                  /* 由 JS 设置 top，恢复吸附 */
-    z-index: 19;
-  }
-  body.freeze-on thead .section-label-row th.col-freeze-group {
-    top: 0 !important;
-    left: 0 !important;
-    z-index: 24 !important;
-    position: sticky !important;
-  }
+  /* 数据行锁定列背景（含 col-4 Gaji Asas，sticky 实心不透底） */
+  body.freeze-on tbody td.col-freeze.col-0 { background: #ffffff; }
+  body.freeze-on tbody td.col-freeze.col-1 { background: #ffffff; }
+  body.freeze-on tbody td.col-freeze.col-2 { background: #ffffff; }
+  body.freeze-on tbody td.col-freeze.col-3 { background: #ffffff; }
+  body.freeze-on tbody td.col-freeze.col-4 { background: #f0f4f9; }   /* Gaji Asas 底色 */
+  body.freeze-on tbody tr:nth-child(even) td.col-freeze.col-0,
+  body.freeze-on tbody tr:nth-child(even) td.col-freeze.col-1,
+  body.freeze-on tbody tr:nth-child(even) td.col-freeze.col-2,
+  body.freeze-on tbody tr:nth-child(even) td.col-freeze.col-3 { background: #fbfdff; }
+  body.freeze-on tbody tr:nth-child(even) td.col-freeze.col-4 { background: #f5f7fb; }
+  body.freeze-on tbody tr:hover td.col-freeze { background: var(--epf-blue-soft); }
 
-  /* 锁定列背景色（thead） */
+  /* thead 里的锁定列：水平锁 + 层级高于同层普通 th */
+  body.freeze-on thead .col-freeze { z-index: 19; }
+
   body.freeze-on thead .col-freeze.bg-slate   { background: #f0f4f9 !important; }
   body.freeze-on thead .col-freeze.bg-amber   { background: #fdf8ec !important; }
   body.freeze-on thead .col-freeze.bg-emerald { background: #f0f9f4 !important; }
@@ -322,13 +328,19 @@
   body.freeze-on thead .filter-row th.col-freeze { background: #ffffff !important; }
   body.freeze-on thead .filter-row th.col-freeze.no-filter { background: var(--epf-blue-soft) !important; }
 
-  /* 深蓝锁定分隔线 */
+  /* section 行里的锁定组最高 */
+  body.freeze-on .section-label-row th.col-freeze-group {
+    position: sticky !important;
+    left: 0 !important;
+    z-index: 24 !important;
+  }
+
   .lock-edge-right {
     border-right: 2px solid var(--epf-blue) !important;
     z-index: 25 !important;
   }
 
-  /* 折叠竖线 */
+  /* 折叠竖线按钮 */
   .fold-line {
     position: absolute; top: 0; bottom: 0; width: 12px;
     background: linear-gradient(to right, rgba(14,92,110,0) 0%, rgba(14,92,110,0.06) 60%, rgba(14,92,110,0.15) 100%);
@@ -1142,10 +1154,10 @@ function contribBase(emp, field, fallback) {
 }
 
 /* =========================================================
-   修复版：表头 sticky 偏移计算
-   - section-label-row 只设 top:0
-   - 其他行按累积高度设 top
-   - 数据行的 col-freeze 由 CSS 强制 top:auto，不参与垂直吸附
+   修复版：表头 sticky 偏移计算 + 数据行锁定列垂直贴合
+   - thead 每行按 offsetHeight 累积设 top
+   - 数据行锁定列（tbody td.col-freeze）额外设 top = 表头总高
+     这样垂直滚动时它们紧贴表头下方，不会"向上穿"
    ========================================================= */
 function updateStickyOffsets() {
   requestAnimationFrame(() => {
@@ -1162,22 +1174,19 @@ function updateStickyOffsets() {
     const hMain    = mainRow.offsetHeight;
     const hSub     = subRow.offsetHeight;
 
-    sectionRow.querySelectorAll('th').forEach(th => {
-      th.style.top = '0px';
-    });
-    mainRow.querySelectorAll('th').forEach(th => {
-      th.style.top = hSection + 'px';
-    });
-    subRow.querySelectorAll('th').forEach(th => {
-      th.style.top = (hSection + hMain) + 'px';
-    });
-    filterRow.querySelectorAll('th').forEach(th => {
-      th.style.top = (hSection + hMain + hSub) + 'px';
-    });
+    const topSection = 0;
+    const topMain    = hSection;
+    const topSub     = hSection + hMain;
+    const topFilter  = hSection + hMain + hSub;
 
-    // 数据行绝对不参与垂直吸附
-    document.querySelectorAll('#tbody td').forEach(td => {
-      td.style.top = 'auto';
+    sectionRow.querySelectorAll('th').forEach(th => { th.style.top = topSection + 'px'; });
+    mainRow.querySelectorAll('th').forEach(th =>   { th.style.top = topMain + 'px'; });
+    subRow.querySelectorAll('th').forEach(th =>    { th.style.top = topSub + 'px'; });
+    filterRow.querySelectorAll('th').forEach(th => { th.style.top = topFilter + 'px'; });
+
+    /* 数据行锁定列垂直方向必须贴表头下缘 */
+    document.querySelectorAll('#tbody td.col-freeze').forEach(td => {
+      td.style.top = topFilter + 'px';
     });
   });
 }
