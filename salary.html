@@ -174,7 +174,7 @@
   .bg-amber   { background: #fdf8ec !important; color: #7a5a12 !important; }
   .bg-blue    { background: #eef5fd !important; color: var(--epf-blue) !important; }
   .bg-gray    { background: #f4f6f9 !important; color: var(--epf-muted) !important; }
-  /* === 新增：PINJAMAN 专属底色（与 LEAVE 系列区分） === */
+  /* === PINJAMAN 专属底色（与 LEAVE 系列区分） === */
   .bg-rose-deep { background: #f7d4e0 !important; color: #7a1f3d !important; }
   .col-split-left { border-left: 2px solid #c97a9b !important; }
   td { z-index: 1; }
@@ -370,7 +370,6 @@
     background: #ffffff; border-color: #7a1f3d;
     box-shadow: 0 0 0 2px rgba(122, 31, 61, 0.14);
   }
-  /* 天数格（D）用较浅的底，和金额格区分 */
   td.leave-days .input.num { background: #fffafc; border-color: #f0c7d3; }
   td.leave-days .input.num:focus {
     background: #ffffff; border-color: #8b2b48;
@@ -435,9 +434,71 @@
   }
   .modal-actions { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
   #printArea { display: none; }
+
+  /* ============================================================
+     ⬇⬇⬇ 新增：深色顶部导航栏 ⬇⬇⬇
+     ============================================================ */
+  .navbar-dark {
+    position: sticky; top: 0; z-index: 250;
+    background: linear-gradient(180deg, #17293f 0%, #0d1b2c 100%);
+    border-bottom: 1px solid #050d16;
+    display: flex; align-items: stretch; height: 44px;
+    padding: 0 1rem; overflow-x: auto; overflow-y: visible;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+    scrollbar-width: none;
+  }
+  .navbar-dark::-webkit-scrollbar { height: 0; }
+  .navbar-dark .nav-spacer { flex: 1; min-width: 0.5rem; }
+  .nav-item {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    padding: 0 0.85rem; flex-shrink: 0;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
+    color: #bfd0e3; text-decoration: none; line-height: 1;
+    background: transparent; border: none; border-bottom: 2px solid transparent;
+    cursor: pointer; font-family: inherit; white-space: nowrap;
+    transition: color .15s, background .15s, border-color .15s;
+  }
+  .nav-item:hover {
+    color: #ffffff; background: rgba(255, 255, 255, 0.07);
+    border-bottom-color: #4a9ae8;
+  }
+  .nav-dropdown { position: relative; display: flex; flex-shrink: 0; }
+  .nav-dropdown > .nav-item .caret {
+    font-size: 0.58rem; opacity: 0.75; transition: transform .15s;
+  }
+  .nav-dropdown.open > .nav-item {
+    color: #fff; background: rgba(255, 255, 255, 0.09);
+    border-bottom-color: #4a9ae8;
+  }
+  .nav-dropdown.open > .nav-item .caret { transform: rotate(180deg); }
+  .nav-panel {
+    position: absolute; top: 100%; left: 0; min-width: 215px;
+    background: #ffffff; border: 1px solid var(--epf-border);
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 14px 30px -10px rgba(0, 0, 0, 0.38);
+    padding: 0.3rem 0; display: none; z-index: 260;
+  }
+  .nav-dropdown.open .nav-panel { display: block; }
+  .nav-panel a {
+    display: block; padding: 0.5rem 1rem;
+    font-size: 0.74rem; font-weight: 600; letter-spacing: 0.04em;
+    color: var(--epf-text); text-decoration: none;
+    border-left: 3px solid transparent; transition: .12s;
+  }
+  .nav-panel a:hover {
+    background: var(--epf-blue-soft); color: var(--epf-blue);
+    border-left-color: var(--epf-blue);
+  }
+  .nav-chat { color: #7fd1a8; }
+  .nav-chat:hover { color: #b7f5d3; border-bottom-color: #7fd1a8; background: rgba(127,209,168,0.10); }
+
+  /* 让原有 topbar 紧贴深色导航栏下方 */
+  .topbar { top: 44px; }
+  /* ============================================================ */
+
   @media print {
     body { background: #fff; padding: 0; }
-    .topbar, .container, .toast, .modal-overlay, .section-legend { display: none !important; }
+    .navbar-dark, .topbar, .container, .toast, .modal-overlay, .section-legend { display: none !important; }
     #printArea { display: block !important; }
     .payslip { page-break-after: always; padding: 12mm; font-size: 10pt; font-family: Arial, sans-serif; color: #000; }
     .payslip:last-child { page-break-after: auto; }
@@ -464,7 +525,13 @@
   .table-wrap::-webkit-scrollbar-thumb { background: #c2d4e6; border-radius: 4px; }
   .table-wrap::-webkit-scrollbar-thumb:hover { background: #9db8d2; }
   @media (max-width: 768px) {
-    .topbar { padding: 0.6rem 1rem; }
+    .navbar-dark {
+      position: relative; top: auto; height: auto;
+      flex-wrap: wrap; padding: 0 0.4rem; overflow: visible;
+    }
+    .nav-item { padding: 0.6rem 0.6rem; font-size: 0.66rem; }
+    .nav-panel { min-width: 190px; }
+    .topbar { top: 0; }
     .container { padding: 1rem; }
     .page-header { padding: 1.2rem 1.2rem; }
     .page-header h1 { font-size: 1.2rem; }
@@ -476,6 +543,49 @@
 </style>
 </head>
 <body class="freeze-on">
+
+<!-- ============================================================
+     ⬇⬇⬇ 新增：深色顶部导航栏 ⬇⬇⬇
+     ============================================================ -->
+<nav class="navbar-dark">
+  <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/staffinfo.html" title="Employees">👥 EMPLOYEES</a>
+  <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/salarysystem/salary.html" title="Payroll View">📊 PAYROLL VIEW</a>
+
+  <div class="nav-dropdown">
+    <button type="button" class="nav-item" onclick="toggleNavDropdown(this, event)">➖ DEDUCTION <span class="caret">▾</span></button>
+    <div class="nav-panel">
+      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/leave.html">LEAVE</a>
+      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/pinjaman.html">PINJAMAN</a>
+      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/epf.html">EPF</a>
+      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/socso.html">SOCSO</a>
+      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/eis.html">EIS</a>
+      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/lindungan.html">24 JAM LINDUNGAN</a>
+    </div>
+  </div>
+
+  <div class="nav-dropdown">
+    <button type="button" class="nav-item" onclick="toggleNavDropdown(this, event)">➕ ADDITIONAL <span class="caret">▾</span></button>
+    <div class="nav-panel">
+      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/overtime.html">OVER TIME</a>
+      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/pendapatantambahan.html">PENDAPATAN TAMBAHAN</a>
+    </div>
+  </div>
+
+  <div class="nav-dropdown">
+    <button type="button" class="nav-item" onclick="toggleNavDropdown(this, event)">⚙️ SETTING <span class="caret">▾</span></button>
+    <div class="nav-panel">
+      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/company.html">COMPANY</a>
+      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/payslip.html">PAYSLIP</a>
+      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/htmlshow.html">HTML</a>
+    </div>
+  </div>
+
+  <span class="nav-spacer"></span>
+
+  <a class="nav-item nav-chat" href="https://chat.deepseek.com/" target="_blank" rel="noopener"
+     title="Buka AI Assistant (DeepSeek)">🤖 REQUEST CHAT</a>
+</nav>
+<!-- ============================================================ -->
 
 <div class="topbar">
   <div class="brand"><div class="logo">P</div> Payroll System</div>
@@ -823,6 +933,28 @@ function t(key) { return I18N[currentLang][key] || key; }
 let employees = [];
 const filterGroup = new Set();
 const filterBank = new Set();
+
+/* ============================================================
+   新增：深色导航栏下拉菜单控制
+   ============================================================ */
+function toggleNavDropdown(el, e) {
+  if (e) { e.preventDefault(); e.stopPropagation(); }
+  const dd = el.closest('.nav-dropdown');
+  if (!dd) return;
+  const wasOpen = dd.classList.contains('open');
+  document.querySelectorAll('.nav-dropdown.open').forEach(d => d.classList.remove('open'));
+  if (!wasOpen) dd.classList.add('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.nav-dropdown')) {
+    document.querySelectorAll('.nav-dropdown.open').forEach(d => d.classList.remove('open'));
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.nav-dropdown.open').forEach(d => d.classList.remove('open'));
+  }
+});
 
 function toast(msg, ok = true) {
   const el = document.getElementById('toast');
