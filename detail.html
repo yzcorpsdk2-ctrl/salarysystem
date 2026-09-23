@@ -93,6 +93,24 @@
       font-weight: 500;
       color: #0a1a2b;
       word-break: break-word;
+      width: 100%;
+    }
+
+    .info-value select, .info-value input {
+      width: 100%;
+      padding: 4px 8px;
+      border: 1px solid #b6c8dd;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      background: white;
+      color: #0a1a2b;
+      outline: none;
+    }
+
+    .info-value select:focus, .info-value input:focus {
+      border-color: #1e3a5f;
+      box-shadow: 0 0 0 2px rgba(30,58,95,0.15);
     }
 
     /* main two column layout */
@@ -334,6 +352,49 @@
       height: 18px;
     }
 
+    .highlight-edit {
+      background: #fef9e7;
+    }
+
+    .edit-icon {
+      margin-left: 4px;
+      color: #8b9eb5;
+      font-size: 0.75rem;
+    }
+
+    .badge-frozen {
+      background: #eef2f7;
+      color: #3c5777;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 30px;
+      margin-left: 6px;
+      font-weight: 600;
+    }
+
+    .sync-status {
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: #eef2f7;
+      color: #3c5777;
+    }
+
+    .sync-status.loading {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .sync-status.success {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .sync-status.error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
     /* responsive */
     @media (max-width: 900px) {
       .columns {
@@ -364,26 +425,6 @@
         font-size: 0.9rem;
       }
     }
-
-    .highlight-edit {
-      background: #fef9e7;
-    }
-
-    .edit-icon {
-      margin-left: 4px;
-      color: #8b9eb5;
-      font-size: 0.75rem;
-    }
-
-    .badge-frozen {
-      background: #eef2f7;
-      color: #3c5777;
-      font-size: 0.7rem;
-      padding: 2px 8px;
-      border-radius: 30px;
-      margin-left: 6px;
-      font-weight: 600;
-    }
   </style>
 </head>
 <body>
@@ -394,23 +435,31 @@
       <div class="period-badge" id="periodBadge">JANUARY 2025</div>
     </div>
 
-    <!-- Employee Info (Situation, Kod, Nama, Kumpulan, Gaji Asas) -->
+    <!-- Employee Info: Situation, Kod, Nama, Kumpulan, Gaji Asas -->
     <div class="info-grid">
       <div class="info-item">
         <span class="info-label">Situation</span>
-        <span class="info-value" id="infoSituation">—</span>
+        <span class="info-value" id="infoSituation">Aktif</span>
       </div>
       <div class="info-item">
         <span class="info-label">Kod</span>
-        <span class="info-value" id="infoKod">—</span>
+        <span class="info-value">
+          <select id="selectKod" disabled><option>—</option></select>
+        </span>
       </div>
       <div class="info-item">
         <span class="info-label">Nama</span>
-        <span class="info-value" id="infoNama">—</span>
+        <span class="info-value">
+          <select id="selectNama" disabled><option>—</option></select>
+        </span>
       </div>
       <div class="info-item">
         <span class="info-label">Kumpulan</span>
-        <span class="info-value" id="infoKumpulan">—</span>
+        <span class="info-value">
+          <select id="selectKumpulan">
+            <option value="">-- Pilih Kumpulan --</option>
+          </select>
+        </span>
       </div>
       <div class="info-item">
         <span class="info-label">Gaji Asas</span>
@@ -491,7 +540,7 @@
       </div>
     </div>
 
-    <!-- Statutory Contributions (Salary for EPF, SOCSO, EIS, 24JAM + contributions) -->
+    <!-- Statutory Contributions -->
     <div class="extra-grid">
       <div class="extra-card">
         <h4><i class="fas fa-shield-alt"></i> GAJI UNTUK CARUMAN</h4>
@@ -587,9 +636,11 @@
       <div class="btn-group">
         <button class="btn btn-outline" onclick="window.history.back()"><i class="fas fa-arrow-left"></i> Kembali</button>
         <button class="btn btn-primary" id="saveBtn"><i class="fas fa-save"></i> Simpan & Sync</button>
+        <button class="btn btn-success" id="syncFromUrlBtn"><i class="fas fa-cloud-download-alt"></i> Muat dari URL</button>
       </div>
       <div style="font-size: 0.85rem; color: #5a6f88;">
         <i class="fas fa-info-circle"></i> Perubahan akan disimpan ke sistem penggajian.
+        <span id="syncStatus" class="sync-status" style="margin-left: 12px;">Sedia</span>
       </div>
     </div>
 
@@ -608,245 +659,598 @@
 
   <script>
     (function() {
-      // ---------- 1. Dapatkan data dari localStorage (dihantar dari salary.html) ----------
-      const urlParams = new URLSearchParams(window.location.search);
-      const employeeId = urlParams.get('id') || localStorage.getItem('selectedEmployeeId') || 'EMP001';
+      // ---------- KONFIGURASI ----------
+      const SALARY_URL = 'https://yzcorpsdk2-ctrl.github.io/salarysystem/salary.html';
+      const STORAGE_KEY = 'payrollEmployees';
+      const SELECTED_ID_KEY = 'selectedEmployeeId';
 
-      // Fungsi untuk memuatkan data pekerja dari localStorage
-      function loadEmployeeData() {
-        let employees = [];
-        try {
-          employees = JSON.parse(localStorage.getItem('payrollEmployees')) || [];
-        } catch (e) {
-          employees = [];
-        }
+      // ---------- STATE ----------
+      let allEmployees = [];          // semua pekerja dari URL / localStorage
+      let currentEmployee = null;     // pekerja yang sedang dipaparkan
+      let currentKumpulan = '';       // kumpulan terpilih
 
-        // Cari pekerja berdasarkan ID
-        let employee = employees.find(emp => emp.kod === employeeId || emp.id === employeeId);
-        
-        // Jika tiada, gunakan data contoh / default
-        if (!employee) {
-          employee = {
-            situation: 'Aktif',
-            kod: employeeId,
-            nama: 'JEFFREY TOH',
-            kumpulan: 'PRO',
-            gajiAsas: 3000.00,
-            otBiasa: 23.07,
-            otRehat: 0.00,
-            otAwam: 0.00,
-            otLain: 0.00,
-            allowance: 0.00,
-            commision: 0.00,
-            incentives: 0.00,
-            firstCalcTotal: 0.00,
-            annualLeave: 0.00,
-            unpaidLeave: 0.00,
-            sickLeave: 0.00,
-            halfDaysLeave: 0.00,
-            pinjaman: 0.00,
-            salaryEpf: 3000.00,
-            salarySocso: 3000.00,
-            salaryEis: 3000.00,
-            salary24jam: 3000.00,
-            epfEmployee: 319.00,
-            epfEmployer: 377.00,
-            socsoEmployee: 19.25,
-            socsoEmployer: 67.35,
-            eisEmployee: 7.70,
-            eisEmployer: 7.70,
-            bankNama: 'Maybank',
-            bankAcc: '1234567890',
-            epfNo: '123456789',
-            socsoNo: '123456789',
-            eisNo: '123456789'
-          };
-        }
+      // ---------- ELEMEN DOM ----------
+      const el = (id) => document.getElementById(id);
+      const selectKumpulan = el('selectKumpulan');
+      const selectKod = el('selectKod');
+      const selectNama = el('selectNama');
+      const infoSituation = el('infoSituation');
+      const infoGajiAsas = el('infoGajiAsas');
+      const syncStatus = el('syncStatus');
 
-        // Pastikan semua field wujud (fallback)
-        const fields = [
-          'situation','kod','nama','kumpulan','gajiAsas','otBiasa','otRehat','otAwam','otLain',
-          'allowance','commision','incentives','firstCalcTotal','annualLeave','unpaidLeave',
-          'sickLeave','halfDaysLeave','pinjaman','salaryEpf','salarySocso','salaryEis','salary24jam',
-          'epfEmployee','epfEmployer','socsoEmployee','socsoEmployer','eisEmployee','eisEmployer',
-          'bankNama','bankAcc','epfNo','socsoNo','eisNo'
-        ];
-        fields.forEach(f => {
-          if (employee[f] === undefined || employee[f] === null) {
-            employee[f] = (typeof employee[f] === 'number') ? 0 : '';
-          }
-        });
+      // Input fields
+      const inputIds = [
+        'otBiasa','otRehat','otAwam','otLain','allowance','commision','incentives',
+        'annualLeave','unpaidLeave','sickLeave','halfDaysLeave','pinjaman',
+        'salaryEpf','salarySocso','salaryEis','salary24jam',
+        'epfEmployee','epfEmployer','socsoEmployee','socsoEmployer','eisEmployee','eisEmployer',
+        'bankNama','bankAcc','epfNo','socsoNo','eisNo'
+      ];
+      const inputs = {};
+      inputIds.forEach(id => { inputs[id] = el(id); });
 
-        return { employee, employees };
-      }
+      // Display totals
+      const firstCalcTotalEl = el('firstCalcTotal');
+      const totalPotonganEl = el('totalPotongan');
+      const gajiKasarDisplay = el('gajiKasarDisplay');
+      const totalPotonganDisplay = el('totalPotonganDisplay');
+      const gajiBersihDisplay = el('gajiBersihDisplay');
 
-      // ---------- 2. Paparkan data ke dalam form ----------
-      const { employee, employees } = loadEmployeeData();
-
-      // Info asas
-      document.getElementById('infoSituation').innerText = employee.situation || '—';
-      document.getElementById('infoKod').innerText = employee.kod || '—';
-      document.getElementById('infoNama').innerText = employee.nama || '—';
-      document.getElementById('infoKumpulan').innerText = employee.kumpulan || '—';
-      document.getElementById('infoGajiAsas').innerText = 'RM ' + (employee.gajiAsas || 0).toFixed(2);
-
-      // Isi input fields
-      const setVal = (id, val) => {
-        const el = document.getElementById(id);
-        if (el) el.value = (val !== undefined && val !== null) ? val : 0;
-      };
-
-      setVal('otBiasa', employee.otBiasa);
-      setVal('otRehat', employee.otRehat);
-      setVal('otAwam', employee.otAwam);
-      setVal('otLain', employee.otLain);
-      setVal('allowance', employee.allowance);
-      setVal('commision', employee.commision);
-      setVal('incentives', employee.incentives);
-      setVal('annualLeave', employee.annualLeave);
-      setVal('unpaidLeave', employee.unpaidLeave);
-      setVal('sickLeave', employee.sickLeave);
-      setVal('halfDaysLeave', employee.halfDaysLeave);
-      setVal('pinjaman', employee.pinjaman);
-      setVal('salaryEpf', employee.salaryEpf);
-      setVal('salarySocso', employee.salarySocso);
-      setVal('salaryEis', employee.salaryEis);
-      setVal('salary24jam', employee.salary24jam);
-      setVal('epfEmployee', employee.epfEmployee);
-      setVal('epfEmployer', employee.epfEmployer);
-      setVal('socsoEmployee', employee.socsoEmployee);
-      setVal('socsoEmployer', employee.socsoEmployer);
-      setVal('eisEmployee', employee.eisEmployee);
-      setVal('eisEmployer', employee.eisEmployer);
-      setVal('bankNama', employee.bankNama);
-      setVal('bankAcc', employee.bankAcc);
-      setVal('epfNo', employee.epfNo);
-      setVal('socsoNo', employee.socsoNo);
-      setVal('eisNo', employee.eisNo);
-
-      // ---------- 3. Kiraan automatik ----------
+      // ---------- FUNGSI BANTU ----------
       function formatRM(val) {
         return 'RM ' + (parseFloat(val) || 0).toFixed(2);
       }
 
+      function setSyncStatus(msg, type = '') {
+        syncStatus.textContent = msg;
+        syncStatus.className = 'sync-status ' + type;
+      }
+
+      // Kira semula semua nilai
       function updateCalculations() {
-        const gajiAsas = parseFloat(employee.gajiAsas) || 0;
-        const otBiasa = parseFloat(document.getElementById('otBiasa').value) || 0;
-        const otRehat = parseFloat(document.getElementById('otRehat').value) || 0;
-        const otAwam = parseFloat(document.getElementById('otAwam').value) || 0;
-        const otLain = parseFloat(document.getElementById('otLain').value) || 0;
-        const allowance = parseFloat(document.getElementById('allowance').value) || 0;
-        const commision = parseFloat(document.getElementById('commision').value) || 0;
-        const incentives = parseFloat(document.getElementById('incentives').value) || 0;
+        if (!currentEmployee) return;
+        const gajiAsas = parseFloat(currentEmployee.gajiAsas) || 0;
+
+        const otBiasa = parseFloat(inputs.otBiasa.value) || 0;
+        const otRehat = parseFloat(inputs.otRehat.value) || 0;
+        const otAwam = parseFloat(inputs.otAwam.value) || 0;
+        const otLain = parseFloat(inputs.otLain.value) || 0;
+        const allowance = parseFloat(inputs.allowance.value) || 0;
+        const commision = parseFloat(inputs.commision.value) || 0;
+        const incentives = parseFloat(inputs.incentives.value) || 0;
 
         const firstCalcTotal = gajiAsas + otBiasa + otRehat + otAwam + otLain + allowance + commision + incentives;
-        document.getElementById('firstCalcTotal').innerText = formatRM(firstCalcTotal);
+        firstCalcTotalEl.innerText = formatRM(firstCalcTotal);
 
-        const annualLeave = parseFloat(document.getElementById('annualLeave').value) || 0;
-        const unpaidLeave = parseFloat(document.getElementById('unpaidLeave').value) || 0;
-        const sickLeave = parseFloat(document.getElementById('sickLeave').value) || 0;
-        const halfDaysLeave = parseFloat(document.getElementById('halfDaysLeave').value) || 0;
-        const pinjaman = parseFloat(document.getElementById('pinjaman').value) || 0;
+        const annualLeave = parseFloat(inputs.annualLeave.value) || 0;
+        const unpaidLeave = parseFloat(inputs.unpaidLeave.value) || 0;
+        const sickLeave = parseFloat(inputs.sickLeave.value) || 0;
+        const halfDaysLeave = parseFloat(inputs.halfDaysLeave.value) || 0;
+        const pinjaman = parseFloat(inputs.pinjaman.value) || 0;
 
         const totalPotongan = annualLeave + unpaidLeave + sickLeave + halfDaysLeave + pinjaman;
-        document.getElementById('totalPotongan').innerText = formatRM(totalPotongan);
+        totalPotonganEl.innerText = formatRM(totalPotongan);
 
         const gajiKasar = firstCalcTotal;
         const gajiBersih = gajiKasar - totalPotongan;
 
-        document.getElementById('gajiKasarDisplay').innerText = formatRM(gajiKasar);
-        document.getElementById('totalPotonganDisplay').innerText = formatRM(totalPotongan);
-        document.getElementById('gajiBersihDisplay').innerText = formatRM(gajiBersih);
-
-        // Kira caruman statutori berdasarkan gaji untuk caruman (contoh mudah: 11% EPF, 0.5% SOCSO, 0.2% EIS)
-        // Dalam sistem sebenar, ini akan merujuk jadual. Di sini kita biarkan editable, tetapi kita auto-update jika mahu.
-        // Kita hanya paparkan, tidak auto-override kerana ia boleh di-edit.
+        gajiKasarDisplay.innerText = formatRM(gajiKasar);
+        totalPotonganDisplay.innerText = formatRM(totalPotongan);
+        gajiBersihDisplay.innerText = formatRM(gajiBersih);
       }
 
-      // Pasang event listener untuk semua input
-      const allInputs = document.querySelectorAll('input[type="number"], input[type="text"]');
-      allInputs.forEach(input => {
-        input.addEventListener('input', updateCalculations);
-        input.addEventListener('change', updateCalculations);
-      });
+      // Isi semua field dari objek pekerja
+      function populateForm(emp) {
+        if (!emp) return;
 
-      // Initial calculation
-      updateCalculations();
+        infoSituation.innerText = emp.situation || 'Aktif';
+        infoGajiAsas.innerText = formatRM(emp.gajiAsas);
 
-      // ---------- 4. Simpan & Sync ke salary.html ----------
-      document.getElementById('saveBtn').addEventListener('click', function() {
-        // Kumpul data dari form
-        const updatedEmployee = {
-          ...employee,
-          situation: document.getElementById('infoSituation').innerText,
-          kod: document.getElementById('infoKod').innerText,
-          nama: document.getElementById('infoNama').innerText,
-          kumpulan: document.getElementById('infoKumpulan').innerText,
-          gajiAsas: parseFloat(employee.gajiAsas) || 0,
-          otBiasa: parseFloat(document.getElementById('otBiasa').value) || 0,
-          otRehat: parseFloat(document.getElementById('otRehat').value) || 0,
-          otAwam: parseFloat(document.getElementById('otAwam').value) || 0,
-          otLain: parseFloat(document.getElementById('otLain').value) || 0,
-          allowance: parseFloat(document.getElementById('allowance').value) || 0,
-          commision: parseFloat(document.getElementById('commision').value) || 0,
-          incentives: parseFloat(document.getElementById('incentives').value) || 0,
-          firstCalcTotal: parseFloat(document.getElementById('firstCalcTotal').innerText.replace('RM ', '')) || 0,
-          annualLeave: parseFloat(document.getElementById('annualLeave').value) || 0,
-          unpaidLeave: parseFloat(document.getElementById('unpaidLeave').value) || 0,
-          sickLeave: parseFloat(document.getElementById('sickLeave').value) || 0,
-          halfDaysLeave: parseFloat(document.getElementById('halfDaysLeave').value) || 0,
-          pinjaman: parseFloat(document.getElementById('pinjaman').value) || 0,
-          salaryEpf: parseFloat(document.getElementById('salaryEpf').value) || 0,
-          salarySocso: parseFloat(document.getElementById('salarySocso').value) || 0,
-          salaryEis: parseFloat(document.getElementById('salaryEis').value) || 0,
-          salary24jam: parseFloat(document.getElementById('salary24jam').value) || 0,
-          epfEmployee: parseFloat(document.getElementById('epfEmployee').value) || 0,
-          epfEmployer: parseFloat(document.getElementById('epfEmployer').value) || 0,
-          socsoEmployee: parseFloat(document.getElementById('socsoEmployee').value) || 0,
-          socsoEmployer: parseFloat(document.getElementById('socsoEmployer').value) || 0,
-          eisEmployee: parseFloat(document.getElementById('eisEmployee').value) || 0,
-          eisEmployer: parseFloat(document.getElementById('eisEmployer').value) || 0,
-          bankNama: document.getElementById('bankNama').value,
-          bankAcc: document.getElementById('bankAcc').value,
-          epfNo: document.getElementById('epfNo').value,
-          socsoNo: document.getElementById('socsoNo').value,
-          eisNo: document.getElementById('eisNo').value
+        // Set nilai input
+        inputs.otBiasa.value = emp.otBiasa ?? 0;
+        inputs.otRehat.value = emp.otRehat ?? 0;
+        inputs.otAwam.value = emp.otAwam ?? 0;
+        inputs.otLain.value = emp.otLain ?? 0;
+        inputs.allowance.value = emp.allowance ?? 0;
+        inputs.commision.value = emp.commision ?? 0;
+        inputs.incentives.value = emp.incentives ?? 0;
+
+        inputs.annualLeave.value = emp.annualLeave ?? 0;
+        inputs.unpaidLeave.value = emp.unpaidLeave ?? 0;
+        inputs.sickLeave.value = emp.sickLeave ?? 0;
+        inputs.halfDaysLeave.value = emp.halfDaysLeave ?? 0;
+        inputs.pinjaman.value = emp.pinjaman ?? 0;
+
+        inputs.salaryEpf.value = emp.salaryEpf ?? 0;
+        inputs.salarySocso.value = emp.salarySocso ?? 0;
+        inputs.salaryEis.value = emp.salaryEis ?? 0;
+        inputs.salary24jam.value = emp.salary24jam ?? 0;
+
+        inputs.epfEmployee.value = emp.epfEmployee ?? 0;
+        inputs.epfEmployer.value = emp.epfEmployer ?? 0;
+        inputs.socsoEmployee.value = emp.socsoEmployee ?? 0;
+        inputs.socsoEmployer.value = emp.socsoEmployer ?? 0;
+        inputs.eisEmployee.value = emp.eisEmployee ?? 0;
+        inputs.eisEmployer.value = emp.eisEmployer ?? 0;
+
+        inputs.bankNama.value = emp.bankNama || '—';
+        inputs.bankAcc.value = emp.bankAcc || '—';
+        inputs.epfNo.value = emp.epfNo || '—';
+        inputs.socsoNo.value = emp.socsoNo || '—';
+        inputs.eisNo.value = emp.eisNo || '—';
+
+        // Tetapkan semula pilihan dropdown
+        selectKod.value = emp.kod || '';
+        selectNama.value = emp.nama || '';
+        selectKumpulan.value = emp.kumpulan || '';
+
+        currentEmployee = emp;
+        updateCalculations();
+      }
+
+      // Dapatkan pekerja dari kod/nama
+      function findEmployeeByKodNama(kod, nama) {
+        return allEmployees.find(e => 
+          (kod && e.kod === kod) || (nama && e.nama === nama)
+        );
+      }
+
+      // Kemas kini dropdown kod & nama berdasarkan kumpulan
+      function refreshKodNamaDropdowns(kumpulanFilter = null) {
+        const filtered = kumpulanFilter
+          ? allEmployees.filter(e => e.kumpulan === kumpulanFilter)
+          : allEmployees;
+
+        // Simpan pilihan semasa
+        const savedKod = selectKod.value;
+        const savedNama = selectNama.value;
+
+        // Kod dropdown
+        selectKod.innerHTML = '<option value="">-- Pilih Kod --</option>';
+        const kodSet = new Set();
+        filtered.forEach(e => {
+          if (e.kod && !kodSet.has(e.kod)) {
+            kodSet.add(e.kod);
+            const opt = document.createElement('option');
+            opt.value = e.kod;
+            opt.textContent = e.kod;
+            selectKod.appendChild(opt);
+          }
+        });
+
+        // Nama dropdown
+        selectNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+        filtered.forEach(e => {
+          if (e.nama) {
+            const opt = document.createElement('option');
+            opt.value = e.nama;
+            opt.textContent = e.nama;
+            selectNama.appendChild(opt);
+          }
+        });
+
+        // Pulihkan pilihan jika masih wujud
+        if (savedKod && [...selectKod.options].some(o => o.value === savedKod)) {
+          selectKod.value = savedKod;
+        }
+        if (savedNama && [...selectNama.options].some(o => o.value === savedNama)) {
+          selectNama.value = savedNama;
+        }
+      }
+
+      // Isi dropdown kumpulan
+      function refreshKumpulanDropdown() {
+        const kumpulanSet = new Set();
+        allEmployees.forEach(e => {
+          if (e.kumpulan) kumpulanSet.add(e.kumpulan);
+        });
+
+        const saved = selectKumpulan.value;
+        selectKumpulan.innerHTML = '<option value="">-- Pilih Kumpulan --</option>';
+        [...kumpulanSet].sort().forEach(k => {
+          const opt = document.createElement('option');
+          opt.value = k;
+          opt.textContent = k;
+          selectKumpulan.appendChild(opt);
+        });
+
+        if (saved && kumpulanSet.has(saved)) {
+          selectKumpulan.value = saved;
+        }
+      }
+
+      // ---------- MUAT DATA DARI URL (salary.html) ----------
+      async function fetchEmployeesFromUrl() {
+        setSyncStatus('Memuat data dari URL...', 'loading');
+        try {
+          const response = await fetch(SALARY_URL + '?t=' + Date.now());
+          if (!response.ok) throw new Error('HTTP ' + response.status);
+          const html = await response.text();
+
+          // Parse HTML untuk mencari data pekerja
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+
+          // Cari sebarang script yang mengandungi data pekerja
+          // Biasanya salary.html mungkin menyimpan data dalam localStorage atau variable JS
+          // Kita cuba cari dari localStorage jika ada, tapi kita fetch dari URL
+          // Strategi: cari elemen <script> yang mengandungi array pekerja
+
+          let employees = [];
+
+          // Cuba cari dari window.localStorage jika ada (tidak boleh akses localStorage cross-origin)
+          // Jadi kita cuba parse dari HTML — mungkin ada jadual dengan data
+
+          // Pendekatan 1: Cari jadual dengan baris pekerja
+          const tables = doc.querySelectorAll('table');
+          tables.forEach(table => {
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+              const cells = row.querySelectorAll('td');
+              if (cells.length > 10) {
+                // Cuba ekstrak mengikut susunan lajur yang mungkin
+                // Ini bergantung pada struktur salary.html — kita cuba teka
+                // Biasanya: Situation, Kod, Nama, Kumpulan, Gaji Asas, ...
+                const situation = cells[0]?.innerText?.trim() || 'Aktif';
+                const kod = cells[1]?.innerText?.trim() || '';
+                const nama = cells[2]?.innerText?.trim() || '';
+                const kumpulan = cells[3]?.innerText?.trim() || '';
+                const gajiAsas = parseFloat(cells[4]?.innerText?.replace(/[^0-9.-]/g, '')) || 0;
+
+                if (kod && nama) {
+                  employees.push({
+                    situation, kod, nama, kumpulan, gajiAsas,
+                    otBiasa: 0, otRehat: 0, otAwam: 0, otLain: 0,
+                    allowance: 0, commision: 0, incentives: 0,
+                    annualLeave: 0, unpaidLeave: 0, sickLeave: 0,
+                    halfDaysLeave: 0, pinjaman: 0,
+                    salaryEpf: gajiAsas, salarySocso: gajiAsas,
+                    salaryEis: gajiAsas, salary24jam: gajiAsas,
+                    epfEmployee: 0, epfEmployer: 0,
+                    socsoEmployee: 0, socsoEmployer: 0,
+                    eisEmployee: 0, eisEmployer: 0,
+                    bankNama: '—', bankAcc: '—',
+                    epfNo: '—', socsoNo: '—', eisNo: '—'
+                  });
+                }
+              }
+            });
+          });
+
+          // Pendekatan 2: Cari dalam script — mungkin ada variable `employees` atau `payrollData`
+          const scripts = doc.querySelectorAll('script');
+          for (const script of scripts) {
+            const text = script.textContent;
+            // Cuba cari pola JSON array
+            const match = text.match(/\[\s*\{[^]*?\}\s*\]/);
+            if (match) {
+              try {
+                const parsed = JSON.parse(match[0]);
+                if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].kod) {
+                  employees = parsed;
+                  break;
+                }
+              } catch (e) { /* bukan JSON yang sah */ }
+            }
+          }
+
+          // Jika masih tiada, gunakan data contoh
+          if (employees.length === 0) {
+            // Fallback: cuba muat dari localStorage (jika ini dibuka dalam origin yang sama)
+            try {
+              const stored = localStorage.getItem(STORAGE_KEY);
+              if (stored) {
+                employees = JSON.parse(stored);
+              }
+            } catch (e) {}
+          }
+
+          if (employees.length === 0) {
+            // Data default sebagai contoh
+            employees = [
+              {
+                situation: 'Aktif', kod: 'EMP001', nama: 'JEFFREY TOH', kumpulan: 'PRO',
+                gajiAsas: 3000.00, otBiasa: 23.07, otRehat: 0, otAwam: 0, otLain: 0,
+                allowance: 0, commision: 0, incentives: 0,
+                annualLeave: 0, unpaidLeave: 0, sickLeave: 0, halfDaysLeave: 0, pinjaman: 0,
+                salaryEpf: 3000, salarySocso: 3000, salaryEis: 3000, salary24jam: 3000,
+                epfEmployee: 319, epfEmployer: 377, socsoEmployee: 19.25, socsoEmployer: 67.35,
+                eisEmployee: 7.70, eisEmployer: 7.70,
+                bankNama: 'Maybank', bankAcc: '1234567890',
+                epfNo: '123456789', socsoNo: '123456789', eisNo: '123456789'
+              },
+              {
+                situation: 'Aktif', kod: 'EMP002', nama: 'SITI RAHAYU', kumpulan: 'ADMIN',
+                gajiAsas: 2500.00, otBiasa: 0, otRehat: 0, otAwam: 0, otLain: 0,
+                allowance: 150, commision: 0, incentives: 0,
+                annualLeave: 0, unpaidLeave: 0, sickLeave: 0, halfDaysLeave: 0, pinjaman: 0,
+                salaryEpf: 2650, salarySocso: 2650, salaryEis: 2650, salary24jam: 2650,
+                epfEmployee: 0, epfEmployer: 0, socsoEmployee: 0, socsoEmployer: 0,
+                eisEmployee: 0, eisEmployer: 0,
+                bankNama: 'CIMB', bankAcc: '9876543210',
+                epfNo: '987654321', socsoNo: '987654321', eisNo: '987654321'
+              },
+              {
+                situation: 'Aktif', kod: 'EMP003', nama: 'AHMAD ZAKI', kumpulan: 'PRO',
+                gajiAsas: 3500.00, otBiasa: 50, otRehat: 30, otAwam: 0, otLain: 0,
+                allowance: 200, commision: 100, incentives: 0,
+                annualLeave: 0, unpaidLeave: 0, sickLeave: 0, halfDaysLeave: 0, pinjaman: 500,
+                salaryEpf: 3500, salarySocso: 3500, salaryEis: 3500, salary24jam: 3500,
+                epfEmployee: 385, epfEmployer: 455, socsoEmployee: 24.50, socsoEmployer: 85.00,
+                eisEmployee: 9.80, eisEmployer: 9.80,
+                bankNama: 'RHB', bankAcc: '5556667777',
+                epfNo: '555666777', socsoNo: '555666777', eisNo: '555666777'
+              }
+            ];
+          }
+
+          // Normalisasi data
+          employees = employees.map(e => {
+            const base = {
+              situation: e.situation || 'Aktif',
+              kod: e.kod || '',
+              nama: e.nama || '',
+              kumpulan: e.kumpulan || '',
+              gajiAsas: parseFloat(e.gajiAsas) || 0,
+              otBiasa: parseFloat(e.otBiasa) || 0,
+              otRehat: parseFloat(e.otRehat) || 0,
+              otAwam: parseFloat(e.otAwam) || 0,
+              otLain: parseFloat(e.otLain) || 0,
+              allowance: parseFloat(e.allowance) || 0,
+              commision: parseFloat(e.commision) || 0,
+              incentives: parseFloat(e.incentives) || 0,
+              annualLeave: parseFloat(e.annualLeave) || 0,
+              unpaidLeave: parseFloat(e.unpaidLeave) || 0,
+              sickLeave: parseFloat(e.sickLeave) || 0,
+              halfDaysLeave: parseFloat(e.halfDaysLeave) || 0,
+              pinjaman: parseFloat(e.pinjaman) || 0,
+              salaryEpf: parseFloat(e.salaryEpf) || 0,
+              salarySocso: parseFloat(e.salarySocso) || 0,
+              salaryEis: parseFloat(e.salaryEis) || 0,
+              salary24jam: parseFloat(e.salary24jam) || 0,
+              epfEmployee: parseFloat(e.epfEmployee) || 0,
+              epfEmployer: parseFloat(e.epfEmployer) || 0,
+              socsoEmployee: parseFloat(e.socsoEmployee) || 0,
+              socsoEmployer: parseFloat(e.socsoEmployer) || 0,
+              eisEmployee: parseFloat(e.eisEmployee) || 0,
+              eisEmployer: parseFloat(e.eisEmployer) || 0,
+              bankNama: e.bankNama || '—',
+              bankAcc: e.bankAcc || '—',
+              epfNo: e.epfNo || '—',
+              socsoNo: e.socsoNo || '—',
+              eisNo: e.eisNo || '—'
+            };
+            return base;
+          });
+
+          allEmployees = employees;
+
+          // Simpan ke localStorage supaya boleh digunakan kemudian
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees));
+          } catch (e) {}
+
+          setSyncStatus('Berjaya muat ' + allEmployees.length + ' pekerja', 'success');
+
+          // Kemas kini UI
+          refreshKumpulanDropdown();
+          refreshKodNamaDropdowns();
+
+          // Pilih pekerja pertama jika ada
+          if (allEmployees.length > 0) {
+            const first = allEmployees[0];
+            currentKumpulan = first.kumpulan;
+            selectKumpulan.value = first.kumpulan;
+            refreshKodNamaDropdowns(first.kumpulan);
+            selectKod.value = first.kod;
+            selectNama.value = first.nama;
+            populateForm(first);
+          }
+          return true;
+        } catch (error) {
+          console.error('Fetch error:', error);
+          setSyncStatus('Gagal muat dari URL, guna data setempat', 'error');
+
+          // Cuba dari localStorage
+          try {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+              allEmployees = JSON.parse(stored);
+              refreshKumpulanDropdown();
+              refreshKodNamaDropdowns();
+              if (allEmployees.length > 0) {
+                const first = allEmployees[0];
+                selectKumpulan.value = first.kumpulan || '';
+                refreshKodNamaDropdowns(first.kumpulan);
+                selectKod.value = first.kod || '';
+                selectNama.value = first.nama || '';
+                populateForm(first);
+              }
+              return true;
+            }
+          } catch (e) {}
+
+          return false;
+        }
+      }
+
+      // ---------- SIMPAN & SYNC KE URL (melalui localStorage + postMessage) ----------
+      function saveAndSync() {
+        if (!currentEmployee) {
+          alert('Tiada pekerja dipilih.');
+          return;
+        }
+
+        // Kumpul data terkini dari form
+        const updated = {
+          ...currentEmployee,
+          situation: infoSituation.innerText,
+          kod: currentEmployee.kod,
+          nama: currentEmployee.nama,
+          kumpulan: currentEmployee.kumpulan,
+          gajiAsas: currentEmployee.gajiAsas,
+          otBiasa: parseFloat(inputs.otBiasa.value) || 0,
+          otRehat: parseFloat(inputs.otRehat.value) || 0,
+          otAwam: parseFloat(inputs.otAwam.value) || 0,
+          otLain: parseFloat(inputs.otLain.value) || 0,
+          allowance: parseFloat(inputs.allowance.value) || 0,
+          commision: parseFloat(inputs.commision.value) || 0,
+          incentives: parseFloat(inputs.incentives.value) || 0,
+          annualLeave: parseFloat(inputs.annualLeave.value) || 0,
+          unpaidLeave: parseFloat(inputs.unpaidLeave.value) || 0,
+          sickLeave: parseFloat(inputs.sickLeave.value) || 0,
+          halfDaysLeave: parseFloat(inputs.halfDaysLeave.value) || 0,
+          pinjaman: parseFloat(inputs.pinjaman.value) || 0,
+          salaryEpf: parseFloat(inputs.salaryEpf.value) || 0,
+          salarySocso: parseFloat(inputs.salarySocso.value) || 0,
+          salaryEis: parseFloat(inputs.salaryEis.value) || 0,
+          salary24jam: parseFloat(inputs.salary24jam.value) || 0,
+          epfEmployee: parseFloat(inputs.epfEmployee.value) || 0,
+          epfEmployer: parseFloat(inputs.epfEmployer.value) || 0,
+          socsoEmployee: parseFloat(inputs.socsoEmployee.value) || 0,
+          socsoEmployer: parseFloat(inputs.socsoEmployer.value) || 0,
+          eisEmployee: parseFloat(inputs.eisEmployee.value) || 0,
+          eisEmployer: parseFloat(inputs.eisEmployer.value) || 0,
+          bankNama: inputs.bankNama.value || '—',
+          bankAcc: inputs.bankAcc.value || '—',
+          epfNo: inputs.epfNo.value || '—',
+          socsoNo: inputs.socsoNo.value || '—',
+          eisNo: inputs.eisNo.value || '—'
         };
 
-        // Kemas kini senarai pekerja dalam localStorage
-        let allEmployees = [];
-        try {
-          allEmployees = JSON.parse(localStorage.getItem('payrollEmployees')) || [];
-        } catch (e) {
-          allEmployees = [];
-        }
-
-        const index = allEmployees.findIndex(emp => emp.kod === employeeId || emp.id === employeeId);
+        // Kemas kini dalam array
+        const index = allEmployees.findIndex(e => e.kod === currentEmployee.kod);
         if (index !== -1) {
-          allEmployees[index] = { ...allEmployees[index], ...updatedEmployee };
+          allEmployees[index] = updated;
         } else {
-          allEmployees.push(updatedEmployee);
+          allEmployees.push(updated);
         }
 
-        localStorage.setItem('payrollEmployees', JSON.stringify(allEmployees));
-        localStorage.setItem('selectedEmployeeId', employeeId);
+        // Simpan ke localStorage
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees));
+          localStorage.setItem(SELECTED_ID_KEY, updated.kod);
+        } catch (e) {
+          console.warn('LocalStorage penuh', e);
+        }
 
-        // Tunjuk notifikasi
-        alert('✅ Data berjaya disimpan! Kembali ke sistem penggajian untuk melihat perubahan.');
-
-        // Jika dibuka dari salary.html, boleh cuba sync melalui window.opener (jika ada)
+        // Cuba sync ke window yang membuka (jika ada)
         if (window.opener && !window.opener.closed) {
           try {
-            window.opener.postMessage({ type: 'SYNC_EMPLOYEE', employee: updatedEmployee }, '*');
+            window.opener.postMessage({
+              type: 'SYNC_EMPLOYEE',
+              employee: updated
+            }, '*');
           } catch (e) {}
         }
 
-        // Redirect ke salary.html selepas simpan (optional)
-        // window.location.href = 'salary.html';
+        // Kemas kini UI
+        currentEmployee = updated;
+        refreshKodNamaDropdowns(currentEmployee.kumpulan);
+        setSyncStatus('Data disimpan pada ' + new Date().toLocaleTimeString(), 'success');
+
+        alert('✅ Data berjaya disimpan! ' + updated.nama + ' (' + updated.kod + ') telah dikemas kini.');
+      }
+
+      // ---------- EVENT LISTENERS ----------
+      // Kumpulan berubah
+      selectKumpulan.addEventListener('change', function() {
+        const kumpulan = this.value;
+        currentKumpulan = kumpulan;
+        refreshKodNamaDropdowns(kumpulan);
+        // Kosongkan pilihan pekerja
+        selectKod.value = '';
+        selectNama.value = '';
+        // Jika ada pekerja dalam kumpulan ini, pilih yang pertama
+        const filtered = kumpulan
+          ? allEmployees.filter(e => e.kumpulan === kumpulan)
+          : allEmployees;
+        if (filtered.length > 0) {
+          const first = filtered[0];
+          selectKod.value = first.kod;
+          selectNama.value = first.nama;
+          populateForm(first);
+        } else {
+          currentEmployee = null;
+          // Kosongkan borang
+          inputIds.forEach(id => { inputs[id].value = 0; });
+          infoSituation.innerText = '—';
+          infoGajiAsas.innerText = 'RM 0.00';
+          updateCalculations();
+        }
       });
 
+      // Kod berubah
+      selectKod.addEventListener('change', function() {
+        const kod = this.value;
+        if (!kod) return;
+        const emp = allEmployees.find(e => e.kod === kod);
+        if (emp) {
+          selectNama.value = emp.nama;
+          selectKumpulan.value = emp.kumpulan;
+          populateForm(emp);
+        }
+      });
+
+      // Nama berubah
+      selectNama.addEventListener('change', function() {
+        const nama = this.value;
+        if (!nama) return;
+        const emp = allEmployees.find(e => e.nama === nama);
+        if (emp) {
+          selectKod.value = emp.kod;
+          selectKumpulan.value = emp.kumpulan;
+          populateForm(emp);
+        }
+      });
+
+      // Semua input nombor/teks dikemas kini
+      inputIds.forEach(id => {
+        const inp = inputs[id];
+        if (inp) {
+          inp.addEventListener('input', updateCalculations);
+          inp.addEventListener('change', updateCalculations);
+        }
+      });
+
+      // Butang simpan
+      el('saveBtn').addEventListener('click', saveAndSync);
+
+      // Butang muat dari URL
+      el('syncFromUrlBtn').addEventListener('click', async function() {
+        const ok = await fetchEmployeesFromUrl();
+        if (ok) {
+          setSyncStatus('Data dikemas kini dari URL', 'success');
+        }
+      });
+
+      // ---------- INIT ----------
+      (async function init() {
+        // Cuba muat dari localStorage dulu untuk paparan pantas
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (stored) {
+            allEmployees = JSON.parse(stored);
+            refreshKumpulanDropdown();
+            refreshKodNamaDropdowns();
+            if (allEmployees.length > 0) {
+              const first = allEmployees[0];
+              selectKumpulan.value = first.kumpulan || '';
+              refreshKodNamaDropdowns(first.kumpulan);
+              selectKod.value = first.kod || '';
+              selectNama.value = first.nama || '';
+              populateForm(first);
+              setSyncStatus('Data setempat dimuat', '');
+            }
+          }
+        } catch (e) {}
+
+        // Kemudian cuba muat dari URL (jika ada internet)
+        await fetchEmployeesFromUrl();
+      })();
+
       // Expose untuk debugging
-      window.updateCalculations = updateCalculations;
+      window.__debug = { allEmployees, fetchEmployeesFromUrl, saveAndSync };
     })();
   </script>
 </body>
