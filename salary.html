@@ -10,6 +10,9 @@
     --epf-blue: #1a4f8a; --epf-blue-light: #e8f0fa; --epf-blue-soft: #f4f8fd;
     --epf-border: #d4e0ee; --epf-border-soft: #e6eef7;
     --epf-text: #1f2d3d; --epf-muted: #64748b; --epf-bg: #f7fafd;
+    --nav-h: 52px;
+    --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover: #16345c;
+    --nav-text: #cbd9ea; --nav-accent: #4d9fff;
   }
   body {
     font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -17,8 +20,226 @@
     padding: 0 0 3rem 0; min-height: 100vh; line-height: 1.5;
     -webkit-font-smoothing: antialiased; font-size: 14px;
   }
+
+  /* ==================== 顶部深色导航栏 ==================== */
+  .navbar {
+    position: sticky; top: 0; z-index: 200;
+    display: flex; align-items: stretch; flex-wrap: wrap;
+    background: linear-gradient(90deg, var(--nav-bg-1) 0%, var(--nav-bg-2) 100%);
+    padding: 0 1rem; min-height: var(--nav-h);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid rgba(77, 159, 255, 0.18);
+  }
+  .navbar .nav-brand {
+    display: flex; align-items: center; gap: 0.55rem;
+    color: #fff; font-weight: 800; font-size: 0.78rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding-right: 1.1rem; margin-right: 0.5rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.12);
+    white-space: nowrap;
+  }
+  .navbar .nav-brand .logo {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: linear-gradient(135deg, #4d9fff, #1a4f8a);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 0.85rem; font-weight: 800;
+    box-shadow: 0 2px 6px rgba(77, 159, 255, 0.35);
+  }
+  .nav-links { display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px; }
+  .nav-item {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    padding: 0 0.85rem; min-height: var(--nav-h);
+    color: var(--nav-text); text-decoration: none;
+    font-family: inherit; font-size: 0.73rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    background: transparent; border: none; cursor: pointer;
+    white-space: nowrap; transition: background 0.15s, color 0.15s;
+    position: relative;
+  }
+  .nav-item:hover { background: var(--nav-hover); color: #fff; }
+  .nav-item::after {
+    content: ''; position: absolute; left: 0.85rem; right: 0.85rem; bottom: 0;
+    height: 2px; background: var(--nav-accent); transform: scaleX(0);
+    transform-origin: left; transition: transform 0.2s;
+  }
+  .nav-item:hover::after { transform: scaleX(1); }
+
+  .nav-dropdown { position: relative; display: flex; align-items: stretch; }
+  .nav-dropdown > .nav-item { cursor: pointer; }
+  .nav-dropdown > .nav-item .caret {
+    font-size: 0.55rem; margin-left: 0.3rem; opacity: 0.8;
+    transition: transform 0.18s; display: inline-block;
+  }
+  .nav-dropdown:hover > .nav-item .caret,
+  .nav-dropdown.open > .nav-item .caret { transform: rotate(180deg); }
+  .nav-dropdown:hover > .nav-item,
+  .nav-dropdown.open > .nav-item { background: var(--nav-hover); color: #fff; }
+
+  .nav-dropdown-menu {
+    position: absolute; top: 100%; left: 0; min-width: 215px;
+    background: #ffffff; border: 1px solid var(--epf-border);
+    border-radius: 0 0 9px 9px;
+    box-shadow: 0 18px 36px -12px rgba(11, 27, 48, 0.42);
+    padding: 0.4rem; display: none; flex-direction: column;
+    z-index: 220;
+  }
+  .nav-dropdown:hover .nav-dropdown-menu,
+  .nav-dropdown.open .nav-dropdown-menu { display: flex; }
+  .nav-dropdown-menu a {
+    display: flex; align-items: center; gap: 0.55rem;
+    padding: 0.5rem 0.8rem; border-radius: 5px;
+    color: var(--epf-text); text-decoration: none;
+    font-size: 0.78rem; font-weight: 500; white-space: nowrap;
+    transition: background 0.13s, color 0.13s, padding-left 0.13s;
+  }
+  .nav-dropdown-menu a .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--epf-blue); opacity: 0.45; flex-shrink: 0;
+    transition: opacity 0.13s, transform 0.13s;
+  }
+  .nav-dropdown-menu a:hover {
+    background: var(--epf-blue-light); color: var(--epf-blue);
+    padding-left: 1rem;
+  }
+  .nav-dropdown-menu a:hover .dot { opacity: 1; transform: scale(1.35); }
+
+  .nav-chat {
+    margin-left: auto; align-self: center;
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    padding: 0.5rem 1rem; border: none; border-radius: 20px;
+    background: linear-gradient(135deg, #2f7fe0 0%, #1a4f8a 100%);
+    color: #fff; font-family: inherit; font-size: 0.73rem;
+    font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer; white-space: nowrap;
+    box-shadow: 0 3px 12px rgba(47, 127, 224, 0.4);
+    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+  }
+  .nav-chat:hover {
+    filter: brightness(1.12); transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(47, 127, 224, 0.5);
+  }
+  .nav-chat .pulse {
+    width: 7px; height: 7px; border-radius: 50%; background: #6ef0a8;
+    box-shadow: 0 0 0 0 rgba(110, 240, 168, 0.75);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(110, 240, 168, 0.7); }
+    70%  { box-shadow: 0 0 0 7px rgba(110, 240, 168, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(110, 240, 168, 0); }
+  }
+
+  /* ==================== REQUEST CHAT 面板 ==================== */
+  .chat-panel {
+    position: fixed; right: 1.5rem; bottom: 1.5rem;
+    width: 390px; max-width: calc(100vw - 2rem);
+    height: 560px; max-height: calc(100vh - 6rem);
+    background: #fff; border: 1px solid var(--epf-border);
+    border-radius: 14px; overflow: hidden;
+    display: none; flex-direction: column;
+    box-shadow: 0 26px 64px -18px rgba(11, 27, 48, 0.5);
+    z-index: 9997;
+  }
+  .chat-panel.open { display: flex; animation: chatIn 0.22s cubic-bezier(0.2, 0.9, 0.3, 1); }
+  @keyframes chatIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to   { opacity: 1; transform: none; }
+  }
+  .chat-head {
+    background: linear-gradient(90deg, var(--nav-bg-1), var(--nav-bg-2));
+    color: #fff; padding: 0.7rem 0.9rem;
+    display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0;
+  }
+  .chat-head .chat-avatar {
+    width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+    background: linear-gradient(135deg, #4d9fff, #1a4f8a);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem;
+  }
+  .chat-head .chat-title { flex: 1; line-height: 1.25; }
+  .chat-head .chat-title strong { font-size: 0.82rem; letter-spacing: 0.02em; display: block; }
+  .chat-head .chat-title small { font-size: 0.65rem; color: #8fb4dd; letter-spacing: 0.03em; }
+  .chat-icon-btn {
+    background: rgba(255, 255, 255, 0.1); border: none; color: #dbe8f7;
+    width: 26px; height: 26px; border-radius: 6px; cursor: pointer;
+    font-size: 0.8rem; line-height: 1; display: flex;
+    align-items: center; justify-content: center; transition: 0.15s;
+    font-family: inherit;
+  }
+  .chat-icon-btn:hover { background: rgba(255, 255, 255, 0.22); color: #fff; }
+
+  .chat-body {
+    flex: 1; overflow-y: auto; padding: 0.9rem;
+    background: var(--epf-bg); display: flex;
+    flex-direction: column; gap: 0.6rem;
+  }
+  .chat-body::-webkit-scrollbar { width: 6px; }
+  .chat-body::-webkit-scrollbar-thumb { background: #c2d4e6; border-radius: 3px; }
+  .chat-msg {
+    max-width: 86%; padding: 0.6rem 0.82rem; border-radius: 13px;
+    font-size: 0.79rem; line-height: 1.6; word-break: break-word;
+    animation: msgIn 0.2s ease;
+  }
+  @keyframes msgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .chat-msg.bot {
+    align-self: flex-start; background: #fff; color: var(--epf-text);
+    border: 1px solid var(--epf-border); border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 3px rgba(26, 79, 138, 0.06);
+  }
+  .chat-msg.user {
+    align-self: flex-end; background: var(--epf-blue); color: #fff;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 2px 8px -2px rgba(26, 79, 138, 0.45);
+  }
+  .chat-msg.bot a { color: var(--epf-blue); font-weight: 600; }
+  .chat-msg.typing { display: flex; gap: 4px; align-items: center; padding: 0.75rem 0.9rem; }
+  .chat-msg.typing span {
+    width: 6px; height: 6px; border-radius: 50%; background: #9db8d2;
+    animation: blink 1.2s infinite ease-in-out;
+  }
+  .chat-msg.typing span:nth-child(2) { animation-delay: 0.18s; }
+  .chat-msg.typing span:nth-child(3) { animation-delay: 0.36s; }
+  @keyframes blink { 0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); } 40% { opacity: 1; transform: scale(1); } }
+
+  .chat-suggest {
+    display: flex; gap: 0.35rem; flex-wrap: wrap;
+    padding: 0.55rem 0.8rem 0.15rem; background: #fff;
+    border-top: 1px solid var(--epf-border-soft); flex-shrink: 0;
+  }
+  .chat-suggest button {
+    background: var(--epf-blue-soft); border: 1px solid var(--epf-border);
+    color: var(--epf-blue); padding: 0.28rem 0.65rem; border-radius: 14px;
+    font-size: 0.68rem; font-family: inherit; font-weight: 600;
+    cursor: pointer; transition: 0.14s; white-space: nowrap;
+  }
+  .chat-suggest button:hover { background: var(--epf-blue-light); border-color: #b8cfe8; }
+
+  .chat-input-row {
+    display: flex; gap: 0.5rem; align-items: flex-end;
+    padding: 0.65rem 0.8rem 0.8rem; background: #fff; flex-shrink: 0;
+  }
+  .chat-input-row textarea {
+    flex: 1; resize: none; min-height: 40px; max-height: 110px;
+    border: 1px solid var(--epf-border); border-radius: 10px;
+    padding: 0.6rem 0.75rem; font-family: inherit; font-size: 0.8rem;
+    color: var(--epf-text); line-height: 1.45; transition: 0.15s;
+  }
+  .chat-input-row textarea:focus {
+    outline: none; border-color: var(--epf-blue);
+    box-shadow: 0 0 0 2px rgba(26, 79, 138, 0.1);
+  }
+  .chat-send {
+    width: 40px; height: 40px; flex-shrink: 0; border: none;
+    border-radius: 10px; background: var(--epf-blue); color: #fff;
+    font-size: 1rem; cursor: pointer; transition: 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .chat-send:hover { background: #15406f; transform: translateY(-1px); }
+  .chat-send:active { transform: translateY(0); }
+
+  /* ==================== 原有样式 ==================== */
   .topbar {
-    position: sticky; top: 0; z-index: 100; background: #ffffff;
+    position: sticky; top: var(--nav-h); z-index: 100; background: #ffffff;
     border-bottom: 1px solid var(--epf-border); padding: 0.65rem 1.75rem;
     display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
     box-shadow: 0 1px 2px rgba(26, 79, 138, 0.04);
@@ -174,7 +395,6 @@
   .bg-amber   { background: #fdf8ec !important; color: #7a5a12 !important; }
   .bg-blue    { background: #eef5fd !important; color: var(--epf-blue) !important; }
   .bg-gray    { background: #f4f6f9 !important; color: var(--epf-muted) !important; }
-  /* === PINJAMAN 专属底色（与 LEAVE 系列区分） === */
   .bg-rose-deep { background: #f7d4e0 !important; color: #7a1f3d !important; }
   .col-split-left { border-left: 2px solid #c97a9b !important; }
   td { z-index: 1; }
@@ -434,71 +654,9 @@
   }
   .modal-actions { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
   #printArea { display: none; }
-
-  /* ============================================================
-     ⬇⬇⬇ 新增：深色顶部导航栏 ⬇⬇⬇
-     ============================================================ */
-  .navbar-dark {
-    position: sticky; top: 0; z-index: 250;
-    background: linear-gradient(180deg, #17293f 0%, #0d1b2c 100%);
-    border-bottom: 1px solid #050d16;
-    display: flex; align-items: stretch; height: 44px;
-    padding: 0 1rem; overflow-x: auto; overflow-y: visible;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
-    scrollbar-width: none;
-  }
-  .navbar-dark::-webkit-scrollbar { height: 0; }
-  .navbar-dark .nav-spacer { flex: 1; min-width: 0.5rem; }
-  .nav-item {
-    display: inline-flex; align-items: center; gap: 0.35rem;
-    padding: 0 0.85rem; flex-shrink: 0;
-    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
-    color: #bfd0e3; text-decoration: none; line-height: 1;
-    background: transparent; border: none; border-bottom: 2px solid transparent;
-    cursor: pointer; font-family: inherit; white-space: nowrap;
-    transition: color .15s, background .15s, border-color .15s;
-  }
-  .nav-item:hover {
-    color: #ffffff; background: rgba(255, 255, 255, 0.07);
-    border-bottom-color: #4a9ae8;
-  }
-  .nav-dropdown { position: relative; display: flex; flex-shrink: 0; }
-  .nav-dropdown > .nav-item .caret {
-    font-size: 0.58rem; opacity: 0.75; transition: transform .15s;
-  }
-  .nav-dropdown.open > .nav-item {
-    color: #fff; background: rgba(255, 255, 255, 0.09);
-    border-bottom-color: #4a9ae8;
-  }
-  .nav-dropdown.open > .nav-item .caret { transform: rotate(180deg); }
-  .nav-panel {
-    position: absolute; top: 100%; left: 0; min-width: 215px;
-    background: #ffffff; border: 1px solid var(--epf-border);
-    border-radius: 0 0 6px 6px;
-    box-shadow: 0 14px 30px -10px rgba(0, 0, 0, 0.38);
-    padding: 0.3rem 0; display: none; z-index: 260;
-  }
-  .nav-dropdown.open .nav-panel { display: block; }
-  .nav-panel a {
-    display: block; padding: 0.5rem 1rem;
-    font-size: 0.74rem; font-weight: 600; letter-spacing: 0.04em;
-    color: var(--epf-text); text-decoration: none;
-    border-left: 3px solid transparent; transition: .12s;
-  }
-  .nav-panel a:hover {
-    background: var(--epf-blue-soft); color: var(--epf-blue);
-    border-left-color: var(--epf-blue);
-  }
-  .nav-chat { color: #7fd1a8; }
-  .nav-chat:hover { color: #b7f5d3; border-bottom-color: #7fd1a8; background: rgba(127,209,168,0.10); }
-
-  /* 让原有 topbar 紧贴深色导航栏下方 */
-  .topbar { top: 44px; }
-  /* ============================================================ */
-
   @media print {
     body { background: #fff; padding: 0; }
-    .navbar-dark, .topbar, .container, .toast, .modal-overlay, .section-legend { display: none !important; }
+    .navbar, .topbar, .container, .toast, .modal-overlay, .section-legend, .chat-panel { display: none !important; }
     #printArea { display: block !important; }
     .payslip { page-break-after: always; padding: 12mm; font-size: 10pt; font-family: Arial, sans-serif; color: #000; }
     .payslip:last-child { page-break-after: auto; }
@@ -525,13 +683,12 @@
   .table-wrap::-webkit-scrollbar-thumb { background: #c2d4e6; border-radius: 4px; }
   .table-wrap::-webkit-scrollbar-thumb:hover { background: #9db8d2; }
   @media (max-width: 768px) {
-    .navbar-dark {
-      position: relative; top: auto; height: auto;
-      flex-wrap: wrap; padding: 0 0.4rem; overflow: visible;
-    }
-    .nav-item { padding: 0.6rem 0.6rem; font-size: 0.66rem; }
-    .nav-panel { min-width: 190px; }
-    .topbar { top: 0; }
+    .navbar { padding: 0 0.5rem; }
+    .navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
+    .navbar .nav-brand span.brand-text { display: none; }
+    .nav-item { padding: 0 0.6rem; font-size: 0.68rem; }
+    .nav-chat { padding: 0.45rem 0.75rem; font-size: 0.66rem; }
+    .topbar { padding: 0.6rem 1rem; }
     .container { padding: 1rem; }
     .page-header { padding: 1.2rem 1.2rem; }
     .page-header h1 { font-size: 1.2rem; }
@@ -539,53 +696,88 @@
     .stat-pill { padding: 0.4rem 0.8rem; min-width: 90px; }
     .stat-pill .value { font-size: 1rem; }
     .ms-btn { min-width: 130px; }
+    .chat-panel {
+      right: 0.5rem; left: 0.5rem; bottom: 0.5rem;
+      width: auto; max-width: none; height: 72vh;
+    }
   }
 </style>
 </head>
 <body class="freeze-on">
 
-<!-- ============================================================
-     ⬇⬇⬇ 新增：深色顶部导航栏 ⬇⬇⬇
-     ============================================================ -->
-<nav class="navbar-dark">
-  <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/staffinfo.html" title="Employees">👥 EMPLOYEES</a>
-  <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/salarysystem/salary.html" title="Payroll View">📊 PAYROLL VIEW</a>
+<!-- ==================== 深色顶部导航栏 ==================== -->
+<nav class="navbar" id="mainNav">
+  <div class="nav-brand">
+    <span class="logo">Y</span>
+    <span class="brand-text">YZ Payroll</span>
+  </div>
 
-  <div class="nav-dropdown">
-    <button type="button" class="nav-item" onclick="toggleNavDropdown(this, event)">➖ DEDUCTION <span class="caret">▾</span></button>
-    <div class="nav-panel">
-      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/leave.html">LEAVE</a>
-      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/pinjaman.html">PINJAMAN</a>
-      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/epf.html">EPF</a>
-      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/socso.html">SOCSO</a>
-      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/eis.html">EIS</a>
-      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/lindungan.html">24 JAM LINDUNGAN</a>
+  <div class="nav-links">
+    <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/.github.io/staffinfo.html">👥 Employees</a>
+
+    <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/salarysystem/salary.html">📊 Payroll View</a>
+
+    <div class="nav-dropdown">
+      <button class="nav-item" type="button">➖ Deduction <span class="caret">▾</span></button>
+      <div class="nav-dropdown-menu">
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/leave.html"><span class="dot"></span>Leave</a>
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/pinjaman.html"><span class="dot"></span>Pinjaman</a>
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/epf.html"><span class="dot"></span>EPF</a>
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/socso.html"><span class="dot"></span>SOCSO</a>
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/eis.html"><span class="dot"></span>EIS</a>
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/lindungan.html"><span class="dot"></span>24 Jam Lindungan</a>
+      </div>
+    </div>
+
+    <div class="nav-dropdown">
+      <button class="nav-item" type="button">➕ Additional <span class="caret">▾</span></button>
+      <div class="nav-dropdown-menu">
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/overtime.html"><span class="dot"></span>Over Time</a>
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/pendapatantambahan.html"><span class="dot"></span>Pendapatan Tambahan</a>
+      </div>
+    </div>
+
+    <div class="nav-dropdown">
+      <button class="nav-item" type="button">⚙️ Setting <span class="caret">▾</span></button>
+      <div class="nav-dropdown-menu">
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/company.html"><span class="dot"></span>Company</a>
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/payslip.html"><span class="dot"></span>Payslip</a>
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/htmlshow.html"><span class="dot"></span>HTML</a>
+      </div>
     </div>
   </div>
 
-  <div class="nav-dropdown">
-    <button type="button" class="nav-item" onclick="toggleNavDropdown(this, event)">➕ ADDITIONAL <span class="caret">▾</span></button>
-    <div class="nav-panel">
-      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/overtime.html">OVER TIME</a>
-      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/pendapatantambahan.html">PENDAPATAN TAMBAHAN</a>
-    </div>
-  </div>
-
-  <div class="nav-dropdown">
-    <button type="button" class="nav-item" onclick="toggleNavDropdown(this, event)">⚙️ SETTING <span class="caret">▾</span></button>
-    <div class="nav-panel">
-      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/company.html">COMPANY</a>
-      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/payslip.html">PAYSLIP</a>
-      <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/htmlshow.html">HTML</a>
-    </div>
-  </div>
-
-  <span class="nav-spacer"></span>
-
-  <a class="nav-item nav-chat" href="https://chat.deepseek.com/" target="_blank" rel="noopener"
-     title="Buka AI Assistant (DeepSeek)">🤖 REQUEST CHAT</a>
+  <button class="nav-chat" type="button" onclick="toggleChat()">
+    <span class="pulse"></span> 💬 Request Chat
+  </button>
 </nav>
-<!-- ============================================================ -->
+
+<!-- ==================== REQUEST CHAT 面板 ==================== -->
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-head">
+    <div class="chat-avatar">🤖</div>
+    <div class="chat-title">
+      <strong>Request Chat · AI 助手</strong>
+      <small>Payroll Assistant · 在线</small>
+    </div>
+    <button class="chat-icon-btn" type="button" onclick="clearChat()" title="清空对话">🗑</button>
+    <button class="chat-icon-btn" type="button" onclick="closeChat()" title="关闭">✕</button>
+  </div>
+
+  <div class="chat-body" id="chatBody"></div>
+
+  <div class="chat-suggest" id="chatSuggest">
+    <button type="button" onclick="askChat('EPF 怎么算？')">EPF 怎么算？</button>
+    <button type="button" onclick="askChat('OT 如何计算？')">OT 怎么算？</button>
+    <button type="button" onclick="askChat('如何保存到 Sheet？')">保存到 Sheet</button>
+    <button type="button" onclick="askChat('借粮 Pinjaman 怎么扣？')">Pinjaman</button>
+  </div>
+
+  <div class="chat-input-row">
+    <textarea id="chatInput" rows="1" placeholder="输入你的问题… (Enter 发送 / Shift+Enter 换行)"></textarea>
+    <button class="chat-send" type="button" onclick="sendChat()" title="发送">➤</button>
+  </div>
+</div>
 
 <div class="topbar">
   <div class="brand"><div class="logo">P</div> Payroll System</div>
@@ -693,7 +885,6 @@
             <col class="col-freeze col-4" style="width:110px">
             <col style="width:85px"><col style="width:85px"><col style="width:85px"><col style="width:85px">
             <col style="width:130px"><col style="width:130px"><col style="width:130px"><col style="width:130px">
-            <!-- LEAVE：各拆成 DAYS / AMOUNT 两小格 -->
             <col style="width:80px"><col style="width:95px">
             <col style="width:80px"><col style="width:95px">
             <col style="width:80px"><col style="width:95px">
@@ -720,7 +911,6 @@
               </th>
               <th colspan="4" class="bg-emerald divider-group"><div class="sec-title" id="sec2">💰 2. PENDAPATAN / ELAUN (OT)</div></th>
               <th colspan="4" class="bg-emerald divider-group"><div class="sec-title" id="sec2b">➕ PENDAPATAN TAMBAHAN</div></th>
-              <!-- 原本 colspan=5 → 现在 4 个 LEAVE x 2 子格 + PINJAMAN = 9 -->
               <th colspan="9" class="bg-rose divider-group" style="position: relative;">
                 <div class="sec-title" id="sec2d">➖ POTONGAN (ON LEAVE + PINJAMAN)</div>
                 <div class="unfold-handle" onclick="toggleSalaryFold(event)" title="Unfold / Expand"></div>
@@ -752,12 +942,10 @@
               <th class="bg-emerald" rowspan="2" id="thCommission">COMMISION</th>
               <th class="bg-emerald" rowspan="2" id="thIncentives">INCENTIVES</th>
               <th class="bg-emerald" rowspan="2" id="thFirstCalcTotal">FIRST CALCULATION TOTAL</th>
-              <!-- LEAVE 系列：每个主栏 colspan=2 -->
               <th class="bg-rose divider-group" colspan="2" id="thAnnualLeave">ANNUAL LEAVE</th>
               <th class="bg-rose" colspan="2" id="thUnpaidLeave">UNPAID LEAVE</th>
               <th class="bg-rose" colspan="2" id="thSickLeave">SICK LEAVE</th>
               <th class="bg-rose" colspan="2" id="thHalfDays">HALF DAYS LEAVE (HOURS)</th>
-              <!-- PINJAMAN：独立底色 + 左侧分割线 -->
               <th class="bg-rose-deep col-split-left" rowspan="2" id="thPinjaman">PINJAMAN</th>
               <th class="bg-cyan divider-group foldable-col" rowspan="2" id="thEPFSalary">Salary for EPF Contributions<br><span style="font-weight:400;font-size:0.6rem;">(Gaji untuk caruman KWSP)</span></th>
               <th class="bg-cyan foldable-col" rowspan="2" id="thSOCSOSalary">Salary for SOCSO Contributions<br><span style="font-weight:400;font-size:0.6rem;">(Gaji untuk caruman PERKESO)</span></th>
@@ -787,7 +975,6 @@
               <th class="bg-gray divider-group" rowspan="2" style="text-align:center;" id="thAction">Tindakan</th>
             </tr>
             <tr class="sub-header-row">
-              <!-- LEAVE 子表头：DAYS / AMOUNT -->
               <th class="bg-rose" id="subALDays">DAYS (D)</th>
               <th class="bg-rose" id="subALAmt">AMOUNT (-RM)</th>
               <th class="bg-rose" id="subULDays">DAYS (D)</th>
@@ -817,7 +1004,6 @@
               <th class="bg-emerald"><input class="th-filter" data-col="10" placeholder="🔍"></th>
               <th class="bg-emerald"><input class="th-filter" data-col="11" placeholder="🔍"></th>
               <th class="bg-emerald"><input class="th-filter" data-col="12" placeholder="🔍"></th>
-              <!-- LEAVE 8 格 -->
               <th class="bg-rose divider-group"><input class="th-filter" data-col="13" placeholder="🔍"></th>
               <th class="bg-rose"><input class="th-filter" data-col="14" placeholder="🔍"></th>
               <th class="bg-rose"><input class="th-filter" data-col="15" placeholder="🔍"></th>
@@ -826,9 +1012,7 @@
               <th class="bg-rose"><input class="th-filter" data-col="18" placeholder="🔍"></th>
               <th class="bg-rose"><input class="th-filter" data-col="19" placeholder="🔍"></th>
               <th class="bg-rose"><input class="th-filter" data-col="20" placeholder="🔍"></th>
-              <!-- PINJAMAN -->
               <th class="bg-rose-deep col-split-left"><input class="th-filter" data-col="21" placeholder="🔍"></th>
-              <!-- 以下全部 +4 -->
               <th class="bg-cyan divider-group foldable-col"><input class="th-filter" data-col="22" placeholder="🔍"></th>
               <th class="bg-cyan foldable-col"><input class="th-filter" data-col="23" placeholder="🔍"></th>
               <th class="bg-cyan foldable-col"><input class="th-filter" data-col="24" placeholder="🔍"></th>
@@ -909,6 +1093,270 @@
 
 <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
+/* ============================================================
+   顶部导航栏：下拉菜单 + 高度同步
+   ============================================================ */
+function syncNavHeight() {
+  const nav = document.getElementById('mainNav');
+  if (!nav) return;
+  document.documentElement.style.setProperty('--nav-h', nav.offsetHeight + 'px');
+}
+
+document.querySelectorAll('.nav-dropdown').forEach(dd => {
+  const trigger = dd.querySelector('.nav-item');
+  if (!trigger) return;
+  trigger.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    const wasOpen = dd.classList.contains('open');
+    document.querySelectorAll('.nav-dropdown.open').forEach(x => x.classList.remove('open'));
+    if (!wasOpen) dd.classList.add('open');
+  });
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('.nav-dropdown')) {
+    document.querySelectorAll('.nav-dropdown.open').forEach(x => x.classList.remove('open'));
+  }
+});
+
+/* ============================================================
+   REQUEST CHAT · 在线 AI 助手
+   ============================================================ */
+const CHAT_WELCOME =
+  '👋 你好！我是 Payroll AI 助手。\n' +
+  '我可以帮你解答：EPF / SOCSO / EIS / 24JAM 计算、OT 加班、借粮 Pinjaman、\n' +
+  '保存到 Sheet、导入导出、粮单打印等等。\n\n' +
+  '直接输入问题，或点下方快捷按钮 👇';
+
+let chatBusy = false;
+
+function toggleChat() {
+  const panel = document.getElementById('chatPanel');
+  if (panel.classList.contains('open')) closeChat(); else openChat();
+}
+function openChat() {
+  const panel = document.getElementById('chatPanel');
+  panel.classList.add('open');
+  const body = document.getElementById('chatBody');
+  if (!body.dataset.inited) {
+    body.dataset.inited = '1';
+    addChatMsg('bot', CHAT_WELCOME);
+  }
+  setTimeout(() => {
+    const inp = document.getElementById('chatInput');
+    if (inp && window.innerWidth > 768) inp.focus();
+  }, 150);
+}
+function closeChat() {
+  document.getElementById('chatPanel').classList.remove('open');
+}
+function clearChat() {
+  const body = document.getElementById('chatBody');
+  body.innerHTML = '';
+  addChatMsg('bot', CHAT_WELCOME);
+}
+function addChatMsg(role, text) {
+  const body = document.getElementById('chatBody');
+  const div = document.createElement('div');
+  div.className = 'chat-msg ' + role;
+  div.innerHTML = escapeHtml(text).replace(/\n/g, '<br>');
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+  return div;
+}
+function addTyping() {
+  const body = document.getElementById('chatBody');
+  const div = document.createElement('div');
+  div.className = 'chat-msg bot typing';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+  return div;
+}
+function askChat(q) {
+  const inp = document.getElementById('chatInput');
+  inp.value = q;
+  sendChat();
+}
+function sendChat() {
+  const inp = document.getElementById('chatInput');
+  const q = (inp.value || '').trim();
+  if (!q || chatBusy) return;
+  chatBusy = true;
+  addChatMsg('user', q);
+  inp.value = '';
+  inp.style.height = 'auto';
+  const typing = addTyping();
+  setTimeout(() => {
+    typing.remove();
+    addChatMsg('bot', aiReply(q));
+    chatBusy = false;
+  }, 420);
+}
+
+/* 本地知识库回复 */
+function aiReply(q) {
+  const s = String(q).toLowerCase();
+  const has = (...ks) => ks.some(k => s.includes(k));
+
+  if (has('你好', 'hi', 'hello', 'halo', '嗨')) {
+    return '你好！👋 我可以帮你解答薪资系统的问题。\n试试问我：EPF 怎么算？/ OT 如何计算？/ 如何保存到 Sheet？';
+  }
+
+  if (has('epf', 'kwsp')) {
+    return '【EPF / KWSP 计算】\n' +
+      '• 55 岁以下：员工 11%，雇主 12%（月薪 ≤ RM5,000 时雇主 13%）\n' +
+      '• 60 岁及以上：员工 0%，雇主 4%\n' +
+      '• 系统会自动进位（Math.ceil）到整数\n' +
+      '• 想手动输入：勾选 EPF 前面的 ✎ 复选框\n' +
+      '• 银行 = CASH / Merchantrade，或 EPF 栏位 = NO 时自动归 0\n' +
+      '• 计算基数可在「Salary for EPF Contributions」栏调整';
+  }
+  if (has('socso', 'perkeso')) {
+    return '【SOCSO / PERKESO】\n' +
+      '• 按缴费表计算，薪资上限 RM6,000\n' +
+      '• 员工约 0.5%，雇主约 1.75%（依薪资区间递增）\n' +
+      '• 月薪超过 RM6,000 → 员工 RM29.75 / 雇主 RM104.15\n' +
+      '• 计算基数可在「Salary for SOCSO Contributions」栏调整';
+  }
+  if (has('eis')) {
+    return '【EIS 就业保险】\n' +
+      '• 员工 0.2% + 雇主 0.2%\n' +
+      '• 薪资上限 RM6,000，员工最高 RM11.90\n' +
+      '• 计算基数可在「Salary for EIS Contributions」栏调整';
+  }
+  if (has('24jam', '24 jam', 'lindung', '24小时')) {
+    return '【24 JAM LINDUNGAN】\n' +
+      '• 费率 0.7325%（仅雇主/员工单方列示，视保单设定）\n' +
+      '• 薪资上限 RM6,000\n' +
+      '• 计算基数可在「Salary for 24JAM Contributions」栏调整';
+  }
+  if (has('ot', 'overtime', '加班')) {
+    return '【OT 加班计算】\n' +
+      '时薪 = 月薪 ÷ 26 ÷ 8\n' +
+      '• 普通工作日加班：1.5 倍\n' +
+      '• 休息日加班：2.0 倍\n' +
+      '• 公共假期加班：3.0 倍\n' +
+      '把金额填入 OT Biasa / OT Rehat / OT Awam / OT Lain 栏，\n' +
+      '系统会自动加总进 Gaji Kasar。';
+  }
+  if (has('pinjaman', '借粮', '借款', '贷款')) {
+    return '【借粮 PINJAMAN】\n' +
+      '• 在 PINJAMAN 栏输入本期扣款金额（正数）\n' +
+      '• 会自动计入 Total Potongan，并从净薪资中扣除\n' +
+      '• 该栏位底色较深（粉红），与请假扣款区分';
+  }
+  if (has('请假', 'leave', 'cuti', '年假', '病假')) {
+    return '【请假扣款】\n' +
+      '4 种假期各有「天数 (D)」和「金额 (-RM)」两小格：\n' +
+      '• ANNUAL LEAVE 年假\n' +
+      '• UNPAID LEAVE 无薪假\n' +
+      '• SICK LEAVE 病假\n' +
+      '• HALF DAYS LEAVE 半天假（小时）\n' +
+      '金额部分会累加进 Total Potongan。';
+  }
+  if (has('净薪', 'net', 'gaji bersih', '公式', '计算方式')) {
+    return '【净薪资公式】\n' +
+      'Gaji Kasar = 基本薪资 + Allowance + Commission + Incentives + 全部 OT\n' +
+      'Total Potongan = 请假扣款 + Pinjaman + EPF + SOCSO + EIS + 24JAM（员工部分）\n' +
+      'Gaji Bersih = Gaji Kasar − Total Potongan';
+  }
+  if (has('手动', 'override', '✎', '覆盖')) {
+    return '【手动覆盖】\n' +
+      '每个 EPF / SOCSO / EIS / 24JAM 前面都有一个 ✎ 复选框：\n' +
+      '• 勾选 → 该栏位变成可编辑，可手动输入金额\n' +
+      '• 取消勾选 → 恢复系统自动计算\n' +
+      'Section 4（U-Y：Bank Nama / Bank Acc / EPF / SOCSO / EIS）也可用同样方式手动编辑。';
+  }
+  if (has('cash', '现金', 'merchantrade')) {
+    return '【CASH / Merchantrade】\n' +
+      '若 SLR Bank Nama 为 CASH 或 Merchantrade，\n' +
+      'EPF / SOCSO / EIS / 24JAM 会自动归 0。';
+  }
+  if (has('保存', 'sheet', 'simpan', 'google')) {
+    return '【保存资料到 Google Sheet】\n' +
+      '• 点顶部「💾 Simpan ke Sheet」→ 把当前所有资料写入 Sheet\n' +
+      '• 点「🔄 Muat dari Sheet」→ 重新拉取最新数据\n' +
+      '（页面载入时会自动先从 Sheet 获取资料）';
+  }
+  if (has('导入', 'import', '导出', 'eksport', 'export')) {
+    return '【导入 / 导出】\n' +
+      '📥 Import：支持 .xlsx / .csv / .txt，可先下载 Excel 或 Word 模板\n' +
+      '💾 Eksport：支持 PDF、Excel (.xlsx)、Text (.txt)、Word (.doc)\n' +
+      '导出会依照当前筛选结果输出。';
+  }
+  if (has('粮单', 'slip', 'payslip', '打印')) {
+    return '【粮单 Payslip】\n' +
+      '• 点每行最右侧「Slip」按钮 → 打印单张粮单\n' +
+      '• 点顶部「📄 Semua Slip Gaji」→ 批量打印（可输入 GroupName 过滤）';
+  }
+  if (has('筛选', 'filter', '搜索', '过滤')) {
+    return '【筛选功能】\n' +
+      '• 右上角 Kumpulan / Bank 多选 → 依分店、银行过滤\n' +
+      '• 表头第三行每栏都有 🔍 搜索框 → 逐栏筛选\n' +
+      '• 顶部会即时显示「符合人数」和「净薪资合计」';
+  }
+  if (has('检查', 'semak', 'check', '对账')) {
+    return '【检查功能】\n' +
+      '点顶部「✅ Semak Semua」会重新核算 EPF / SOCSO / EIS / 24JAM，\n' +
+      '正确 → 绿色底；有差异 → 红色底（鼠标移上去会显示正确金额）。';
+  }
+  if (has('冻结', 'freeze', 'lock', '锁')) {
+    return '【冻结列 Freeze】\n' +
+      '点「Gaji Asas」栏位右侧的 ⋮⋮ 把手 → 可锁定 / 解锁前 5 栏，\n' +
+      '让 Situation、Kod、Nama、Kumpulan、Gaji Asas 在横向滚动时保持可见。';
+  }
+  if (has('折叠', 'fold', '收起')) {
+    return '【折叠 GAJI UNTUK CARUMAN】\n' +
+      '点「📐 GAJI UNTUK CARUMAN」两边的 ▸ 把手，可折叠 / 展开\n' +
+      'Salary for EPF / SOCSO / EIS / 24JAM Contributions 这 4 栏。';
+  }
+  if (has('借粮页面', 'leave 页面', '跳转', '导航', 'menu', '菜单')) {
+    return '【顶部导航栏】\n' +
+      '• EMPLOYEES → 员工资料\n' +
+      '• PAYROLL VIEW → 薪资总览\n' +
+      '• DEDUCTION ▾ → Leave / Pinjaman / EPF / SOCSO / EIS / 24 Jam Lindungan\n' +
+      '• ADDITIONAL ▾ → Over Time / Pendapatan Tambahan\n' +
+      '• SETTING ▾ → Company / Payslip / HTML';
+  }
+  if (has('lang', '语言', 'bahasa', '中文')) {
+    return '【语言切换】\n' +
+      '右上角语言选单支持：Bahasa Melayu / English / 中文，\n' +
+      '切换后整个表格与按钮文字会即时更新。';
+  }
+  if (has('谢谢', 'thank', 'terima kasih', 'thanks')) {
+    return '不客气！😊 还有其他问题随时问我。';
+  }
+
+  return '我暂时没有找到相关答案 🤔\n\n' +
+    '你可以试试这些关键词：\n' +
+    '• EPF / SOCSO / EIS / 24JAM\n' +
+    '• OT 加班 / Pinjaman 借粮 / 请假扣款\n' +
+    '• 保存 Sheet / 导入导出 / 粮单\n' +
+    '• 筛选 / 检查 / 冻结 / 折叠\n\n' +
+    '你也可以点右上角语言切换，或到 DeepSeek 继续提问 → chat.deepseek.com';
+}
+
+/* 输入框事件 */
+window.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('chatInput');
+  if (inp) {
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendChat();
+      }
+    });
+    inp.addEventListener('input', () => {
+      inp.style.height = 'auto';
+      inp.style.height = Math.min(inp.scrollHeight, 110) + 'px';
+    });
+  }
+});
+
+/* ============================================================
+   以下为原有 Payroll 逻辑
+   ============================================================ */
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJQe5hNv7sC_Rmig6xZ0NP4nP_PqXQmgTHbG7Ou6_9JtWadETnVmVfFr7b3Cu5qidZ/exec';
 const DETAIL_URL = 'https://yzcorpsdk2-ctrl.github.io/salarysystem/detail.html';
 const STORAGE_KEY = 'payrollEmployees';
@@ -933,28 +1381,6 @@ function t(key) { return I18N[currentLang][key] || key; }
 let employees = [];
 const filterGroup = new Set();
 const filterBank = new Set();
-
-/* ============================================================
-   新增：深色导航栏下拉菜单控制
-   ============================================================ */
-function toggleNavDropdown(el, e) {
-  if (e) { e.preventDefault(); e.stopPropagation(); }
-  const dd = el.closest('.nav-dropdown');
-  if (!dd) return;
-  const wasOpen = dd.classList.contains('open');
-  document.querySelectorAll('.nav-dropdown.open').forEach(d => d.classList.remove('open'));
-  if (!wasOpen) dd.classList.add('open');
-}
-document.addEventListener('click', e => {
-  if (!e.target.closest('.nav-dropdown')) {
-    document.querySelectorAll('.nav-dropdown.open').forEach(d => d.classList.remove('open'));
-  }
-});
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    document.querySelectorAll('.nav-dropdown.open').forEach(d => d.classList.remove('open'));
-  }
-});
 
 function toast(msg, ok = true) {
   const el = document.getElementById('toast');
@@ -1408,7 +1834,6 @@ function renderTable() {
       <td>${numInput('Commission', false)}</td>
       <td>${numInput('Incentives', false)}</td>
       <td>${numInput('FirstCalcTotal', true, 'first-total')}</td>
-      <!-- LEAVE：DAYS / AMOUNT 拆分为两小格 -->
       <td class="bg-rose divider-group leave-days">${numInput('AnnualLeaveDays', false)}</td>
       <td class="bg-rose">${numInput('AnnualLeave', false)}</td>
       <td class="bg-rose leave-days">${numInput('UnpaidLeaveDays', false)}</td>
@@ -1417,7 +1842,6 @@ function renderTable() {
       <td class="bg-rose">${numInput('SickLeave', false)}</td>
       <td class="bg-rose leave-days">${numInput('HalfDaysDays', false)}</td>
       <td class="bg-rose">${numInput('HalfDays', false)}</td>
-      <!-- PINJAMAN：不同底色 + 左侧分割线 -->
       <td class="bg-rose-deep col-split-left">${numInput('Pinjaman', false)}</td>
       <td class="bg-cyan divider-group foldable-col">${numInput('EPFSalary', false)}</td>
       <td class="bg-cyan foldable-col">${numInput('SOCSOSalary', false)}</td>
@@ -2186,18 +2610,23 @@ function switchLang(lang) {
 window.addEventListener('DOMContentLoaded', () => {
   const langSelect = document.getElementById('langSelect');
   if (langSelect) langSelect.value = currentLang;
+  syncNavHeight();
   loadEmployees();
   updateStickyOffsets();
   setTimeout(updateStickyOffsets, 200);
   setTimeout(updateStickyOffsets, 600);
+  setTimeout(syncNavHeight, 300);
 });
 let resizeTimer = null;
 window.addEventListener('resize', () => {
   if (resizeTimer) clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(updateStickyOffsets, 100);
+  resizeTimer = setTimeout(() => {
+    updateStickyOffsets();
+    syncNavHeight();
+  }, 100);
 });
 if (document.fonts && document.fonts.ready) {
-  document.fonts.ready.then(() => updateStickyOffsets());
+  document.fonts.ready.then(() => { updateStickyOffsets(); syncNavHeight(); });
 }
 </script>
 </body>
