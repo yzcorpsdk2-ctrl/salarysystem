@@ -213,29 +213,17 @@
   .bg-gray    { background: #f4f6f9 !important; color: var(--epf-muted) !important; }
 
   /* ==========================================================
-     表头 sticky 分层（从顶到底）：
-       1. section-label-row → top:0        （粘顶）
-       2. main-header-row   → 由 JS 测量
-       3. sub-header-row    → 由 JS 测量
-       4. filter-row        → 由 JS 测量
-     z-index 分层（从低到高）：
-       普通 td ................ 1
-       数据行锁定列 ............ 9
-       thead filter th ........ 16
-       thead sub th ........... 17
-       thead main th .......... 18
-       thead 锁定列 ........... 19
-       section-label-row th ... 22
-       section-label-row 锁定组 24
-       .lock-edge-right ....... 25
-       unfold-handle .......... 40
+     表头 sticky 分层
      ========================================================== */
 
-  /* 普通单元格显式压在锁定列之下，避免滚动时穿过覆盖 */
+  /* 普通数据单元格压在最低层，禁止垂直吸附 */
   td { z-index: 1; }
 
   .section-label-row th {
-    position: sticky !important; top: 0 !important; z-index: 22 !important;
+    position: sticky !important;
+    top: 0 !important;
+    left: auto;                          /* ← 非锁定 section th 不参与水平吸附 */
+    z-index: 22 !important;
     padding: 0.45rem 0.6rem; font-size: 0.68rem; font-weight: 700;
     letter-spacing: 0.05em; text-transform: uppercase;
     border-bottom: 1px solid var(--epf-border); text-align: center;
@@ -250,7 +238,6 @@
     background: #ffffff; padding: 0.35rem 0.4rem;
     border-bottom: 1px solid var(--epf-border); text-align: left;
   }
-  /* 搜索筛选底部的装饰线（无功能） */
   .filter-row th::after {
     content: '';
     position: absolute;
@@ -275,7 +262,6 @@
   .filter-row .th-filter::placeholder { color: #a7b7c9; font-weight: 400; }
   .filter-row th.no-filter { background: var(--epf-blue-soft); }
 
-  /* 禁止 filter-row 里出现任何 unfold-handle（避免压住筛选框） */
   .filter-row .unfold-handle { display: none !important; }
 
   td {
@@ -290,11 +276,20 @@
 
   /* ==========================================================
      锁定列：Situation / Kod / Nama / Kumpulan / Gaji Asas
+     - 数据行锁定列：只做水平 sticky，禁止垂直吸附
+     - thead 锁定列：正常参与垂直 sticky
      ========================================================== */
   body.freeze-on .col-freeze {
     position: sticky;
-    z-index: 9;                  /* ← 高于普通 td (1)，5 列整体锁定 */
+    top: auto !important;          /* ← 关键：数据行锁定列禁止垂直吸附 */
+    z-index: 9;
     background: #ffffff;
+  }
+  body.freeze-on td.col-freeze {
+    top: auto !important;          /* ← 双重保险 */
+  }
+  body.freeze-on td:not(.col-freeze) {
+    top: auto !important;          /* ← 普通 td 也禁止垂直吸附 */
   }
   body.freeze-on tr:nth-child(even) td.col-freeze { background: #fbfdff; }
   body.freeze-on tr:hover td.col-freeze { background: var(--epf-blue-soft); }
@@ -305,8 +300,17 @@
   body.freeze-on .col-freeze.col-3 { left: 310px; }
   body.freeze-on .col-freeze.col-4 { left: 420px; }
 
-  /* thead 里的锁定列高于同层普通 th */
-  body.freeze-on thead .col-freeze { z-index: 19; }
+  /* thead 锁定列：恢复垂直吸附，且高于同层普通 th */
+  body.freeze-on thead .col-freeze {
+    top: inherit;                  /* 由 JS 设置 top，恢复吸附 */
+    z-index: 19;
+  }
+  body.freeze-on thead .section-label-row th.col-freeze-group {
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 24 !important;
+    position: sticky !important;
+  }
 
   /* 锁定列背景色（thead） */
   body.freeze-on thead .col-freeze.bg-slate   { background: #f0f4f9 !important; }
@@ -318,20 +322,13 @@
   body.freeze-on thead .filter-row th.col-freeze { background: #ffffff !important; }
   body.freeze-on thead .filter-row th.col-freeze.no-filter { background: var(--epf-blue-soft) !important; }
 
-  /* section 行里的锁定组最高，盖住所有 */
-  body.freeze-on .section-label-row th.col-freeze-group {
-    position: sticky !important;
-    left: 0 !important;
-    z-index: 24 !important;
-  }
-
-  /* 深蓝锁定分隔线始终在最上面（右边缘） */
+  /* 深蓝锁定分隔线 */
   .lock-edge-right {
     border-right: 2px solid var(--epf-blue) !important;
     z-index: 25 !important;
   }
 
-  /* 折叠竖线按钮（放在 GAJI UNTUK CARUMAN 表头内） */
+  /* 折叠竖线 */
   .fold-line {
     position: absolute; top: 0; bottom: 0; width: 12px;
     background: linear-gradient(to right, rgba(14,92,110,0) 0%, rgba(14,92,110,0.06) 60%, rgba(14,92,110,0.15) 100%);
@@ -351,12 +348,9 @@
   .fold-line:hover::before { opacity: 1; }
   body.salary-folded .fold-line::before { content: '▾'; }
 
-  /* 折叠 GAJI UNTUK CARUMAN：只隐藏 th/td，不隐藏 col，避免 sticky 偏移错位 */
   body.salary-folded .foldable-col { display: none !important; }
 
-  /* ==========================================================
-     展开把手：唯一挂在 PINJAMAN 的 section-label-row 上
-     ========================================================== */
+  /* 展开把手 */
   .unfold-handle {
     display: none;
     position: absolute;
@@ -717,37 +711,27 @@
       <div class="table-wrap">
         <table id="mainTable">
           <colgroup>
-            <!-- 1. Maklumat Asas (冻结) -->
             <col class="col-freeze col-0" style="width:80px">
             <col class="col-freeze col-1" style="width:70px">
             <col class="col-freeze col-2" style="width:160px">
             <col class="col-freeze col-3" style="width:110px">
-            <!-- BASIC SALARY (col-freeze col-4) -->
             <col class="col-freeze col-4" style="width:110px">
-            <!-- 2. Pendapatan (OT) 4 列 -->
             <col style="width:85px"><col style="width:85px"><col style="width:85px"><col style="width:85px">
-            <!-- ADDITIONAL INCOME 4 列 -->
             <col style="width:130px"><col style="width:130px"><col style="width:130px"><col style="width:130px">
-            <!-- POTONGAN 5 列 -->
             <col style="width:130px"><col style="width:130px"><col style="width:130px"><col style="width:130px">
             <col style="width:110px">
-            <!-- SALARY FOR CONTRIBUTIONS 4 列 -->
             <col style="width:130px"><col style="width:130px">
             <col style="width:130px"><col style="width:130px">
-            <!-- Section 3 (11) -->
             <col style="width:40px"><col style="width:85px"><col style="width:85px">
             <col style="width:40px"><col style="width:85px"><col style="width:85px">
             <col style="width:40px"><col style="width:85px"><col style="width:85px">
             <col style="width:40px"><col style="width:80px">
-            <!-- Section 4 (10) -->
             <col style="width:40px"><col style="width:130px">
             <col style="width:40px"><col style="width:130px">
             <col style="width:40px"><col style="width:130px">
             <col style="width:40px"><col style="width:130px">
             <col style="width:40px"><col style="width:130px">
-            <!-- Section 5 (3) -->
             <col style="width:95px"><col style="width:95px"><col style="width:95px">
-            <!-- Section 6 (1) -->
             <col style="width:80px">
           </colgroup>
           <thead>
@@ -1159,8 +1143,9 @@ function contribBase(emp, field, fallback) {
 
 /* =========================================================
    修复版：表头 sticky 偏移计算
-   - 用 offsetHeight 逐行测量（避免 rowspan 干扰）
-   - 只设 top，z-index 完全交给 CSS
+   - section-label-row 只设 top:0
+   - 其他行按累积高度设 top
+   - 数据行的 col-freeze 由 CSS 强制 top:auto，不参与垂直吸附
    ========================================================= */
 function updateStickyOffsets() {
   requestAnimationFrame(() => {
@@ -1177,15 +1162,23 @@ function updateStickyOffsets() {
     const hMain    = mainRow.offsetHeight;
     const hSub     = subRow.offsetHeight;
 
-    const topSection = 0;
-    const topMain    = hSection;
-    const topSub     = hSection + hMain;
-    const topFilter  = hSection + hMain + hSub;
+    sectionRow.querySelectorAll('th').forEach(th => {
+      th.style.top = '0px';
+    });
+    mainRow.querySelectorAll('th').forEach(th => {
+      th.style.top = hSection + 'px';
+    });
+    subRow.querySelectorAll('th').forEach(th => {
+      th.style.top = (hSection + hMain) + 'px';
+    });
+    filterRow.querySelectorAll('th').forEach(th => {
+      th.style.top = (hSection + hMain + hSub) + 'px';
+    });
 
-    sectionRow.querySelectorAll('th').forEach(th => { th.style.top = topSection + 'px'; });
-    mainRow.querySelectorAll('th').forEach(th =>   { th.style.top = topMain + 'px'; });
-    subRow.querySelectorAll('th').forEach(th =>    { th.style.top = topSub + 'px'; });
-    filterRow.querySelectorAll('th').forEach(th => { th.style.top = topFilter + 'px'; });
+    // 数据行绝对不参与垂直吸附
+    document.querySelectorAll('#tbody td').forEach(td => {
+      td.style.top = 'auto';
+    });
   });
 }
 
