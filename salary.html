@@ -477,6 +477,10 @@
   tr:nth-child(even) td { background: #fbfdff; }
   tr:hover td { background: var(--epf-blue-soft); }
   .divider-group { box-shadow: inset 1px 0 0 var(--epf-border) !important; }
+
+  /* ============================================================
+     ★★★ 冻结列（修复：tbody 只做水平冻结，不再强制垂直粘住） ★★★
+     ============================================================ */
   body.freeze-on .col-freeze { position: sticky; z-index: 9; background: #ffffff; }
   body.freeze-on .col-freeze.col-0 { left: 0px; }
   body.freeze-on .col-freeze.col-1 { left: 80px; }
@@ -510,6 +514,9 @@
   body.freeze-on .section-label-row th.col-freeze-group {
     position: sticky !important; left: 0 !important; z-index: 24 !important;
   }
+  /* 关键修复：tbody 冻结列禁止垂直粘住（top:auto），只靠 left 做水平冻结 */
+  body.freeze-on tbody td.col-freeze { top: auto !important; }
+
   .lock-edge-right { border-right: 2px solid var(--epf-blue) !important; z-index: 25 !important; }
   .fold-line {
     position: absolute; top: 0; bottom: 0; width: 12px;
@@ -782,7 +789,6 @@
   <div class="nav-links">
     <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/.github.io/staffinfo.html">👥 Employees</a>
 
-    <!-- ===== BACKUP（替代原 PAYROLL VIEW） ===== -->
     <div class="nav-dropdown">
       <button class="nav-item" type="button">💾 Backup <span class="caret">▾</span></button>
       <div class="nav-dropdown-menu">
@@ -858,7 +864,7 @@
   </div>
 </div>
 
-<!-- ==================== 工具栏（精简后） ==================== -->
+<!-- ==================== 工具栏 ==================== -->
 <div class="topbar">
   <div class="brand"><div class="logo">P</div> Payroll System</div>
   <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
@@ -866,7 +872,6 @@
   <button class="btn btn-success" onclick="saveToSheet()" id="btnSaveSheet">💾 Simpan ke Sheet</button>
   <button class="btn" onclick="checkAll()" id="btnCheckAll">✅ Semak Semua</button>
 
-  <!-- PRINT 下拉菜单 -->
   <div class="toolbar-dropdown" id="printDropdown">
     <button class="btn" type="button" onclick="toggleToolbarDropdown('printDropdown', event)">
       🖨️ Print <span class="caret">▾</span>
@@ -1131,7 +1136,6 @@
 <div id="printArea"></div>
 <div id="toast" class="toast"></div>
 
-<!-- ============ 冻结列弹窗 ============ -->
 <div id="freezeModal" class="modal-overlay" style="display:none;">
   <div class="modal-box compact">
     <h3 style="justify-content:center; font-size:1.05rem; margin-bottom:0.3rem; color:var(--epf-blue);" id="freezeTitle">🔒 Tetapan Freeze Kolum</h3>
@@ -1144,7 +1148,6 @@
   </div>
 </div>
 
-<!-- ============ 导入弹窗 ============ -->
 <div id="importModal" class="modal-overlay" style="display:none;">
   <div class="modal-box">
     <div class="modal-header">
@@ -1169,7 +1172,6 @@
   </div>
 </div>
 
-<!-- ============ 按 Group 复印 - 选择分店弹窗 ============ -->
 <div id="groupSelectModal" class="modal-overlay" style="display:none;">
   <div class="modal-box">
     <div class="modal-header">
@@ -1189,7 +1191,6 @@
   </div>
 </div>
 
-<!-- ============ 批量复印 - 选择员工弹窗 ============ -->
 <div id="batchPrintModal" class="modal-overlay" style="display:none;">
   <div class="modal-box">
     <div class="modal-header">
@@ -1336,7 +1337,6 @@ function sendChat() {
   }, 420);
 }
 
-/* 本地知识库回复 */
 function aiReply(q) {
   const s = String(q).toLowerCase();
   const has = (...ks) => ks.some(k => s.includes(k));
@@ -1481,7 +1481,6 @@ function aiReply(q) {
     '你也可以点右上角语言切换，或到 DeepSeek 继续提问 → chat.deepseek.com';
 }
 
-/* 输入框事件 */
 window.addEventListener('DOMContentLoaded', () => {
   const inp = document.getElementById('chatInput');
   if (inp) {
@@ -1499,7 +1498,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ============================================================
-   以下为原有 Payroll 逻辑
+   原有 Payroll 逻辑
    ============================================================ */
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJQe5hNv7sC_Rmig6xZ0NP4nP_PqXQmgTHbG7Ou6_9JtWadETnVmVfFr7b3Cu5qidZ/exec';
 const DETAIL_URL = 'https://yzcorpsdk2-ctrl.github.io/salarysystem/detail.html';
@@ -1590,13 +1589,9 @@ window.addEventListener('message', (ev) => {
 });
 
 /* ============================================================
-   ★★★ 修复：Sticky 偏移 ★★★
-   -------------------------------------------------------------
-   之前版本这里给 `#tbody td.col-freeze` 也设置了 `top = topFilter`，
-   由于它们已经 position: sticky（水平方向），再加上 top 就变成了
-   「同时向两个方向吸附」，视觉上就是 BASIC SALARY 下方的筛选框
-   在往下滚动时上飘/错位。这里把那段循环彻底删除，只保留 thead
-   里四行表头的 top 计算。
+   ★★★ 修复版 updateStickyOffsets() ★★★
+   - 只给 thead 的 4 行设置 top 粘性
+   - tbody 的冻结列只保留 left（水平冻结），不再设置 top（不再垂直粘住）
    ============================================================ */
 function updateStickyOffsets() {
   requestAnimationFrame(() => {
@@ -1607,24 +1602,21 @@ function updateStickyOffsets() {
     const subRow     = thead.querySelector('.sub-header-row');
     const filterRow  = thead.querySelector('.filter-row');
     if (!sectionRow || !mainRow || !subRow || !filterRow) return;
-
     const hSection = sectionRow.offsetHeight;
     const hMain    = mainRow.offsetHeight;
     const hSub     = subRow.offsetHeight;
-
     const topSection = 0;
     const topMain    = hSection;
     const topSub     = hSection + hMain;
     const topFilter  = hSection + hMain + hSub;
-
     sectionRow.querySelectorAll('th').forEach(th => { th.style.top = topSection + 'px'; });
     mainRow.querySelectorAll('th').forEach(th =>   { th.style.top = topMain + 'px'; });
     subRow.querySelectorAll('th').forEach(th =>    { th.style.top = topSub + 'px'; });
     filterRow.querySelectorAll('th').forEach(th => { th.style.top = topFilter + 'px'; });
-
-    /* 注意：不要给 #tbody td.col-freeze 设置 top！
-       它们只需要在水平方向冻结（left 已由 CSS 提供），
-       设置 top 会导致它们垂直方向也吸附，出现「筛选框上飘」。 */
+    /* ★ 关键修复：清掉 tbody 冻结列上错误的 top 值（之前会造成垂直粘住 = 搜索框漂移） */
+    document.querySelectorAll('#tbody td.col-freeze').forEach(td => {
+      td.style.top = '';
+    });
   });
 }
 
@@ -2286,28 +2278,9 @@ async function handleImportFile(file) {
     if (!rows || rows.length < 2) { toast(t('importFail'), false); return; }
     const headers = rows[0].map(h => String(h).trim());
     const idx = {};
-    // ★ 与 getExportHeaders() / Apps Script 的 HEADERS 完全同步
-    const WANTED = [
-      'Situation','Code','Name','Group','Basic',
-      'Normal OT','Rest OT','Public OT','Other OT',
-      'Allowance2','Commission','Incentives','FirstCalcTotal',
-      'Annual Leave Days','Annual Leave',
-      'Unpaid Leave Days','Unpaid Leave',
-      'Sick Leave Days','Sick Leave',
-      'Half Days Leave Days','Half Days Leave',
-      'Pinjaman',
-      'Salary for EPF Contributions',
-      'Salary for SOCSO Contributions',
-      'Salary for EIS Contributions',
-      'Salary for 24JAM Contributions',
-      'EPF (Employee)','EPF (Employer)',
-      'SOCSO (Employee)','SOCSO (Employer)',
-      'EIS (Employee)','EIS (Employer)',
-      '24JAM',
-      'SLR Bank Nama','SLR Bank Account No',
-      'SLR EPF','SLR SOCSO','SLR EIS',
-      'Gross Pay','Total Deduction','Net Salary'
-    ];
+    const WANTED = ['Situation','Code','Name','Group','Bank','Basic','Allowance','Deduction','Normal OT','Rest OT','Public OT','Other OT','Pinjaman','Others',
+      'Annual Leave Days','Annual Leave','Unpaid Leave Days','Unpaid Leave','Sick Leave Days','Sick Leave','Half Days Leave Days','Half Days Leave',
+      'Allowance2','Commission','Incentives','FirstCalcTotal','Salary for EPF Contributions','Salary for SOCSO Contributions','Salary for EIS Contributions','Salary for 24JAM Lindungan Contributions','EPF (Employee)','EPF (Employer)','SOCSO (Employee)','SOCSO (Employer)','EIS (Employee)','EIS (Employer)','24JAM','SLR Bank Nama','SLR Bank Account No','SLR EPF','SLR SOCSO','SLR EIS'];
     headers.forEach((h, i) => {
       const lh = h.toLowerCase();
       for (const w of WANTED) { if (lh === w.toLowerCase()) { idx[w] = i; break; } }
@@ -2332,7 +2305,7 @@ async function handleImportFile(file) {
       const epfSalary = parseOpt(row, 'Salary for EPF Contributions');
       const socsoSalary = parseOpt(row, 'Salary for SOCSO Contributions');
       const eisSalary = parseOpt(row, 'Salary for EIS Contributions');
-      const lindungSalary = parseOpt(row, 'Salary for 24JAM Contributions');
+      const lindungSalary = parseOpt(row, 'Salary for 24JAM Lindungan Contributions');
       const epfBase = epfSalary === '' ? basic : epfSalary;
       const socsoBase = socsoSalary === '' ? basic : socsoSalary;
       const eisBase = eisSalary === '' ? basic : eisSalary;
@@ -2348,15 +2321,15 @@ async function handleImportFile(file) {
       const impEISE = parseFloat(get(row, 'EIS (Employee)')) || 0;
       const impEISR = parseFloat(get(row, 'EIS (Employer)')) || 0;
       const impLindung = parseFloat(get(row, '24JAM')) || 0;
-      const slrBankNama = String(get(row, 'SLR Bank Nama') || '');
+      const slrBankNama = String(get(row, 'SLR Bank Nama') || get(row, 'Bank') || '');
       const slrBankAcc = String(get(row, 'SLR Bank Account No') || '');
       const slrEPF = String(get(row, 'SLR EPF') || '');
       const slrPERKESO = String(get(row, 'SLR SOCSO') || '');
       const slrEIS = String(get(row, 'SLR EIS') || '');
       imported.push({
         Situation: sit, Code: code, Name: String(get(row, 'Name') || ''),
-        GroupName: String(get(row, 'Group') || ''), BankNama: slrBankNama,
-        Basic: basic, Allowance: 0,
+        GroupName: String(get(row, 'Group') || ''), BankNama: String(get(row, 'Bank') || ''),
+        Basic: basic, Allowance: parseFloat(get(row, 'Allowance')) || 0,
         Allowance2: parseFloat(get(row, 'Allowance2')) || 0,
         Commission: parseFloat(get(row, 'Commission')) || 0,
         Incentives: parseFloat(get(row, 'Incentives')) || 0,
@@ -2369,13 +2342,13 @@ async function handleImportFile(file) {
         SickLeave: parseFloat(get(row, 'Sick Leave')) || 0,
         HalfDaysDays: parseFloat(get(row, 'Half Days Leave Days')) || 0,
         HalfDays: parseFloat(get(row, 'Half Days Leave')) || 0,
-        Deduction: 0,
+        Deduction: parseFloat(get(row, 'Deduction')) || 0,
         NormalOT: parseFloat(get(row, 'Normal OT')) || 0,
         RestOT: parseFloat(get(row, 'Rest OT')) || 0,
         PublicOT: parseFloat(get(row, 'Public OT')) || 0,
         OtherOT: parseFloat(get(row, 'Other OT')) || 0,
         Pinjaman: parseFloat(get(row, 'Pinjaman')) || 0,
-        Others: 0, Age: 30,
+        Others: parseFloat(get(row, 'Others')) || 0, Age: 30,
         EPF: 'YES', PERKESO: 'YES', EIS: 'YES', Lindungan: 'YES',
         EPF_Employee: impEPFE, EPF_Employer: impEPFR,
         SOCSO_Employee: impSOCSOE, SOCSO_Employer: impSOCSOR,
@@ -2401,58 +2374,16 @@ async function handleImportFile(file) {
   } catch (err) { console.error(err); toast('Import error: ' + err.message, false); }
 }
 
-/* ============================================================
-   ★★★ 修复：导出表头顺序与 HTML 页面列顺序一致 ★★★
-   ============================================================ */
 function getExportHeaders() {
-  return [
-    // 1. 基本资料
-    'Situation', 'Code', 'Name', 'Group', 'Basic',
-    // 2. OT
-    'Normal OT', 'Rest OT', 'Public OT', 'Other OT',
-    // 2.5 额外收入
-    'Allowance2', 'Commission', 'Incentives', 'FirstCalcTotal',
-    // 2.8 扣款（请假 + 借粮）
-    'Annual Leave Days', 'Annual Leave',
-    'Unpaid Leave Days', 'Unpaid Leave',
-    'Sick Leave Days', 'Sick Leave',
-    'Half Days Leave Days', 'Half Days Leave',
-    'Pinjaman',
-    // 2.9 缴款薪资
-    'Salary for EPF Contributions',
-    'Salary for SOCSO Contributions',
-    'Salary for EIS Contributions',
-    'Salary for 24JAM Contributions',
-    // 3. 法定缴款
-    'EPF (Employee)', 'EPF (Employer)',
-    'SOCSO (Employee)', 'SOCSO (Employer)',
-    'EIS (Employee)', 'EIS (Employer)',
-    '24JAM',
-    // 4. Staff Login Record
-    'SLR Bank Nama', 'SLR Bank Account No',
-    'SLR EPF', 'SLR SOCSO', 'SLR EIS',
-    // 5. 薪资汇总
-    'Gross Pay', 'Total Deduction', 'Net Salary'
-  ];
+  return ['Situation','Code','Name','Group','Bank','Basic','Normal OT','Rest OT','Public OT','Other OT','Allowance2','Commission','Incentives','FirstCalcTotal',
+    'Annual Leave Days','Annual Leave','Unpaid Leave Days','Unpaid Leave','Sick Leave Days','Sick Leave','Half Days Leave Days','Half Days Leave','Pinjaman',
+    'Salary for EPF Contributions','Salary for SOCSO Contributions','Salary for EIS Contributions','Salary for 24JAM Lindungan Contributions','EPF (Employee)','EPF (Employer)','SOCSO (Employee)','SOCSO (Employer)','EIS (Employee)','EIS (Employer)','24JAM','SLR Bank Nama','SLR Bank Account No','SLR EPF','SLR SOCSO','SLR EIS','Gross Pay','Total Deduction','Net Salary'];
 }
 function downloadTemplate(format) {
   const headers = getExportHeaders();
-  // 示例数据按同样的顺序，去掉 Bank 列
   const sample = [
-    ['ACTIVE','EMP001','Ahmad bin Ali','YZ UFO',4500,
-     0,0,0,0, 0,0,0,5100,
-     0,0, 0,0, 0,0, 0,0, 0,
-     4500,4500,4500,4500,
-     495,585, 22.25,77.85, 9,9, 32.96,
-     'Maybank','1234567890','YES','YES','YES',
-     5100,1125.06,3974.94],
-    ['PENDING','EMP002','Siti Nurhaliza','YZ CYBER',3800,
-     0,0,0,0, 200,150,100,4700,
-     0,0, 0,0, 0,0, 0,0, 0,
-     3800,3800,3800,3800,
-     418,494, 19.75,69.15, 7.6,7.6, 27.83,
-     'CIMB','9876543210','YES','NO','YES',
-     4700,930.93,3769.07]
+    ['ACTIVE','EMP001','Ahmad bin Ali','YZ UFO','Maybank',4500,0,0,0,0,0,0,0,5100,0,0,0,0,0,0,0,0,0,4500,4500,4500,4500,495,585,22.25,77.85,9,9,32.96,'Maybank','1234567890','YES','YES','YES',5100,1125.06,3974.94],
+    ['PENDING','EMP002','Siti Nurhaliza','YZ CYBER','CIMB',3800,0,0,0,0,200,150,100,4700,0,0,0,0,0,0,0,0,0,3800,3800,3800,3800,418,494,19.75,69.15,7.6,7.6,27.83,'CIMB','9876543210','YES','NO','YES',4700,930.93,3769.07]
   ];
   if (format === 'xlsx') {
     if (typeof XLSX === 'undefined') { toast('SheetJS tidak dimuat', false); return; }
@@ -2473,8 +2404,6 @@ function downloadTemplate(format) {
     toast('Template Word dimuat turun');
   }
 }
-
-/* ★★★ 修复：导出数据行顺序与表头一致 ★★★ */
 function getExportRows() {
   const rows = [];
   const trs = document.querySelectorAll('#tbody tr');
@@ -2486,32 +2415,25 @@ function getExportRows() {
     if (!emp) return;
     const e = recalcRow({ ...emp });
     rows.push([
-      // 1. 基本资料
-      emp.Situation || '', emp.Code || '', emp.Name || '', emp.GroupName || '', num(e.Basic),
-      // 2. OT
+      emp.Situation || '', emp.Code || '', emp.Name || '', emp.GroupName || '',
+      emp.BankNama || '', num(e.Basic),
       num(e.NormalOT), num(e.RestOT), num(e.PublicOT), num(e.OtherOT),
-      // 2.5 额外收入
       num(e.Allowance2), num(e.Commission), num(e.Incentives), num(e.FirstCalcTotal),
-      // 2.8 扣款
       num(e.AnnualLeaveDays), num(e.AnnualLeave),
       num(e.UnpaidLeaveDays), num(e.UnpaidLeave),
       num(e.SickLeaveDays), num(e.SickLeave),
       num(e.HalfDaysDays), num(e.HalfDays),
       num(e.Pinjaman),
-      // 2.9 缴款薪资
       emp.EPFSalary === '' || emp.EPFSalary === undefined ? '' : num(emp.EPFSalary),
       emp.SOCSOSalary === '' || emp.SOCSOSalary === undefined ? '' : num(emp.SOCSOSalary),
       emp.EISSalary === '' || emp.EISSalary === undefined ? '' : num(emp.EISSalary),
       emp.LindungSalary === '' || emp.LindungSalary === undefined ? '' : num(emp.LindungSalary),
-      // 3. 法定缴款
       num(e.EPF_Employee), num(e.EPF_Employer),
       num(e.SOCSO_Employee), num(e.SOCSO_Employer),
       num(e.EIS_Employee), num(e.EIS_Employer),
       num(e.Lindung24Jam),
-      // 4. Staff Login Record
       emp.SLRBankNama || '', emp.SLRBankAccountNo || '',
       emp.SLREPF || '', emp.SLRPERKESO || '', emp.SLREIS || '',
-      // 5. 薪资汇总
       num(e.GrossPay), num(e.TotalDeduction), num(e.NetSalary)
     ]);
   });
@@ -2534,8 +2456,7 @@ function buildExportTableHTML() {
   rows.forEach(r => {
     html += '<tr>';
     r.forEach((c, i) => {
-      // 数字列：从 Basic 之后到 Net Salary（索引 4~39） 才用右对齐
-      const cls = (i >= 4 && i <= 40) ? ' class="num"' : '';
+      const cls = (i >= 5 && i <= 33) ? ' class="num"' : '';
       html += `<td${cls}>${escapeHtml(c)}</td>`;
     });
     html += '</tr>';
@@ -2612,7 +2533,7 @@ function exportToDOC() {
   rows.forEach(r => {
     html += '<tr>';
     r.forEach((c, i) => {
-      const cls = (i >= 4 && i <= 40) ? ' class="num"' : '';
+      const cls = (i >= 5 && i <= 33) ? ' class="num"' : '';
       html += `<td${cls}>${escapeHtml(c)}</td>`;
     });
     html += '</tr>';
@@ -2637,9 +2558,9 @@ async function loadEmployees(opts = {}) {
         employees = json.data.map(row => ({
           Situation: String(row.Situation || 'ACTIVE').trim().toUpperCase(),
           Code: row.Code, Name: row.Name, GroupName: row.GroupName || '',
-          BankNama: row.SLRBankNama || row.BankNama || '',
-          Basic: Number(row.Basic) || 0,
-          Allowance: 0,
+          BankNama: row.BankNama || row.Bank || '',
+          Basic: Number(row.Salary || row.Basic) || 0,
+          Allowance: Number(row.Allowance) || 0,
           Allowance2: Number(row.Allowance2) || 0,
           Commission: Number(row.Commission) || 0,
           Incentives: Number(row.Incentives) || 0,
@@ -2655,7 +2576,7 @@ async function loadEmployees(opts = {}) {
           SickLeave: Number(row.SickLeave) || 0,
           HalfDaysDays: Number(row.HalfDaysDays) || 0,
           HalfDays: Number(row.HalfDays) || 0,
-          Deduction: 0,
+          Deduction: Number(row.Deduction) || 0,
           NormalOT: Number(row.NormalOT) || 0,
           RestOT: Number(row.RestOT) || 0,
           PublicOT: Number(row.PublicOT) || 0,
@@ -2674,11 +2595,11 @@ async function loadEmployees(opts = {}) {
           manualSOCSO: !!row.manualSOCSO,
           manualEIS: !!row.manualEIS,
           manual24JAM: !!row.manual24JAM,
-          SLRBankNama: String(row.SLRBankNama || '').trim(),
-          SLRBankAccountNo: String(row.SLRBankAccountNo || '').trim(),
-          SLREPF: String(row.SLREPF || '').trim(),
-          SLRPERKESO: String(row.SLRPERKESO || '').trim(),
-          SLREIS: String(row.SLREIS || '').trim(),
+          SLRBankNama: String(row.SLRBankNama || row.BankNama || row.Bank || '').trim(),
+          SLRBankAccountNo: String(row.SLRBankAccountNo || row.BankAccountNo || row.BankAcc || '').trim(),
+          SLREPF: String(row.SLREPF || row.EPF || '').trim(),
+          SLRPERKESO: String(row.SLRPERKESO || row.SOCSO || row.PERKESO || '').trim(),
+          SLREIS: String(row.SLREIS || row.EIS || '').trim(),
           manualSLRBankNama: false, manualSLRBankAccountNo: false,
           manualSLREPF: false, manualSLRPERKESO: false, manualSLREIS: false
         })).filter(e => e.Situation !== 'UNACTIVE' && e.Situation !== 'INACTIVE');
@@ -2771,7 +2692,7 @@ function printAll() {
 }
 
 /* ============================================================
-   PRINT 下拉：根据 Group 复印 —— 弹窗选择分店
+   PRINT 下拉：根据 Group 复印
    ============================================================ */
 function printByGroup() {
   closeAllToolbarDropdowns();
@@ -2824,7 +2745,7 @@ function confirmGroupPrint() {
 }
 
 /* ============================================================
-   PRINT 下拉：批量复印 —— 弹窗勾选员工
+   PRINT 下拉：批量复印
    ============================================================ */
 function printBatch() {
   closeAllToolbarDropdowns();
