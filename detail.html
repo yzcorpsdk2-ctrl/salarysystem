@@ -1,1 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detail Pekerja · Sistem Penggajian</title>
+  <!-- Font Awesome 6 (free) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
+    body {
+      font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: #f7f9fc;
+      color: #1e2b3a;
+      padding: 1.5rem 1rem;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    /* header style similar to epf page */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .page-header h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      background: linear-gradient(145deg, #1a3b5c, #2a5f7a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .page-header h1 i {
+      background: #eef2f6;
+      padding: 0.75rem;
+      border-radius: 16px;
+      color: #1f5e8e;
+      -webkit-text-fill-color: #1f5e8e;
+    }
+
+    .badge {
+      background: #e3f0fa;
+      color: #11517c;
+      padding: 0.5rem 1.25rem;
+      border-radius: 100px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      border: 1px solid #b8d9ef;
+    }
+
+    .badge i {
+      color: #2a7aa2;
+    }
+
+    /* base card */
+    .card {
+      background: #ffffff;
+      border-radius: 28px;
+      box-shadow: 0 8px 28px rgba(0, 20, 30, 0.06);
+      border: 1px solid #e2eaf2;
+      padding: 1.8rem 1.8rem 1.8rem 1.8rem;
+      margin-bottom: 2rem;
+      transition: box-shadow 0.15s;
+    }
+
+    .card:hover {
+      box-shadow: 0 12px 32px rgba(0, 30, 40, 0.08);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 600;
+      font-size: 1.4rem;
+      color: #17364b;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.01em;
+    }
+
+    .section-title i {
+      color: #1e6f9c;
+      font-size: 1.6rem;
+      width: 1.8rem;
+    }
+
+    /* basic info grid */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem 1.5rem;
+      background: #f9fcff;
+      padding: 1.5rem 1.8rem;
+      border-radius: 22px;
+      border: 1px solid #deecf5;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .info-item label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      font-weight: 600;
+      color: #587b98;
+    }
+
+    .info-item .value {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #0d2b40;
+      background: #ffffff;
+      padding: 0.5rem 0.8rem;
+      border-radius: 14px;
+      border: 1px solid #d5e3ee;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
+      word-break: break-word;
+      min-height: 2.8rem;
+      display: flex;
+      align-items: center;
+    }
+
+    /* table style for salary components — inspired by epf table */
+    .component-table-wrapper {
+      overflow-x: auto;
+      border-radius: 20px;
+      border: 1px solid #d9e5f0;
+      background: #ffffff;
+      margin: 1.5rem 0 1rem;
+      box-shadow: 0 2px 10px rgba(0, 20, 30, 0.02);
+    }
+
+    .component-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      min-width: 1300px;
+      white-space: nowrap;
+    }
+
+    .component-table th {
+      background: #e9f2fa;
+      color: #154a6b;
+      font-weight: 600;
+      padding: 0.9rem 0.6rem;
+      text-align: center;
+      border-bottom: 1px solid #c2d9ec;
+      font-size: 0.75rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      vertical-align: middle;
+    }
+
+    .component-table td {
+      padding: 0.6rem 0.4rem;
+      border-bottom: 1px solid #e3edf6;
+      text-align: center;
+      vertical-align: middle;
+      background-color: #fff;
+    }
+
+    .component-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .component-table input {
+      width: 100%;
+      max-width: 110px;
+      min-width: 70px;
+      padding: 0.5rem 0.3rem;
+      border: 1px solid #cbdae7;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-align: center;
+      background: #ffffff;
+      transition: 0.15s;
+      color: #0b2f44;
+    }
+
+    .component-table input:focus {
+      outline: none;
+      border-color: #2b7ba8;
+      box-shadow: 0 0 0 3px rgba(43, 123, 168, 0.15);
+      background: #fafdff;
+    }
+
+    .component-table input[readonly] {
+      background: #f2f7fc;
+      border-color: #d1e0ec;
+      color: #1f4b67;
+    }
+
+    /* group header for statutori */
+    .statutory-header {
+      background: #d9e9f7;
+      font-weight: 700;
+      color: #0e3d5c;
+    }
+
+    /* small pencil icon */
+    .pencil-icon {
+      color: #4183b1;
+      font-size: 0.9rem;
+      margin-left: 5px;
+      opacity: 0.7;
+      cursor: default;
+    }
+
+    .edit-badge {
+      background: #fff3e0;
+      border-radius: 30px;
+      padding: 0.15rem 0.5rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #b45f1b;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    /* action bar */
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #d6e4f0;
+    }
+
+    .btn {
+      border: none;
+      padding: 0.85rem 2rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      cursor: pointer;
+      transition: 0.15s;
+      letter-spacing: 0.01em;
+      background: #ffffff;
+      border: 1px solid #c6d9ea;
+      color: #1d4e70;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    .btn-primary {
+      background: #1c6c9c;
+      border: 1px solid #1c6c9c;
+      color: white;
+      box-shadow: 0 6px 14px rgba(28, 108, 156, 0.25);
+    }
+
+    .btn-primary:hover {
+      background: #135b86;
+      border-color: #135b86;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary:hover {
+      background: #e9f2fa;
+      border-color: #aac4db;
+    }
+
+    .btn i {
+      font-size: 1rem;
+    }
+
+    .status-message {
+      font-size: 0.9rem;
+      color: #277a4c;
+      background: #e2f3e9;
+      padding: 0.6rem 1.2rem;
+      border-radius: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+
+    .status-message.show {
+      opacity: 1;
+    }
+
+    .footer-note {
+      font-size: 0.8rem;
+      color: #6d8ca0;
+      text-align: right;
+      margin-top: 1rem;
+    }
+
+    /* responsive */
+    @media (max-width: 700px) {
+      body { padding: 0.8rem; }
+      .card { padding: 1.2rem; }
+      .page-header h1 { font-size: 1.5rem; }
+      .info-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- header -->
+  <div class="page-header">
+    <h1>
+      <i class="fas fa-id-card"></i> 
+      Butiran Pekerja · Detail
+    </h1>
+    <div class="badge">
+      <i class="fas fa-sync-alt"></i> 
+      <span>Data diselaraskan dengan salary.html</span>
+    </div>
+  </div>
+
+  <!-- BASIC INFO (SITUATION, CODE, GROUP, BASIC SALARY, NAME) -->
+  <div class="card">
+    <div class="section-title">
+      <i class="fas fa-user-circle"></i> 1. MAKLUMAT ASAS
+    </div>
+    <div class="info-grid" id="basicInfoContainer">
+      <!-- dynamic via js, but we prefill with placeholders / fetch from URL -->
+      <div class="info-item">
+        <label>SITUATION</label>
+        <div class="value" id="infoSituation">—</div>
+      </div>
+      <div class="info-item">
+        <label>CODE</label>
+        <div class="value" id="infoCode">—</div>
+      </div>
+      <div class="info-item">
+        <label>GROUP</label>
+        <div class="value" id="infoGroup">—</div>
+      </div>
+      <div class="info-item">
+        <label>BASIC SALARY (RM)</label>
+        <div class="value" id="infoBasicSalary">0.00</div>
+      </div>
+      <div class="info-item">
+        <label>NAME</label>
+        <div class="value" id="infoName">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYROLL COMPONENTS (all columns from salary.html) -->
+  <div class="card">
+    <div class="section-title">
+      <i class="fas fa-calculator"></i> 2. KOMPONEN GAJI & CARUMAN
+    </div>
+
+    <div class="component-table-wrapper">
+      <table class="component-table" id="payrollTable">
+        <thead>
+          <!-- first header row: groups -->
+          <tr>
+            <th colspan="4">PENDAPATAN / OT</th>
+            <th colspan="3">TAMBAHAN</th>
+            <th>CALC</th>
+            <th colspan="4">CUTI / POTONGAN</th>
+            <th colspan="4">GAJI UNTUK CARUMAN</th>
+            <th colspan="8">CARUMAN STATUTORI</th>
+            <th colspan="6">LOGIN RECORD</th>
+            <th colspan="3">RINGKASAN</th>
+          </tr>
+          <!-- second header row: detailed fields -->
+          <tr>
+            <th>OT Biasa</th>
+            <th>OT Rehat</th>
+            <th>OT Awam</th>
+            <th>OT Lain</th>
+            <th>ALLOWANCE</th>
+            <th>COMMISION</th>
+            <th>INCENTIVES</th>
+            <th>FIRST CALC TOTAL</th>
+            <th>ANNUAL LEAVE</th>
+            <th>UNPAID LEAVE</th>
+            <th>SICK LEAVE</th>
+            <th>HALF DAYS (HOURS)</th>
+            <th>PINJAMAN</th>
+            <th>EPF (Gaji)</th>
+            <th>SOCSO (Gaji)</th>
+            <th>EIS (Gaji)</th>
+            <th>24JAM (Gaji)</th>
+            <th>✎ EPF</th>
+            <th>EPF</th>
+            <th>✎ SOCSO</th>
+            <th>SOCSO</th>
+            <th>✎ EIS</th>
+            <th>EIS</th>
+            <th>✎ 24JAM</th>
+            <th>24JAM</th>
+            <th>Bank Nama (U)</th>
+            <th>✎</th>
+            <th>Bank Acc (V)</th>
+            <th>✎</th>
+            <th>EPF (W)</th>
+            <th>✎</th>
+            <th>SOCSO (X)</th>
+            <th>✎</th>
+            <th>EIS (Y)</th>
+            <th>Gaji Kasar</th>
+            <th>Total Potongan</th>
+            <th>Gaji Bersih</th>
+          </tr>
+        </thead>
+        <tbody id="payrollTableBody">
+          <!-- single row with all inputs, populated by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="action-bar">
+      <span id="statusMsg" class="status-message"><i class="fas fa-check-circle"></i> Perubahan disimpan</span>
+      <button class="btn btn-secondary" id="resetBtn" type="button"><i class="fas fa-undo-alt"></i> Reset</button>
+      <button class="btn btn-primary" id="saveBtn" type="button"><i class="fas fa-save"></i> Simpan & Selaras</button>
+    </div>
+    <div class="footer-note">
+      <i class="fas fa-info-circle"></i> Data akan dikemas kini ke salary.html (localStorage / sync simulation)
+    </div>
+  </div>
+
+</div>
+
+<script>
+  (function() {
+    // --------------------------------------------------------------
+    // 1. GET EMPLOYEE ID FROM URL (e.g., detail.html?code=EMP001)
+    // --------------------------------------------------------------
+    const urlParams = new URLSearchParams(window.location.search);
+    // Try to get code / id / index – we support 'code', 'id', 'employee'
+    let employeeKey = urlParams.get('code') || urlParams.get('id') || urlParams.get('employee') || urlParams.get('index');
+    
+    // If no key, try to get from hash or fallback
+    if (!employeeKey) {
+      // maybe from hash #EMP001
+      const hash = window.location.hash.substring(1);
+      if (hash) employeeKey = hash;
+    }
+
+    // If still not present, we use a default demo employee (for preview)
+    // This mimics a "selected employee" from salary.html
+    const DEFAULT_EMPLOYEE_KEY = 'DEMO001';
+
+    // --------------------------------------------------------------
+    // 2. MOCK DATABASE (localStorage) – represent salary.html data
+    //    In real integration, this would be shared across pages.
+    //    For this demo, we store an array of employees.
+    // --------------------------------------------------------------
+    const STORAGE_KEY = 'payroll_employees';
+
+    // Helper: get all employees from localStorage, or init with sample
+    function getAllEmployees() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try {
+          return JSON.parse(stored);
+        } catch (e) {
+          console.warn('Invalid storage, resetting');
+        }
+      }
+      // Initial sample data (2 employees) – matches salary.html columns
+      const initial = [
+        {
+          code: 'EMP001',
+          name: 'Ahmad bin Abdullah',
+          group: 'A',
+          situation: 'Aktif',
+          basicSalary: 3200.00,
+          otBiasa: 120.00,
+          otRehat: 80.00,
+          otAwam: 200.00,
+          otLain: 40.00,
+          allowance: 300.00,
+          commision: 150.00,
+          incentives: 100.00,
+          firstCalcTotal: 4190.00,
+          annualLeave: 12,
+          unpaidLeave: 0,
+          sickLeave: 2,
+          halfDaysHours: 4,
+          pinjaman: 200.00,
+          salaryForEpf: 3990.00,
+          salaryForSocso: 3990.00,
+          salaryForEis: 3990.00,
+          salaryFor24jam: 3990.00,
+          epfEmployee: 439.00,
+          epfEmployer: 519.00,
+          socsoEmployee: 19.75,
+          socsoEmployer: 69.05,
+          eisEmployee: 7.90,
+          eisEmployer: 7.90,
+          jam24Employee: 0.00,
+          jam24Employer: 0.00,
+          bankNama: 'Maybank',
+          bankAcc: '1234567890',
+          epfNo: 'EPF123456',
+          socsoNo: 'SOCSO7890',
+          eisNo: 'EIS112233',
+          gajiKasar: 4190.00,
+          totalPotongan: 200.00,
+          gajiBersih: 3990.00,
+          // notes: "✎" columns are flags for manual override, we use simple boolean
+          epfManual: false,
+          socsoManual: false,
+          eisManual: false,
+          jam24Manual: false,
+          bankNamaManual: false,
+          bankAccManual: false,
+          epfNoManual: false,
+          socsoNoManual: false,
+          eisNoManual: false
+        },
+        {
+          code: 'EMP002',
+          name: 'Siti binti Hassan',
+          group: 'B',
+          situation: 'Aktif',
+          basicSalary: 2500.00,
+          otBiasa: 60.00,
+          otRehat: 0,
+          otAwam: 0,
+          otLain: 0,
+          allowance: 200.00,
+          commision: 0,
+          incentives: 50.00,
+          firstCalcTotal: 2810.00,
+          annualLeave: 10,
+          unpaidLeave: 1,
+          sickLeave: 0,
+          halfDaysHours: 0,
+          pinjaman: 0,
+          salaryForEpf: 2810.00,
+          salaryForSocso: 2810.00,
+          salaryForEis: 2810.00,
+          salaryFor24jam: 2810.00,
+          epfEmployee: 309.00,
+          epfEmployer: 365.00,
+          socsoEmployee: 13.90,
+          socsoEmployer: 48.65,
+          eisEmployee: 5.50,
+          eisEmployer: 5.50,
+          jam24Employee: 0.00,
+          jam24Employer: 0.00,
+          bankNama: 'CIMB',
+          bankAcc: '9876543210',
+          epfNo: 'EPF654321',
+          socsoNo: 'SOCSO0987',
+          eisNo: 'EIS445566',
+          gajiKasar: 2810.00,
+          totalPotongan: 0.00,
+          gajiBersih: 2810.00,
+          epfManual: false,
+          socsoManual: false,
+          eisManual: false,
+          jam24Manual: false,
+          bankNamaManual: false,
+          bankAccManual: false,
+          epfNoManual: false,
+          socsoNoManual: false,
+          eisNoManual: false
+        }
+      ];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+      return initial;
+    }
+
+    // Save entire list
+    function saveAllEmployees(employees) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(employees));
+    }
+
+    // Find employee by code (or id)
+    function findEmployeeByKey(key) {
+      const employees = getAllEmployees();
+      return employees.find(emp => emp.code === key || emp.code === key?.toUpperCase() || emp.code === key?.toLowerCase());
+    }
+
+    // Get the current employee, or default
+    let currentEmployee = null;
+    let currentEmployeeIndex = -1;
+
+    if (employeeKey) {
+      const employees = getAllEmployees();
+      currentEmployeeIndex = employees.findIndex(emp => emp.code === employeeKey);
+      if (currentEmployeeIndex !== -1) {
+        currentEmployee = employees[currentEmployeeIndex];
+      } else {
+        // try case-insensitive
+        const idx = employees.findIndex(emp => emp.code.toLowerCase() === employeeKey.toLowerCase());
+        if (idx !== -1) {
+          currentEmployeeIndex = idx;
+          currentEmployee = employees[idx];
+        }
+      }
+    }
+
+    // If still no employee, use first one (or create demo)
+    if (!currentEmployee) {
+      const employees = getAllEmployees();
+      if (employees.length > 0) {
+        currentEmployee = employees[0];
+        currentEmployeeIndex = 0;
+        // update URL without reload (optional)
+        if (history.replaceState) {
+          const newUrl = new URL(window.location);
+          newUrl.searchParams.set('code', currentEmployee.code);
+          window.history.replaceState({}, '', newUrl);
+        }
+      } else {
+        // extreme fallback: create one
+        const demo = {
+          code: 'EMP000',
+          name: 'Default Pekerja',
+          group: 'Z',
+          situation: 'Aktif',
+          basicSalary: 2000.00,
+          otBiasa: 0, otRehat: 0, otAwam: 0, otLain: 0,
+          allowance: 0, commision: 0, incentives: 0,
+          firstCalcTotal: 2000.00,
+          annualLeave: 0, unpaidLeave: 0, sickLeave: 0, halfDaysHours: 0,
+          pinjaman: 0,
+          salaryForEpf: 2000.00, salaryForSocso: 2000.00, salaryForEis: 2000.00, salaryFor24jam: 2000.00,
+          epfEmployee: 220.00, epfEmployer: 260.00,
+          socsoEmployee: 9.75, socsoEmployer: 34.15,
+          eisEmployee: 3.90, eisEmployer: 3.90,
+          jam24Employee: 0.00, jam24Employer: 0.00,
+          bankNama: '', bankAcc: '', epfNo: '', socsoNo: '', eisNo: '',
+          gajiKasar: 2000.00, totalPotongan: 0.00, gajiBersih: 2000.00,
+          epfManual: false, socsoManual: false, eisManual: false, jam24Manual: false,
+          bankNamaManual: false, bankAccManual: false, epfNoManual: false, socsoNoManual: false, eisNoManual: false
+        };
+        const list = [demo];
+        saveAllEmployees(list);
+        currentEmployee = demo;
+        currentEmployeeIndex = 0;
+      }
+    }
+
+    // --------------------------------------------------------------
+    // 3. RENDER BASIC INFO
+    // --------------------------------------------------------------
+    function renderBasicInfo(emp) {
+      document.getElementById('infoSituation').innerText = emp.situation || '—';
+      document.getElementById('infoCode').innerText = emp.code || '—';
+      document.getElementById('infoGroup').innerText = emp.group || '—';
+      document.getElementById('infoBasicSalary').innerText = (emp.basicSalary ?? 0).toFixed(2);
+      document.getElementById('infoName').innerText = emp.name || '—';
+    }
+
+    // --------------------------------------------------------------
+    // 4. RENDER TABLE ROW (single row, all fields)
+    // --------------------------------------------------------------
+    function renderPayrollRow(emp) {
+      const tbody = document.getElementById('payrollTableBody');
+      tbody.innerHTML = '';
+
+      const tr = document.createElement('tr');
+
+      // Helper to create input cell
+      function inputCell(value, field, type = 'number', step = '0.01', readonly = false) {
+        const td = document.createElement('td');
+        const input = document.createElement('input');
+        input.type = type;
+        if (type === 'number') {
+          input.step = step;
+          input.min = '0';
+          // For numeric fields we show 2 decimals if not null
+          input.value = (value !== undefined && value !== null) ? Number(value).toFixed(2) : '0.00';
+        } else {
+          input.value = value ?? '';
+        }
+        input.dataset.field = field;
+        if (readonly) input.readOnly = true;
+        // For "✎" fields we use checkbox-like toggle? we'll keep them as small inputs for manual flags
+        // Actually the ✎ columns in salary.html are checkboxes for manual override; we'll represent them as checkboxes.
+        return { td, input };
+      }
+
+      // We'll build cells in order: there are 38 columns in second row (from OT Biasa to Gaji Bersih)
+      // Let's list fields in exact order:
+      const fields = [
+        { field: 'otBiasa', label: 'OT Biasa' },
+        { field: 'otRehat', label: 'OT Rehat' },
+        { field: 'otAwam', label: 'OT Awam' },
+        { field: 'otLain', label: 'OT Lain' },
+        { field: 'allowance', label: 'ALLOWANCE' },
+        { field: 'commision', label: 'COMMISION' },
+        { field: 'incentives', label: 'INCENTIVES' },
+        { field: 'firstCalcTotal', label: 'FIRST CALC TOTAL', readonly: true }, // calculated
+        { field: 'annualLeave', label: 'ANNUAL LEAVE', type: 'number', step: '1' },
+        { field: 'unpaidLeave', label: 'UNPAID LEAVE', type: 'number', step: '1' },
+        { field: 'sickLeave', label: 'SICK LEAVE', type: 'number', step: '1' },
+        { field: 'halfDaysHours', label: 'HALF DAYS (HOURS)', type: 'number', step: '1' },
+        { field: 'pinjaman', label: 'PINJAMAN' },
+        { field: 'salaryForEpf', label: 'Salary for EPF' },
+        { field: 'salaryForSocso', label: 'Salary for SOCSO' },
+        { field: 'salaryForEis', label: 'Salary for EIS' },
+        { field: 'salaryFor24jam', label: 'Salary for 24JAM' },
+        // now the "✎" columns (EPF, SOCSO, EIS, 24JAM) – these are manual override checkboxes
+        { field: 'epfManual', label: '✎ EPF', type: 'checkbox' },
+        { field: 'epfEmployee', label: 'EPF' },
+        { field: 'socsoManual', label: '✎ SOCSO', type: 'checkbox' },
+        { field: 'socsoEmployee', label: 'SOCSO' },
+        { field: 'eisManual', label: '✎ EIS', type: 'checkbox' },
+        { field: 'eisEmployee', label: 'EIS' },
+        { field: 'jam24Manual', label: '✎ 24JAM', type: 'checkbox' },
+        { field: 'jam24Employee', label: '24JAM' },
+        // Login record U-Y columns + ✎
+        { field: 'bankNama', label: 'Bank Nama (U)', type: 'text' },
+        { field: 'bankNamaManual', label: '✎', type: 'checkbox' },
+        { field: 'bankAcc', label: 'Bank Acc (V)', type: 'text' },
+        { field: 'bankAccManual', label: '✎', type: 'checkbox' },
+        { field: 'epfNo', label: 'EPF (W)', type: 'text' },
+        { field: 'epfNoManual', label: '✎', type: 'checkbox' },
+        { field: 'socsoNo', label: 'SOCSO (X)', type: 'text' },
+        { field: 'socsoNoManual', label: '✎', type: 'checkbox' },
+        { field: 'eisNo', label: 'EIS (Y)', type: 'text' },
+        { field: 'eisNoManual', label: '✎', type: 'checkbox' },
+        // Ringkasan
+        { field: 'gajiKasar', label: 'Gaji Kasar', readonly: true },
+        { field: 'totalPotongan', label: 'Total Potongan', readonly: true },
+        { field: 'gajiBersih', label: 'Gaji Bersih', readonly: true }
+      ];
+
+      fields.forEach(f => {
+        const td = document.createElement('td');
+        let input;
+        if (f.type === 'checkbox') {
+          input = document.createElement('input');
+          input.type = 'checkbox';
+          input.checked = !!emp[f.field];
+          input.dataset.field = f.field;
+          input.style.width = '20px';
+          input.style.height = '20px';
+          input.style.accentColor = '#1c6c9c';
+          input.style.cursor = 'pointer';
+        } else {
+          input = document.createElement('input');
+          input.type = f.type || 'number';
+          if (input.type === 'number') {
+            input.step = f.step || '0.01';
+            input.min = '0';
+            input.value = (emp[f.field] !== undefined && emp[f.field] !== null) ? Number(emp[f.field]).toFixed(2) : '0.00';
+          } else {
+            input.value = emp[f.field] ?? '';
+          }
+          input.dataset.field = f.field;
+          if (f.readonly) input.readOnly = true;
+          if (f.type === 'text') input.style.minWidth = '90px';
+        }
+        td.appendChild(input);
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+
+      // attach live recalculation for some fields? we'll keep simple: on save we recalc from current inputs
+    }
+
+    // --------------------------------------------------------------
+    // 5. COLLECT DATA FROM TABLE & RECALCULATE (simple)
+    // --------------------------------------------------------------
+    function collectFormData() {
+      const row = document.querySelector('#payrollTableBody tr');
+      if (!row) return null;
+
+      const inputs = row.querySelectorAll('input');
+      const data = {};
+
+      inputs.forEach(input => {
+        const field = input.dataset.field;
+        if (!field) return;
+        if (input.type === 'checkbox') {
+          data[field] = input.checked;
+        } else if (input.type === 'number') {
+          data[field] = parseFloat(input.value) || 0;
+        } else {
+          data[field] = input.value;
+        }
+      });
+
+      // Recalculate FIRST CALCULATION TOTAL = sum of OT Biasa + OT Rehat + OT Awam + OT Lain + ALLOWANCE + COMMISION + INCENTIVES
+      const otBiasa = data.otBiasa || 0;
+      const otRehat = data.otRehat || 0;
+      const otAwam = data.otAwam || 0;
+      const otLain = data.otLain || 0;
+      const allowance = data.allowance || 0;
+      const commision = data.commision || 0;
+      const incentives = data.incentives || 0;
+      const firstCalcTotal = otBiasa + otRehat + otAwam + otLain + allowance + commision + incentives;
+      data.firstCalcTotal = firstCalcTotal;
+
+      // Gaji Kasar = BASIC SALARY + firstCalcTotal (we also have basicSalary from base info)
+      // Actually basic salary is in basic info, but we need it; we get from currentEmployee.basicSalary (but we might edit basic salary? Not in this page, it's freeze)
+      const basicSalary = currentEmployee.basicSalary || 0;
+      const gajiKasar = basicSalary + firstCalcTotal;
+      data.gajiKasar = gajiKasar;
+
+      // Total Potongan = pinjaman + unpaidLeave deduction? For demo we assume pinjaman + (unpaidLeave * daily rate) — but we simplify to pinjaman + unpaid leave amount not implemented. We'll just use pinjaman as total potongan.
+      // In real system we would compute; for demo we set total potongan = pinjaman
+      data.totalPotongan = data.pinjaman || 0;
+
+      // Gaji Bersih = Gaji Kasar - Total Potongan
+      data.gajiBersih = gajiKasar - data.totalPotongan;
+
+      // Also recompute salaryForEpf etc? Usually they equal gajiKasar (but can be overridden)
+      // If not manually overridden (checkbox false), we set them to gajiKasar
+      if (!data.epfManual) {
+        data.salaryForEpf = gajiKasar;
+      }
+      if (!data.socsoManual) {
+        data.salaryForSocso = gajiKasar;
+      }
+      if (!data.eisManual) {
+        data.salaryForEis = gajiKasar;
+      }
+      if (!data.jam24Manual) {
+        data.salaryFor24jam = gajiKasar;
+      }
+
+      // Also update EPF/SOCSO/EIS/24JAM amounts if not manual? Could use simple rate, but we'll just keep existing for demo.
+      // We can recompute simple: EPF employee = 11% of salaryForEpf, but actual table depends on EPF schedule. For simplicity we keep user values.
+
+      // Update the read-only fields in the table to reflect new calc totals
+      // But we already have inputs bound; after save we re-render.
+
+      return data;
+    }
+
+    // --------------------------------------------------------------
+    // 6. SAVE: update localStorage and re-render
+    // --------------------------------------------------------------
+    function saveChanges() {
+      const newData = collectFormData();
+      if (!newData) return;
+
+      // Merge with currentEmployee (keep basic info unchanged: name, code, group, situation, basicSalary)
+      const updated = {
+        ...currentEmployee,
+        ...newData,
+        // Ensure basic info not overwritten by missing fields
+        code: currentEmployee.code,
+        name: currentEmployee.name,
+        group: currentEmployee.group,
+        situation: currentEmployee.situation,
+        basicSalary: currentEmployee.basicSalary,
+      };
+
+      // Update in array
+      const employees = getAllEmployees();
+      if (currentEmployeeIndex !== -1 && currentEmployeeIndex < employees.length) {
+        employees[currentEmployeeIndex] = updated;
+      } else {
+        // fallback
+        const idx = employees.findIndex(e => e.code === currentEmployee.code);
+        if (idx !== -1) employees[idx] = updated;
+        else employees.push(updated);
+      }
+      saveAllEmployees(employees);
+
+      // update current reference
+      currentEmployee = updated;
+
+      // Re-render everything
+      renderBasicInfo(updated);
+      renderPayrollRow(updated);
+
+      // Show status message
+      const statusEl = document.getElementById('statusMsg');
+      statusEl.classList.add('show');
+      setTimeout(() => statusEl.classList.remove('show'), 2500);
+
+      // Also update the URL if needed? Not necessary.
+      // Also we could simulate updating salary.html by dispatching storage event, but that's fine.
+    }
+
+    // --------------------------------------------------------------
+    // 7. RESET to last saved (from storage)
+    // --------------------------------------------------------------
+    function resetForm() {
+      // reload from storage
+      const employees = getAllEmployees();
+      let emp = employees.find(e => e.code === currentEmployee.code);
+      if (!emp && employees.length) emp = employees[0];
+      if (emp) {
+        currentEmployee = emp;
+        currentEmployeeIndex = employees.indexOf(emp);
+        renderBasicInfo(emp);
+        renderPayrollRow(emp);
+        // also update status (optional)
+        const statusEl = document.getElementById('statusMsg');
+        statusEl.textContent = '↺ Data dikembalikan';
+        statusEl.classList.add('show');
+        setTimeout(() => {
+          statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Perubahan disimpan';
+          statusEl.classList.remove('show');
+        }, 1500);
+      }
+    }
+
+    // --------------------------------------------------------------
+    // 8. INITIAL RENDER + EVENT LISTENERS
+    // --------------------------------------------------------------
+    function init() {
+      // Ensure storage has initial sample if empty
+      getAllEmployees();
+
+      // Re-fetch current employee from storage (in case storage changed)
+      const employees = getAllEmployees();
+      let emp = employees.find(e => e.code === currentEmployee?.code);
+      if (!emp && employees.length) {
+        emp = employees[0];
+        currentEmployee = emp;
+        currentEmployeeIndex = 0;
+      } else if (emp) {
+        currentEmployee = emp;
+        currentEmployeeIndex = employees.indexOf(emp);
+      }
+
+      if (currentEmployee) {
+        renderBasicInfo(currentEmployee);
+        renderPayrollRow(currentEmployee);
+      } else {
+        // if still no employee, just show dummy
+        document.getElementById('payrollTableBody').innerHTML = '<tr><td colspan="38" style="text-align:center;padding:2rem;">Tiada data pekerja</td></tr>';
+      }
+
+      // Button events
+      document.getElementById('saveBtn').addEventListener('click', saveChanges);
+      document.getElementById('resetBtn').addEventListener('click', resetForm);
+    }
+
+    // Start
+    init();
+
+    // Optional: sync across tabs via storage event (if user opens salary.html in another tab)
+    window.addEventListener('storage', (e) => {
+      if (e.key === STORAGE_KEY && e.newValue) {
+        // refresh data
+        const employees = JSON.parse(e.newValue);
+        const emp = employees.find(emp => emp.code === currentEmployee?.code);
+        if (emp) {
+          currentEmployee = emp;
+          currentEmployeeIndex = employees.indexOf(emp);
+          renderBasicInfo(emp);
+          renderPayrollRow(emp);
+        }
+      }
+    });
+
+  })();
+</script>
+
+</body>
+</html>
