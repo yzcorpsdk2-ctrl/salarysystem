@@ -214,13 +214,13 @@
 
   /* ==========================================================
      表头 sticky 分层（从顶到底）：
-       1. section-label-row → top:0        （粘顶）
+       1. section-label-row → top:0        （粘顶，最高 z）
        2. main-header-row   → 由 JS 测量
        3. sub-header-row    → 由 JS 测量
        4. filter-row        → 由 JS 测量
      ========================================================== */
   .section-label-row th {
-    position: sticky; top: 0; z-index: 15;
+    position: sticky !important; top: 0 !important; z-index: 22 !important;
     padding: 0.45rem 0.6rem; font-size: 0.68rem; font-weight: 700;
     letter-spacing: 0.05em; text-transform: uppercase;
     border-bottom: 1px solid var(--epf-border); text-align: center;
@@ -228,10 +228,10 @@
   .section-label-row th .sec-title {
     display: flex; align-items: center; justify-content: center; gap: 0.4rem;
   }
-  .main-header-row th { position: sticky; z-index: 13; text-align: left; }
-  .sub-header-row th { position: sticky; z-index: 14; text-align: center; padding: 0.35rem 0.5rem; }
+  .main-header-row th { position: sticky; z-index: 18; text-align: left; }
+  .sub-header-row th { position: sticky; z-index: 17; text-align: center; padding: 0.35rem 0.5rem; }
   .filter-row th {
-    position: sticky; z-index: 12;
+    position: sticky; z-index: 16;
     background: #ffffff; padding: 0.35rem 0.4rem;
     border-bottom: 1px solid var(--epf-border); text-align: left;
   }
@@ -260,6 +260,9 @@
   .filter-row .th-filter::placeholder { color: #a7b7c9; font-weight: 400; }
   .filter-row th.no-filter { background: var(--epf-blue-soft); }
 
+  /* 禁止 filter-row 里出现任何 unfold-handle（避免压住筛选框） */
+  .filter-row .unfold-handle { display: none !important; }
+
   td {
     padding: 0.4rem 0.45rem; border-bottom: 1px solid var(--epf-border-soft);
     vertical-align: middle; background: #ffffff; transition: background 0.15s;
@@ -282,7 +285,7 @@
   body.freeze-on .col-freeze.col-3 { left: 310px; }
   body.freeze-on .col-freeze.col-4 { left: 420px; }
 
-  body.freeze-on thead .col-freeze { z-index: 16; }
+  body.freeze-on thead .col-freeze { z-index: 19; }
   body.freeze-on thead .col-freeze.bg-slate   { background: #f0f4f9 !important; }
   body.freeze-on thead .col-freeze.bg-amber   { background: #fdf8ec !important; }
   body.freeze-on thead .col-freeze.bg-emerald { background: #f0f9f4 !important; }
@@ -292,7 +295,7 @@
   body.freeze-on thead .filter-row th.col-freeze { background: #ffffff !important; }
   body.freeze-on thead .filter-row th.col-freeze.no-filter { background: var(--epf-blue-soft) !important; }
   body.freeze-on .section-label-row th.col-freeze-group {
-    position: sticky !important; left: 0 !important; z-index: 17 !important;
+    position: sticky !important; left: 0 !important; z-index: 24 !important;
   }
 
   /* 深蓝锁定分隔线 */
@@ -325,8 +328,8 @@
 
   /* ==========================================================
      展开把手：唯一挂在 PINJAMAN 的 section-label-row 上，
-     并悬在 PINJAMAN 的 filter-row 右边界上。
-     不放在数据行（避免行高变化）。
+     并悬在 PINJAMAN 的 section 右边界上。
+     不放在数据行、不放在 filter-row（避免压住筛选框）。
      ========================================================== */
   .unfold-handle {
     display: none;
@@ -729,7 +732,7 @@
               </th>
               <th colspan="4" class="bg-emerald divider-group"><div class="sec-title" id="sec2">💰 2. PENDAPATAN / ELAUN (OT)</div></th>
               <th colspan="4" class="bg-emerald divider-group"><div class="sec-title" id="sec2b">➕ PENDAPATAN TAMBAHAN</div></th>
-              <!-- POTONGAN 分区标题：展开把手在这里 -->
+              <!-- POTONGAN 分区标题：展开把手在这里（唯一位置） -->
               <th colspan="5" class="bg-rose divider-group" style="position: relative;">
                 <div class="sec-title" id="sec2d">➖ POTONGAN (ON LEAVE + PINJAMAN)</div>
                 <div class="unfold-handle" onclick="toggleSalaryFold(event)" title="Unfold / Expand"></div>
@@ -831,11 +834,8 @@
               <th class="bg-rose"><input class="th-filter" data-col="14" placeholder="🔍"></th>
               <th class="bg-rose"><input class="th-filter" data-col="15" placeholder="🔍"></th>
               <th class="bg-rose"><input class="th-filter" data-col="16" placeholder="🔍"></th>
-              <!-- PINJAMAN 筛选（不挂把手，展开把手在 section-label-row 上） -->
-              <th class="bg-rose" style="position: relative;">
-                <input class="th-filter" data-col="17" placeholder="🔍">
-                <div class="unfold-handle" onclick="toggleSalaryFold(event)" title="Unfold / Expand"></div>
-              </th>
+              <!-- PINJAMAN 筛选（干净，无把手） -->
+              <th class="bg-rose"><input class="th-filter" data-col="17" placeholder="🔍"></th>
               <th class="bg-cyan divider-group foldable-col"><input class="th-filter" data-col="18" placeholder="🔍"></th>
               <th class="bg-cyan foldable-col"><input class="th-filter" data-col="19" placeholder="🔍"></th>
               <th class="bg-cyan foldable-col"><input class="th-filter" data-col="20" placeholder="🔍"></th>
@@ -1135,16 +1135,47 @@ function contribBase(emp, field, fallback) {
   return isNaN(n) ? fallback : n;
 }
 
+/* =========================================================
+   修复版：表头 sticky 偏移计算
+   - 用 offsetHeight 逐行测量（避免 rowspan 干扰）
+   - 显式写死 top 累积值与 z-index
+   - section-label-row 永远 top:0，最高层
+   ========================================================= */
 function updateStickyOffsets() {
   requestAnimationFrame(() => {
     const thead = document.querySelector('#mainTable thead');
     if (!thead) return;
-    const rows = thead.querySelectorAll('tr');
-    let top = 0;
-    rows.forEach(row => {
-      const h = Math.ceil(row.getBoundingClientRect().height);
-      row.querySelectorAll('th').forEach(th => { th.style.top = top + 'px'; });
-      top += h;
+
+    const sectionRow = thead.querySelector('.section-label-row');
+    const mainRow    = thead.querySelector('.main-header-row');
+    const subRow     = thead.querySelector('.sub-header-row');
+    const filterRow  = thead.querySelector('.filter-row');
+    if (!sectionRow || !mainRow || !subRow || !filterRow) return;
+
+    const hSection = sectionRow.offsetHeight;
+    const hMain    = mainRow.offsetHeight;
+    const hSub     = subRow.offsetHeight;
+
+    const topSection = 0;
+    const topMain    = hSection;
+    const topSub     = hSection + hMain;
+    const topFilter  = hSection + hMain + hSub;
+
+    sectionRow.querySelectorAll('th').forEach(th => {
+      th.style.top = topSection + 'px';
+      th.style.zIndex = '22';
+    });
+    mainRow.querySelectorAll('th').forEach(th => {
+      th.style.top = topMain + 'px';
+      th.style.zIndex = '18';
+    });
+    subRow.querySelectorAll('th').forEach(th => {
+      th.style.top = topSub + 'px';
+      th.style.zIndex = '17';
+    });
+    filterRow.querySelectorAll('th').forEach(th => {
+      th.style.top = topFilter + 'px';
+      th.style.zIndex = '16';
     });
   });
 }
