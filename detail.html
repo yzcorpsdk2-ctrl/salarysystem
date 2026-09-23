@@ -4,503 +4,164 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Detail Pekerja · Sistem Penggajian</title>
-  <!-- Font Awesome 6 (free) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-    }
-
-    body {
-      background: #f2f5f9;
-      padding: 24px 16px;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
+    body { background: #f2f5f9; padding: 24px 16px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
     .payslip-container {
-      max-width: 1280px;
-      width: 100%;
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
-      padding: 28px 30px 35px;
+      max-width: 1280px; width: 100%; background: white; border-radius: 20px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12); padding: 28px 30px 35px;
       border: 1px solid #d9e1ec;
     }
-
-    /* Header Company + period */
     .company-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      border-bottom: 3px solid #1e3a5f;
-      padding-bottom: 8px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 10px;
+      display: flex; justify-content: space-between; align-items: baseline;
+      border-bottom: 3px solid #1e3a5f; padding-bottom: 8px; margin-bottom: 20px;
+      flex-wrap: wrap; gap: 10px;
     }
-
-    .company-name {
-      font-size: 1.9rem;
-      font-weight: 700;
-      color: #1e3a5f;
-      letter-spacing: -0.5px;
-    }
-
+    .company-name { font-size: 1.9rem; font-weight: 700; color: #1e3a5f; letter-spacing: -0.5px; }
     .period-badge {
-      background: #1e3a5f;
-      color: white;
-      font-weight: 600;
-      font-size: 1.1rem;
-      padding: 6px 18px;
-      border-radius: 40px;
-      letter-spacing: 0.5px;
+      background: #1e3a5f; color: white; font-weight: 600; font-size: 1.1rem;
+      padding: 6px 18px; border-radius: 40px; letter-spacing: 0.5px;
     }
-
-    /* employee info grid */
     .info-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr 1fr;
-      gap: 12px 20px;
-      background: #f8faff;
-      padding: 16px 18px;
-      border-radius: 14px;
-      margin-bottom: 24px;
-      border: 1px solid #cddaea;
+      display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 12px 20px;
+      background: #f8faff; padding: 16px 18px; border-radius: 14px;
+      margin-bottom: 24px; border: 1px solid #cddaea;
     }
-
-    .info-item {
-      display: flex;
-      align-items: baseline;
-      font-size: 0.95rem;
-      line-height: 1.6;
-      color: #1e2b3c;
+    .info-item { display: flex; align-items: baseline; font-size: 0.95rem; line-height: 1.6; color: #1e2b3c; }
+    .info-label { font-weight: 600; width: 120px; color: #2a4059; flex-shrink: 0; }
+    .info-value { font-weight: 500; color: #0a1a2b; word-break: break-word; width: 100%; }
+    .info-value input {
+      width: 100%; padding: 4px 8px; border: 1px solid #b6c8dd; border-radius: 8px;
+      font-size: 0.95rem; font-weight: 500; background: white; color: #0a1a2b; outline: none;
     }
-
-    .info-label {
-      font-weight: 600;
-      width: 120px;
-      color: #2a4059;
-      flex-shrink: 0;
-    }
-
-    .info-value {
-      font-weight: 500;
-      color: #0a1a2b;
-      word-break: break-word;
-      width: 100%;
-    }
-
-    .info-value select, .info-value input {
-      width: 100%;
-      padding: 4px 8px;
-      border: 1px solid #b6c8dd;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      font-weight: 500;
-      background: white;
-      color: #0a1a2b;
-      outline: none;
-    }
-
-    .info-value select:focus, .info-value input:focus {
-      border-color: #1e3a5f;
-      box-shadow: 0 0 0 2px rgba(30,58,95,0.15);
-    }
-
-    /* main two column layout */
-    .columns {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      margin-bottom: 24px;
-    }
-
-    .col {
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
-    }
-
+    .info-value input:focus { border-color: #1e3a5f; box-shadow: 0 0 0 2px rgba(30,58,95,0.15); }
+    .columns { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+    .col { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02); }
     .col-header {
-      background: #e9eef6;
-      padding: 12px 18px;
-      font-weight: 700;
-      font-size: 1.05rem;
-      color: #1e3a5f;
-      border-bottom: 1px solid #b6c8dd;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      background: #e9eef6; padding: 12px 18px; font-weight: 700; font-size: 1.05rem;
+      color: #1e3a5f; border-bottom: 1px solid #b6c8dd;
+      display: flex; align-items: center; gap: 8px;
     }
-
-    .col-body {
-      padding: 12px 18px 16px;
-    }
-
+    .col-body { padding: 12px 18px 16px; }
     .row-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 7px 0;
-      border-bottom: 1px dashed #d8e1ed;
-      font-size: 0.95rem;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 7px 0; border-bottom: 1px dashed #d8e1ed; font-size: 0.95rem;
     }
-
-    .row-item:last-child {
-      border-bottom: none;
-    }
-
-    .row-label {
-      color: #2f4055;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .row-label i {
-      color: #6b7f99;
-      font-size: 0.8rem;
-      width: 16px;
-    }
-
+    .row-item:last-child { border-bottom: none; }
+    .row-label { color: #2f4055; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+    .row-label i { color: #6b7f99; font-size: 0.8rem; width: 16px; }
     .row-value {
-      font-weight: 600;
-      color: #0e1c2e;
-      background: #f4f8ff;
-      padding: 2px 12px;
-      border-radius: 30px;
-      font-size: 0.95rem;
-      min-width: 90px;
-      text-align: right;
+      font-weight: 600; color: #0e1c2e; background: #f4f8ff; padding: 2px 12px;
+      border-radius: 30px; font-size: 0.95rem; min-width: 90px; text-align: right;
       border: 1px solid #dbe4f0;
     }
-
-    /* editable inputs */
     .row-value input {
-      width: 100%;
-      border: none;
-      background: transparent;
-      font-weight: 600;
-      font-size: 0.95rem;
-      text-align: right;
-      color: #0e1c2e;
-      outline: none;
-      font-family: inherit;
+      width: 100%; border: none; background: transparent; font-weight: 600;
+      font-size: 0.95rem; text-align: right; color: #0e1c2e; outline: none; font-family: inherit;
     }
-
-    .row-value input:focus {
-      background: #eef6ff;
-      border-radius: 20px;
-      padding: 2px 8px;
-      margin: -2px -8px;
-    }
-
-    /* total rows */
+    .row-value input:focus { background: #eef6ff; border-radius: 20px; padding: 2px 8px; margin: -2px -8px; }
+    .row-value input.text { text-align: left; }
     .total-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #1e3a5f;
-      color: white;
-      padding: 12px 18px;
-      border-radius: 12px;
-      margin-top: 8px;
-      font-weight: 700;
-      font-size: 1.1rem;
+      display: flex; justify-content: space-between; align-items: center;
+      background: #1e3a5f; color: white; padding: 12px 18px; border-radius: 12px;
+      margin-top: 8px; font-weight: 700; font-size: 1.1rem;
     }
-
-    .total-row .label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .total-row .value {
-      background: #ffffff20;
-      padding: 4px 16px;
-      border-radius: 40px;
-      letter-spacing: 0.5px;
-    }
-
-    /* statutory / bank section */
-    .extra-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 14px;
-      margin-top: 12px;
-      margin-bottom: 20px;
-    }
-
-    .extra-card {
-      background: #f8faff;
-      border: 1px solid #cddaea;
-      border-radius: 14px;
-      padding: 12px 14px;
-    }
-
+    .total-row .label { display: flex; align-items: center; gap: 8px; }
+    .total-row .value { background: #ffffff20; padding: 4px 16px; border-radius: 40px; letter-spacing: 0.5px; }
+    .extra-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-top: 12px; margin-bottom: 20px; }
+    .extra-card { background: #f8faff; border: 1px solid #cddaea; border-radius: 14px; padding: 12px 14px; }
     .extra-card h4 {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #4e6b8a;
-      margin-bottom: 8px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 5px;
+      font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;
+      color: #4e6b8a; margin-bottom: 8px; font-weight: 700;
+      display: flex; align-items: center; gap: 5px;
     }
-
-    .extra-card .row-item {
-      padding: 4px 0;
-      font-size: 0.9rem;
-    }
-
-    /* action buttons */
+    .extra-card .row-item { padding: 4px 0; font-size: 0.9rem; }
     .action-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 24px;
-      flex-wrap: wrap;
-      gap: 12px;
-      border-top: 2px solid #e2eaf3;
-      padding-top: 22px;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 24px; flex-wrap: wrap; gap: 12px;
+      border-top: 2px solid #e2eaf3; padding-top: 22px;
     }
-
-    .btn-group {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
+    .btn-group { display: flex; gap: 12px; flex-wrap: wrap; }
     .btn {
-      padding: 10px 28px;
-      border-radius: 40px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      border: none;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: 0.2s;
+      padding: 10px 28px; border-radius: 40px; font-weight: 600; font-size: 0.95rem;
+      border: none; cursor: pointer; display: inline-flex; align-items: center;
+      gap: 8px; transition: 0.2s;
     }
-
-    .btn-primary {
-      background: #1e3a5f;
-      color: white;
-      box-shadow: 0 4px 8px rgba(30, 58, 95, 0.25);
-    }
-
-    .btn-primary:hover {
-      background: #14304e;
-      transform: translateY(-1px);
-    }
-
-    .btn-outline {
-      background: white;
-      border: 1.5px solid #1e3a5f;
-      color: #1e3a5f;
-    }
-
-    .btn-outline:hover {
-      background: #eef4fb;
-    }
-
-    .btn-success {
-      background: #1e7b4c;
-      color: white;
-      box-shadow: 0 4px 8px rgba(30, 123, 76, 0.25);
-    }
-
-    .btn-success:hover {
-      background: #14633c;
-    }
-
+    .btn-primary { background: #1e3a5f; color: white; box-shadow: 0 4px 8px rgba(30, 58, 95, 0.25); }
+    .btn-primary:hover { background: #14304e; transform: translateY(-1px); }
+    .btn-outline { background: white; border: 1.5px solid #1e3a5f; color: #1e3a5f; }
+    .btn-outline:hover { background: #eef4fb; }
+    .btn-success { background: #1e7b4c; color: white; box-shadow: 0 4px 8px rgba(30, 123, 76, 0.25); }
+    .btn-success:hover { background: #14633c; }
     .signature-area {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 30px;
-      padding-top: 18px;
-      border-top: 1px solid #cbdae9;
-      font-size: 0.9rem;
-      color: #2f4055;
+      display: flex; justify-content: space-between; margin-top: 30px; padding-top: 18px;
+      border-top: 1px solid #cbdae9; font-size: 0.9rem; color: #2f4055;
     }
-
-    .signature-line {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .signature-line span:first-child {
-      font-weight: 600;
-    }
-
-    .signature-line .line {
-      border-bottom: 1.5px solid #a0b8d0;
-      width: 200px;
-      height: 18px;
-    }
-
-    .highlight-edit {
-      background: #fef9e7;
-    }
-
-    .edit-icon {
-      margin-left: 4px;
-      color: #8b9eb5;
-      font-size: 0.75rem;
-    }
-
-    .badge-frozen {
-      background: #eef2f7;
-      color: #3c5777;
-      font-size: 0.7rem;
-      padding: 2px 8px;
-      border-radius: 30px;
-      margin-left: 6px;
-      font-weight: 600;
-    }
-
-    .sync-status {
-      font-size: 0.8rem;
-      padding: 4px 10px;
-      border-radius: 20px;
-      background: #eef2f7;
-      color: #3c5777;
-    }
-
-    .sync-status.loading {
-      background: #fff3cd;
-      color: #856404;
-    }
-
-    .sync-status.success {
-      background: #d4edda;
-      color: #155724;
-    }
-
-    .sync-status.error {
-      background: #f8d7da;
-      color: #721c24;
-    }
-
-    /* responsive */
+    .signature-line { display: flex; flex-direction: column; gap: 6px; }
+    .signature-line span:first-child { font-weight: 600; }
+    .signature-line .line { border-bottom: 1.5px solid #a0b8d0; width: 200px; height: 18px; }
+    .sync-status { font-size: 0.8rem; padding: 4px 10px; border-radius: 20px; background: #eef2f7; color: #3c5777; }
+    .sync-status.success { background: #d4edda; color: #155724; }
+    .sync-status.error { background: #f8d7da; color: #721c24; }
     @media (max-width: 900px) {
-      .columns {
-        grid-template-columns: 1fr;
-      }
-      .info-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-      .extra-grid {
-        grid-template-columns: 1fr 1fr;
-      }
+      .columns { grid-template-columns: 1fr; }
+      .info-grid { grid-template-columns: 1fr 1fr; }
+      .extra-grid { grid-template-columns: 1fr 1fr; }
     }
-
     @media (max-width: 600px) {
-      .payslip-container {
-        padding: 18px;
-      }
-      .info-grid {
-        grid-template-columns: 1fr;
-      }
-      .extra-grid {
-        grid-template-columns: 1fr;
-      }
-      .company-name {
-        font-size: 1.4rem;
-      }
-      .period-badge {
-        font-size: 0.9rem;
-      }
+      .payslip-container { padding: 18px; }
+      .info-grid, .extra-grid { grid-template-columns: 1fr; }
+      .company-name { font-size: 1.4rem; }
+      .period-badge { font-size: 0.9rem; }
     }
   </style>
 </head>
 <body>
   <div class="payslip-container" id="payslipContainer">
-    <!-- Header -->
     <div class="company-header">
       <div class="company-name" id="companyName">Sistem Penggajian Sdn Bhd</div>
-      <div class="period-badge" id="periodBadge">JANUARY 2025</div>
+      <div class="period-badge" id="periodBadge">—</div>
     </div>
 
-    <!-- Employee Info: Situation, Kod, Nama, Kumpulan, Gaji Asas -->
     <div class="info-grid">
       <div class="info-item">
         <span class="info-label">Situation</span>
-        <span class="info-value" id="infoSituation">Aktif</span>
+        <span class="info-value" id="infoSituation">—</span>
       </div>
       <div class="info-item">
         <span class="info-label">Kod</span>
-        <span class="info-value">
-          <select id="selectKod" disabled><option>—</option></select>
-        </span>
+        <span class="info-value"><input type="text" id="infoKod" readonly></span>
       </div>
       <div class="info-item">
         <span class="info-label">Nama</span>
-        <span class="info-value">
-          <select id="selectNama" disabled><option>—</option></select>
-        </span>
+        <span class="info-value"><input type="text" id="infoNama" readonly></span>
       </div>
       <div class="info-item">
         <span class="info-label">Kumpulan</span>
-        <span class="info-value">
-          <select id="selectKumpulan">
-            <option value="">-- Pilih Kumpulan --</option>
-          </select>
-        </span>
+        <span class="info-value"><input type="text" id="infoKumpulan"></span>
       </div>
       <div class="info-item">
         <span class="info-label">Gaji Asas</span>
         <span class="info-value" id="infoGajiAsas">RM 0.00</span>
       </div>
+      <div class="info-item">
+        <span class="info-label">Gaji Asas (Edit)</span>
+        <span class="info-value"><input type="number" step="0.01" id="inputGajiAsas" value="0"></span>
+      </div>
     </div>
 
-    <!-- Main columns: Earnings / Deductions -->
     <div class="columns">
-      <!-- Left: Earnings / Income -->
       <div class="col">
         <div class="col-header"><i class="fas fa-plus-circle" style="color:#1e7b4c;"></i> EARNINGS / INCOME</div>
         <div class="col-body">
-          <div class="row-item">
-            <span class="row-label"><i class="fas fa-clock"></i> OT Biasa</span>
-            <span class="row-value"><input type="number" step="0.01" id="otBiasa" value="0.00"></span>
-          </div>
-          <div class="row-item">
-            <span class="row-label"><i class="fas fa-clock"></i> OT Rehat</span>
-            <span class="row-value"><input type="number" step="0.01" id="otRehat" value="0.00"></span>
-          </div>
-          <div class="row-item">
-            <span class="row-label"><i class="fas fa-clock"></i> OT Awam</span>
-            <span class="row-value"><input type="number" step="0.01" id="otAwam" value="0.00"></span>
-          </div>
-          <div class="row-item">
-            <span class="row-label"><i class="fas fa-clock"></i> OT Lain</span>
-            <span class="row-value"><input type="number" step="0.01" id="otLain" value="0.00"></span>
-          </div>
-          <div class="row-item">
-            <span class="row-label"><i class="fas fa-hand-holding-usd"></i> ALLOWANCE</span>
-            <span class="row-value"><input type="number" step="0.01" id="allowance" value="0.00"></span>
-          </div>
-          <div class="row-item">
-            <span class="row-label"><i class="fas fa-percent"></i> COMMISION</span>
-            <span class="row-value"><input type="number" step="0.01" id="commision" value="0.00"></span>
-          </div>
-          <div class="row-item">
-            <span class="row-label"><i class="fas fa-gift"></i> INCENTIVES</span>
-            <span class="row-value"><input type="number" step="0.01" id="incentives" value="0.00"></span>
-          </div>
+          <div class="row-item"><span class="row-label"><i class="fas fa-clock"></i> OT Biasa</span><span class="row-value"><input type="number" step="0.01" id="otBiasa" value="0"></span></div>
+          <div class="row-item"><span class="row-label"><i class="fas fa-clock"></i> OT Rehat</span><span class="row-value"><input type="number" step="0.01" id="otRehat" value="0"></span></div>
+          <div class="row-item"><span class="row-label"><i class="fas fa-clock"></i> OT Awam</span><span class="row-value"><input type="number" step="0.01" id="otAwam" value="0"></span></div>
+          <div class="row-item"><span class="row-label"><i class="fas fa-clock"></i> OT Lain</span><span class="row-value"><input type="number" step="0.01" id="otLain" value="0"></span></div>
+          <div class="row-item"><span class="row-label"><i class="fas fa-hand-holding-usd"></i> ALLOWANCE</span><span class="row-value"><input type="number" step="0.01" id="allowance" value="0"></span></div>
+          <div class="row-item"><span class="row-label"><i class="fas fa-percent"></i> COMMISION</span><span class="row-value"><input type="number" step="0.01" id="commision" value="0"></span></div>
+          <div class="row-item"><span class="row-label"><i class="fas fa-gift"></i> INCENTIVES</span><span class="row-value"><input type="number" step="0.01" id="incentives" value="0"></span></div>
           <div class="row-item" style="border-bottom: 2px solid #b6c8dd; margin-top: 4px; padding-top: 8px;">
             <span class="row-label"><i class="fas fa-calculator"></i> FIRST CALCULATION TOTAL</span>
             <span class="row-value" id="firstCalcTotal">RM 0.00</span>
@@ -508,30 +169,14 @@
         </div>
       </div>
 
-      <!-- Right: Deductions -->
       <div class="col">
         <div class="col-header"><i class="fas fa-minus-circle" style="color:#b22234;"></i> DEDUCTIONS / POTONGAN</div>
         <div class="col-body">
-          <div class="row-item">
-            <span class="row-label"><i class="fas fa-calendar-check"></i> ANNUAL LEAVE</span>
-            <span class="row-value"><input type="number" step="0.01" id="annualLeave" value="0.00"></span>
-          </div>
-          <div class="row-item">
-            <span class="row-label"><i class="fas fa-calendar-times"></i> UNPAID LEAVE</span>
-            <span class="row-value"><input type="number" step="0.01" id="unpaidLeave" value="0.00"></span>
-          </div>
-          <div class="row-item">
-            <span class="row-label"><i class="fas fa-notes-medical"></i> SICK LEAVE</span>
-            <span class="row-value"><input type="number" step="0.01" id="sickLeave" value="0.00"></span>
-          </div>
-          <div class="row-item">
-            <span class="row-label"><i class="fas fa-hourglass-half"></i> HALF DAYS LEAVE (HOURS)</span>
-            <span class="row-value"><input type="number" step="0.01" id="halfDaysLeave" value="0.00"></span>
-          </div>
-          <div class="row-item">
-            <span class="row-label"><i class="fas fa-hand-holding-usd"></i> PINJAMAN</span>
-            <span class="row-value"><input type="number" step="0.01" id="pinjaman" value="0.00"></span>
-          </div>
+          <div class="row-item"><span class="row-label"><i class="fas fa-calendar-check"></i> ANNUAL LEAVE</span><span class="row-value"><input type="number" step="0.01" id="annualLeave" value="0"></span></div>
+          <div class="row-item"><span class="row-label"><i class="fas fa-calendar-times"></i> UNPAID LEAVE</span><span class="row-value"><input type="number" step="0.01" id="unpaidLeave" value="0"></span></div>
+          <div class="row-item"><span class="row-label"><i class="fas fa-notes-medical"></i> SICK LEAVE</span><span class="row-value"><input type="number" step="0.01" id="sickLeave" value="0"></span></div>
+          <div class="row-item"><span class="row-label"><i class="fas fa-hourglass-half"></i> HALF DAYS LEAVE (HOURS)</span><span class="row-value"><input type="number" step="0.01" id="halfDaysLeave" value="0"></span></div>
+          <div class="row-item"><span class="row-label"><i class="fas fa-hand-holding-usd"></i> PINJAMAN</span><span class="row-value"><input type="number" step="0.01" id="pinjaman" value="0"></span></div>
           <div class="row-item" style="border-bottom: 2px solid #b6c8dd; margin-top: 4px; padding-top: 8px;">
             <span class="row-label"><i class="fas fa-calculator"></i> TOTAL POTONGAN</span>
             <span class="row-value" id="totalPotongan">RM 0.00</span>
@@ -540,82 +185,36 @@
       </div>
     </div>
 
-    <!-- Statutory Contributions -->
     <div class="extra-grid">
       <div class="extra-card">
         <h4><i class="fas fa-shield-alt"></i> GAJI UNTUK CARUMAN</h4>
-        <div class="row-item">
-          <span class="row-label">EPF (KWSP)</span>
-          <span class="row-value"><input type="number" step="0.01" id="salaryEpf" value="0.00"></span>
-        </div>
-        <div class="row-item">
-          <span class="row-label">SOCSO (PERKESO)</span>
-          <span class="row-value"><input type="number" step="0.01" id="salarySocso" value="0.00"></span>
-        </div>
-        <div class="row-item">
-          <span class="row-label">EIS</span>
-          <span class="row-value"><input type="number" step="0.01" id="salaryEis" value="0.00"></span>
-        </div>
-        <div class="row-item">
-          <span class="row-label">24JAM</span>
-          <span class="row-value"><input type="number" step="0.01" id="salary24jam" value="0.00"></span>
-        </div>
+        <div class="row-item"><span class="row-label">EPF (KWSP)</span><span class="row-value"><input type="number" step="0.01" id="salaryEpf" value="0"></span></div>
+        <div class="row-item"><span class="row-label">SOCSO (PERKESO)</span><span class="row-value"><input type="number" step="0.01" id="salarySocso" value="0"></span></div>
+        <div class="row-item"><span class="row-label">EIS</span><span class="row-value"><input type="number" step="0.01" id="salaryEis" value="0"></span></div>
+        <div class="row-item"><span class="row-label">24JAM</span><span class="row-value"><input type="number" step="0.01" id="salary24jam" value="0"></span></div>
       </div>
 
       <div class="extra-card">
         <h4><i class="fas fa-building"></i> CARUMAN STATUTORI</h4>
-        <div class="row-item">
-          <span class="row-label">EPF (Pekerja)</span>
-          <span class="row-value"><input type="number" step="0.01" id="epfEmployee" value="0.00"></span>
-        </div>
-        <div class="row-item">
-          <span class="row-label">EPF (Majikan)</span>
-          <span class="row-value"><input type="number" step="0.01" id="epfEmployer" value="0.00"></span>
-        </div>
-        <div class="row-item">
-          <span class="row-label">SOCSO (Pekerja)</span>
-          <span class="row-value"><input type="number" step="0.01" id="socsoEmployee" value="0.00"></span>
-        </div>
-        <div class="row-item">
-          <span class="row-label">SOCSO (Majikan)</span>
-          <span class="row-value"><input type="number" step="0.01" id="socsoEmployer" value="0.00"></span>
-        </div>
-        <div class="row-item">
-          <span class="row-label">EIS (Pekerja)</span>
-          <span class="row-value"><input type="number" step="0.01" id="eisEmployee" value="0.00"></span>
-        </div>
-        <div class="row-item">
-          <span class="row-label">EIS (Majikan)</span>
-          <span class="row-value"><input type="number" step="0.01" id="eisEmployer" value="0.00"></span>
-        </div>
+        <div class="row-item"><span class="row-label">EPF (Pekerja)</span><span class="row-value"><input type="number" step="0.01" id="epfEmployee" value="0"></span></div>
+        <div class="row-item"><span class="row-label">EPF (Majikan)</span><span class="row-value"><input type="number" step="0.01" id="epfEmployer" value="0"></span></div>
+        <div class="row-item"><span class="row-label">SOCSO (Pekerja)</span><span class="row-value"><input type="number" step="0.01" id="socsoEmployee" value="0"></span></div>
+        <div class="row-item"><span class="row-label">SOCSO (Majikan)</span><span class="row-value"><input type="number" step="0.01" id="socsoEmployer" value="0"></span></div>
+        <div class="row-item"><span class="row-label">EIS (Pekerja)</span><span class="row-value"><input type="number" step="0.01" id="eisEmployee" value="0"></span></div>
+        <div class="row-item"><span class="row-label">EIS (Majikan)</span><span class="row-value"><input type="number" step="0.01" id="eisEmployer" value="0"></span></div>
+        <div class="row-item"><span class="row-label">24JAM (Pekerja)</span><span class="row-value"><input type="number" step="0.01" id="lindung24jam" value="0"></span></div>
       </div>
 
       <div class="extra-card">
         <h4><i class="fas fa-university"></i> BANK & LOGIN (U-Y)</h4>
-        <div class="row-item">
-          <span class="row-label">Bank Nama (U)</span>
-          <span class="row-value"><input type="text" id="bankNama" value="—" style="text-align:left;"></span>
-        </div>
-        <div class="row-item">
-          <span class="row-label">Bank Acc (V)</span>
-          <span class="row-value"><input type="text" id="bankAcc" value="—" style="text-align:left;"></span>
-        </div>
-        <div class="row-item">
-          <span class="row-label">EPF (W)</span>
-          <span class="row-value"><input type="text" id="epfNo" value="—" style="text-align:left;"></span>
-        </div>
-        <div class="row-item">
-          <span class="row-label">SOCSO (X)</span>
-          <span class="row-value"><input type="text" id="socsoNo" value="—" style="text-align:left;"></span>
-        </div>
-        <div class="row-item">
-          <span class="row-label">EIS (Y)</span>
-          <span class="row-value"><input type="text" id="eisNo" value="—" style="text-align:left;"></span>
-        </div>
+        <div class="row-item"><span class="row-label">Bank Nama (U)</span><span class="row-value"><input type="text" class="text" id="bankNama" value="—"></span></div>
+        <div class="row-item"><span class="row-label">Bank Acc (V)</span><span class="row-value"><input type="text" class="text" id="bankAcc" value="—"></span></div>
+        <div class="row-item"><span class="row-label">EPF (W)</span><span class="row-value"><input type="text" class="text" id="epfNo" value="—"></span></div>
+        <div class="row-item"><span class="row-label">SOCSO (X)</span><span class="row-value"><input type="text" class="text" id="socsoNo" value="—"></span></div>
+        <div class="row-item"><span class="row-label">EIS (Y)</span><span class="row-value"><input type="text" class="text" id="eisNo" value="—"></span></div>
       </div>
     </div>
 
-    <!-- Totals: Gaji Kasar, Total Potongan, Gaji Bersih -->
     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 10px;">
       <div class="total-row" style="background: #1e3a5f;">
         <span class="label"><i class="fas fa-money-bill-wave"></i> Gaji Kasar</span>
@@ -631,626 +230,268 @@
       </div>
     </div>
 
-    <!-- Action Buttons -->
     <div class="action-bar">
       <div class="btn-group">
-        <button class="btn btn-outline" onclick="window.history.back()"><i class="fas fa-arrow-left"></i> Kembali</button>
+        <button class="btn btn-outline" onclick="window.close()"><i class="fas fa-arrow-left"></i> Kembali</button>
         <button class="btn btn-primary" id="saveBtn"><i class="fas fa-save"></i> Simpan & Sync</button>
-        <button class="btn btn-success" id="syncFromUrlBtn"><i class="fas fa-cloud-download-alt"></i> Muat dari URL</button>
+        <button class="btn btn-success" id="reloadBtn"><i class="fas fa-cloud-download-alt"></i> Muat semula</button>
       </div>
       <div style="font-size: 0.85rem; color: #5a6f88;">
-        <i class="fas fa-info-circle"></i> Perubahan akan disimpan ke sistem penggajian.
+        <i class="fas fa-info-circle"></i> Perubahan akan disimpan dan disegerakkan ke salary.html
         <span id="syncStatus" class="sync-status" style="margin-left: 12px;">Sedia</span>
       </div>
     </div>
 
-    <!-- Signature -->
     <div class="signature-area">
-      <div class="signature-line">
-        <span>APPROVED BY :</span>
-        <div class="line"></div>
-      </div>
-      <div class="signature-line">
-        <span>RECEIVED BY :</span>
-        <div class="line"></div>
-      </div>
+      <div class="signature-line"><span>APPROVED BY :</span><div class="line"></div></div>
+      <div class="signature-line"><span>RECEIVED BY :</span><div class="line"></div></div>
     </div>
   </div>
 
   <script>
-    (function() {
-      // ---------- KONFIGURASI ----------
-      const SALARY_URL = 'https://yzcorpsdk2-ctrl.github.io/salarysystem/salary.html';
+    (function () {
+      /* ===== 常量 ===== */
       const STORAGE_KEY = 'payrollEmployees';
-      const SELECTED_ID_KEY = 'selectedEmployeeId';
+      const SELECTED_CODE_KEY = 'payrollSelectedCode';
+      const SELECTED_EMP_KEY = 'payrollSelectedEmployee';
 
-      // ---------- STATE ----------
-      let allEmployees = [];          // semua pekerja dari URL / localStorage
-      let currentEmployee = null;     // pekerja yang sedang dipaparkan
-      let currentKumpulan = '';       // kumpulan terpilih
+      /* ===== 字段映射：detail element id -> salary.html 字段名 ===== */
+      const FIELD_MAP = {
+        otBiasa: 'NormalOT',
+        otRehat: 'RestOT',
+        otAwam: 'PublicOT',
+        otLain: 'OtherOT',
+        allowance: 'Allowance2',
+        commision: 'Commission',
+        incentives: 'Incentives',
+        annualLeave: 'AnnualLeave',
+        unpaidLeave: 'UnpaidLeave',
+        sickLeave: 'SickLeave',
+        halfDaysLeave: 'HalfDays',
+        pinjaman: 'Pinjaman',
+        salaryEpf: 'EPFSalary',
+        salarySocso: 'SOCSOSalary',
+        salaryEis: 'EISSalary',
+        salary24jam: 'LindungSalary',
+        epfEmployee: 'EPF_Employee',
+        epfEmployer: 'EPF_Employer',
+        socsoEmployee: 'SOCSO_Employee',
+        socsoEmployer: 'SOCSO_Employer',
+        eisEmployee: 'EIS_Employee',
+        eisEmployer: 'EIS_Employer',
+        lindung24jam: 'Lindung24Jam',
+        bankNama: 'SLRBankNama',
+        bankAcc: 'SLRBankAccountNo',
+        epfNo: 'SLREPF',
+        socsoNo: 'SLRPERKESO',
+        eisNo: 'SLREIS'
+      };
+      const TEXT_FIELDS = new Set(['bankNama','bankAcc','epfNo','socsoNo','eisNo']);
 
-      // ---------- ELEMEN DOM ----------
-      const el = (id) => document.getElementById(id);
-      const selectKumpulan = el('selectKumpulan');
-      const selectKod = el('selectKod');
-      const selectNama = el('selectNama');
-      const infoSituation = el('infoSituation');
-      const infoGajiAsas = el('infoGajiAsas');
-      const syncStatus = el('syncStatus');
-
-      // Input fields
-      const inputIds = [
-        'otBiasa','otRehat','otAwam','otLain','allowance','commision','incentives',
-        'annualLeave','unpaidLeave','sickLeave','halfDaysLeave','pinjaman',
-        'salaryEpf','salarySocso','salaryEis','salary24jam',
-        'epfEmployee','epfEmployer','socsoEmployee','socsoEmployer','eisEmployee','eisEmployer',
-        'bankNama','bankAcc','epfNo','socsoNo','eisNo'
-      ];
+      /* ===== DOM helpers ===== */
+      const el = id => document.getElementById(id);
       const inputs = {};
-      inputIds.forEach(id => { inputs[id] = el(id); });
+      Object.keys(FIELD_MAP).forEach(id => { inputs[id] = el(id); });
 
-      // Display totals
-      const firstCalcTotalEl = el('firstCalcTotal');
-      const totalPotonganEl = el('totalPotongan');
-      const gajiKasarDisplay = el('gajiKasarDisplay');
-      const totalPotonganDisplay = el('totalPotonganDisplay');
-      const gajiBersihDisplay = el('gajiBersihDisplay');
+      let currentRaw = null;         // 当前员工的 salary.html 格式对象
+      let allEmployees = [];         // 全部员工数组
 
-      // ---------- FUNGSI BANTU ----------
-      function formatRM(val) {
-        return 'RM ' + (parseFloat(val) || 0).toFixed(2);
+      function num(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
+      function fmtRM(v) { return 'RM ' + num(v).toFixed(2); }
+      function setSyncStatus(msg, type) {
+        const s = el('syncStatus');
+        s.textContent = msg;
+        s.className = 'sync-status ' + (type || '');
       }
 
-      function setSyncStatus(msg, type = '') {
-        syncStatus.textContent = msg;
-        syncStatus.className = 'sync-status ' + type;
+      /* ===== 计算 ===== */
+      function updateCalc() {
+        const basic = num(el('inputGajiAsas').value);
+        const income = basic
+          + num(inputs.otBiasa.value) + num(inputs.otRehat.value)
+          + num(inputs.otAwam.value) + num(inputs.otLain.value)
+          + num(inputs.allowance.value) + num(inputs.commision.value)
+          + num(inputs.incentives.value);
+        el('firstCalcTotal').innerText = fmtRM(income);
+        el('infoGajiAsas').innerText = fmtRM(basic);
+
+        const ded = num(inputs.annualLeave.value) + num(inputs.unpaidLeave.value)
+          + num(inputs.sickLeave.value) + num(inputs.halfDaysLeave.value)
+          + num(inputs.pinjaman.value);
+        el('totalPotongan').innerText = fmtRM(ded);
+
+        el('gajiKasarDisplay').innerText = fmtRM(income);
+        el('totalPotonganDisplay').innerText = fmtRM(ded);
+        el('gajiBersihDisplay').innerText = fmtRM(income - ded);
       }
 
-      // Kira semula semua nilai
-      function updateCalculations() {
-        if (!currentEmployee) return;
-        const gajiAsas = parseFloat(currentEmployee.gajiAsas) || 0;
+      /* ===== 填充表单 ===== */
+      function fillForm(raw) {
+        if (!raw) return;
+        currentRaw = raw;
 
-        const otBiasa = parseFloat(inputs.otBiasa.value) || 0;
-        const otRehat = parseFloat(inputs.otRehat.value) || 0;
-        const otAwam = parseFloat(inputs.otAwam.value) || 0;
-        const otLain = parseFloat(inputs.otLain.value) || 0;
-        const allowance = parseFloat(inputs.allowance.value) || 0;
-        const commision = parseFloat(inputs.commision.value) || 0;
-        const incentives = parseFloat(inputs.incentives.value) || 0;
+        el('infoSituation').innerText = raw.Situation || 'Aktif';
+        el('infoKod').value = raw.Code || '';
+        el('infoNama').value = raw.Name || '';
+        el('infoKumpulan').value = raw.GroupName || '';
+        el('inputGajiAsas').value = raw.Basic != null ? raw.Basic : 0;
 
-        const firstCalcTotal = gajiAsas + otBiasa + otRehat + otAwam + otLain + allowance + commision + incentives;
-        firstCalcTotalEl.innerText = formatRM(firstCalcTotal);
+        // 自动生成期间
+        const now = new Date();
+        const m = now.toLocaleDateString('ms-MY', { month: 'long', year: 'numeric' });
+        el('periodBadge').innerText = m.toUpperCase();
 
-        const annualLeave = parseFloat(inputs.annualLeave.value) || 0;
-        const unpaidLeave = parseFloat(inputs.unpaidLeave.value) || 0;
-        const sickLeave = parseFloat(inputs.sickLeave.value) || 0;
-        const halfDaysLeave = parseFloat(inputs.halfDaysLeave.value) || 0;
-        const pinjaman = parseFloat(inputs.pinjaman.value) || 0;
-
-        const totalPotongan = annualLeave + unpaidLeave + sickLeave + halfDaysLeave + pinjaman;
-        totalPotonganEl.innerText = formatRM(totalPotongan);
-
-        const gajiKasar = firstCalcTotal;
-        const gajiBersih = gajiKasar - totalPotongan;
-
-        gajiKasarDisplay.innerText = formatRM(gajiKasar);
-        totalPotonganDisplay.innerText = formatRM(totalPotongan);
-        gajiBersihDisplay.innerText = formatRM(gajiBersih);
-      }
-
-      // Isi semua field dari objek pekerja
-      function populateForm(emp) {
-        if (!emp) return;
-
-        infoSituation.innerText = emp.situation || 'Aktif';
-        infoGajiAsas.innerText = formatRM(emp.gajiAsas);
-
-        // Set nilai input
-        inputs.otBiasa.value = emp.otBiasa ?? 0;
-        inputs.otRehat.value = emp.otRehat ?? 0;
-        inputs.otAwam.value = emp.otAwam ?? 0;
-        inputs.otLain.value = emp.otLain ?? 0;
-        inputs.allowance.value = emp.allowance ?? 0;
-        inputs.commision.value = emp.commision ?? 0;
-        inputs.incentives.value = emp.incentives ?? 0;
-
-        inputs.annualLeave.value = emp.annualLeave ?? 0;
-        inputs.unpaidLeave.value = emp.unpaidLeave ?? 0;
-        inputs.sickLeave.value = emp.sickLeave ?? 0;
-        inputs.halfDaysLeave.value = emp.halfDaysLeave ?? 0;
-        inputs.pinjaman.value = emp.pinjaman ?? 0;
-
-        inputs.salaryEpf.value = emp.salaryEpf ?? 0;
-        inputs.salarySocso.value = emp.salarySocso ?? 0;
-        inputs.salaryEis.value = emp.salaryEis ?? 0;
-        inputs.salary24jam.value = emp.salary24jam ?? 0;
-
-        inputs.epfEmployee.value = emp.epfEmployee ?? 0;
-        inputs.epfEmployer.value = emp.epfEmployer ?? 0;
-        inputs.socsoEmployee.value = emp.socsoEmployee ?? 0;
-        inputs.socsoEmployer.value = emp.socsoEmployer ?? 0;
-        inputs.eisEmployee.value = emp.eisEmployee ?? 0;
-        inputs.eisEmployer.value = emp.eisEmployer ?? 0;
-
-        inputs.bankNama.value = emp.bankNama || '—';
-        inputs.bankAcc.value = emp.bankAcc || '—';
-        inputs.epfNo.value = emp.epfNo || '—';
-        inputs.socsoNo.value = emp.socsoNo || '—';
-        inputs.eisNo.value = emp.eisNo || '—';
-
-        // Tetapkan semula pilihan dropdown
-        selectKod.value = emp.kod || '';
-        selectNama.value = emp.nama || '';
-        selectKumpulan.value = emp.kumpulan || '';
-
-        currentEmployee = emp;
-        updateCalculations();
-      }
-
-      // Dapatkan pekerja dari kod/nama
-      function findEmployeeByKodNama(kod, nama) {
-        return allEmployees.find(e => 
-          (kod && e.kod === kod) || (nama && e.nama === nama)
-        );
-      }
-
-      // Kemas kini dropdown kod & nama berdasarkan kumpulan
-      function refreshKodNamaDropdowns(kumpulanFilter = null) {
-        const filtered = kumpulanFilter
-          ? allEmployees.filter(e => e.kumpulan === kumpulanFilter)
-          : allEmployees;
-
-        // Simpan pilihan semasa
-        const savedKod = selectKod.value;
-        const savedNama = selectNama.value;
-
-        // Kod dropdown
-        selectKod.innerHTML = '<option value="">-- Pilih Kod --</option>';
-        const kodSet = new Set();
-        filtered.forEach(e => {
-          if (e.kod && !kodSet.has(e.kod)) {
-            kodSet.add(e.kod);
-            const opt = document.createElement('option');
-            opt.value = e.kod;
-            opt.textContent = e.kod;
-            selectKod.appendChild(opt);
+        // 数值 / 文本字段
+        Object.entries(FIELD_MAP).forEach(([id, key]) => {
+          const inp = inputs[id];
+          if (!inp) return;
+          const v = raw[key];
+          if (TEXT_FIELDS.has(id)) {
+            inp.value = (v === undefined || v === null || v === '') ? '—' : String(v);
+          } else {
+            inp.value = (v === undefined || v === null || v === '') ? 0 : num(v);
           }
         });
 
-        // Nama dropdown
-        selectNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
-        filtered.forEach(e => {
-          if (e.nama) {
-            const opt = document.createElement('option');
-            opt.value = e.nama;
-            opt.textContent = e.nama;
-            selectNama.appendChild(opt);
-          }
-        });
-
-        // Pulihkan pilihan jika masih wujud
-        if (savedKod && [...selectKod.options].some(o => o.value === savedKod)) {
-          selectKod.value = savedKod;
-        }
-        if (savedNama && [...selectNama.options].some(o => o.value === savedNama)) {
-          selectNama.value = savedNama;
-        }
+        updateCalc();
+        setSyncStatus('Data dimuat', 'success');
       }
 
-      // Isi dropdown kumpulan
-      function refreshKumpulanDropdown() {
-        const kumpulanSet = new Set();
-        allEmployees.forEach(e => {
-          if (e.kumpulan) kumpulanSet.add(e.kumpulan);
-        });
+      /* ===== 从 localStorage 加载 ===== */
+      function loadFromStorage() {
+        let code = '';
+        try { code = localStorage.getItem(SELECTED_CODE_KEY) || ''; } catch (e) {}
 
-        const saved = selectKumpulan.value;
-        selectKumpulan.innerHTML = '<option value="">-- Pilih Kumpulan --</option>';
-        [...kumpulanSet].sort().forEach(k => {
-          const opt = document.createElement('option');
-          opt.value = k;
-          opt.textContent = k;
-          selectKumpulan.appendChild(opt);
-        });
-
-        if (saved && kumpulanSet.has(saved)) {
-          selectKumpulan.value = saved;
-        }
-      }
-
-      // ---------- MUAT DATA DARI URL (salary.html) ----------
-      async function fetchEmployeesFromUrl() {
-        setSyncStatus('Memuat data dari URL...', 'loading');
+        // 优先：直接读取当前选中员工
         try {
-          const response = await fetch(SALARY_URL + '?t=' + Date.now());
-          if (!response.ok) throw new Error('HTTP ' + response.status);
-          const html = await response.text();
-
-          // Parse HTML untuk mencari data pekerja
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, 'text/html');
-
-          // Cari sebarang script yang mengandungi data pekerja
-          // Biasanya salary.html mungkin menyimpan data dalam localStorage atau variable JS
-          // Kita cuba cari dari localStorage jika ada, tapi kita fetch dari URL
-          // Strategi: cari elemen <script> yang mengandungi array pekerja
-
-          let employees = [];
-
-          // Cuba cari dari window.localStorage jika ada (tidak boleh akses localStorage cross-origin)
-          // Jadi kita cuba parse dari HTML — mungkin ada jadual dengan data
-
-          // Pendekatan 1: Cari jadual dengan baris pekerja
-          const tables = doc.querySelectorAll('table');
-          tables.forEach(table => {
-            const rows = table.querySelectorAll('tbody tr');
-            rows.forEach(row => {
-              const cells = row.querySelectorAll('td');
-              if (cells.length > 10) {
-                // Cuba ekstrak mengikut susunan lajur yang mungkin
-                // Ini bergantung pada struktur salary.html — kita cuba teka
-                // Biasanya: Situation, Kod, Nama, Kumpulan, Gaji Asas, ...
-                const situation = cells[0]?.innerText?.trim() || 'Aktif';
-                const kod = cells[1]?.innerText?.trim() || '';
-                const nama = cells[2]?.innerText?.trim() || '';
-                const kumpulan = cells[3]?.innerText?.trim() || '';
-                const gajiAsas = parseFloat(cells[4]?.innerText?.replace(/[^0-9.-]/g, '')) || 0;
-
-                if (kod && nama) {
-                  employees.push({
-                    situation, kod, nama, kumpulan, gajiAsas,
-                    otBiasa: 0, otRehat: 0, otAwam: 0, otLain: 0,
-                    allowance: 0, commision: 0, incentives: 0,
-                    annualLeave: 0, unpaidLeave: 0, sickLeave: 0,
-                    halfDaysLeave: 0, pinjaman: 0,
-                    salaryEpf: gajiAsas, salarySocso: gajiAsas,
-                    salaryEis: gajiAsas, salary24jam: gajiAsas,
-                    epfEmployee: 0, epfEmployer: 0,
-                    socsoEmployee: 0, socsoEmployer: 0,
-                    eisEmployee: 0, eisEmployer: 0,
-                    bankNama: '—', bankAcc: '—',
-                    epfNo: '—', socsoNo: '—', eisNo: '—'
-                  });
-                }
-              }
-            });
-          });
-
-          // Pendekatan 2: Cari dalam script — mungkin ada variable `employees` atau `payrollData`
-          const scripts = doc.querySelectorAll('script');
-          for (const script of scripts) {
-            const text = script.textContent;
-            // Cuba cari pola JSON array
-            const match = text.match(/\[\s*\{[^]*?\}\s*\]/);
-            if (match) {
+          const selJson = localStorage.getItem(SELECTED_EMP_KEY);
+          if (selJson) {
+            const sel = JSON.parse(selJson);
+            if (sel && sel.Code) {
+              // 如果主数组有，用主数组里最新的覆盖
               try {
-                const parsed = JSON.parse(match[0]);
-                if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].kod) {
-                  employees = parsed;
-                  break;
+                const allJson = localStorage.getItem(STORAGE_KEY);
+                if (allJson) {
+                  allEmployees = JSON.parse(allJson) || [];
+                  const found = allEmployees.find(e => e.Code === sel.Code);
+                  if (found) { fillForm(found); return true; }
                 }
-              } catch (e) { /* bukan JSON yang sah */ }
-            }
-          }
-
-          // Jika masih tiada, gunakan data contoh
-          if (employees.length === 0) {
-            // Fallback: cuba muat dari localStorage (jika ini dibuka dalam origin yang sama)
-            try {
-              const stored = localStorage.getItem(STORAGE_KEY);
-              if (stored) {
-                employees = JSON.parse(stored);
-              }
-            } catch (e) {}
-          }
-
-          if (employees.length === 0) {
-            // Data default sebagai contoh
-            employees = [
-              {
-                situation: 'Aktif', kod: 'EMP001', nama: 'JEFFREY TOH', kumpulan: 'PRO',
-                gajiAsas: 3000.00, otBiasa: 23.07, otRehat: 0, otAwam: 0, otLain: 0,
-                allowance: 0, commision: 0, incentives: 0,
-                annualLeave: 0, unpaidLeave: 0, sickLeave: 0, halfDaysLeave: 0, pinjaman: 0,
-                salaryEpf: 3000, salarySocso: 3000, salaryEis: 3000, salary24jam: 3000,
-                epfEmployee: 319, epfEmployer: 377, socsoEmployee: 19.25, socsoEmployer: 67.35,
-                eisEmployee: 7.70, eisEmployer: 7.70,
-                bankNama: 'Maybank', bankAcc: '1234567890',
-                epfNo: '123456789', socsoNo: '123456789', eisNo: '123456789'
-              },
-              {
-                situation: 'Aktif', kod: 'EMP002', nama: 'SITI RAHAYU', kumpulan: 'ADMIN',
-                gajiAsas: 2500.00, otBiasa: 0, otRehat: 0, otAwam: 0, otLain: 0,
-                allowance: 150, commision: 0, incentives: 0,
-                annualLeave: 0, unpaidLeave: 0, sickLeave: 0, halfDaysLeave: 0, pinjaman: 0,
-                salaryEpf: 2650, salarySocso: 2650, salaryEis: 2650, salary24jam: 2650,
-                epfEmployee: 0, epfEmployer: 0, socsoEmployee: 0, socsoEmployer: 0,
-                eisEmployee: 0, eisEmployer: 0,
-                bankNama: 'CIMB', bankAcc: '9876543210',
-                epfNo: '987654321', socsoNo: '987654321', eisNo: '987654321'
-              },
-              {
-                situation: 'Aktif', kod: 'EMP003', nama: 'AHMAD ZAKI', kumpulan: 'PRO',
-                gajiAsas: 3500.00, otBiasa: 50, otRehat: 30, otAwam: 0, otLain: 0,
-                allowance: 200, commision: 100, incentives: 0,
-                annualLeave: 0, unpaidLeave: 0, sickLeave: 0, halfDaysLeave: 0, pinjaman: 500,
-                salaryEpf: 3500, salarySocso: 3500, salaryEis: 3500, salary24jam: 3500,
-                epfEmployee: 385, epfEmployer: 455, socsoEmployee: 24.50, socsoEmployer: 85.00,
-                eisEmployee: 9.80, eisEmployer: 9.80,
-                bankNama: 'RHB', bankAcc: '5556667777',
-                epfNo: '555666777', socsoNo: '555666777', eisNo: '555666777'
-              }
-            ];
-          }
-
-          // Normalisasi data
-          employees = employees.map(e => {
-            const base = {
-              situation: e.situation || 'Aktif',
-              kod: e.kod || '',
-              nama: e.nama || '',
-              kumpulan: e.kumpulan || '',
-              gajiAsas: parseFloat(e.gajiAsas) || 0,
-              otBiasa: parseFloat(e.otBiasa) || 0,
-              otRehat: parseFloat(e.otRehat) || 0,
-              otAwam: parseFloat(e.otAwam) || 0,
-              otLain: parseFloat(e.otLain) || 0,
-              allowance: parseFloat(e.allowance) || 0,
-              commision: parseFloat(e.commision) || 0,
-              incentives: parseFloat(e.incentives) || 0,
-              annualLeave: parseFloat(e.annualLeave) || 0,
-              unpaidLeave: parseFloat(e.unpaidLeave) || 0,
-              sickLeave: parseFloat(e.sickLeave) || 0,
-              halfDaysLeave: parseFloat(e.halfDaysLeave) || 0,
-              pinjaman: parseFloat(e.pinjaman) || 0,
-              salaryEpf: parseFloat(e.salaryEpf) || 0,
-              salarySocso: parseFloat(e.salarySocso) || 0,
-              salaryEis: parseFloat(e.salaryEis) || 0,
-              salary24jam: parseFloat(e.salary24jam) || 0,
-              epfEmployee: parseFloat(e.epfEmployee) || 0,
-              epfEmployer: parseFloat(e.epfEmployer) || 0,
-              socsoEmployee: parseFloat(e.socsoEmployee) || 0,
-              socsoEmployer: parseFloat(e.socsoEmployer) || 0,
-              eisEmployee: parseFloat(e.eisEmployee) || 0,
-              eisEmployer: parseFloat(e.eisEmployer) || 0,
-              bankNama: e.bankNama || '—',
-              bankAcc: e.bankAcc || '—',
-              epfNo: e.epfNo || '—',
-              socsoNo: e.socsoNo || '—',
-              eisNo: e.eisNo || '—'
-            };
-            return base;
-          });
-
-          allEmployees = employees;
-
-          // Simpan ke localStorage supaya boleh digunakan kemudian
-          try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees));
-          } catch (e) {}
-
-          setSyncStatus('Berjaya muat ' + allEmployees.length + ' pekerja', 'success');
-
-          // Kemas kini UI
-          refreshKumpulanDropdown();
-          refreshKodNamaDropdowns();
-
-          // Pilih pekerja pertama jika ada
-          if (allEmployees.length > 0) {
-            const first = allEmployees[0];
-            currentKumpulan = first.kumpulan;
-            selectKumpulan.value = first.kumpulan;
-            refreshKodNamaDropdowns(first.kumpulan);
-            selectKod.value = first.kod;
-            selectNama.value = first.nama;
-            populateForm(first);
-          }
-          return true;
-        } catch (error) {
-          console.error('Fetch error:', error);
-          setSyncStatus('Gagal muat dari URL, guna data setempat', 'error');
-
-          // Cuba dari localStorage
-          try {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            if (stored) {
-              allEmployees = JSON.parse(stored);
-              refreshKumpulanDropdown();
-              refreshKodNamaDropdowns();
-              if (allEmployees.length > 0) {
-                const first = allEmployees[0];
-                selectKumpulan.value = first.kumpulan || '';
-                refreshKodNamaDropdowns(first.kumpulan);
-                selectKod.value = first.kod || '';
-                selectNama.value = first.nama || '';
-                populateForm(first);
-              }
+              } catch (e) {}
+              fillForm(sel);
               return true;
-            }
-          } catch (e) {}
-
-          return false;
-        }
-      }
-
-      // ---------- SIMPAN & SYNC KE URL (melalui localStorage + postMessage) ----------
-      function saveAndSync() {
-        if (!currentEmployee) {
-          alert('Tiada pekerja dipilih.');
-          return;
-        }
-
-        // Kumpul data terkini dari form
-        const updated = {
-          ...currentEmployee,
-          situation: infoSituation.innerText,
-          kod: currentEmployee.kod,
-          nama: currentEmployee.nama,
-          kumpulan: currentEmployee.kumpulan,
-          gajiAsas: currentEmployee.gajiAsas,
-          otBiasa: parseFloat(inputs.otBiasa.value) || 0,
-          otRehat: parseFloat(inputs.otRehat.value) || 0,
-          otAwam: parseFloat(inputs.otAwam.value) || 0,
-          otLain: parseFloat(inputs.otLain.value) || 0,
-          allowance: parseFloat(inputs.allowance.value) || 0,
-          commision: parseFloat(inputs.commision.value) || 0,
-          incentives: parseFloat(inputs.incentives.value) || 0,
-          annualLeave: parseFloat(inputs.annualLeave.value) || 0,
-          unpaidLeave: parseFloat(inputs.unpaidLeave.value) || 0,
-          sickLeave: parseFloat(inputs.sickLeave.value) || 0,
-          halfDaysLeave: parseFloat(inputs.halfDaysLeave.value) || 0,
-          pinjaman: parseFloat(inputs.pinjaman.value) || 0,
-          salaryEpf: parseFloat(inputs.salaryEpf.value) || 0,
-          salarySocso: parseFloat(inputs.salarySocso.value) || 0,
-          salaryEis: parseFloat(inputs.salaryEis.value) || 0,
-          salary24jam: parseFloat(inputs.salary24jam.value) || 0,
-          epfEmployee: parseFloat(inputs.epfEmployee.value) || 0,
-          epfEmployer: parseFloat(inputs.epfEmployer.value) || 0,
-          socsoEmployee: parseFloat(inputs.socsoEmployee.value) || 0,
-          socsoEmployer: parseFloat(inputs.socsoEmployer.value) || 0,
-          eisEmployee: parseFloat(inputs.eisEmployee.value) || 0,
-          eisEmployer: parseFloat(inputs.eisEmployer.value) || 0,
-          bankNama: inputs.bankNama.value || '—',
-          bankAcc: inputs.bankAcc.value || '—',
-          epfNo: inputs.epfNo.value || '—',
-          socsoNo: inputs.socsoNo.value || '—',
-          eisNo: inputs.eisNo.value || '—'
-        };
-
-        // Kemas kini dalam array
-        const index = allEmployees.findIndex(e => e.kod === currentEmployee.kod);
-        if (index !== -1) {
-          allEmployees[index] = updated;
-        } else {
-          allEmployees.push(updated);
-        }
-
-        // Simpan ke localStorage
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees));
-          localStorage.setItem(SELECTED_ID_KEY, updated.kod);
-        } catch (e) {
-          console.warn('LocalStorage penuh', e);
-        }
-
-        // Cuba sync ke window yang membuka (jika ada)
-        if (window.opener && !window.opener.closed) {
-          try {
-            window.opener.postMessage({
-              type: 'SYNC_EMPLOYEE',
-              employee: updated
-            }, '*');
-          } catch (e) {}
-        }
-
-        // Kemas kini UI
-        currentEmployee = updated;
-        refreshKodNamaDropdowns(currentEmployee.kumpulan);
-        setSyncStatus('Data disimpan pada ' + new Date().toLocaleTimeString(), 'success');
-
-        alert('✅ Data berjaya disimpan! ' + updated.nama + ' (' + updated.kod + ') telah dikemas kini.');
-      }
-
-      // ---------- EVENT LISTENERS ----------
-      // Kumpulan berubah
-      selectKumpulan.addEventListener('change', function() {
-        const kumpulan = this.value;
-        currentKumpulan = kumpulan;
-        refreshKodNamaDropdowns(kumpulan);
-        // Kosongkan pilihan pekerja
-        selectKod.value = '';
-        selectNama.value = '';
-        // Jika ada pekerja dalam kumpulan ini, pilih yang pertama
-        const filtered = kumpulan
-          ? allEmployees.filter(e => e.kumpulan === kumpulan)
-          : allEmployees;
-        if (filtered.length > 0) {
-          const first = filtered[0];
-          selectKod.value = first.kod;
-          selectNama.value = first.nama;
-          populateForm(first);
-        } else {
-          currentEmployee = null;
-          // Kosongkan borang
-          inputIds.forEach(id => { inputs[id].value = 0; });
-          infoSituation.innerText = '—';
-          infoGajiAsas.innerText = 'RM 0.00';
-          updateCalculations();
-        }
-      });
-
-      // Kod berubah
-      selectKod.addEventListener('change', function() {
-        const kod = this.value;
-        if (!kod) return;
-        const emp = allEmployees.find(e => e.kod === kod);
-        if (emp) {
-          selectNama.value = emp.nama;
-          selectKumpulan.value = emp.kumpulan;
-          populateForm(emp);
-        }
-      });
-
-      // Nama berubah
-      selectNama.addEventListener('change', function() {
-        const nama = this.value;
-        if (!nama) return;
-        const emp = allEmployees.find(e => e.nama === nama);
-        if (emp) {
-          selectKod.value = emp.kod;
-          selectKumpulan.value = emp.kumpulan;
-          populateForm(emp);
-        }
-      });
-
-      // Semua input nombor/teks dikemas kini
-      inputIds.forEach(id => {
-        const inp = inputs[id];
-        if (inp) {
-          inp.addEventListener('input', updateCalculations);
-          inp.addEventListener('change', updateCalculations);
-        }
-      });
-
-      // Butang simpan
-      el('saveBtn').addEventListener('click', saveAndSync);
-
-      // Butang muat dari URL
-      el('syncFromUrlBtn').addEventListener('click', async function() {
-        const ok = await fetchEmployeesFromUrl();
-        if (ok) {
-          setSyncStatus('Data dikemas kini dari URL', 'success');
-        }
-      });
-
-      // ---------- INIT ----------
-      (async function init() {
-        // Cuba muat dari localStorage dulu untuk paparan pantas
-        try {
-          const stored = localStorage.getItem(STORAGE_KEY);
-          if (stored) {
-            allEmployees = JSON.parse(stored);
-            refreshKumpulanDropdown();
-            refreshKodNamaDropdowns();
-            if (allEmployees.length > 0) {
-              const first = allEmployees[0];
-              selectKumpulan.value = first.kumpulan || '';
-              refreshKodNamaDropdowns(first.kumpulan);
-              selectKod.value = first.kod || '';
-              selectNama.value = first.nama || '';
-              populateForm(first);
-              setSyncStatus('Data setempat dimuat', '');
             }
           }
         } catch (e) {}
 
-        // Kemudian cuba muat dari URL (jika ada internet)
-        await fetchEmployeesFromUrl();
-      })();
+        // 次选：从主数组里按 code 找
+        try {
+          const allJson = localStorage.getItem(STORAGE_KEY);
+          if (allJson) {
+            allEmployees = JSON.parse(allJson) || [];
+            if (Array.isArray(allEmployees) && allEmployees.length > 0) {
+              let picked = allEmployees[0];
+              if (code) {
+                const found = allEmployees.find(e => e.Code === code);
+                if (found) picked = found;
+              }
+              fillForm(picked);
+              return true;
+            }
+          }
+        } catch (e) {}
 
-      // Expose untuk debugging
-      window.__debug = { allEmployees, fetchEmployeesFromUrl, saveAndSync };
+        return false;
+      }
+
+      /* ===== 收集表单到 salary.html 格式对象 ===== */
+      function collectUpdates() {
+        if (!currentRaw) return null;
+        const updated = { ...currentRaw };
+        updated.Basic = num(el('inputGajiAsas').value);
+        updated.GroupName = el('infoKumpulan').value || updated.GroupName || '';
+        Object.entries(FIELD_MAP).forEach(([id, key]) => {
+          const inp = inputs[id];
+          if (!inp) return;
+          if (TEXT_FIELDS.has(id)) updated[key] = inp.value;
+          else updated[key] = num(inp.value);
+        });
+        // 用户在 detail 修改过缴款额 → 标记为手动，避免 salary.html 自动重算
+        if (updated.EPF_Employee !== currentRaw.EPF_Employee ||
+            updated.EPF_Employer !== currentRaw.EPF_Employer) updated.manualEPF = true;
+        if (updated.SOCSO_Employee !== currentRaw.SOCSO_Employee ||
+            updated.SOCSO_Employer !== currentRaw.SOCSO_Employer) updated.manualSOCSO = true;
+        if (updated.EIS_Employee !== currentRaw.EIS_Employee ||
+            updated.EIS_Employer !== currentRaw.EIS_Employer) updated.manualEIS = true;
+        if (updated.Lindung24Jam !== currentRaw.Lindung24Jam) updated.manual24JAM = true;
+        return updated;
+      }
+
+      /* ===== 保存 + 同步 ===== */
+      function saveAndSync() {
+        const updated = collectUpdates();
+        if (!updated) { alert('Tiada pekerja untuk disimpan'); return; }
+
+        // 更新主数组
+        let all = [];
+        try {
+          const allJson = localStorage.getItem(STORAGE_KEY);
+          if (allJson) all = JSON.parse(allJson) || [];
+        } catch (e) {}
+        if (!Array.isArray(all)) all = [];
+
+        const i = all.findIndex(e => e.Code === updated.Code);
+        if (i !== -1) all[i] = { ...all[i], ...updated };
+        else all.push(updated);
+
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+          localStorage.setItem(SELECTED_EMP_KEY, JSON.stringify(updated));
+          localStorage.setItem(SELECTED_CODE_KEY, updated.Code || '');
+        } catch (e) { console.error(e); }
+
+        currentRaw = updated;
+        allEmployees = all;
+
+        // 通知 opener
+        try {
+          if (window.opener && !window.opener.closed) {
+            window.opener.postMessage({ type: 'PAYROLL_UPDATE', employees: all }, '*');
+          }
+        } catch (e) {}
+
+        setSyncStatus('已保存 · ' + new Date().toLocaleTimeString('zh-CN'), 'success');
+        alert('✅ 已保存并同步到薪资页面\n' + (updated.Name || updated.Code));
+      }
+
+      /* ===== 事件绑定 ===== */
+      Object.values(inputs).forEach(inp => {
+        if (!inp) return;
+        inp.addEventListener('input', updateCalc);
+        inp.addEventListener('change', updateCalc);
+      });
+      el('inputGajiAsas').addEventListener('input', updateCalc);
+
+      el('saveBtn').addEventListener('click', saveAndSync);
+      el('reloadBtn').addEventListener('click', function () {
+        if (loadFromStorage()) setSyncStatus('已重新载入', 'success');
+        else setSyncStatus('没有可载入的数据', 'error');
+      });
+
+      /* ===== Init ===== */
+      if (!loadFromStorage()) {
+        setSyncStatus('未找到数据', 'error');
+        // 友好提示，不阻塞用户
+        setTimeout(() => {
+          alert('未找到员工数据。\n请从 salary.html 点击员工名字进入本页面。');
+        }, 200);
+      }
+
+      // 也监听 storage，方便在别的地方修改后自动刷新
+      window.addEventListener('storage', (ev) => {
+        if (ev.key === SELECTED_CODE_KEY && ev.newValue) {
+          loadFromStorage();
+        }
+      });
     })();
   </script>
 </body>
