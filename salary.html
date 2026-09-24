@@ -477,10 +477,6 @@
   tr:nth-child(even) td { background: #fbfdff; }
   tr:hover td { background: var(--epf-blue-soft); }
   .divider-group { box-shadow: inset 1px 0 0 var(--epf-border) !important; }
-
-  /* ============================================================
-     ★★★ 冻结列（修复：tbody 只做水平冻结，不再强制垂直粘住） ★★★
-     ============================================================ */
   body.freeze-on .col-freeze { position: sticky; z-index: 9; background: #ffffff; }
   body.freeze-on .col-freeze.col-0 { left: 0px; }
   body.freeze-on .col-freeze.col-1 { left: 80px; }
@@ -514,9 +510,6 @@
   body.freeze-on .section-label-row th.col-freeze-group {
     position: sticky !important; left: 0 !important; z-index: 24 !important;
   }
-  /* 关键修复：tbody 冻结列禁止垂直粘住（top:auto），只靠 left 做水平冻结 */
-  body.freeze-on tbody td.col-freeze { top: auto !important; }
-
   .lock-edge-right { border-right: 2px solid var(--epf-blue) !important; z-index: 25 !important; }
   .fold-line {
     position: absolute; top: 0; bottom: 0; width: 12px;
@@ -1254,10 +1247,6 @@ function toggleToolbarDropdown(id, e) {
   document.querySelectorAll('.toolbar-dropdown.open').forEach(x => x.classList.remove('open'));
   if (!wasOpen) el.classList.add('open');
 }
-function closeToolbarDropdown(id) {
-  const el = document.getElementById(id);
-  if (el) el.classList.remove('open');
-}
 function closeAllToolbarDropdowns() {
   document.querySelectorAll('.toolbar-dropdown.open').forEach(x => x.classList.remove('open'));
 }
@@ -1340,145 +1329,27 @@ function sendChat() {
 function aiReply(q) {
   const s = String(q).toLowerCase();
   const has = (...ks) => ks.some(k => s.includes(k));
-
-  if (has('你好', 'hi', 'hello', 'halo', '嗨')) {
-    return '你好！👋 我可以帮你解答薪资系统的问题。\n试试问我：EPF 怎么算？/ OT 如何计算？/ 如何保存到 Sheet？';
-  }
-  if (has('epf', 'kwsp')) {
-    return '【EPF / KWSP 计算】\n' +
-      '• 55 岁以下：员工 11%，雇主 12%（月薪 ≤ RM5,000 时雇主 13%）\n' +
-      '• 60 岁及以上：员工 0%，雇主 4%\n' +
-      '• 系统会自动进位（Math.ceil）到整数\n' +
-      '• 想手动输入：勾选 EPF 前面的 ✎ 复选框\n' +
-      '• 银行 = CASH / Merchantrade，或 EPF 栏位 = NO 时自动归 0\n' +
-      '• 计算基数可在「Salary for EPF Contributions」栏调整';
-  }
-  if (has('socso', 'perkeso')) {
-    return '【SOCSO / PERKESO】\n' +
-      '• 按缴费表计算，薪资上限 RM6,000\n' +
-      '• 员工约 0.5%，雇主约 1.75%（依薪资区间递增）\n' +
-      '• 月薪超过 RM6,000 → 员工 RM29.75 / 雇主 RM104.15\n' +
-      '• 计算基数可在「Salary for SOCSO Contributions」栏调整';
-  }
-  if (has('eis')) {
-    return '【EIS 就业保险】\n' +
-      '• 员工 0.2% + 雇主 0.2%\n' +
-      '• 薪资上限 RM6,000，员工最高 RM11.90\n' +
-      '• 计算基数可在「Salary for EIS Contributions」栏调整';
-  }
-  if (has('24jam', '24 jam', 'lindung', '24小时')) {
-    return '【24 JAM LINDUNGAN】\n' +
-      '• 费率 0.7325%（仅雇主/员工单方列示，视保单设定）\n' +
-      '• 薪资上限 RM6,000\n' +
-      '• 计算基数可在「Salary for 24JAM Contributions」栏调整';
-  }
-  if (has('ot', 'overtime', '加班')) {
-    return '【OT 加班计算】\n' +
-      '时薪 = 月薪 ÷ 26 ÷ 8\n' +
-      '• 普通工作日加班：1.5 倍\n' +
-      '• 休息日加班：2.0 倍\n' +
-      '• 公共假期加班：3.0 倍\n' +
-      '把金额填入 OT Biasa / OT Rehat / OT Awam / OT Lain 栏，\n' +
-      '系统会自动加总进 Gaji Kasar。';
-  }
-  if (has('pinjaman', '借粮', '借款', '贷款')) {
-    return '【借粮 PINJAMAN】\n' +
-      '• 在 PINJAMAN 栏输入本期扣款金额（正数）\n' +
-      '• 会自动计入 Total Potongan，并从净薪资中扣除\n' +
-      '• 该栏位底色较深（粉红），与请假扣款区分';
-  }
-  if (has('请假', 'leave', 'cuti', '年假', '病假')) {
-    return '【请假扣款】\n' +
-      '4 种假期各有「天数 (D)」和「金额 (-RM)」两小格：\n' +
-      '• ANNUAL LEAVE 年假\n' +
-      '• UNPAID LEAVE 无薪假\n' +
-      '• SICK LEAVE 病假\n' +
-      '• HALF DAYS LEAVE 半天假（小时）\n' +
-      '金额部分会累加进 Total Potongan。';
-  }
-  if (has('净薪', 'net', 'gaji bersih', '公式', '计算方式')) {
-    return '【净薪资公式】\n' +
-      'Gaji Kasar = 基本薪资 + Allowance + Commission + Incentives + 全部 OT\n' +
-      'Total Potongan = 请假扣款 + Pinjaman + EPF + SOCSO + EIS + 24JAM（员工部分）\n' +
-      'Gaji Bersih = Gaji Kasar − Total Potongan';
-  }
-  if (has('手动', 'override', '✎', '覆盖')) {
-    return '【手动覆盖】\n' +
-      '每个 EPF / SOCSO / EIS / 24JAM 前面都有一个 ✎ 复选框：\n' +
-      '• 勾选 → 该栏位变成可编辑，可手动输入金额\n' +
-      '• 取消勾选 → 恢复系统自动计算\n' +
-      'Section 4（U-Y：Bank Nama / Bank Acc / EPF / SOCSO / EIS）也可用同样方式手动编辑。';
-  }
-  if (has('cash', '现金', 'merchantrade')) {
-    return '【CASH / Merchantrade】\n' +
-      '若 SLR Bank Nama 为 CASH 或 Merchantrade，\n' +
-      'EPF / SOCSO / EIS / 24JAM 会自动归 0。';
-  }
-  if (has('保存', 'sheet', 'simpan', 'google')) {
-    return '【保存资料到 Google Sheet】\n' +
-      '• 点顶部「💾 Simpan ke Sheet」→ 把当前所有资料写入 Sheet\n' +
-      '• 点导航栏「Backup ▾ → Muat dari Sheet」→ 重新拉取最新数据\n' +
-      '（页面载入时会自动先从 Sheet 获取资料）';
-  }
-  if (has('导入', 'import', '导出', 'eksport', 'export')) {
-    return '【导入 / 导出】\n' +
-      '📥 Import：Backup ▾ → Import，支持 .xlsx / .csv / .txt\n' +
-      '💾 Eksport：Backup ▾ → 选择 PDF / Excel / Text / Word\n' +
-      '导出会依照当前筛选结果输出。';
-  }
-  if (has('粮单', 'slip', 'payslip', '打印', 'print', '复印')) {
-    return '【粮单 PRINT 功能】\n' +
-      '点顶部「🖨️ Print ▾」可选择：\n' +
-      '• 📄 全部复印 → 打印所有在职员工\n' +
-      '• 📁 根据 Group 复印 → 弹窗勾选分店后打印\n' +
-      '• ☑️ 批量复印 → 弹窗勾选员工后打印\n' +
-      '表格内每行右侧「Slip」按钮也可单独打印一张。';
-  }
-  if (has('筛选', 'filter', '搜索', '过滤')) {
-    return '【筛选功能】\n' +
-      '• 右上角 Kumpulan / Bank 多选 → 依分店、银行过滤\n' +
-      '• 表头第三行每栏都有 🔍 搜索框 → 逐栏筛选\n' +
-      '• 顶部会即时显示「符合人数」和「净薪资合计」';
-  }
-  if (has('检查', 'semak', 'check', '对账')) {
-    return '【检查功能】\n' +
-      '点顶部「✅ Semak Semua」会重新核算 EPF / SOCSO / EIS / 24JAM，\n' +
-      '正确 → 绿色底；有差异 → 红色底（鼠标移上去会显示正确金额）。';
-  }
-  if (has('冻结', 'freeze', 'lock', '锁')) {
-    return '【冻结列 Freeze】\n' +
-      '点「Gaji Asas」栏位右侧的 ⋮⋮ 把手 → 可锁定 / 解锁前 5 栏，\n' +
-      '让 Situation、Kod、Nama、Kumpulan、Gaji Asas 在横向滚动时保持可见。';
-  }
-  if (has('折叠', 'fold', '收起')) {
-    return '【折叠 GAJI UNTUK CARUMAN】\n' +
-      '点「📐 GAJI UNTUK CARUMAN」两边的 ▸ 把手，可折叠 / 展开\n' +
-      'Salary for EPF / SOCSO / EIS / 24JAM Contributions 这 4 栏。';
-  }
-  if (has('借粮页面', 'leave 页面', '跳转', '导航', 'menu', '菜单')) {
-    return '【顶部导航栏】\n' +
-      '• EMPLOYEES → 员工资料\n' +
-      '• BACKUP ▾ → Muat dari Sheet / Import / Eksport\n' +
-      '• DEDUCTION ▾ → Leave / Pinjaman / EPF / SOCSO / EIS / 24 Jam Lindungan\n' +
-      '• ADDITIONAL ▾ → Over Time / Pendapatan Tambahan\n' +
-      '• SETTING ▾ → Company / Payslip / HTML';
-  }
-  if (has('lang', '语言', 'bahasa', '中文')) {
-    return '【语言切换】\n' +
-      '右上角语言选单支持：Bahasa Melayu / English / 中文，\n' +
-      '切换后整个表格与按钮文字会即时更新。';
-  }
-  if (has('谢谢', 'thank', 'terima kasih', 'thanks')) {
-    return '不客气！😊 还有其他问题随时问我。';
-  }
-
-  return '我暂时没有找到相关答案 🤔\n\n' +
-    '你可以试试这些关键词：\n' +
-    '• EPF / SOCSO / EIS / 24JAM\n' +
-    '• OT 加班 / Pinjaman 借粮 / 请假扣款\n' +
-    '• 保存 Sheet / 导入导出 / 粮单\n' +
-    '• 筛选 / 检查 / 冻结 / 折叠\n\n' +
-    '你也可以点右上角语言切换，或到 DeepSeek 继续提问 → chat.deepseek.com';
+  if (has('你好', 'hi', 'hello', 'halo', '嗨')) return '你好！👋 我可以帮你解答薪资系统的问题。\n试试问我：EPF 怎么算？/ OT 如何计算？/ 如何保存到 Sheet？';
+  if (has('epf', 'kwsp')) return '【EPF / KWSP 计算】\n• 55 岁以下：员工 11%，雇主 12%（月薪 ≤ RM5,000 时雇主 13%）\n• 60 岁及以上：员工 0%，雇主 4%\n• 系统会自动进位\n• 想手动输入：勾选 EPF 前面的 ✎ 复选框\n• 银行 = CASH / Merchantrade 时自动归 0';
+  if (has('socso', 'perkeso')) return '【SOCSO / PERKESO】\n• 按缴费表计算，薪资上限 RM6,000\n• 员工约 0.5%，雇主约 1.75%\n• 月薪超过 RM6,000 → 员工 RM29.75 / 雇主 RM104.15';
+  if (has('eis')) return '【EIS 就业保险】\n• 员工 0.2% + 雇主 0.2%\n• 薪资上限 RM6,000，员工最高 RM11.90';
+  if (has('24jam', '24 jam', 'lindung', '24小时')) return '【24 JAM LINDUNGAN】\n• 费率 0.7325%\n• 薪资上限 RM6,000';
+  if (has('ot', 'overtime', '加班')) return '【OT 加班计算】\n时薪 = 月薪 ÷ 26 ÷ 8\n• 普通工作日：1.5 倍\n• 休息日：2.0 倍\n• 公共假期：3.0 倍';
+  if (has('pinjaman', '借粮', '借款', '贷款')) return '【借粮 PINJAMAN】\n• 在 PINJAMAN 栏输入本期扣款金额（正数）\n• 会自动计入 Total Potongan';
+  if (has('请假', 'leave', 'cuti', '年假', '病假')) return '【请假扣款】\n4 种假期各有「天数 (D)」和「金额 (-RM)」两小格，\n金额部分会累加进 Total Potongan。';
+  if (has('净薪', 'net', 'gaji bersih', '公式', '计算方式')) return '【净薪资公式】\nGaji Kasar = 基本薪资 + Allowance + Commission + Incentives + 全部 OT\nTotal Potongan = 请假扣款 + Pinjaman + EPF + SOCSO + EIS + 24JAM\nGaji Bersih = Gaji Kasar − Total Potongan';
+  if (has('手动', 'override', '✎', '覆盖')) return '【手动覆盖】\n每个 EPF / SOCSO / EIS / 24JAM 前面都有一个 ✎ 复选框：\n• 勾选 → 可手动输入\n• 取消勾选 → 恢复自动计算';
+  if (has('cash', '现金', 'merchantrade')) return '【CASH / Merchantrade】\n若 SLR Bank Nama 为 CASH 或 Merchantrade，\nEPF / SOCSO / EIS / 24JAM 会自动归 0。';
+  if (has('保存', 'sheet', 'simpan', 'google')) return '【保存资料到 Google Sheet】\n• 点顶部「💾 Simpan ke Sheet」→ 把当前所有资料写入 Sheet\n• Backup ▾ → Muat dari Sheet → 重新拉取最新数据';
+  if (has('导入', 'import', '导出', 'eksport', 'export')) return '【导入 / 导出】\n📥 Import：Backup ▾ → Import\n💾 Eksport：Backup ▾ → 选择 PDF / Excel / Text / Word';
+  if (has('粮单', 'slip', 'payslip', '打印', 'print', '复印')) return '【粮单 PRINT 功能】\n• 📄 全部复印\n• 📁 根据 Group 复印\n• ☑️ 批量复印';
+  if (has('筛选', 'filter', '搜索', '过滤')) return '【筛选功能】\n• 右上角 Kumpulan / Bank 多选\n• 表头第三行每栏都有 🔍 搜索框';
+  if (has('检查', 'semak', 'check', '对账')) return '【检查功能】\n点「✅ Semak Semua」会重新核算 EPF / SOCSO / EIS / 24JAM。';
+  if (has('冻结', 'freeze', 'lock', '锁')) return '【冻结列 Freeze】\n点「Gaji Asas」栏位右侧的 ⋮⋮ 把手 → 可锁定 / 解锁前 5 栏。';
+  if (has('折叠', 'fold', '收起')) return '【折叠 GAJI UNTUK CARUMAN】\n点两边的 ▸ 把手，可折叠 / 展开 4 栏缴款薪资。';
+  if (has('导航', 'menu', '菜单')) return '【顶部导航栏】\n• BACKUP ▾ → Muat / Import / Eksport\n• DEDUCTION ▾ → Leave / Pinjaman / EPF / SOCSO / EIS / 24JAM\n• ADDITIONAL ▾ → OT / Pendapatan Tambahan\n• SETTING ▾ → Company / Payslip / HTML';
+  if (has('谢谢', 'thank', 'terima kasih', 'thanks')) return '不客气！😊 还有其他问题随时问我。';
+  return '我暂时没有找到相关答案 🤔\n\n你可以试试这些关键词：\n• EPF / SOCSO / EIS / 24JAM\n• OT / Pinjaman / 请假扣款\n• 保存 Sheet / 导入导出 / 粮单\n• 筛选 / 检查 / 冻结 / 折叠';
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -1498,7 +1369,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ============================================================
-   原有 Payroll 逻辑
+   核心常量
    ============================================================ */
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJQe5hNv7sC_Rmig6xZ0NP4nP_PqXQmgTHbG7Ou6_9JtWadETnVmVfFr7b3Cu5qidZ/exec';
 const DETAIL_URL = 'https://yzcorpsdk2-ctrl.github.io/salarysystem/detail.html';
@@ -1513,10 +1384,37 @@ const GROUP_FIELDS = {
   '24JAM': ['Lindung24Jam']
 };
 
+/* ============================================================
+   统一导出表头 —— 与 Google Sheet PayrollData 完全一致
+   ============================================================ */
+function getExportHeaders() {
+  return [
+    'Situation', 'Code', 'Name', 'Group', 'Bank', 'Basic',
+    'Normal OT', 'Rest OT', 'Public OT', 'Other OT',
+    'Allowance', 'Commission', 'Incentives', 'First Calculation Total',
+    'Annual Leave Days', 'Annual Leave',
+    'Unpaid Leave Days', 'Unpaid Leave',
+    'Sick Leave Days', 'Sick Leave',
+    'Half Days Leave Days', 'Half Days Leave',
+    'Pinjaman',
+    'Salary for EPF Contributions',
+    'Salary for SOCSO Contributions',
+    'Salary for EIS Contributions',
+    'Salary for 24JAM Contributions',
+    'EPF (Employee)', 'EPF (Employer)',
+    'SOCSO (Employee)', 'SOCSO (Employer)',
+    'EIS (Employee)', 'EIS (Employer)',
+    '24JAM',
+    'SLR Bank Nama', 'SLR Bank Account No',
+    'SLR EPF', 'SLR SOCSO', 'SLR EIS',
+    'Gross Pay', 'Total Deduction', 'Net Salary'
+  ];
+}
+
 const I18N = {
-  ms: { title:'Sistem Penggajian', desc:'Pengurusan gaji pekerja dengan pengiraan automatik EPF, SOCSO, EIS & 24JAM Lindungan.', badge:'Auto kira caruman statutori · Manual override dengan kotak semak', save:'Simpan ke Sheet', importBtn:'Import / 导入', exportMenu:'Eksport', allSlip:'Semua Slip Gaji', checkAll:'Semak Semua', legend1:'1. Maklumat Asas + Basic Salary (Freeze)', legend2:'2. Pendapatan (OT)', legend2b:'2.5 Pendapatan Tambahan', legend2d:'2.8 Potongan (On Leave + Pinjaman)', legend2c:'2.9 Gaji untuk Caruman (boleh lipat)', legend3:'3. Caruman Statutori', legend4:'4. Staff Login Record (U-Y)', legend5:'5. Ringkasan Gaji', legend6:'6. Tindakan', sec1:'📌 1. MAKLUMAT ASAS + 💵 BASIC SALARY (FREEZE)', sec2:'💰 2. PENDAPATAN / ELAUN (OT)', sec2b:'➕ PENDAPATAN TAMBAHAN', sec2d:'➖ POTONGAN (ON LEAVE + PINJAMAN)', sec2c:'📐 GAJI UNTUK CARUMAN', sec3:'🏛️ 3. CARUMAN STATUTORI (EPF / SOCSO / EIS / 24JAM)', sec4:'📋 4. STAFF LOGIN RECORD (U-Y)', sec5:'🧮 5. RINGKASAN GAJI', sec6:'⚙️ 6. TINDAKAN', situation:'Situation', kod:'Kod', nama:'Nama', kumpulan:'Kumpulan', basic:'Gaji Asas', normalOT:'OT Biasa', restOT:'OT Rehat', publicOT:'OT Awam', otherOT:'OT Lain', pinjaman:'PINJAMAN', annualLeave:'ANNUAL LEAVE', unpaidLeave:'UNPAID LEAVE', sickLeave:'SICK LEAVE', halfDays:'HALF DAYS LEAVE (HOURS)', allowance2:'ALLOWANCE', commission:'COMMISION', incentives:'INCENTIVES', firstCalcTotal:'FIRST CALCULATION TOTAL', epfSalary:'Salary for EPF Contributions', socsoSalary:'Salary for SOCSO Contributions', eisSalary:'Salary for EIS Contributions', lindungSalary:'Salary for 24JAM Contributions', epfE:'Pekerja', epfR:'Majikan', socsoE:'Pekerja', socsoR:'Majikan', eisE:'Pekerja', eisR:'Majikan', lindung:'24JAM', bankNama:'Bank Nama', bankAcc:'Bank Acc', epf:'EPF', socso:'SOCSO', eis:'EIS', gross:'Gaji Kasar', totalDed:'Total Potongan', net:'Gaji Bersih', action:'Tindakan', slip:'Slip', legend:'Nota: Klik pada Nama pekerja untuk buka halaman detail. Tandakan ✔ di hadapan EPF/SOCSO/EIS/24JAM untuk isi manual. Section 4 (U-Y) juga boleh edit. Jika Bank Nama = CASH, EPF/SOCSO/EIS auto 0.', saved:'Berjaya disimpan ke Sheet', failed:'Gagal simpan', loading:'Memuatkan data...', importSuccess:'Berjaya import {n} pekerja', importFail:'Fail tidak sah atau kosong', importFormat:'Format fail tidak disokong', noData:'Tiada data untuk dieksport', freezeLocked:'Kolum dibekukan (freeze ON)', freezeUnlocked:'Kolum dibuka (freeze OFF)', salaryFolded:'GAJI UNTUK CARUMAN dilipat', salaryUnfolded:'GAJI UNTUK CARUMAN dibuka', freezeTitle:'🔒 Tetapan Freeze Kolum', freezeDesc:'Pilih sama ada mahu kunci kolum pertama (Situation → Gaji Asas) supaya sentiasa kelihatan semasa scroll, atau buka kunci sepenuhnya.', freezeUnlock:'🔓 Buka Kunci', freezeLock:'🔒 Kunci Kolum', freezeCancel:'Batal', importTitle:'📥 Import Data / 导入资料', importDrop:'Lepaskan fail di sini atau klik untuk pilih', importDropHint:'Drag & drop file here, or click to browse', importFormatHint:'Format: .xlsx / .csv / .txt', importTemplate:'📥 Template:', importClose:'Tutup', filterGroup:'Kumpulan', filterBank:'Bank', all:'Semua', selectedSuffix:' dipilih', matchedCount:'Padan', netTotal:'Jumlah Bersih', btnSelectAll:'Semua', btnClear:'Kosong', noOptions:'Tiada pilihan' },
-  en: { title:'Payroll System', desc:'Employee payroll management with automatic EPF, SOCSO, EIS & 24JAM Lindungan calculation.', badge:'Auto-calculate statutory contributions · Manual override with checkbox', save:'Save to Sheet', importBtn:'Import', exportMenu:'Export', allSlip:'All Payslips', checkAll:'Check All', legend1:'1. Basic Info + Basic Salary (Freeze)', legend2:'2. Income (OT)', legend2b:'2.5 Additional Income', legend2d:'2.8 Deductions (On Leave + Loan)', legend2c:'2.9 Salary for Contributions (collapsible)', legend3:'3. Statutory Contributions', legend4:'4. Staff Login Record (U-Y)', legend5:'5. Salary Summary', legend6:'6. Actions', sec1:'📌 1. BASIC INFO + 💵 BASIC SALARY (FREEZE)', sec2:'💰 2. INCOME / ALLOWANCE (OT)', sec2b:'➕ ADDITIONAL INCOME', sec2d:'➖ DEDUCTIONS (ON LEAVE + LOAN)', sec2c:'📐 SALARY FOR CONTRIBUTIONS', sec3:'🏛️ 3. STATUTORY CONTRIBUTIONS (EPF / SOCSO / EIS / 24JAM)', sec4:'📋 4. STAFF LOGIN RECORD (U-Y)', sec5:'🧮 5. SALARY SUMMARY', sec6:'⚙️ 6. ACTIONS', situation:'Situation', kod:'Code', nama:'Name', kumpulan:'Group', basic:'Basic', normalOT:'Normal OT', restOT:'Rest OT', publicOT:'Public OT', otherOT:'Other OT', pinjaman:'LOAN', annualLeave:'ANNUAL LEAVE', unpaidLeave:'UNPAID LEAVE', sickLeave:'SICK LEAVE', halfDays:'HALF DAYS LEAVE (HOURS)', allowance2:'ALLOWANCE', commission:'COMMISION', incentives:'INCENTIVES', firstCalcTotal:'FIRST CALCULATION TOTAL', epfSalary:'Salary for EPF Contributions', socsoSalary:'Salary for SOCSO Contributions', eisSalary:'Salary for EIS Contributions', lindungSalary:'Salary for 24JAM Contributions', epfE:'Employee', epfR:'Employer', socsoE:'Employee', socsoR:'Employer', eisE:'Employee', eisR:'Employer', lindung:'24JAM', bankNama:'Bank Name', bankAcc:'Bank Acc', epf:'EPF', socso:'SOCSO', eis:'EIS', gross:'Gross', totalDed:'Total Ded', net:'Net', action:'Action', slip:'Payslip', legend:'Note: Click on employee Name to open detail page. Tick ✔ before EPF/SOCSO/EIS/24JAM to enter manually. Section 4 (U-Y) is also editable.', saved:'Saved successfully', failed:'Save failed', loading:'Loading data...', importSuccess:'Imported {n} employees', importFail:'Invalid or empty file', importFormat:'Unsupported file format', noData:'No data to export', freezeLocked:'Columns frozen (ON)', freezeUnlocked:'Columns unfrozen (OFF)', salaryFolded:'SALARY FOR CONTRIBUTIONS collapsed', salaryUnfolded:'SALARY FOR CONTRIBUTIONS expanded', freezeTitle:'🔒 Freeze Column Setting', freezeDesc:'Choose whether to lock the first columns.', freezeUnlock:'🔓 Unlock', freezeLock:'🔒 Lock Columns', freezeCancel:'Cancel', importTitle:'📥 Import Data', importDrop:'Drop file here or click to select', importDropHint:'Drag & drop file here, or click to browse', importFormatHint:'Format: .xlsx / .csv / .txt', importTemplate:'📥 Template:', importClose:'Close', filterGroup:'Group', filterBank:'Bank', all:'All', selectedSuffix:' selected', matchedCount:'Matched', netTotal:'Net Total', btnSelectAll:'All', btnClear:'Clear', noOptions:'No options' },
-  zh: { title:'薪资系统', desc:'员工薪资管理，自动计算 EPF、SOCSO、EIS 及 24JAM Lindungan。', badge:'自动计算法定缴款 · 使用复选框手动覆盖', save:'保存到 Sheet', importBtn:'Import / 导入', exportMenu:'导出', allSlip:'全部粮单', checkAll:'检查全部', legend1:'1. 基本资料 + 基本薪资 (冻结)', legend2:'2. 收入 (OT)', legend2b:'2.5 额外收入', legend2d:'2.8 扣款 (请假 + 借粮)', legend2c:'2.9 缴款薪资 (可折叠)', legend3:'3. 法定缴款', legend4:'4. 员工登录记录 (U-Y)', legend5:'5. 薪资汇总', legend6:'6. 操作', sec1:'📌 1. 基本资料 + 💵 基本薪资 (冻结)', sec2:'💰 2. 收入 / 津贴 (OT)', sec2b:'➕ 额外收入', sec2d:'➖ 扣款 (请假 + 借粮)', sec2c:'📐 缴款薪资', sec3:'🏛️ 3. 法定缴款 (EPF / SOCSO / EIS / 24JAM)', sec4:'📋 4. 员工登录记录 (U-Y)', sec5:'🧮 5. 薪资汇总', sec6:'⚙️ 6. 操作', situation:'状态', kod:'编号', nama:'姓名', kumpulan:'分店', basic:'基本薪资', normalOT:'普通加班', restOT:'休息日加班', publicOT:'公假加班', otherOT:'其他加班', pinjaman:'借粮', annualLeave:'年假', unpaidLeave:'无薪假', sickLeave:'病假', halfDays:'半天假 (小时)', allowance2:'津贴', commission:'佣金', incentives:'奖励', firstCalcTotal:'首次计算总额', epfSalary:'EPF 缴款薪资', socsoSalary:'SOCSO 缴款薪资', eisSalary:'EIS 缴款薪资', lindungSalary:'24JAM 缴款薪资', epfE:'员工', epfR:'雇主', socsoE:'员工', socsoR:'雇主', eisE:'员工', eisR:'雇主', lindung:'24JAM', bankNama:'银行名', bankAcc:'银行账号', epf:'EPF', socso:'SOCSO', eis:'EIS', gross:'总薪资', totalDed:'总扣款', net:'净薪资', action:'操作', slip:'粮单', legend:'备注：点击员工姓名可打开详情页。勾选 EPF/SOCSO/EIS/24JAM 前的 ✔ 手动填写。Section 4 (U-Y) 也可编辑。', saved:'已成功保存到 Sheet', failed:'保存失败', loading:'加载数据中...', importSuccess:'成功导入 {n} 位员工', importFail:'文件无效或为空', importFormat:'不支持的文件格式', noData:'没有可导出的数据', freezeLocked:'列已冻结', freezeUnlocked:'列已解冻', salaryFolded:'缴款薪资组已折叠', salaryUnfolded:'缴款薪资组已展开', freezeTitle:'🔒 冻结列设置', freezeDesc:'选择是否锁定前几列。', freezeUnlock:'🔓 解锁', freezeLock:'🔒 锁定列', freezeCancel:'取消', importTitle:'📥 导入资料', importDrop:'拖入文件或点击选择', importDropHint:'拖入文件或点击浏览', importFormatHint:'格式：.xlsx / .csv / .txt', importTemplate:'📥 模板：', importClose:'关闭', filterGroup:'分店', filterBank:'银行', all:'全部', selectedSuffix:' 项', matchedCount:'符合人数', netTotal:'净薪资合计', btnSelectAll:'全选', btnClear:'清除', noOptions:'暂无选项' }
+  ms: { title:'Sistem Penggajian', desc:'Pengurusan gaji pekerja dengan pengiraan automatik EPF, SOCSO, EIS & 24JAM Lindungan.', badge:'Auto kira caruman statutori · Manual override dengan kotak semak', save:'Simpan ke Sheet', importBtn:'Import / 导入', exportMenu:'Eksport', allSlip:'Semua Slip Gaji', checkAll:'Semak Semua', legend1:'1. Maklumat Asas + Basic Salary (Freeze)', legend2:'2. Pendapatan (OT)', legend2b:'2.5 Pendapatan Tambahan', legend2d:'2.8 Potongan (On Leave + Pinjaman)', legend2c:'2.9 Gaji untuk Caruman (boleh lipat)', legend3:'3. Caruman Statutori', legend4:'4. Staff Login Record (U-Y)', legend5:'5. Ringkasan Gaji', legend6:'6. Tindakan', sec1:'📌 1. MAKLUMAT ASAS + 💵 BASIC SALARY (FREEZE)', sec2:'💰 2. PENDAPATAN / ELAUN (OT)', sec2b:'➕ PENDAPATAN TAMBAHAN', sec2d:'➖ POTONGAN (ON LEAVE + PINJAMAN)', sec2c:'📐 GAJI UNTUK CARUMAN', sec3:'🏛️ 3. CARUMAN STATUTORI (EPF / SOCSO / EIS / 24JAM)', sec4:'📋 4. STAFF LOGIN RECORD (U-Y)', sec5:'🧮 5. RINGKASAN GAJI', sec6:'⚙️ 6. TINDAKAN', situation:'Situation', kod:'Kod', nama:'Nama', kumpulan:'Kumpulan', basic:'Gaji Asas', normalOT:'OT Biasa', restOT:'OT Rehat', publicOT:'OT Awam', otherOT:'OT Lain', pinjaman:'PINJAMAN', annualLeave:'ANNUAL LEAVE', unpaidLeave:'UNPAID LEAVE', sickLeave:'SICK LEAVE', halfDays:'HALF DAYS LEAVE (HOURS)', allowance2:'ALLOWANCE', commission:'COMMISION', incentives:'INCENTIVES', firstCalcTotal:'FIRST CALCULATION TOTAL', epfSalary:'Salary for EPF Contributions', socsoSalary:'Salary for SOCSO Contributions', eisSalary:'Salary for EIS Contributions', lindungSalary:'Salary for 24JAM Contributions', epfE:'Pekerja', epfR:'Majikan', socsoE:'Pekerja', socsoR:'Majikan', eisE:'Pekerja', eisR:'Majikan', lindung:'24JAM', bankNama:'Bank Nama', bankAcc:'Bank Acc', epf:'EPF', socso:'SOCSO', eis:'EIS', gross:'Gaji Kasar', totalDed:'Total Potongan', net:'Gaji Bersih', action:'Tindakan', slip:'Slip', legend:'Nota: Klik pada Nama pekerja untuk buka halaman detail. Tandakan ✔ di hadapan EPF/SOCSO/EIS/24JAM untuk isi manual.', saved:'Berjaya disimpan ke Sheet', failed:'Gagal simpan', loading:'Memuatkan data...', importSuccess:'Berjaya import {n} pekerja', importFail:'Fail tidak sah atau kosong', importFormat:'Format fail tidak disokong', noData:'Tiada data untuk dieksport', freezeLocked:'Kolum dibekukan (freeze ON)', freezeUnlocked:'Kolum dibuka (freeze OFF)', salaryFolded:'GAJI UNTUK CARUMAN dilipat', salaryUnfolded:'GAJI UNTUK CARUMAN dibuka', freezeTitle:'🔒 Tetapan Freeze Kolum', freezeDesc:'Pilih sama ada mahu kunci kolum pertama (Situation → Gaji Asas) supaya sentiasa kelihatan semasa scroll, atau buka kunci sepenuhnya.', freezeUnlock:'🔓 Buka Kunci', freezeLock:'🔒 Kunci Kolum', freezeCancel:'Batal', importTitle:'📥 Import Data / 导入资料', importDrop:'Lepaskan fail di sini atau klik untuk pilih', importDropHint:'Drag & drop file here, or click to browse', importFormatHint:'Format: .xlsx / .csv / .txt', importTemplate:'📥 Template:', importClose:'Tutup', filterGroup:'Kumpulan', filterBank:'Bank', all:'Semua', selectedSuffix:' dipilih', matchedCount:'Padan', netTotal:'Jumlah Bersih', btnSelectAll:'Semua', btnClear:'Kosong', noOptions:'Tiada pilihan' },
+  en: { title:'Payroll System', desc:'Employee payroll management with automatic EPF, SOCSO, EIS & 24JAM Lindungan calculation.', badge:'Auto-calculate statutory contributions · Manual override with checkbox', save:'Save to Sheet', importBtn:'Import', exportMenu:'Export', allSlip:'All Payslips', checkAll:'Check All', legend1:'1. Basic Info + Basic Salary (Freeze)', legend2:'2. Income (OT)', legend2b:'2.5 Additional Income', legend2d:'2.8 Deductions (On Leave + Loan)', legend2c:'2.9 Salary for Contributions (collapsible)', legend3:'3. Statutory Contributions', legend4:'4. Staff Login Record (U-Y)', legend5:'5. Salary Summary', legend6:'6. Actions', sec1:'📌 1. BASIC INFO + 💵 BASIC SALARY (FREEZE)', sec2:'💰 2. INCOME / ALLOWANCE (OT)', sec2b:'➕ ADDITIONAL INCOME', sec2d:'➖ DEDUCTIONS (ON LEAVE + LOAN)', sec2c:'📐 SALARY FOR CONTRIBUTIONS', sec3:'🏛️ 3. STATUTORY CONTRIBUTIONS (EPF / SOCSO / EIS / 24JAM)', sec4:'📋 4. STAFF LOGIN RECORD (U-Y)', sec5:'🧮 5. SALARY SUMMARY', sec6:'⚙️ 6. ACTIONS', situation:'Situation', kod:'Code', nama:'Name', kumpulan:'Group', basic:'Basic', normalOT:'Normal OT', restOT:'Rest OT', publicOT:'Public OT', otherOT:'Other OT', pinjaman:'LOAN', annualLeave:'ANNUAL LEAVE', unpaidLeave:'UNPAID LEAVE', sickLeave:'SICK LEAVE', halfDays:'HALF DAYS LEAVE (HOURS)', allowance2:'ALLOWANCE', commission:'COMMISION', incentives:'INCENTIVES', firstCalcTotal:'FIRST CALCULATION TOTAL', epfSalary:'Salary for EPF Contributions', socsoSalary:'Salary for SOCSO Contributions', eisSalary:'Salary for EIS Contributions', lindungSalary:'Salary for 24JAM Contributions', epfE:'Employee', epfR:'Employer', socsoE:'Employee', socsoR:'Employer', eisE:'Employee', eisR:'Employer', lindung:'24JAM', bankNama:'Bank Name', bankAcc:'Bank Acc', epf:'EPF', socso:'SOCSO', eis:'EIS', gross:'Gross', totalDed:'Total Ded', net:'Net', action:'Action', slip:'Payslip', legend:'Note: Click on employee Name to open detail page.', saved:'Saved successfully', failed:'Save failed', loading:'Loading data...', importSuccess:'Imported {n} employees', importFail:'Invalid or empty file', importFormat:'Unsupported file format', noData:'No data to export', freezeLocked:'Columns frozen (ON)', freezeUnlocked:'Columns unfrozen (OFF)', salaryFolded:'SALARY FOR CONTRIBUTIONS collapsed', salaryUnfolded:'SALARY FOR CONTRIBUTIONS expanded', freezeTitle:'🔒 Freeze Column Setting', freezeDesc:'Choose whether to lock the first columns.', freezeUnlock:'🔓 Unlock', freezeLock:'🔒 Lock Columns', freezeCancel:'Cancel', importTitle:'📥 Import Data', importDrop:'Drop file here or click to select', importDropHint:'Drag & drop file here, or click to browse', importFormatHint:'Format: .xlsx / .csv / .txt', importTemplate:'📥 Template:', importClose:'Close', filterGroup:'Group', filterBank:'Bank', all:'All', selectedSuffix:' selected', matchedCount:'Matched', netTotal:'Net Total', btnSelectAll:'All', btnClear:'Clear', noOptions:'No options' },
+  zh: { title:'薪资系统', desc:'员工薪资管理，自动计算 EPF、SOCSO、EIS 及 24JAM Lindungan。', badge:'自动计算法定缴款 · 使用复选框手动覆盖', save:'保存到 Sheet', importBtn:'Import / 导入', exportMenu:'导出', allSlip:'全部粮单', checkAll:'检查全部', legend1:'1. 基本资料 + 基本薪资 (冻结)', legend2:'2. 收入 (OT)', legend2b:'2.5 额外收入', legend2d:'2.8 扣款 (请假 + 借粮)', legend2c:'2.9 缴款薪资 (可折叠)', legend3:'3. 法定缴款', legend4:'4. 员工登录记录 (U-Y)', legend5:'5. 薪资汇总', legend6:'6. 操作', sec1:'📌 1. 基本资料 + 💵 基本薪资 (冻结)', sec2:'💰 2. 收入 / 津贴 (OT)', sec2b:'➕ 额外收入', sec2d:'➖ 扣款 (请假 + 借粮)', sec2c:'📐 缴款薪资', sec3:'🏛️ 3. 法定缴款 (EPF / SOCSO / EIS / 24JAM)', sec4:'📋 4. 员工登录记录 (U-Y)', sec5:'🧮 5. 薪资汇总', sec6:'⚙️ 6. 操作', situation:'状态', kod:'编号', nama:'姓名', kumpulan:'分店', basic:'基本薪资', normalOT:'普通加班', restOT:'休息日加班', publicOT:'公假加班', otherOT:'其他加班', pinjaman:'借粮', annualLeave:'年假', unpaidLeave:'无薪假', sickLeave:'病假', halfDays:'半天假 (小时)', allowance2:'津贴', commission:'佣金', incentives:'奖励', firstCalcTotal:'首次计算总额', epfSalary:'EPF 缴款薪资', socsoSalary:'SOCSO 缴款薪资', eisSalary:'EIS 缴款薪资', lindungSalary:'24JAM 缴款薪资', epfE:'员工', epfR:'雇主', socsoE:'员工', socsoR:'雇主', eisE:'员工', eisR:'雇主', lindung:'24JAM', bankNama:'银行名', bankAcc:'银行账号', epf:'EPF', socso:'SOCSO', eis:'EIS', gross:'总薪资', totalDed:'总扣款', net:'净薪资', action:'操作', slip:'粮单', legend:'备注：点击员工姓名可打开详情页。', saved:'已成功保存到 Sheet', failed:'保存失败', loading:'加载数据中...', importSuccess:'成功导入 {n} 位员工', importFail:'文件无效或为空', importFormat:'不支持的文件格式', noData:'没有可导出的数据', freezeLocked:'列已冻结', freezeUnlocked:'列已解冻', salaryFolded:'缴款薪资组已折叠', salaryUnfolded:'缴款薪资组已展开', freezeTitle:'🔒 冻结列设置', freezeDesc:'选择是否锁定前几列。', freezeUnlock:'🔓 解锁', freezeLock:'🔒 锁定列', freezeCancel:'取消', importTitle:'📥 导入资料', importDrop:'拖入文件或点击选择', importDropHint:'拖入文件或点击浏览', importFormatHint:'格式：.xlsx / .csv / .txt', importTemplate:'📥 模板：', importClose:'关闭', filterGroup:'分店', filterBank:'银行', all:'全部', selectedSuffix:' 项', matchedCount:'符合人数', netTotal:'净薪资合计', btnSelectAll:'全选', btnClear:'清除', noOptions:'暂无选项' }
 };
 let currentLang = 'ms';
 function t(key) { return I18N[currentLang][key] || key; }
@@ -1588,11 +1486,11 @@ window.addEventListener('message', (ev) => {
   }
 });
 
-/* ============================================================
-   ★★★ 修复版 updateStickyOffsets() ★★★
-   - 只给 thead 的 4 行设置 top 粘性
-   - tbody 的冻结列只保留 left（水平冻结），不再设置 top（不再垂直粘住）
-   ============================================================ */
+/* ============ Sticky 偏移 ============
+   ✅ 修复：移除了给 tbody 冻结列设置 top 的错误逻辑，
+      该逻辑会导致 BASIC SALARY 下方的搜索筛选行在滚动时“上飘”。
+      现在 tbody 的 .col-freeze 只做水平粘性（left），不再参与垂直粘性。
+   ===================================== */
 function updateStickyOffsets() {
   requestAnimationFrame(() => {
     const thead = document.querySelector('#mainTable thead');
@@ -1613,9 +1511,9 @@ function updateStickyOffsets() {
     mainRow.querySelectorAll('th').forEach(th =>   { th.style.top = topMain + 'px'; });
     subRow.querySelectorAll('th').forEach(th =>    { th.style.top = topSub + 'px'; });
     filterRow.querySelectorAll('th').forEach(th => { th.style.top = topFilter + 'px'; });
-    /* ★ 关键修复：清掉 tbody 冻结列上错误的 top 值（之前会造成垂直粘住 = 搜索框漂移） */
+    // ✅ 清除任何历史遗留的 tbody 冻结列 top 值（防止上飘）
     document.querySelectorAll('#tbody td.col-freeze').forEach(td => {
-      td.style.top = '';
+      if (td.style.top) td.style.top = '';
     });
   });
 }
@@ -2278,9 +2176,12 @@ async function handleImportFile(file) {
     if (!rows || rows.length < 2) { toast(t('importFail'), false); return; }
     const headers = rows[0].map(h => String(h).trim());
     const idx = {};
-    const WANTED = ['Situation','Code','Name','Group','Bank','Basic','Allowance','Deduction','Normal OT','Rest OT','Public OT','Other OT','Pinjaman','Others',
+    const WANTED = ['Situation','Code','Name','Group','Bank','Basic','Allowance','Allowance2','Deduction','Normal OT','Rest OT','Public OT','Other OT','Pinjaman','Others',
       'Annual Leave Days','Annual Leave','Unpaid Leave Days','Unpaid Leave','Sick Leave Days','Sick Leave','Half Days Leave Days','Half Days Leave',
-      'Allowance2','Commission','Incentives','FirstCalcTotal','Salary for EPF Contributions','Salary for SOCSO Contributions','Salary for EIS Contributions','Salary for 24JAM Lindungan Contributions','EPF (Employee)','EPF (Employer)','SOCSO (Employee)','SOCSO (Employer)','EIS (Employee)','EIS (Employer)','24JAM','SLR Bank Nama','SLR Bank Account No','SLR EPF','SLR SOCSO','SLR EIS'];
+      'Commission','Incentives','First Calculation Total','FirstCalcTotal',
+      'Salary for EPF Contributions','Salary for SOCSO Contributions','Salary for EIS Contributions','Salary for 24JAM Contributions','Salary for 24JAM Lindungan Contributions',
+      'EPF (Employee)','EPF (Employer)','SOCSO (Employee)','SOCSO (Employer)','EIS (Employee)','EIS (Employer)','24JAM',
+      'SLR Bank Nama','SLR Bank Account No','SLR EPF','SLR SOCSO','SLR EIS'];
     headers.forEach((h, i) => {
       const lh = h.toLowerCase();
       for (const w of WANTED) { if (lh === w.toLowerCase()) { idx[w] = i; break; } }
@@ -2302,10 +2203,13 @@ async function handleImportFile(file) {
       const sit = String(get(row, 'Situation') || 'ACTIVE').trim().toUpperCase();
       if (sit === 'UNACTIVE' || sit === 'INACTIVE') continue;
       const basic = parseFloat(get(row, 'Basic')) || 0;
+      // 兼容旧表头 Allowance2 与新表头 Allowance
+      const allowanceVal = parseFloat(get(row, 'Allowance')) || parseFloat(get(row, 'Allowance2')) || 0;
+      const firstCalcVal = parseFloat(get(row, 'First Calculation Total')) || parseFloat(get(row, 'FirstCalcTotal')) || 0;
       const epfSalary = parseOpt(row, 'Salary for EPF Contributions');
       const socsoSalary = parseOpt(row, 'Salary for SOCSO Contributions');
       const eisSalary = parseOpt(row, 'Salary for EIS Contributions');
-      const lindungSalary = parseOpt(row, 'Salary for 24JAM Lindungan Contributions');
+      const lindungSalary = parseOpt(row, 'Salary for 24JAM Contributions') || parseOpt(row, 'Salary for 24JAM Lindungan Contributions');
       const epfBase = epfSalary === '' ? basic : epfSalary;
       const socsoBase = socsoSalary === '' ? basic : socsoSalary;
       const eisBase = eisSalary === '' ? basic : eisSalary;
@@ -2329,8 +2233,8 @@ async function handleImportFile(file) {
       imported.push({
         Situation: sit, Code: code, Name: String(get(row, 'Name') || ''),
         GroupName: String(get(row, 'Group') || ''), BankNama: String(get(row, 'Bank') || ''),
-        Basic: basic, Allowance: parseFloat(get(row, 'Allowance')) || 0,
-        Allowance2: parseFloat(get(row, 'Allowance2')) || 0,
+        Basic: basic, Allowance: 0,
+        Allowance2: allowanceVal,
         Commission: parseFloat(get(row, 'Commission')) || 0,
         Incentives: parseFloat(get(row, 'Incentives')) || 0,
         EPFSalary: epfSalary, SOCSOSalary: socsoSalary, EISSalary: eisSalary, LindungSalary: lindungSalary,
@@ -2374,11 +2278,6 @@ async function handleImportFile(file) {
   } catch (err) { console.error(err); toast('Import error: ' + err.message, false); }
 }
 
-function getExportHeaders() {
-  return ['Situation','Code','Name','Group','Bank','Basic','Normal OT','Rest OT','Public OT','Other OT','Allowance2','Commission','Incentives','FirstCalcTotal',
-    'Annual Leave Days','Annual Leave','Unpaid Leave Days','Unpaid Leave','Sick Leave Days','Sick Leave','Half Days Leave Days','Half Days Leave','Pinjaman',
-    'Salary for EPF Contributions','Salary for SOCSO Contributions','Salary for EIS Contributions','Salary for 24JAM Lindungan Contributions','EPF (Employee)','EPF (Employer)','SOCSO (Employee)','SOCSO (Employer)','EIS (Employee)','EIS (Employer)','24JAM','SLR Bank Nama','SLR Bank Account No','SLR EPF','SLR SOCSO','SLR EIS','Gross Pay','Total Deduction','Net Salary'];
-}
 function downloadTemplate(format) {
   const headers = getExportHeaders();
   const sample = [
@@ -2561,7 +2460,7 @@ async function loadEmployees(opts = {}) {
           BankNama: row.BankNama || row.Bank || '',
           Basic: Number(row.Salary || row.Basic) || 0,
           Allowance: Number(row.Allowance) || 0,
-          Allowance2: Number(row.Allowance2) || 0,
+          Allowance2: Number(row.Allowance2 !== undefined && row.Allowance2 !== '' ? row.Allowance2 : row.Allowance) || 0,
           Commission: Number(row.Commission) || 0,
           Incentives: Number(row.Incentives) || 0,
           EPFSalary: row.EPFSalary !== undefined && row.EPFSalary !== null && row.EPFSalary !== '' ? Number(row.EPFSalary) : '',
