@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Staff Info · 员工信息</title>
+    <style>
+        /* ==================== 全局变量（与 salary.html 一致） ==================== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --epf-blue: #1a4f8a; --epf-blue-light: #e8f0fa; --epf-blue-soft: #f4f8fd;
+            --epf-border: #d4e0ee; --epf-border-soft: #e6eef7;
+            --epf-text: #1f2d3d; --epf-muted: #64748b; --epf-bg: #f7fafd;
+            --nav-h: 52px;
+            --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover: #16345c;
+            --nav-text: #cbd9ea; --nav-accent: #4d9fff;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--epf-bg); color: var(--epf-text);
+            padding: 0 0 3rem 0; min-height: 100vh; line-height: 1.5;
+            -webkit-font-smoothing: antialiased; font-size: 14px;
+        }
+
+        /* ==================== 顶部深色导航栏 ==================== */
+        .navbar {
+            position: sticky; top: 0; z-index: 200;
+            display: flex; align-items: stretch; flex-wrap: wrap;
+            background: linear-gradient(90deg, var(--nav-bg-1) 0%, var(--nav-bg-2) 100%);
+            padding: 0 1rem; min-height: var(--nav-h);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+            border-bottom: 1px solid rgba(77, 159, 255, 0.18);
+        }
+        .navbar .nav-brand {
+            display: flex; align-items: center; gap: 0.55rem;
+            color: #fff; font-weight: 800; font-size: 0.78rem;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            padding-right: 1.1rem; margin-right: 0.5rem;
+            border-right: 1px solid rgba(255, 255, 255, 0.12);
+            white-space: nowrap;
+        }
+        .navbar .nav-brand .logo {
+            width: 28px; height: 28px; border-radius: 7px;
+            background: linear-gradient(135deg, #4d9fff, #1a4f8a);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 0.85rem; font-weight: 800;
+            box-shadow: 0 2px 6px rgba(77, 159, 255, 0.35);
+        }
+        .nav-links { display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px; }
+        .nav-item {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            padding: 0 0.85rem; min-height: var(--nav-h);
+            color: var(--nav-text); text-decoration: none;
+            font-family: inherit; font-size: 0.73rem; font-weight: 700;
+            letter-spacing: 0.06em; text-transform: uppercase;
+            background: transparent; border: none; cursor: pointer;
+            white-space: nowrap; transition: background 0.15s, color 0.15s;
+            position: relative;
+        }
+        .nav-item:hover { background: var(--nav-hover); color: #fff; }
+        .nav-item::after {
+            content: ''; position: absolute; left: 0.85rem; right: 0.85rem; bottom: 0;
+            height: 2px; background: var(--nav-accent); transform: scaleX(0);
+            transform-origin: left; transition: transform 0.2s;
+        }
+        .nav-item:hover::after { transform: scaleX(1); }
+
+        /* ==================== 工具栏 ==================== */
+        .topbar {
+            position: sticky; top: var(--nav-h); z-index: 100; background: #ffffff;
+            border-bottom: 1px solid var(--epf-border); padding: 0.65rem 1.75rem;
+            display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+            box-shadow: 0 1px 2px rgba(26, 79, 138, 0.04);
+        }
+        .topbar .spacer { flex: 1; }
+        .topbar .brand {
+            font-weight: 700; font-size: 0.95rem; color: var(--epf-blue);
+            display: flex; align-items: center; gap: 0.6rem;
+            margin-right: 0.5rem; letter-spacing: -0.01em;
+        }
+        .topbar .brand .logo {
+            width: 32px; height: 32px; background: var(--epf-blue); border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 0.95rem; font-weight: 800;
+        }
+
+        /* ==================== 按钮 ==================== */
+        .btn {
+            background: #ffffff; border: 1px solid var(--epf-border);
+            padding: 0.42rem 0.9rem; border-radius: 5px; font-size: 0.78rem;
+            font-weight: 500; cursor: pointer; color: var(--epf-blue);
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            transition: all 0.15s ease; white-space: nowrap; font-family: inherit;
+        }
+        .btn:hover { background: var(--epf-blue-soft); border-color: #b8cfe8; }
+        .btn-primary { background: var(--epf-blue); border: 1px solid var(--epf-blue); color: #fff; }
+        .btn-primary:hover { background: #15406f; border-color: #15406f; }
+        .btn-success { background: #0f7a54; border: 1px solid #0f7a54; color: #fff; }
+        .btn-success:hover { background: #0c6a48; border-color: #0c6a48; }
+        .btn-danger { background: #c53030; border: 1px solid #c53030; color: #fff; }
+        .btn-danger:hover { background: #9b2c2c; border-color: #9b2c2c; }
+        .btn-gray { background: #e2e8f0; border: 1px solid #e2e8f0; color: #4a5568; }
+        .btn-gray:hover { background: #cbd5e0; }
+        .btn-sm { padding: 0.25rem 0.7rem; font-size: 0.72rem; border-radius: 4px; }
+        select.btn {
+            cursor: pointer; padding-right: 1.8rem; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%231a4f8a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 0.7rem center;
+        }
+
+        /* ==================== 容器与卡片 ==================== */
+        .container { max-width: 100%; margin: 0 auto; padding: 1.5rem 1.75rem; }
+        .page-header {
+            background: #ffffff; border: 1px solid var(--epf-border); border-radius: 8px;
+            padding: 1.4rem 1.75rem; margin-bottom: 1.25rem;
+            display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
+            justify-content: space-between; box-shadow: 0 1px 3px rgba(26, 79, 138, 0.04);
+        }
+        .page-header .info { flex: 1; min-width: 240px; }
+        .page-header h1 {
+            font-size: 1.45rem; font-weight: 700; margin-bottom: 0.35rem;
+            color: var(--epf-blue); letter-spacing: -0.015em;
+        }
+        .page-header p { font-size: 0.85rem; color: var(--epf-muted); line-height: 1.6; }
+        .page-header .badge {
+            display: inline-block; background: var(--epf-blue-light); color: var(--epf-blue);
+            padding: 0.25rem 0.85rem; border-radius: 4px; font-size: 0.7rem;
+            font-weight: 600; margin-top: 0.6rem; border: 1px solid #cfe0f2;
+        }
+        .card {
+            background: #ffffff; border-radius: 8px; border: 1px solid var(--epf-border);
+            overflow: hidden; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(26, 79, 138, 0.04);
+        }
+        .card-body { padding: 1.25rem 1.5rem; }
+        .card-body.p-0 { padding: 0; }
+
+        /* ==================== 筛选区域 ==================== */
+        .filter-section {
+            background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft);
+            border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1rem;
+        }
+        .filter-row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
+        .filter-group { flex: 1 1 180px; min-width: 140px; }
+        .filter-group label {
+            display: block; font-weight: 600; font-size: 0.72rem;
+            color: var(--epf-muted); text-transform: uppercase;
+            letter-spacing: 0.05em; margin-bottom: 0.35rem;
+        }
+        .filter-group select, .filter-group input {
+            width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--epf-border);
+            border-radius: 5px; font-size: 0.82rem; background: #fff;
+            font-family: inherit; color: var(--epf-text); transition: 0.15s;
+        }
+        .filter-group select:focus, .filter-group input:focus {
+            outline: none; border-color: var(--epf-blue);
+            box-shadow: 0 0 0 2px rgba(26, 79, 138, 0.10);
+        }
+
+        /* ==================== 状态栏与警告 ==================== */
+        .status-bar {
+            background: var(--epf-blue-soft); padding: 0.6rem 1rem;
+            border-radius: 6px; font-size: 0.78rem; color: var(--epf-muted);
+            margin-bottom: 1rem; border: 1px solid var(--epf-border-soft);
+            word-break: break-all;
+        }
+        .status-bar.success { background: #e3f5ea; color: #14663f; border-color: #b7e4c7; }
+        .status-bar.error { background: #fdeaea; color: #8b2b48; border-color: #f0b4b4; }
+        .status-bar.info { background: #eef5fd; color: var(--epf-blue); border-color: #cfe0f2; }
+        .status-bar.saving { background: #fdf8ec; color: #7a5a12; border-color: #e8d48a; }
+        .status-bar.debug { background: #f4f1fb; color: #4a3a8a; border-color: #c4b8e8; }
+        .alert {
+            padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 1rem;
+            display: none; font-weight: 500; font-size: 0.82rem;
+        }
+        .alert.error { background: #fdeaea; color: #8b2b48; display: block; border: 1px solid #f0b4b4; }
+        .alert.success { background: #e3f5ea; color: #14663f; display: block; border: 1px solid #b7e4c7; }
+        .alert.info { background: #eef5fd; color: var(--epf-blue); display: block; border: 1px solid #cfe0f2; }
+
+        /* ==================== 员工列表 ==================== */
+        .staff-list { display: flex; flex-direction: column; gap: 0.6rem; }
+        .staff-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.85rem 1.1rem; background: #fff;
+            border: 1px solid var(--epf-border-soft); border-radius: 8px;
+            cursor: pointer; transition: 0.15s;
+        }
+        .staff-item:hover {
+            border-color: var(--epf-blue); background: var(--epf-blue-soft);
+            box-shadow: 0 2px 8px rgba(26, 79, 138, 0.08);
+        }
+        .staff-item .info { display: flex; flex-direction: column; gap: 0.2rem; }
+        .staff-item .name { font-weight: 700; font-size: 0.92rem; color: var(--epf-blue); }
+        .staff-item .code { font-size: 0.75rem; color: var(--epf-muted); }
+        .staff-item .status-wrap { display: flex; align-items: center; gap: 0.5rem; }
+        .staff-item .arrow { color: var(--epf-muted); font-size: 1.1rem; }
+
+        /* 状态徽章 */
+        .status-badge {
+            display: inline-block; padding: 0.2rem 0.7rem; border-radius: 20px;
+            font-size: 0.68rem; font-weight: 600; letter-spacing: 0.03em;
+        }
+        .status-badge.active { background: #c6f6d5; color: #22543d; }
+        .status-badge.inactive { background: #fed7d7; color: #9b2c2c; }
+        .status-badge.pending { background: #fefcbf; color: #975a16; }
+        .status-badge.unknown { background: #e2e8f0; color: #4a5568; }
+
+        /* 空状态 */
+        .empty-state { text-align: center; padding: 2.5rem 1rem; color: #a7b7c9; font-size: 0.85rem; }
+        .empty-state .icon { font-size: 2.2rem; display: block; margin-bottom: 0.75rem; }
+
+        /* ==================== 资料视图 ==================== */
+        .profile-view { margin-top: 1rem; }
+        .profile-view h2 {
+            color: var(--epf-blue); font-size: 1.15rem; margin-bottom: 0.5rem;
+        }
+        .profile-edit-hint {
+            font-size: 0.75rem; color: var(--epf-muted); margin-bottom: 1rem;
+        }
+        .profile-field {
+            display: flex; justify-content: space-between; padding: 0.6rem 0;
+            border-bottom: 1px solid var(--epf-border-soft); align-items: center;
+            flex-wrap: wrap; gap: 0.5rem;
+        }
+        .profile-field label {
+            font-weight: 600; color: var(--epf-muted); font-size: 0.75rem;
+            flex: 0 0 140px; text-transform: uppercase; letter-spacing: 0.03em;
+        }
+        .profile-field input, .profile-field select {
+            border: 1px solid var(--epf-border); border-radius: 5px;
+            font-size: 0.82rem; background: #fff; flex: 1;
+            padding: 0.4rem 0.65rem; min-width: 120px; transition: 0.15s;
+            font-family: inherit; color: var(--epf-text);
+        }
+        .profile-field input:focus, .profile-field select:focus {
+            outline: none; border-color: var(--epf-blue);
+            box-shadow: 0 0 0 2px rgba(26, 79, 138, 0.10);
+        }
+        .profile-field input:read-only {
+            background: var(--epf-blue-soft); border-color: transparent; color: var(--epf-muted);
+        }
+        .situation-select { font-weight: 600; }
+        .situation-select.active { color: #22543d; background: #c6f6d5; border-color: #22543d !important; }
+        .situation-select.inactive { color: #9b2c2c; background: #fed7d7; border-color: #9b2c2c !important; }
+        .situation-select.pending { color: #975a16; background: #fefcbf; border-color: #975a16 !important; }
+
+        /* ==================== 员工登录弹窗 ==================== */
+        .login-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(11, 27, 48, 0.55); display: none;
+            align-items: center; justify-content: center; z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        .login-overlay.active { display: flex; }
+        .login-overlay .login-box {
+            background: #fff; padding: 2rem 1.75rem; border-radius: 12px;
+            max-width: 400px; width: 92%; box-shadow: 0 20px 60px rgba(11, 27, 48, 0.3);
+            animation: fadeIn 0.25s ease;
+        }
+        @keyframes fadeIn { from { transform: scale(0.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .login-overlay .login-box h3 {
+            text-align: center; color: var(--epf-blue); font-size: 1.15rem; margin-bottom: 0.3rem;
+        }
+        .login-overlay .login-box .login-sub {
+            text-align: center; color: var(--epf-muted); font-size: 0.78rem; margin-bottom: 1.25rem;
+        }
+        .login-overlay .login-box .form-group { margin-bottom: 0.85rem; }
+        .login-overlay .login-box .form-group label {
+            display: block; font-weight: 600; font-size: 0.72rem;
+            color: var(--epf-muted); text-transform: uppercase;
+            letter-spacing: 0.04em; margin-bottom: 0.3rem;
+        }
+        .login-overlay .login-box .form-group input {
+            width: 100%; padding: 0.6rem 0.85rem; border: 1px solid var(--epf-border);
+            border-radius: 5px; font-size: 0.88rem; font-family: inherit;
+            transition: 0.15s; color: var(--epf-text);
+        }
+        .login-overlay .login-box .form-group input:focus {
+            outline: none; border-color: var(--epf-blue);
+            box-shadow: 0 0 0 2px rgba(26, 79, 138, 0.10);
+        }
+        .login-overlay .login-box .btn {
+            width: 100%; padding: 0.65rem; border-radius: 5px;
+            font-size: 0.85rem; font-weight: 600; cursor: pointer;
+            transition: 0.15s; margin-top: 0.4rem; font-family: inherit;
+            border: 1px solid transparent;
+        }
+        .login-overlay .login-box .btn-primary { background: var(--epf-blue); color: #fff; border-color: var(--epf-blue); }
+        .login-overlay .login-box .btn-primary:hover { background: #15406f; }
+        .login-overlay .login-box .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        .login-overlay .login-box .btn-gray { background: #e2e8f0; color: #4a5568; border-color: #e2e8f0; }
+        .login-overlay .login-box .btn-gray:hover { background: #cbd5e0; }
+        .login-overlay .login-box .error-msg {
+            color: #c53030; font-size: 0.78rem; text-align: center;
+            margin-top: 0.6rem; display: none;
+        }
+        .login-overlay .login-box .success-msg {
+            color: #22543d; font-size: 0.78rem; text-align: center;
+            margin-top: 0.6rem; display: none;
+        }
+
+        /* ==================== Loading Spinner ==================== */
+        .loading-spinner {
+            display: inline-block; width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid #fff;
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+            margin-right: 6px; vertical-align: middle;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* ==================== 响应式 ==================== */
+        @media (max-width: 768px) {
+            .navbar { padding: 0 0.5rem; }
+            .navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
+            .navbar .nav-brand .brand-text { display: none; }
+            .nav-item { padding: 0 0.6rem; font-size: 0.68rem; }
+            .topbar { padding: 0.6rem 1rem; }
+            .container { padding: 1rem; }
+            .page-header { padding: 1.2rem 1.2rem; }
+            .page-header h1 { font-size: 1.2rem; }
+            .filter-row { flex-direction: column; gap: 0.75rem; }
+            .filter-group { flex: 1 1 100%; }
+            .profile-field label { flex: 0 0 100px; font-size: 0.7rem; }
+            .profile-field input, .profile-field select { font-size: 0.78rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ==================== 顶部深色导航栏（与 salary.html 一致） ==================== -->
+<nav class="navbar">
+    <div class="nav-brand">
+        <span class="logo">Y</span>
+        <span class="brand-text">YZ Staff</span>
+    </div>
+    <div class="nav-links">
+        <a class="nav-item" href="salary.html">💰 Payroll</a>
+        <a class="nav-item" href="staffinfo.html" style="background:var(--nav-hover);color:#fff;">👥 Employees</a>
+        <a class="nav-item" href="#" onclick="goBackToIndex();return false;">🏠 Index</a>
+    </div>
+</nav>
+
+<!-- ==================== 工具栏 ==================== -->
+<div class="topbar">
+    <div class="brand">
+        <div class="logo">👥</div>
+        Staff Info
+    </div>
+    <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
+    <button class="btn" onclick="testConnection()">🔧 Test Connection</button>
+    <span class="spacer"></span>
+    <select id="langSelect" class="btn" onchange="setLanguage(this.value)">
+        <option value="ms">🇲🇾 Bahasa Melayu</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="zh">🇨🇳 中文</option>
+    </select>
+</div>
+
+<div class="container" id="mainContent">
+
+    <!-- 页面标题 -->
+    <div class="page-header">
+        <div class="info">
+            <h1 id="mainTitle">📇 Staff Info</h1>
+            <p id="subTitle">Pilih cawangan & lihat senarai staf</p>
+            <span class="badge" id="pageBadge">Klik pada staf untuk melihat profil & sunting</span>
+        </div>
+    </div>
+
+    <!-- 状态栏 -->
+    <div id="statusBar" class="status-bar">🔌 Memuatkan data...</div>
+
+    <!-- 警告框 -->
+    <div id="alert" class="alert"></div>
+
+    <!-- 筛选区域 -->
+    <div id="filterSection" class="filter-section">
+        <div class="filter-row">
+            <div class="filter-group">
+                <label for="branchSelect">🏢 Cawangan (GroupName)</label>
+                <select id="branchSelect">
+                    <option value="">-- Pilih Cawangan --</option>
+                </select>
+                <div id="otherBranchContainer" class="hidden" style="margin-top:0.5rem;">
+                    <input type="text" id="otherBranchInput" placeholder="Sila nyatakan cawangan lain...">
+                </div>
+            </div>
+            <div class="filter-group">
+                <label for="statusSelect">📌 Status (Situation)</label>
+                <select id="statusSelect">
+                    <option value="">Semua Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Pending">Pending</option>
+                </select>
+            </div>
+            <div class="filter-group" style="flex:0 1 auto;min-width:80px;">
+                <button class="btn btn-gray" style="width:100%;" onclick="goBackToIndex()">← Kembali</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 员工列表 -->
+    <div class="card" id="staffListContainer">
+        <div class="card-body p-0">
+            <div class="staff-list" id="staffList" style="padding:0.75rem;"></div>
+        </div>
+    </div>
+
+    <!-- 资料视图 -->
+    <div class="card" id="profileView" style="display:none;">
+        <div class="card-body">
+            <h2 id="profileTitle">👤 Profil Staf</h2>
+            <div class="profile-edit-hint">✏️ Klik pada mana-mana medan untuk sunting</div>
+            <div id="profileFields"></div>
+            <button class="btn btn-success" style="width:100%;margin-top:1rem;" id="saveProfileBtn" onclick="saveProfile()">💾 Simpan Perubahan</button>
+            <button class="btn btn-danger" style="width:100%;margin-top:0.5rem;" onclick="logoutAndGoBack()">🚪 Log Keluar & Kembali</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- ==================== 员工登录弹窗（保留，但样式已统一） ==================== -->
+<div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+        <h3>🔐 Log Masuk Staf</h3>
+        <p class="login-sub">Masukkan Code dan Password untuk melihat profil</p>
+        <div class="form-group">
+            <label for="loginCode">Code</label>
+            <input type="text" id="loginCode" placeholder="Masukkan Code Staff" autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" placeholder="Masukkan Password">
+        </div>
+        <button class="btn btn-primary" id="loginBtn" onclick="performStaffLogin()">🔓 Log Masuk</button>
+        <button class="btn btn-gray" onclick="closeStaffLogin()">Batal</button>
+        <div class="error-msg" id="loginError">Code atau Password salah!</div>
+        <div class="success-msg" id="loginSuccess">✅ Log masuk berjaya!</div>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    //  KONFIGURASI
+    // ============================================================
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMvU6u4HEWNoULZedWPs3XvjJMY8fb-J3UDCRbNeRnijj7DDbqPXnb07RlL2st0xsmHQ/exec';
+    const SHEET_NAME = 'STAFF LOGIN RECORD';
+
+    // ============================================================
+    //  STATE
+    // ============================================================
+    let allStaff = [];
+    let branches = [];
+    let isLoading = false;
+    let currentUser = null;
+    let isLoggedIn = false;
+    let currentLanguage = 'ms';
+
+    // DOM Elements
+    const branchSelect = document.getElementById('branchSelect');
+    const statusSelect = document.getElementById('statusSelect');
+    const staffListEl = document.getElementById('staffList');
+    const statusBar = document.getElementById('statusBar');
+    const otherBranchContainer = document.getElementById('otherBranchContainer');
+    const otherBranchInput = document.getElementById('otherBranchInput');
+    const alertBox = document.getElementById('alert');
+    const profileView = document.getElementById('profileView');
+    const profileFields = document.getElementById('profileFields');
+    const filterSection = document.getElementById('filterSection');
+    const staffListContainer = document.getElementById('staffListContainer');
+
+    // Staff Login
+    const loginOverlay = document.getElementById('loginOverlay');
+    const loginCode = document.getElementById('loginCode');
+    const loginPassword = document.getElementById('loginPassword');
+    const loginError = document.getElementById('loginError');
+    const loginSuccess = document.getElementById('loginSuccess');
+    const loginBtn = document.getElementById('loginBtn');
+
+    // ============================================================
+    //  TEST CONNECTION
+    // ============================================================
+    async function testConnection() {
+        updateStatus('🔍 Menguji sambungan ke Google Sheets...', 'info');
+        showAlert('🔍 Menguji sambungan...', 'info');
+
+        try {
+            const url = `${SCRIPT_URL}?action=getData&_t=${Date.now()}`;
+            const response = await fetch(url);
+            const text = await response.text();
+
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                updateStatus('❌ Response bukan JSON: ' + text.substring(0, 100), 'error');
+                showAlert('❌ Server tidak mengembalikan JSON. Sila semak Apps Script deployment.', 'error');
+                return;
+            }
+
+            if (data && data.result === 'success') {
+                const count = data.data ? data.data.length : 0;
+                updateStatus(`✅ Sambungan berjaya! Ditemui ${count} rekod.`, 'success');
+                showAlert(`✅ Sambungan berjaya! Ditemui ${count} rekod.`, 'success');
+            } else {
+                updateStatus('⚠️ Sambungan berjaya tetapi data tidak seperti dijangka.', 'debug');
+                showAlert('⚠️ Sambungan berjaya tetapi format data tidak dijangka.', 'info');
+            }
+        } catch (err) {
+            updateStatus('❌ Gagal menyambung: ' + err.message, 'error');
+            showAlert('❌ Gagal menyambung ke server: ' + err.message, 'error');
+        }
+    }
+
+    // ============================================================
+    //  TRANSLATIONS
+    // ============================================================
+    const translations = {
+        ms: {
+            title: '📇 Staff Info',
+            subTitle: 'Pilih cawangan & lihat senarai staf',
+            profileTitle: '👤 Profil Staf',
+            editHint: '✏️ Klik pada mana-mana medan untuk sunting',
+            saveBtn: '💾 Simpan Perubahan',
+            logoutBtn: '🚪 Log Keluar & Kembali',
+            saveSuccess: '✅ Data berjaya disimpan ke Google Sheets!',
+            saveFail: '❌ Gagal menyimpan data ke Google Sheets.',
+            networkError: '⚠️ Ralat rangkaian',
+            noData: 'Tiada staf untuk paparan.',
+            selectBranch: '-- Pilih Cawangan --',
+            allStatus: 'Semua Status',
+            groupName: '🏢 Cawangan (GroupName)',
+            statusLabel: '📌 Status (Situation)',
+            loading: '🔌 Memuatkan data...',
+            connected: '✅ Bersambung! {count} rekod ditemui.',
+            othersPlaceholder: 'Sila nyatakan cawangan lain...',
+            emptyOthers: 'Sila nyatakan cawangan lain di ruangan yang disediakan.',
+            confirmLogout: 'Anda pasti mahu log keluar?',
+            staffLoginTitle: '🔐 Log Masuk Staf',
+            staffLoginSub: 'Masukkan Code dan Password untuk melihat profil',
+            staffLoginCode: 'Code',
+            staffLoginPassword: 'Password',
+            staffLoginBtn: '🔓 Log Masuk',
+            cancelBtn: 'Batal',
+            staffLoginSuccess: '✅ Log masuk berjaya!',
+            staffLoginError: 'Code atau Password salah!',
+            saving: 'Menyimpan ke Google Sheets...',
+            saved: 'Disimpan',
+            situationLabel: '📌 Situation (Status)'
+        },
+        en: {
+            title: '📇 Staff Info',
+            subTitle: 'Select branch & view staff list',
+            profileTitle: '👤 Staff Profile',
+            editHint: '✏️ Click on any field to edit',
+            saveBtn: '💾 Save Changes',
+            logoutBtn: '🚪 Logout & Back',
+            saveSuccess: '✅ Data saved to Google Sheets successfully!',
+            saveFail: '❌ Failed to save data to Google Sheets.',
+            networkError: '⚠️ Network error',
+            noData: 'No staff to display.',
+            selectBranch: '-- Select Branch --',
+            allStatus: 'All Status',
+            groupName: '🏢 Branch (GroupName)',
+            statusLabel: '📌 Status (Situation)',
+            loading: '🔌 Loading data...',
+            connected: '✅ Connected! {count} records found.',
+            othersPlaceholder: 'Please specify other branch...',
+            emptyOthers: 'Please specify other branch in the field provided.',
+            confirmLogout: 'Are you sure you want to logout?',
+            staffLoginTitle: '🔐 Staff Login',
+            staffLoginSub: 'Enter Code and Password to view profile',
+            staffLoginCode: 'Code',
+            staffLoginPassword: 'Password',
+            staffLoginBtn: '🔓 Login',
+            cancelBtn: 'Cancel',
+            staffLoginSuccess: '✅ Login successful!',
+            staffLoginError: 'Incorrect Code or Password!',
+            saving: 'Saving to Google Sheets...',
+            saved: 'Saved',
+            situationLabel: '📌 Situation (Status)'
+        },
+        zh: {
+            title: '📇 员工信息',
+            subTitle: '选择分店并查看员工列表',
+            profileTitle: '👤 员工资料',
+            editHint: '✏️ 点击任意字段进行编辑',
+            saveBtn: '💾 保存修改',
+            logoutBtn: '🚪 退出并返回',
+            saveSuccess: '✅ 数据已成功保存到 Google Sheets！',
+            saveFail: '❌ 保存数据到 Google Sheets 失败。',
+            networkError: '⚠️ 网络错误',
+            noData: '没有员工可显示。',
+            selectBranch: '-- 选择分店 --',
+            allStatus: '所有状态',
+            groupName: '🏢 分店 (GroupName)',
+            statusLabel: '📌 状态 (Situation)',
+            loading: '🔌 加载数据中...',
+            connected: '✅ 已连接！找到 {count} 条记录。',
+            othersPlaceholder: '请注明其他分店...',
+            emptyOthers: '请在提供的字段中注明其他分店。',
+            confirmLogout: '您确定要退出登录吗？',
+            staffLoginTitle: '🔐 员工登录',
+            staffLoginSub: '输入代码和密码以查看资料',
+            staffLoginCode: '员工代码',
+            staffLoginPassword: '密码',
+            staffLoginBtn: '🔓 登录',
+            cancelBtn: '取消',
+            staffLoginSuccess: '✅ 登录成功！',
+            staffLoginError: '代码或密码错误！',
+            saving: '正在保存到 Google Sheets...',
+            saved: '已保存',
+            situationLabel: '📌 状态 (Situation)'
+        }
+    };
+
+    function t(key) {
+        return translations[currentLanguage]?.[key] || key;
+    }
+
+    function setLanguage(lang) {
+        currentLanguage = lang;
+        document.getElementById('langSelect').value = lang;
+        updateAllTexts();
+    }
+
+    function updateAllTexts() {
+        document.getElementById('mainTitle').textContent = t('title');
+        document.getElementById('subTitle').textContent = t('subTitle');
+        document.getElementById('profileTitle').textContent = t('profileTitle');
+        document.querySelector('.profile-edit-hint').textContent = t('editHint');
+        document.getElementById('saveProfileBtn').textContent = t('saveBtn');
+
+        const branchSel = document.getElementById('branchSelect');
+        if (branchSel.options.length > 0) branchSel.options[0].text = t('selectBranch');
+        const statusSel = document.getElementById('statusSelect');
+        if (statusSel.options.length > 0) statusSel.options[0].text = t('allStatus');
+        document.getElementById('otherBranchInput').placeholder = t('othersPlaceholder');
+    }
+
+    // ============================================================
+    //  ALERT & STATUS
+    // ============================================================
+    function showAlert(msg, type = 'error') {
+        alertBox.textContent = msg;
+        alertBox.className = 'alert ' + type;
+        setTimeout(() => { alertBox.className = 'alert'; }, 8000);
+    }
+
+    function updateStatus(msg, type = '') {
+        statusBar.textContent = msg;
+        statusBar.className = 'status-bar ' + type;
+    }
+
+    function getStatusBadge(status) {
+        const s = (status || '').toLowerCase();
+        let cls = 'unknown';
+        let label = status || 'Unknown';
+        if (s === 'active') { cls = 'active'; label = 'Active'; }
+        else if (s === 'inactive') { cls = 'inactive'; label = 'Inactive'; }
+        else if (s === 'pending') { cls = 'pending'; label = 'Pending'; }
+        return `<span class="status-badge ${cls}">${label}</span>`;
+    }
+
+    // ============================================================
+    //  BRANCH HANDLING
+    // ============================================================
+    function handleBranchChange() {
+        const selected = branchSelect.value;
+        if (selected === 'Others') {
+            otherBranchContainer.classList.remove('hidden');
+            otherBranchInput.focus();
+            renderStaffList();
+        } else {
+            otherBranchContainer.classList.add('hidden');
+            otherBranchInput.value = '';
+            renderStaffList();
+        }
+    }
+    otherBranchInput.addEventListener('input', renderStaffList);
+
+    // ============================================================
+    //  FETCH DATA
+    // ============================================================
+    async function fetchStaffData() {
+        isLoading = true;
+        updateStatus('⏳ Menghubungi server...', 'info');
+
+        try {
+            const url = `${SCRIPT_URL}?action=getData&_t=${Date.now()}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+
+            const rawResult = await response.json();
+            let dataArray;
+
+            if (Array.isArray(rawResult)) {
+                dataArray = rawResult;
+            } else if (rawResult && rawResult.data && Array.isArray(rawResult.data)) {
+                dataArray = rawResult.data;
+            } else if (rawResult && rawResult.values && Array.isArray(rawResult.values)) {
+                dataArray = rawResult.values;
+            } else if (rawResult && rawResult.rows && Array.isArray(rawResult.rows)) {
+                dataArray = rawResult.rows;
+            } else if (typeof rawResult === 'object' && rawResult !== null) {
+                const keys = Object.keys(rawResult);
+                if (keys.length > 0 && keys.every(k => !isNaN(parseInt(k)))) {
+                    dataArray = Object.values(rawResult);
+                } else {
+                    const possibleFields = ['Code', 'Name', 'GroupName', 'Situation'];
+                    const hasStaffFields = possibleFields.some(f => rawResult[f] !== undefined);
+                    if (hasStaffFields) {
+                        dataArray = [rawResult];
+                    } else {
+                        throw new Error('Format data tidak dikenali: ' + JSON.stringify(rawResult).substring(0, 200));
+                    }
+                }
+            } else {
+                throw new Error('Format data tidak dikenali.');
+            }
+
+            if (!dataArray || dataArray.length === 0) throw new Error('Tiada data ditemui.');
+
+            const firstRow = dataArray[0];
+            let staff = [];
+            const branchSet = new Set();
+
+            if (Array.isArray(firstRow)) {
+                const idx = {
+                    situation: 1, loginPwd: 28, name: 4, code: 3, group: 2,
+                    jantina: 5, tarikhLahir: 6, salary: 7, ic: 8, jawatan: 9,
+                    tarikhMasuk: 10, telefon: 11, email: 12, shift: 13, offDay: 14,
+                    alamatTetap: 15, namaWaris: 16, alamatWaris: 17, bankNama: 18,
+                    bankAccount: 19, epf: 20, perkeso: 21, eis: 22, lindungan: 23,
+                    yellowCard: 24, phoneType: 25, signupDate: 26, updateDate: 27
+                };
+                for (let i = 1; i < dataArray.length; i++) {
+                    const row = dataArray[i];
+                    if (!Array.isArray(row)) continue;
+                    if (row.length <= Math.max(idx.situation, idx.loginPwd, idx.name, idx.code, idx.group)) continue;
+                    const group = (row[idx.group] || '').toString().trim();
+                    const code = (row[idx.code] || '').toString().trim();
+                    const name = (row[idx.name] || '').toString().trim();
+                    const situation = (row[idx.situation] || '').toString().trim();
+                    const loginPwd = (row[idx.loginPwd] || '').toString().trim();
+                    if (!code || !name) continue;
+
+                    const userObj = {
+                        Code: code, GroupName: group || 'Tidak Diketahui', Name: name,
+                        Situation: situation || 'Unknown', LoginPassword: loginPwd,
+                        Jantina: (row[idx.jantina] || '').toString().trim(),
+                        TarikhLahir: (row[idx.tarikhLahir] || '').toString().trim(),
+                        Salary: (row[idx.salary] || '').toString().trim(),
+                        IC: (row[idx.ic] || '').toString().trim(),
+                        Jawatan: (row[idx.jawatan] || '').toString().trim(),
+                        TarikhMasukKerja: (row[idx.tarikhMasuk] || '').toString().trim(),
+                        TelefonNo: (row[idx.telefon] || '').toString().trim(),
+                        Email: (row[idx.email] || '').toString().trim(),
+                        ShiftType: (row[idx.shift] || '').toString().trim(),
+                        OffDay: (row[idx.offDay] || '').toString().trim(),
+                        AlamatTetap: (row[idx.alamatTetap] || '').toString().trim(),
+                        NamaWaris: (row[idx.namaWaris] || '').toString().trim(),
+                        AlamatWaris: (row[idx.alamatWaris] || '').toString().trim(),
+                        BankNama: (row[idx.bankNama] || '').toString().trim(),
+                        BankAccountNo: (row[idx.bankAccount] || '').toString().trim(),
+                        EPF: (row[idx.epf] || '').toString().trim(),
+                        PERKESO: (row[idx.perkeso] || '').toString().trim(),
+                        EIS: (row[idx.eis] || '').toString().trim(),
+                        Lindungan: (row[idx.lindungan] || '').toString().trim(),
+                        YellowCard: (row[idx.yellowCard] || '').toString().trim(),
+                        PhoneType: (row[idx.phoneType] || '').toString().trim(),
+                        SignupDate: (row[idx.signupDate] || '').toString().trim(),
+                        UpdateDate: (row[idx.updateDate] || '').toString().trim()
+                    };
+                    staff.push(userObj);
+                    if (group) branchSet.add(group);
+                }
+            } else if (typeof firstRow === 'object' && firstRow !== null) {
+                const sampleKeys = Object.keys(firstRow);
+                const findKey = (possibleNames) => {
+                    for (const name of possibleNames) {
+                        const found = sampleKeys.find(k => k.toLowerCase() === name.toLowerCase());
+                        if (found) return found;
+                    }
+                    for (const name of possibleNames) {
+                        const found = sampleKeys.find(k => k.toLowerCase().includes(name.toLowerCase()));
+                        if (found) return found;
+                    }
+                    return null;
+                };
+                const situationKey = findKey(['Situation', 'situation', 'STATUS', 'Status']);
+                const loginPwdKey = findKey(['LoginPassword', 'loginPassword', 'Password', 'password']);
+                const nameKey = findKey(['Name', 'name', 'Nama', 'nama']);
+                const codeKey = findKey(['Code', 'code', 'Kod', 'kod', 'ID']);
+                const groupKey = findKey(['GroupName', 'groupName', 'Group', 'group', 'Cawangan', 'cawangan']);
+
+                if (!situationKey || !loginPwdKey || !nameKey || !codeKey || !groupKey) {
+                    throw new Error('Header tidak dijumpai. Keys: ' + sampleKeys.join(', '));
+                }
+
+                const fieldMap = {
+                    jantina: findKey(['Jantina', 'jantina', 'Gender', 'gender']),
+                    tarikhLahir: findKey(['TarikhLahir', 'tarikhLahir', 'DateOfBirth', 'DOB']),
+                    salary: findKey(['Salary', 'salary', 'Gaji', 'gaji']),
+                    ic: findKey(['IC', 'ic', 'Passport', 'passport', 'DocNo']),
+                    jawatan: findKey(['Jawatan', 'jawatan', 'Position', 'position']),
+                    tarikhMasuk: findKey(['TarikhMasukKerja', 'tarikhMasukKerja', 'StartDate', 'startDate']),
+                    telefon: findKey(['TelefonNo', 'telefonNo', 'Phone', 'phone']),
+                    email: findKey(['Email', 'email']),
+                    shift: findKey(['ShiftType', 'shiftType', 'Shift', 'shift']),
+                    offDay: findKey(['OffDay', 'offDay', 'Off', 'off']),
+                    alamatTetap: findKey(['AlamatTetap', 'alamatTetap', 'Address', 'address']),
+                    namaWaris: findKey(['NamaWaris', 'namaWaris', 'NextOfKin', 'nextOfKin']),
+                    alamatWaris: findKey(['AlamatWaris', 'alamatWaris', 'NextOfKinAddress']),
+                    bankNama: findKey(['BankNama', 'bankNama', 'Bank', 'bank']),
+                    bankAccount: findKey(['BankAccountNo', 'bankAccountNo', 'AccountNo', 'accountNo']),
+                    epf: findKey(['EPF', 'epf', 'KWSP', 'kwsp']),
+                    perkeso: findKey(['PERKESO', 'perkeso']),
+                    eis: findKey(['EIS', 'eis']),
+                    lindungan: findKey(['Lindungan', 'lindungan', '24Jam', '24jam']),
+                    yellowCard: findKey(['YellowCard', 'yellowCard', 'Yellow', 'yellow']),
+                    phoneType: findKey(['PhoneType', 'phoneType', 'Device', 'device']),
+                    signupDate: findKey(['SignupDate', 'signupDate']),
+                    updateDate: findKey(['UpdateDate', 'updateDate'])
+                };
+
+                for (const row of dataArray) {
+                    if (typeof row !== 'object' || row === null) continue;
+                    const code = (row[codeKey] || '').toString().trim();
+                    const name = (row[nameKey] || '').toString().trim();
+                    if (!code || !name) continue;
+
+                    const userObj = {
+                        Code: code, GroupName: (row[groupKey] || '').toString().trim() || 'Tidak Diketahui',
+                        Name: name, Situation: (row[situationKey] || '').toString().trim() || 'Unknown',
+                        LoginPassword: (row[loginPwdKey] || '').toString().trim(),
+                        Jantina: fieldMap.jantina ? (row[fieldMap.jantina] || '').toString().trim() : '',
+                        TarikhLahir: fieldMap.tarikhLahir ? (row[fieldMap.tarikhLahir] || '').toString().trim() : '',
+                        Salary: fieldMap.salary ? (row[fieldMap.salary] || '').toString().trim() : '',
+                        IC: fieldMap.ic ? (row[fieldMap.ic] || '').toString().trim() : '',
+                        Jawatan: fieldMap.jawatan ? (row[fieldMap.jawatan] || '').toString().trim() : '',
+                        TarikhMasukKerja: fieldMap.tarikhMasuk ? (row[fieldMap.tarikhMasuk] || '').toString().trim() : '',
+                        TelefonNo: fieldMap.telefon ? (row[fieldMap.telefon] || '').toString().trim() : '',
+                        Email: fieldMap.email ? (row[fieldMap.email] || '').toString().trim() : '',
+                        ShiftType: fieldMap.shift ? (row[fieldMap.shift] || '').toString().trim() : '',
+                        OffDay: fieldMap.offDay ? (row[fieldMap.offDay] || '').toString().trim() : '',
+                        AlamatTetap: fieldMap.alamatTetap ? (row[fieldMap.alamatTetap] || '').toString().trim() : '',
+                        NamaWaris: fieldMap.namaWaris ? (row[fieldMap.namaWaris] || '').toString().trim() : '',
+                        AlamatWaris: fieldMap.alamatWaris ? (row[fieldMap.alamatWaris] || '').toString().trim() : '',
+                        BankNama: fieldMap.bankNama ? (row[fieldMap.bankNama] || '').toString().trim() : '',
+                        BankAccountNo: fieldMap.bankAccount ? (row[fieldMap.bankAccount] || '').toString().trim() : '',
+                        EPF: fieldMap.epf ? (row[fieldMap.epf] || '').toString().trim() : '',
+                        PERKESO: fieldMap.perkeso ? (row[fieldMap.perkeso] || '').toString().trim() : '',
+                        EIS: fieldMap.eis ? (row[fieldMap.eis] || '').toString().trim() : '',
+                        Lindungan: fieldMap.lindungan ? (row[fieldMap.lindungan] || '').toString().trim() : '',
+                        YellowCard: fieldMap.yellowCard ? (row[fieldMap.yellowCard] || '').toString().trim() : '',
+                        PhoneType: fieldMap.phoneType ? (row[fieldMap.phoneType] || '').toString().trim() : '',
+                        SignupDate: fieldMap.signupDate ? (row[fieldMap.signupDate] || '').toString().trim() : '',
+                        UpdateDate: fieldMap.updateDate ? (row[fieldMap.updateDate] || '').toString().trim() : ''
+                    };
+                    staff.push(userObj);
+                    if (userObj.GroupName && userObj.GroupName !== 'Tidak Diketahui') branchSet.add(userObj.GroupName);
+                }
+            } else {
+                throw new Error('Format data tidak disokong.');
+            }
+
+            if (staff.length === 0) throw new Error('Tiada rekod staf yang sah.');
+
+            allStaff = staff;
+            branches = Array.from(branchSet).sort((a, b) => a.localeCompare(b));
+
+            const msg = t('connected').replace('{count}', staff.length);
+            updateStatus(msg, 'success');
+            return true;
+
+        } catch (err) {
+            console.error('❌ Ralat fetch:', err);
+            updateStatus(`❌ Gagal: ${err.message}`, 'error');
+            allStaff = [];
+            branches = [];
+            return false;
+        } finally {
+            isLoading = false;
+        }
+    }
+
+    // ============================================================
+    //  RENDER STAFF LIST
+    // ============================================================
+    function renderStaffList() {
+        let selectedBranch = branchSelect.value;
+        if (selectedBranch === 'Others') {
+            const otherVal = otherBranchInput.value.trim();
+            if (otherVal) {
+                selectedBranch = otherVal;
+            } else {
+                staffListEl.innerHTML = `<div class="empty-state"><span class="icon">✏️</span>${t('emptyOthers')}</div>`;
+                return;
+            }
+        }
+
+        const selectedStatus = statusSelect.value;
+        let filtered = allStaff;
+        if (selectedBranch) filtered = filtered.filter(s => s.GroupName === selectedBranch);
+        if (selectedStatus) filtered = filtered.filter(s => s.Situation.toLowerCase() === selectedStatus.toLowerCase());
+        filtered.sort((a, b) => a.Name.localeCompare(b.Name));
+
+        if (filtered.length === 0) {
+            staffListEl.innerHTML = `
+                <div class="empty-state">
+                    <span class="icon">📭</span>${t('noData')}
+                    ${selectedBranch ? `<br><small style="color:#a0aec0;">Cawangan: ${selectedBranch}</small>` : ''}
+                    ${selectedStatus ? `<br><small style="color:#a0aec0;">Status: ${selectedStatus}</small>` : ''}
+                </div>`;
+            return;
+        }
+
+        let html = '';
+        filtered.forEach(staff => {
+            const statusBadge = getStatusBadge(staff.Situation);
+            const safeCode = staff.Code.replace(/'/g, "\\'");
+            html += `
+                <div class="staff-item" onclick="openStaffLogin('${safeCode}')">
+                    <div class="info">
+                        <div class="name">${staff.Name}</div>
+                        <div class="code">🔑 ${staff.Code}</div>
+                    </div>
+                    <div class="status-wrap">
+                        ${statusBadge}
+                        <span class="arrow">›</span>
+                    </div>
+                </div>`;
+        });
+        staffListEl.innerHTML = html;
+    }
+
+    // ============================================================
+    //  STAFF LOGIN
+    // ============================================================
+    function openStaffLogin(code) {
+        if (isLoggedIn) {
+            const staff = allStaff.find(s => s.Code === code);
+            if (staff) {
+                currentUser = { ...staff };
+                showProfile(currentUser);
+            }
+            return;
+        }
+
+        loginCode.value = code;
+        loginPassword.value = '';
+        loginError.style.display = 'none';
+        loginSuccess.style.display = 'none';
+        loginBtn.disabled = false;
+        loginBtn.textContent = t('staffLoginBtn');
+        loginOverlay.classList.add('active');
+        loginPassword.focus();
+    }
+
+    function closeStaffLogin() {
+        loginOverlay.classList.remove('active');
+    }
+
+    function performStaffLogin() {
+        const code = loginCode.value.trim();
+        const password = loginPassword.value.trim();
+
+        if (!code || !password) {
+            loginError.textContent = 'Sila masukkan Code dan Password.';
+            loginError.style.display = 'block';
+            loginSuccess.style.display = 'none';
+            return;
+        }
+
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = `<span class="loading-spinner"></span>Memproses...`;
+        loginError.style.display = 'none';
+        loginSuccess.style.display = 'none';
+
+        const staff = allStaff.find(s => s.Code === code);
+
+        if (!staff) {
+            loginBtn.disabled = false;
+            loginBtn.textContent = t('staffLoginBtn');
+            loginError.textContent = 'Code tidak dijumpai!';
+            loginError.style.display = 'block';
+            return;
+        }
+
+        if (staff.LoginPassword !== password) {
+            loginBtn.disabled = false;
+            loginBtn.textContent = t('staffLoginBtn');
+            loginError.textContent = t('staffLoginError');
+            loginError.style.display = 'block';
+            loginPassword.value = '';
+            loginPassword.focus();
+            return;
+        }
+
+        loginSuccess.textContent = t('staffLoginSuccess');
+        loginSuccess.style.display = 'block';
+        loginBtn.disabled = false;
+        loginBtn.textContent = t('staffLoginBtn');
+
+        setTimeout(() => {
+            loginOverlay.classList.remove('active');
+            isLoggedIn = true;
+            currentUser = { ...staff };
+            showProfile(currentUser);
+        }, 600);
+    }
+
+    loginPassword.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') performStaffLogin();
+    });
+    loginCode.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') loginPassword.focus();
+    });
+    loginOverlay.addEventListener('click', function(e) {
+        if (e.target === this) closeStaffLogin();
+    });
+
+    // ============================================================
+    //  SHOW PROFILE
+    // ============================================================
+    function showProfile(user) {
+        filterSection.style.display = 'none';
+        staffListContainer.style.display = 'none';
+        profileView.style.display = 'block';
+        profileFields.innerHTML = '';
+
+        const fields = [
+            'Situation', 'GroupName', 'Code', 'Name', 'Jantina', 'TarikhLahir',
+            'Salary', 'IC', 'Jawatan', 'TarikhMasukKerja', 'TelefonNo', 'Email',
+            'ShiftType', 'OffDay', 'AlamatTetap', 'NamaWaris', 'AlamatWaris',
+            'BankNama', 'BankAccountNo', 'EPF', 'PERKESO', 'EIS',
+            'Lindungan', 'YellowCard', 'LoginPassword', 'PhoneType',
+            'SignupDate', 'UpdateDate'
+        ];
+
+        const labels = {
+            Situation: '📌 Situation (Status)', GroupName: 'Group Name', Code: 'Code',
+            Name: 'Name', Jantina: 'Jantina', TarikhLahir: 'Tarikh Lahir',
+            Salary: 'Salary', IC: 'IC/Passport/Doc.No', Jawatan: 'Jawatan',
+            TarikhMasukKerja: 'Tarikh Masuk Kerja', TelefonNo: 'Telefon No.',
+            Email: 'Email', ShiftType: 'Shift Type', OffDay: 'Off Day',
+            AlamatTetap: 'Alamat Tetap', NamaWaris: 'Nama Waris',
+            AlamatWaris: 'Alamat Waris', BankNama: 'Bank Nama',
+            BankAccountNo: 'Bank Account No.', EPF: 'EPF (kwsp) No.',
+            PERKESO: 'PERKESO NO.', EIS: 'EIS NO.', Lindungan: '24Jam Lindungan',
+            YellowCard: 'Kad Kebersihan (Yellow Card)', LoginPassword: 'Login Password',
+            PhoneType: 'Phone Type', SignupDate: 'Signup Date', UpdateDate: 'Update Date'
+        };
+
+        const situationOptions = ['ACTIVE', 'INACTIVE', 'PENDING'];
+
+        for (let key of fields) {
+            const val = user[key] || '';
+            const div = document.createElement('div');
+            div.className = 'profile-field';
+
+            const label = document.createElement('label');
+            label.textContent = labels[key] || key + ':';
+
+            let input;
+
+            if (key === 'Situation') {
+                input = document.createElement('select');
+                input.className = 'situation-select';
+                situationOptions.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.textContent = opt;
+                    if (val.toUpperCase() === opt) option.selected = true;
+                    input.appendChild(option);
+                });
+                const valLower = val.toLowerCase();
+                if (valLower === 'active') input.classList.add('active');
+                else if (valLower === 'inactive') input.classList.add('inactive');
+                else if (valLower === 'pending') input.classList.add('pending');
+
+                input.addEventListener('change', function() {
+                    this.classList.remove('active', 'inactive', 'pending');
+                    const newVal = this.value.toLowerCase();
+                    if (newVal === 'active') this.classList.add('active');
+                    else if (newVal === 'inactive') this.classList.add('inactive');
+                    else if (newVal === 'pending') this.classList.add('pending');
+                    currentUser.Situation = this.value;
+                    currentUser.UpdateDate = new Date().toISOString();
+                    const saveBtn = document.getElementById('saveProfileBtn');
+                    saveBtn.textContent = '💾 ' + t('saveBtn') + ' ⚡';
+                    saveBtn.style.background = '#dd6b20';
+                });
+            } else if (key === 'Code' || key === 'SignupDate' || key === 'UpdateDate') {
+                input = document.createElement('input');
+                input.type = 'text';
+                input.value = val;
+                input.readOnly = true;
+            } else if (key === 'LoginPassword') {
+                input = document.createElement('input');
+                input.type = 'password';
+                input.value = val;
+            } else {
+                input = document.createElement('input');
+                input.type = 'text';
+                input.value = val;
+            }
+
+            input.dataset.field = key;
+            input.id = 'prof_' + key;
+            input.placeholder = 'Klik untuk sunting';
+
+            if (key !== 'Situation' && key !== 'Code' && key !== 'SignupDate' && key !== 'UpdateDate') {
+                input.addEventListener('change', function() {
+                    currentUser[key] = this.value;
+                    currentUser.UpdateDate = new Date().toISOString();
+                    const saveBtn = document.getElementById('saveProfileBtn');
+                    saveBtn.textContent = '💾 ' + t('saveBtn') + ' ⚡';
+                    saveBtn.style.background = '#dd6b20';
+                });
+            }
+
+            div.appendChild(label);
+            div.appendChild(input);
+            profileFields.appendChild(div);
+        }
+
+        const saveBtn = document.getElementById('saveProfileBtn');
+        saveBtn.textContent = '💾 ' + t('saveBtn');
+        saveBtn.style.background = '#0f7a54';
+        saveBtn.disabled = false;
+
+        profileView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ============================================================
+    //  SAVE PROFILE
+    // ============================================================
+    function saveProfile() {
+        if (!currentUser || !currentUser.Code) {
+            showAlert('Tiada data untuk disimpan.', 'error');
+            return;
+        }
+
+        const btn = document.getElementById('saveProfileBtn');
+        btn.innerHTML = `<span class="loading-spinner"></span>${t('saving')}`;
+        btn.disabled = true;
+
+        const inputs = profileFields.querySelectorAll('input');
+        inputs.forEach(el => {
+            const field = el.dataset.field;
+            if (field && field !== 'Code' && field !== 'SignupDate' && field !== 'UpdateDate') {
+                currentUser[field] = el.value;
+            }
+        });
+
+        const selects = profileFields.querySelectorAll('select');
+        selects.forEach(el => {
+            const field = el.dataset.field;
+            if (field) currentUser[field] = el.value;
+        });
+
+        currentUser.UpdateDate = new Date().toISOString();
+
+        const payload = {
+            action: 'update',
+            Code: currentUser.Code || '',
+            GroupName: currentUser.GroupName || '',
+            Name: currentUser.Name || '',
+            Jantina: currentUser.Jantina || '',
+            TarikhLahir: currentUser.TarikhLahir || '',
+            Salary: currentUser.Salary || '',
+            IC: currentUser.IC || '',
+            Jawatan: currentUser.Jawatan || '',
+            TarikhMasukKerja: currentUser.TarikhMasukKerja || '',
+            TelefonNo: currentUser.TelefonNo || '',
+            Email: currentUser.Email || '',
+            ShiftType: currentUser.ShiftType || '',
+            OffDay: currentUser.OffDay || '',
+            AlamatTetap: currentUser.AlamatTetap || '',
+            NamaWaris: currentUser.NamaWaris || '',
+            AlamatWaris: currentUser.AlamatWaris || '',
+            BankNama: currentUser.BankNama || '',
+            BankAccountNo: currentUser.BankAccountNo || '',
+            EPF: currentUser.EPF || '',
+            PERKESO: currentUser.PERKESO || '',
+            EIS: currentUser.EIS || '',
+            Lindungan: currentUser.Lindungan || '',
+            YellowCard: currentUser.YellowCard || '',
+            LoginPassword: currentUser.LoginPassword || '',
+            PhoneType: currentUser.PhoneType || '',
+            Situation: currentUser.Situation || 'Unknown',
+            SignupDate: currentUser.SignupDate || '',
+            UpdateDate: currentUser.UpdateDate || ''
+        };
+
+        updateStatus('⏳ Menyimpan ke Google Sheets...', 'saving');
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams(payload)
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+            return response.json();
+        })
+        .then(result => {
+            btn.innerHTML = '💾 ' + t('saveBtn') + ' ✅';
+            btn.disabled = false;
+            btn.style.background = '#0f7a54';
+
+            if (result.result === 'success') {
+                showAlert('✅ ' + t('saveSuccess'), 'success');
+                updateStatus('✅ Data disimpan ke Google Sheets', 'success');
+                const idx = allStaff.findIndex(s => s.Code === currentUser.Code);
+                if (idx !== -1) allStaff[idx] = { ...currentUser };
+
+                const situationSelect = document.querySelector('select[data-field="Situation"]');
+                if (situationSelect) {
+                    situationSelect.className = 'situation-select';
+                    const val = situationSelect.value.toLowerCase();
+                    if (val === 'active') situationSelect.classList.add('active');
+                    else if (val === 'inactive') situationSelect.classList.add('inactive');
+                    else if (val === 'pending') situationSelect.classList.add('pending');
+                }
+                setTimeout(() => {
+                    btn.innerHTML = '💾 ' + t('saveBtn');
+                    btn.style.background = '#0f7a54';
+                }, 3000);
+            } else {
+                showAlert('❌ ' + t('saveFail') + ': ' + (result.message || 'Unknown error'), 'error');
+                updateStatus('❌ Gagal menyimpan', 'error');
+                btn.innerHTML = '💾 ' + t('saveBtn') + ' ❌';
+                setTimeout(() => {
+                    btn.innerHTML = '💾 ' + t('saveBtn');
+                    btn.style.background = '#0f7a54';
+                }, 3000);
+            }
+        })
+        .catch(err => {
+            btn.innerHTML = '💾 ' + t('saveBtn') + ' ❌';
+            btn.disabled = false;
+            btn.style.background = '#c53030';
+            showAlert('⚠️ ' + t('networkError') + ': ' + err.message, 'error');
+            updateStatus('❌ Ralat: ' + err.message, 'error');
+            setTimeout(() => {
+                btn.innerHTML = '💾 ' + t('saveBtn');
+                btn.style.background = '#0f7a54';
+            }, 4000);
+        });
+    }
+
+    // ============================================================
+    //  LOGOUT
+    // ============================================================
+    function logoutAndGoBack() {
+        if (!confirm(t('confirmLogout'))) return;
+        isLoggedIn = false;
+        currentUser = null;
+        profileView.style.display = 'none';
+        filterSection.style.display = 'block';
+        staffListContainer.style.display = 'block';
+        renderStaffList();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goBackToIndex() {
+        window.location.href = 'index.html';
+    }
+
+    // ============================================================
+    //  INIT（无需页面登录，直接加载）
+    // ============================================================
+    async function init() {
+        setLanguage('ms');
+
+        const success = await fetchStaffData();
+
+        if (success && allStaff.length > 0) {
+            branchSelect.innerHTML = '<option value="">-- Pilih Cawangan --</option>';
+            branches.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b;
+                opt.textContent = b;
+                branchSelect.appendChild(opt);
+            });
+            const optOthers = document.createElement('option');
+            optOthers.value = 'Others';
+            optOthers.textContent = 'Others (Lain-lain)';
+            branchSelect.appendChild(optOthers);
+
+            renderStaffList();
+        } else {
+            staffListEl.innerHTML = `
+                <div class="empty-state">
+                    <span class="icon">⚠️</span>
+                    Gagal memuatkan data. Sila semak semula sambungan atau sheet.
+                    <br><small style="color:#a0aec0;">Pastikan sheet "${SHEET_NAME}" wujud dan mempunyai data.</small>
+                    <br><br>
+                    <button class="btn btn-primary" onclick="testConnection()" style="width:auto;padding:8px 24px;display:inline-block;">🔧 Test Connection</button>
+                </div>`;
+        }
+
+        branchSelect.addEventListener('change', handleBranchChange);
+        statusSelect.addEventListener('change', renderStaffList);
+    }
+
+    // ============================================================
+    //  START（直接启动，无页面登录）
+    // ============================================================
+    init();
+
+    // 处理 window resize
+    let resizeTimer = null;
+    window.addEventListener('resize', () => {
+        if (resizeTimer) clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {}, 100);
+    });
+</script>
+</body>
+</html>
