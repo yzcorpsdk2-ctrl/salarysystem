@@ -310,6 +310,22 @@
     padding-left: 1rem;
   }
 
+  /* ============ 自动同步状态徽章 ============ */
+  .sync-badge {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft);
+    padding: 0.3rem 0.7rem; border-radius: 20px;
+    font-size: 0.68rem; font-weight: 600; color: var(--epf-muted);
+    white-space: nowrap;
+  }
+  .sync-badge .dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #9db8d2;
+    transition: background 0.2s;
+  }
+  .sync-badge.ok .dot { background: #22c55e; }
+  .sync-badge.busy .dot { background: #f59e0b; animation: pulse 1s infinite; }
+  .sync-badge.err .dot { background: #ef4444; }
+
   .container { max-width: 100%; margin: 0 auto; padding: 1.5rem 1.75rem; }
   .page-header {
     background: #ffffff; border: 1px solid var(--epf-border); border-radius: 8px;
@@ -417,6 +433,13 @@
     border-collapse: separate; border-spacing: 0; font-size: 0.8rem;
     table-layout: fixed; width: 4690px; min-width: 4690px;
   }
+
+  /* ============ 表头 sticky（修复版：使用 CSS 变量 + 明确 z-index） ============ */
+  #mainTable {
+    --sticky-main-top:   40px;
+    --sticky-sub-top:    80px;
+    --sticky-filter-top: 120px;
+  }
   th {
     background: var(--epf-blue-soft); padding: 0.5rem 0.5rem; text-align: left;
     font-weight: 600; color: var(--epf-blue); border-bottom: 1px solid var(--epf-border);
@@ -435,8 +458,11 @@
   .bg-rose-deep { background: #f7d4e0 !important; color: #7a1f3d !important; }
   .col-split-left { border-left: 2px solid #c97a9b !important; }
   td { z-index: 1; }
+
   .section-label-row th {
-    position: sticky !important; top: 0 !important; z-index: 22 !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 45 !important;
     padding: 0.45rem 0.6rem; font-size: 0.68rem; font-weight: 700;
     letter-spacing: 0.05em; text-transform: uppercase;
     border-bottom: 1px solid var(--epf-border); text-align: center;
@@ -444,10 +470,23 @@
   .section-label-row th .sec-title {
     display: flex; align-items: center; justify-content: center; gap: 0.4rem;
   }
-  .main-header-row th { position: sticky; z-index: 18; text-align: left; }
-  .sub-header-row th { position: sticky; z-index: 17; text-align: center; padding: 0.35rem 0.5rem; }
+  .main-header-row th {
+    position: sticky !important;
+    top: var(--sticky-main-top) !important;
+    z-index: 40 !important;
+    text-align: left;
+  }
+  .sub-header-row th {
+    position: sticky !important;
+    top: var(--sticky-sub-top) !important;
+    z-index: 35 !important;
+    text-align: center; padding: 0.35rem 0.5rem;
+  }
   .filter-row th {
-    position: sticky; z-index: 16; background: #ffffff; padding: 0.35rem 0.4rem;
+    position: sticky !important;
+    top: var(--sticky-filter-top) !important;
+    z-index: 30 !important;
+    background: #ffffff; padding: 0.35rem 0.4rem;
     border-bottom: 1px solid var(--epf-border); text-align: left;
   }
   .filter-row th::after {
@@ -477,6 +516,11 @@
   tr:nth-child(even) td { background: #fbfdff; }
   tr:hover td { background: var(--epf-blue-soft); }
   .divider-group { box-shadow: inset 1px 0 0 var(--epf-border) !important; }
+
+  /* ============ 冻结列（水平 + 垂直 sticky）============
+     ⚠ 修复：tbody 的 .col-freeze 只做水平 sticky，绝对不设置 top，
+     否则它会在垂直滚动时"上飘"并覆盖 filter-row。
+     ==================================================== */
   body.freeze-on .col-freeze { position: sticky; z-index: 9; background: #ffffff; }
   body.freeze-on .col-freeze.col-0 { left: 0px; }
   body.freeze-on .col-freeze.col-1 { left: 80px; }
@@ -494,11 +538,15 @@
   body.freeze-on tbody tr:nth-child(even) td.col-freeze.col-3 { background: #fbfdff; }
   body.freeze-on tbody tr:nth-child(even) td.col-freeze.col-4 { background: #f5f7fb; }
   body.freeze-on tbody tr:hover td.col-freeze { background: var(--epf-blue-soft); }
-  body.freeze-on .main-header-row th.col-freeze { z-index: 22 !important; }
-  body.freeze-on .sub-header-row  th.col-freeze { z-index: 21 !important; }
-  body.freeze-on .filter-row      th.col-freeze { z-index: 20 !important; }
+
+  /* 表头冻结列 z-index（确保 filter-row 在 tbody 之上）*/
+  body.freeze-on .section-label-row th.col-freeze-group { z-index: 50 !important; }
+  body.freeze-on .main-header-row  th.col-freeze         { z-index: 44 !important; }
+  body.freeze-on .sub-header-row   th.col-freeze         { z-index: 39 !important; }
+  body.freeze-on .filter-row       th.col-freeze         { z-index: 34 !important; }
   body.freeze-on th.col-freeze .freeze-line { z-index: 30 !important; }
   body.freeze-on th.col-freeze .th-filter   { position: relative; z-index: 3; }
+
   body.freeze-on thead .col-freeze.bg-slate   { background: #f0f4f9 !important; }
   body.freeze-on thead .col-freeze.bg-amber   { background: #fdf8ec !important; }
   body.freeze-on thead .col-freeze.bg-emerald { background: #f0f9f4 !important; }
@@ -508,8 +556,9 @@
   body.freeze-on thead .filter-row th.col-freeze { background: #ffffff !important; }
   body.freeze-on thead .filter-row th.col-freeze.no-filter { background: var(--epf-blue-soft) !important; }
   body.freeze-on .section-label-row th.col-freeze-group {
-    position: sticky !important; left: 0 !important; z-index: 24 !important;
+    position: sticky !important; left: 0 !important; z-index: 50 !important;
   }
+
   .lock-edge-right { border-right: 2px solid var(--epf-blue) !important; z-index: 25 !important; }
   .fold-line {
     position: absolute; top: 0; bottom: 0; width: 12px;
@@ -875,6 +924,10 @@
       <button type="button" onclick="printBatch()">☑️ 批量复印</button>
     </div>
   </div>
+
+  <span class="sync-badge" id="syncBadge" title="每 20 秒自动同步到 Google Sheet">
+    <span class="dot"></span><span id="syncBadgeText">AutoSync: 待机</span>
+  </span>
 
   <span class="spacer"></span>
   <select id="langSelect" class="btn" onchange="switchLang(this.value)">
@@ -1340,7 +1393,8 @@ function aiReply(q) {
   if (has('净薪', 'net', 'gaji bersih', '公式', '计算方式')) return '【净薪资公式】\nGaji Kasar = 基本薪资 + Allowance + Commission + Incentives + 全部 OT\nTotal Potongan = 请假扣款 + Pinjaman + EPF + SOCSO + EIS + 24JAM\nGaji Bersih = Gaji Kasar − Total Potongan';
   if (has('手动', 'override', '✎', '覆盖')) return '【手动覆盖】\n每个 EPF / SOCSO / EIS / 24JAM 前面都有一个 ✎ 复选框：\n• 勾选 → 可手动输入\n• 取消勾选 → 恢复自动计算';
   if (has('cash', '现金', 'merchantrade')) return '【CASH / Merchantrade】\n若 SLR Bank Nama 为 CASH 或 Merchantrade，\nEPF / SOCSO / EIS / 24JAM 会自动归 0。';
-  if (has('保存', 'sheet', 'simpan', 'google')) return '【保存资料到 Google Sheet】\n• 点顶部「💾 Simpan ke Sheet」→ 把当前所有资料写入 Sheet\n• Backup ▾ → Muat dari Sheet → 重新拉取最新数据';
+  if (has('保存', 'sheet', 'simpan', 'google')) return '【保存资料到 Google Sheet】\n• 点顶部「💾 Simpan ke Sheet」→ 立即写入\n• 系统每 20 秒会自动同步一次（看右上角 AutoSync 徽章）\n• Backup ▾ → Muat dari Sheet → 重新拉取最新数据';
+  if (has('同步', 'auto', 'autosync', '自动')) return '【自动同步 AutoSync】\n• 每 20 秒把全部员工推送到 PayrollData\n• 推送格式与 Excel 导出一致（同样表头、同样列顺序）\n• 右上角徽章显示状态：\n  · 待机 = 等待中\n  · 同步中 = 正在推送\n  · 已同步 = 成功\n  · 错误 = 推送失败';
   if (has('导入', 'import', '导出', 'eksport', 'export')) return '【导入 / 导出】\n📥 Import：Backup ▾ → Import\n💾 Eksport：Backup ▾ → 选择 PDF / Excel / Text / Word';
   if (has('粮单', 'slip', 'payslip', '打印', 'print', '复印')) return '【粮单 PRINT 功能】\n• 📄 全部复印\n• 📁 根据 Group 复印\n• ☑️ 批量复印';
   if (has('筛选', 'filter', '搜索', '过滤')) return '【筛选功能】\n• 右上角 Kumpulan / Bank 多选\n• 表头第三行每栏都有 🔍 搜索框';
@@ -1377,12 +1431,77 @@ const STORAGE_KEY = 'payrollEmployees';
 const SELECTED_CODE_KEY = 'payrollSelectedCode';
 const SELECTED_EMP_KEY = 'payrollSelectedEmployee';
 
-const GROUP_FIELDS = {
-  EPF:   ['EPF_Employee', 'EPF_Employer'],
-  SOCSO: ['SOCSO_Employee', 'SOCSO_Employer'],
-  EIS:   ['EIS_Employee', 'EIS_Employer'],
-  '24JAM': ['Lindung24Jam']
-};
+/* ============================================================
+   自动同步：每 20 秒把 PayrollData 完整推送到 Google Sheet
+   ============================================================ */
+const AUTO_SYNC_INTERVAL_MS = 20000;
+let autoSyncTimer = null;
+let autoSyncInFlight = false;
+let autoSyncCount = 0;
+let autoSyncLastOk = 0;
+
+function setSyncBadge(state, text) {
+  const badge = document.getElementById('syncBadge');
+  const txt = document.getElementById('syncBadgeText');
+  if (!badge || !txt) return;
+  badge.classList.remove('ok', 'busy', 'err');
+  if (state) badge.classList.add(state);
+  txt.textContent = text;
+}
+
+async function autoSyncToSheet(force = false) {
+  if (autoSyncInFlight && !force) return;
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
+    setSyncBadge('err', 'AutoSync: 未设置 URL');
+    return;
+  }
+  if (!employees || !employees.length) return;
+
+  autoSyncInFlight = true;
+  setSyncBadge('busy', 'AutoSync: 同步中…');
+  try {
+    // 重算所有员工，确保最新
+    employees.forEach(emp => recalcRow(emp));
+
+    // 表头 + 全部行（含被筛选隐藏的），格式与 Excel 导出完全一致
+    const headers = getExportHeaders();
+    const rows = getExportRows(true);
+
+    const payload = { headers, rows };
+
+    // 顺便更新 localStorage
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
+
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    autoSyncCount++;
+    autoSyncLastOk = Date.now();
+    const hhmmss = new Date(autoSyncLastOk).toLocaleTimeString('zh-CN', { hour12: false });
+    setSyncBadge('ok', 'AutoSync: 已同步 ' + hhmmss);
+    console.log('[AutoSync] pushed ' + rows.length + ' rows (#' + autoSyncCount + ')');
+  } catch (err) {
+    console.warn('[AutoSync] failed:', err);
+    setSyncBadge('err', 'AutoSync: 同步失败');
+  } finally {
+    autoSyncInFlight = false;
+  }
+}
+
+function startAutoSync() {
+  if (autoSyncTimer) clearInterval(autoSyncTimer);
+  setSyncBadge('', 'AutoSync: 待机');
+  autoSyncTimer = setInterval(() => autoSyncToSheet(), AUTO_SYNC_INTERVAL_MS);
+  console.log('[AutoSync] started, interval=' + AUTO_SYNC_INTERVAL_MS + 'ms');
+}
+
+function stopAutoSync() {
+  if (autoSyncTimer) { clearInterval(autoSyncTimer); autoSyncTimer = null; }
+  setSyncBadge('', 'AutoSync: 已停止');
+}
 
 /* ============================================================
    统一导出表头 —— 与 Google Sheet PayrollData 完全一致
@@ -1410,6 +1529,13 @@ function getExportHeaders() {
     'Gross Pay', 'Total Deduction', 'Net Salary'
   ];
 }
+
+const GROUP_FIELDS = {
+  EPF:   ['EPF_Employee', 'EPF_Employer'],
+  SOCSO: ['SOCSO_Employee', 'SOCSO_Employer'],
+  EIS:   ['EIS_Employee', 'EIS_Employer'],
+  '24JAM': ['Lindung24Jam']
+};
 
 const I18N = {
   ms: { title:'Sistem Penggajian', desc:'Pengurusan gaji pekerja dengan pengiraan automatik EPF, SOCSO, EIS & 24JAM Lindungan.', badge:'Auto kira caruman statutori · Manual override dengan kotak semak', save:'Simpan ke Sheet', importBtn:'Import / 导入', exportMenu:'Eksport', allSlip:'Semua Slip Gaji', checkAll:'Semak Semua', legend1:'1. Maklumat Asas + Basic Salary (Freeze)', legend2:'2. Pendapatan (OT)', legend2b:'2.5 Pendapatan Tambahan', legend2d:'2.8 Potongan (On Leave + Pinjaman)', legend2c:'2.9 Gaji untuk Caruman (boleh lipat)', legend3:'3. Caruman Statutori', legend4:'4. Staff Login Record (U-Y)', legend5:'5. Ringkasan Gaji', legend6:'6. Tindakan', sec1:'📌 1. MAKLUMAT ASAS + 💵 BASIC SALARY (FREEZE)', sec2:'💰 2. PENDAPATAN / ELAUN (OT)', sec2b:'➕ PENDAPATAN TAMBAHAN', sec2d:'➖ POTONGAN (ON LEAVE + PINJAMAN)', sec2c:'📐 GAJI UNTUK CARUMAN', sec3:'🏛️ 3. CARUMAN STATUTORI (EPF / SOCSO / EIS / 24JAM)', sec4:'📋 4. STAFF LOGIN RECORD (U-Y)', sec5:'🧮 5. RINGKASAN GAJI', sec6:'⚙️ 6. TINDAKAN', situation:'Situation', kod:'Kod', nama:'Nama', kumpulan:'Kumpulan', basic:'Gaji Asas', normalOT:'OT Biasa', restOT:'OT Rehat', publicOT:'OT Awam', otherOT:'OT Lain', pinjaman:'PINJAMAN', annualLeave:'ANNUAL LEAVE', unpaidLeave:'UNPAID LEAVE', sickLeave:'SICK LEAVE', halfDays:'HALF DAYS LEAVE (HOURS)', allowance2:'ALLOWANCE', commission:'COMMISION', incentives:'INCENTIVES', firstCalcTotal:'FIRST CALCULATION TOTAL', epfSalary:'Salary for EPF Contributions', socsoSalary:'Salary for SOCSO Contributions', eisSalary:'Salary for EIS Contributions', lindungSalary:'Salary for 24JAM Contributions', epfE:'Pekerja', epfR:'Majikan', socsoE:'Pekerja', socsoR:'Majikan', eisE:'Pekerja', eisR:'Majikan', lindung:'24JAM', bankNama:'Bank Nama', bankAcc:'Bank Acc', epf:'EPF', socso:'SOCSO', eis:'EIS', gross:'Gaji Kasar', totalDed:'Total Potongan', net:'Gaji Bersih', action:'Tindakan', slip:'Slip', legend:'Nota: Klik pada Nama pekerja untuk buka halaman detail. Tandakan ✔ di hadapan EPF/SOCSO/EIS/24JAM untuk isi manual.', saved:'Berjaya disimpan ke Sheet', failed:'Gagal simpan', loading:'Memuatkan data...', importSuccess:'Berjaya import {n} pekerja', importFail:'Fail tidak sah atau kosong', importFormat:'Format fail tidak disokong', noData:'Tiada data untuk dieksport', freezeLocked:'Kolum dibekukan (freeze ON)', freezeUnlocked:'Kolum dibuka (freeze OFF)', salaryFolded:'GAJI UNTUK CARUMAN dilipat', salaryUnfolded:'GAJI UNTUK CARUMAN dibuka', freezeTitle:'🔒 Tetapan Freeze Kolum', freezeDesc:'Pilih sama ada mahu kunci kolum pertama (Situation → Gaji Asas) supaya sentiasa kelihatan semasa scroll, atau buka kunci sepenuhnya.', freezeUnlock:'🔓 Buka Kunci', freezeLock:'🔒 Kunci Kolum', freezeCancel:'Batal', importTitle:'📥 Import Data / 导入资料', importDrop:'Lepaskan fail di sini atau klik untuk pilih', importDropHint:'Drag & drop file here, or click to browse', importFormatHint:'Format: .xlsx / .csv / .txt', importTemplate:'📥 Template:', importClose:'Tutup', filterGroup:'Kumpulan', filterBank:'Bank', all:'Semua', selectedSuffix:' dipilih', matchedCount:'Padan', netTotal:'Jumlah Bersih', btnSelectAll:'Semua', btnClear:'Kosong', noOptions:'Tiada pilihan' },
@@ -1486,32 +1612,39 @@ window.addEventListener('message', (ev) => {
   }
 });
 
-/* ============ Sticky 偏移 ============
-   ✅ 修复：移除了给 tbody 冻结列设置 top 的错误逻辑，
-      该逻辑会导致 BASIC SALARY 下方的搜索筛选行在滚动时“上飘”。
-      现在 tbody 的 .col-freeze 只做水平粘性（left），不再参与垂直粘性。
-   ===================================== */
+/* ============================================================
+   Sticky 偏移（修复版）
+   ------------------------------------------------------------
+   问题：旧版会给 tbody td.col-freeze 设置 top，导致垂直滚动时
+        这些冻结列会"上飘"，覆盖 filter-row（BASIC SALARY 下方的
+        搜索行）。
+   修复：使用 CSS 变量控制各段表头 top，tbody 冻结列完全
+        不参与垂直 sticky。
+   ============================================================ */
 function updateStickyOffsets() {
   requestAnimationFrame(() => {
-    const thead = document.querySelector('#mainTable thead');
+    const table = document.getElementById('mainTable');
+    const thead = table && table.querySelector('thead');
     if (!thead) return;
     const sectionRow = thead.querySelector('.section-label-row');
     const mainRow    = thead.querySelector('.main-header-row');
     const subRow     = thead.querySelector('.sub-header-row');
     const filterRow  = thead.querySelector('.filter-row');
     if (!sectionRow || !mainRow || !subRow || !filterRow) return;
+
     const hSection = sectionRow.offsetHeight;
     const hMain    = mainRow.offsetHeight;
     const hSub     = subRow.offsetHeight;
-    const topSection = 0;
-    const topMain    = hSection;
-    const topSub     = hSection + hMain;
-    const topFilter  = hSection + hMain + hSub;
-    sectionRow.querySelectorAll('th').forEach(th => { th.style.top = topSection + 'px'; });
-    mainRow.querySelectorAll('th').forEach(th =>   { th.style.top = topMain + 'px'; });
-    subRow.querySelectorAll('th').forEach(th =>    { th.style.top = topSub + 'px'; });
-    filterRow.querySelectorAll('th').forEach(th => { th.style.top = topFilter + 'px'; });
-    // ✅ 清除任何历史遗留的 tbody 冻结列 top 值（防止上飘）
+
+    // 写入 CSS 变量（table 上）
+    table.style.setProperty('--sticky-main-top',   hSection + 'px');
+    table.style.setProperty('--sticky-sub-top',    (hSection + hMain) + 'px');
+    table.style.setProperty('--sticky-filter-top', (hSection + hMain + hSub) + 'px');
+
+    // 清掉旧版遗留的 inline top，避免与 CSS 变量冲突
+    thead.querySelectorAll('th').forEach(th => { th.style.top = ''; });
+
+    // ⚠ 关键修复：tbody 冻结列绝不能有垂直 top
     document.querySelectorAll('#tbody td.col-freeze').forEach(td => {
       if (td.style.top) td.style.top = '';
     });
@@ -2064,31 +2197,32 @@ function checkAll() {
   toast('Semakan selesai');
 }
 
-/* ============ 保存到 Google Sheet ============ */
+/* ============ 保存到 Google Sheet（与自动同步相同格式）============ */
 async function saveToSheet() {
   if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
     toast('Sila tetapkan APPS_SCRIPT_URL dahulu!', false); return;
   }
-  const payload = employees.map(emp => {
-    recalcRow(emp);
-    const out = {};
-    Object.keys(emp).forEach(k => {
-      if (typeof emp[k] !== 'object' && typeof emp[k] !== 'function' && !k.startsWith('_')) {
-        out[k] = emp[k];
-      }
-    });
-    out.Timestamp = new Date().toISOString();
-    return out;
-  });
+  employees.forEach(emp => recalcRow(emp));
+  const headers = getExportHeaders();
+  const rows = getExportRows(true);
+
   try {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
+    setSyncBadge('busy', 'AutoSync: 手动推送中…');
     await fetch(APPS_SCRIPT_URL, {
-      method: 'POST', mode: 'no-cors',
+      method: 'POST',
+      mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ payroll: payload })
+      body: JSON.stringify({ headers, rows })
     });
-    toast(t('saved'));
-  } catch (err) { console.error(err); toast(t('failed'), false); }
+    const hhmmss = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+    setSyncBadge('ok', 'AutoSync: 已同步 ' + hhmmss);
+    toast(t('saved') + ' (' + rows.length + ' rows)');
+  } catch (err) {
+    console.error(err);
+    setSyncBadge('err', 'AutoSync: 同步失败');
+    toast(t('failed'), false);
+  }
 }
 
 /* ============ 从 Google Sheet 手动重新拉取 ============ */
@@ -2203,9 +2337,7 @@ async function handleImportFile(file) {
       const sit = String(get(row, 'Situation') || 'ACTIVE').trim().toUpperCase();
       if (sit === 'UNACTIVE' || sit === 'INACTIVE') continue;
       const basic = parseFloat(get(row, 'Basic')) || 0;
-      // 兼容旧表头 Allowance2 与新表头 Allowance
       const allowanceVal = parseFloat(get(row, 'Allowance')) || parseFloat(get(row, 'Allowance2')) || 0;
-      const firstCalcVal = parseFloat(get(row, 'First Calculation Total')) || parseFloat(get(row, 'FirstCalcTotal')) || 0;
       const epfSalary = parseOpt(row, 'Salary for EPF Contributions');
       const socsoSalary = parseOpt(row, 'Salary for SOCSO Contributions');
       const eisSalary = parseOpt(row, 'Salary for EIS Contributions');
@@ -2303,11 +2435,13 @@ function downloadTemplate(format) {
     toast('Template Word dimuat turun');
   }
 }
-function getExportRows() {
+
+/* ============ 导出（Excel / CSV / TXT / DOC / PDF）============ */
+function getExportRows(includeAll = false) {
   const rows = [];
   const trs = document.querySelectorAll('#tbody tr');
   trs.forEach((tr, idx) => {
-    if (tr.style.display === 'none') return;
+    if (!includeAll && tr.style.display === 'none') return;
     const firstCell = tr.querySelector('td');
     if (!firstCell || firstCell.hasAttribute('colspan')) return;
     const emp = employees[idx];
@@ -2751,6 +2885,9 @@ function switchLang(lang) {
   setTimeout(updateStickyOffsets, 60);
 }
 
+/* ============================================================
+   初始化
+   ============================================================ */
 window.addEventListener('DOMContentLoaded', () => {
   const langSelect = document.getElementById('langSelect');
   if (langSelect) langSelect.value = currentLang;
@@ -2760,7 +2897,18 @@ window.addEventListener('DOMContentLoaded', () => {
   setTimeout(updateStickyOffsets, 200);
   setTimeout(updateStickyOffsets, 600);
   setTimeout(syncNavHeight, 300);
+
+  // 🚀 启动 20 秒自动同步
+  startAutoSync();
+  // 首次延迟 5 秒后立刻同步一次，让 Sheet 拿到最新资料
+  setTimeout(() => autoSyncToSheet(), 5000);
 });
+
+// 分页关闭前，把最新资料存 localStorage（下次打开不会丢）
+window.addEventListener('beforeunload', () => {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
+});
+
 let resizeTimer = null;
 window.addEventListener('resize', () => {
   if (resizeTimer) clearTimeout(resizeTimer);
