@@ -243,12 +243,13 @@
         .situation-select.inactive { color: #9b2c2c; background: #fed7d7; border-color: #9b2c2c !important; }
         .situation-select.pending { color: #975a16; background: #fefcbf; border-color: #975a16 !important; }
 
-        /* ==================== 员工登录弹窗 ==================== */
+        /* ==================== 弹窗（登录 + 新增员工） ==================== */
         .login-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(11, 27, 48, 0.55); display: none;
             align-items: center; justify-content: center; z-index: 1000;
             backdrop-filter: blur(4px);
+            padding: 1rem;
         }
         .login-overlay.active { display: flex; }
         .login-overlay .login-box {
@@ -289,6 +290,9 @@
         .login-overlay .login-box .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
         .login-overlay .login-box .btn-gray { background: #e2e8f0; color: #4a5568; border-color: #e2e8f0; }
         .login-overlay .login-box .btn-gray:hover { background: #cbd5e0; }
+        .login-overlay .login-box .btn-success { background: #0f7a54; color: #fff; border-color: #0f7a54; }
+        .login-overlay .login-box .btn-success:hover { background: #0c6a48; }
+        .login-overlay .login-box .btn-success:disabled { opacity: 0.6; cursor: not-allowed; }
         .login-overlay .login-box .error-msg {
             color: #c53030; font-size: 0.78rem; text-align: center;
             margin-top: 0.6rem; display: none;
@@ -346,6 +350,7 @@
         Staff Info
     </div>
     <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
+    <button class="btn btn-success" onclick="openAddStaffModal()">➕ Tambah Staf</button>
     <button class="btn" onclick="testConnection()">🔧 Test Connection</button>
     <span class="spacer"></span>
     <select id="langSelect" class="btn" onchange="setLanguage(this.value)">
@@ -380,7 +385,7 @@
                 <select id="branchSelect">
                     <option value="">-- Pilih Cawangan --</option>
                 </select>
-                <div id="otherBranchContainer" class="hidden" style="margin-top:0.5rem;">
+                <div id="otherBranchContainer" class="hidden" style="margin-top:0.5rem;display:none;">
                     <input type="text" id="otherBranchInput" placeholder="Sila nyatakan cawangan lain...">
                 </div>
             </div>
@@ -419,7 +424,7 @@
 
 </div>
 
-<!-- ==================== 员工登录弹窗（保留，但样式已统一） ==================== -->
+<!-- ==================== 员工登录弹窗 ==================== -->
 <div class="login-overlay" id="loginOverlay">
     <div class="login-box">
         <h3>🔐 Log Masuk Staf</h3>
@@ -436,6 +441,19 @@
         <button class="btn btn-gray" onclick="closeStaffLogin()">Batal</button>
         <div class="error-msg" id="loginError">Code atau Password salah!</div>
         <div class="success-msg" id="loginSuccess">✅ Log masuk berjaya!</div>
+    </div>
+</div>
+
+<!-- ==================== 新增员工弹窗 ==================== -->
+<div class="login-overlay" id="addStaffOverlay">
+    <div class="login-box" style="max-width:560px;max-height:88vh;overflow-y:auto;text-align:left;">
+        <h3 style="text-align:center;">➕ Tambah Staf Baru</h3>
+        <p class="login-sub">Isi maklumat staf baru. Hanya Code &amp; Name wajib diisi.</p>
+        <div id="addStaffFields"></div>
+        <button class="btn btn-success" id="addStaffBtn" onclick="submitAddStaff()" style="margin-top:1rem;">💾 Simpan Staf Baru</button>
+        <button class="btn btn-gray" onclick="closeAddStaffModal()">Batal</button>
+        <div class="error-msg" id="addStaffError"></div>
+        <div class="success-msg" id="addStaffSuccess"></div>
     </div>
 </div>
 
@@ -478,7 +496,7 @@
     const loginBtn = document.getElementById('loginBtn');
 
     // ============================================================
-    //  TEST CONNECTION
+    //  TEST CONNECTION（已修正）
     // ============================================================
     async function testConnection() {
         updateStatus('🔍 Menguji sambungan ke Google Sheets...', 'info');
@@ -490,18 +508,20 @@
             const text = await response.text();
 
             let data;
-            try {
-                data = JSON.parse(text);
-            } catch (e) {
+            try { data = JSON.parse(text); }
+            catch (e) {
                 updateStatus('❌ Response bukan JSON: ' + text.substring(0, 100), 'error');
                 showAlert('❌ Server tidak mengembalikan JSON. Sila semak Apps Script deployment.', 'error');
                 return;
             }
 
             if (data && data.result === 'success') {
-                const count = data.data ? data.data.length : 0;
+                const count = Array.isArray(data.data) ? data.data.length : 0;
                 updateStatus(`✅ Sambungan berjaya! Ditemui ${count} rekod.`, 'success');
                 showAlert(`✅ Sambungan berjaya! Ditemui ${count} rekod.`, 'success');
+            } else if (Array.isArray(data)) {
+                updateStatus(`✅ Sambungan berjaya! Ditemui ${data.length} rekod.`, 'success');
+                showAlert(`✅ Sambungan berjaya! Ditemui ${data.length} rekod.`, 'success');
             } else {
                 updateStatus('⚠️ Sambungan berjaya tetapi data tidak seperti dijangka.', 'debug');
                 showAlert('⚠️ Sambungan berjaya tetapi format data tidak dijangka.', 'info');
@@ -669,10 +689,12 @@
         const selected = branchSelect.value;
         if (selected === 'Others') {
             otherBranchContainer.classList.remove('hidden');
+            otherBranchContainer.style.display = 'block';
             otherBranchInput.focus();
             renderStaffList();
         } else {
             otherBranchContainer.classList.add('hidden');
+            otherBranchContainer.style.display = 'none';
             otherBranchInput.value = '';
             renderStaffList();
         }
@@ -694,7 +716,10 @@
             const rawResult = await response.json();
             let dataArray;
 
-            if (Array.isArray(rawResult)) {
+            // ✅ 优先处理 { result:'success', data: [...] } 新格式
+            if (rawResult && rawResult.result === 'success' && Array.isArray(rawResult.data)) {
+                dataArray = rawResult.data;
+            } else if (Array.isArray(rawResult)) {
                 dataArray = rawResult;
             } else if (rawResult && rawResult.data && Array.isArray(rawResult.data)) {
                 dataArray = rawResult.data;
@@ -726,6 +751,7 @@
             const branchSet = new Set();
 
             if (Array.isArray(firstRow)) {
+                // ── 数组格式（兼容旧 doGet）──
                 const idx = {
                     situation: 1, loginPwd: 28, name: 4, code: 3, group: 2,
                     jantina: 5, tarikhLahir: 6, salary: 7, ic: 8, jawatan: 9,
@@ -776,6 +802,7 @@
                     if (group) branchSet.add(group);
                 }
             } else if (typeof firstRow === 'object' && firstRow !== null) {
+                // ── 对象格式（新 doGet，键值对）──
                 const sampleKeys = Object.keys(firstRow);
                 const findKey = (possibleNames) => {
                     for (const name of possibleNames) {
@@ -794,11 +821,14 @@
                 const codeKey = findKey(['Code', 'code', 'Kod', 'kod', 'ID']);
                 const groupKey = findKey(['GroupName', 'groupName', 'Group', 'group', 'Cawangan', 'cawangan']);
 
-                if (!situationKey || !loginPwdKey || !nameKey || !codeKey || !groupKey) {
+                if (!nameKey || !codeKey) {
                     throw new Error('Header tidak dijumpai. Keys: ' + sampleKeys.join(', '));
                 }
 
                 const fieldMap = {
+                    situation: situationKey,
+                    loginPwd: loginPwdKey,
+                    group: groupKey,
                     jantina: findKey(['Jantina', 'jantina', 'Gender', 'gender']),
                     tarikhLahir: findKey(['TarikhLahir', 'tarikhLahir', 'DateOfBirth', 'DOB']),
                     salary: findKey(['Salary', 'salary', 'Gaji', 'gaji']),
@@ -831,9 +861,11 @@
                     if (!code || !name) continue;
 
                     const userObj = {
-                        Code: code, GroupName: (row[groupKey] || '').toString().trim() || 'Tidak Diketahui',
-                        Name: name, Situation: (row[situationKey] || '').toString().trim() || 'Unknown',
-                        LoginPassword: (row[loginPwdKey] || '').toString().trim(),
+                        Code: code,
+                        GroupName: fieldMap.group ? (row[fieldMap.group] || '').toString().trim() || 'Tidak Diketahui' : 'Tidak Diketahui',
+                        Name: name,
+                        Situation: fieldMap.situation ? (row[fieldMap.situation] || '').toString().trim() || 'Unknown' : 'Unknown',
+                        LoginPassword: fieldMap.loginPwd ? (row[fieldMap.loginPwd] || '').toString().trim() : '',
                         Jantina: fieldMap.jantina ? (row[fieldMap.jantina] || '').toString().trim() : '',
                         TarikhLahir: fieldMap.tarikhLahir ? (row[fieldMap.tarikhLahir] || '').toString().trim() : '',
                         Salary: fieldMap.salary ? (row[fieldMap.salary] || '').toString().trim() : '',
@@ -886,7 +918,7 @@
     }
 
     // ============================================================
-    //  RENDER STAFF LIST
+    //  RENDER STAFF LIST（含 🗑 删除按钮）
     // ============================================================
     function renderStaffList() {
         let selectedBranch = branchSelect.value;
@@ -919,7 +951,7 @@
         let html = '';
         filtered.forEach(staff => {
             const statusBadge = getStatusBadge(staff.Situation);
-            const safeCode = staff.Code.replace(/'/g, "\\'");
+            const safeCode = String(staff.Code || '').replace(/'/g, "\\'");
             html += `
                 <div class="staff-item" onclick="openStaffLogin('${safeCode}')">
                     <div class="info">
@@ -928,6 +960,10 @@
                     </div>
                     <div class="status-wrap">
                         ${statusBadge}
+                        <button class="btn btn-sm btn-danger"
+                                style="padding:0.2rem 0.6rem;font-size:0.7rem;"
+                                onclick="event.stopPropagation(); deleteStaff('${safeCode}');"
+                                title="Padam">🗑</button>
                         <span class="arrow">›</span>
                     </div>
                 </div>`;
@@ -1072,10 +1108,10 @@
                     const option = document.createElement('option');
                     option.value = opt;
                     option.textContent = opt;
-                    if (val.toUpperCase() === opt) option.selected = true;
+                    if (String(val).toUpperCase() === opt) option.selected = true;
                     input.appendChild(option);
                 });
-                const valLower = val.toLowerCase();
+                const valLower = String(val).toLowerCase();
                 if (valLower === 'active') input.classList.add('active');
                 else if (valLower === 'inactive') input.classList.add('inactive');
                 else if (valLower === 'pending') input.classList.add('pending');
@@ -1270,6 +1306,174 @@
         window.location.href = 'index.html';
     }
 
+    /* ============================================================
+       新增：添加员工
+       ============================================================ */
+    const ADD_FIELDS = [
+        { key: 'Code',             label: '🔑 Code *',                        required: true },
+        { key: 'Name',             label: '👤 Name *',                        required: true },
+        { key: 'GroupName',        label: '🏢 GroupName' },
+        { key: 'Jantina',          label: '⚧ Jantina' },
+        { key: 'TarikhLahir',      label: '🎂 Tarikh Lahir' },
+        { key: 'Salary',           label: '💰 Salary' },
+        { key: 'IC',               label: '🪪 IC / Passport' },
+        { key: 'Jawatan',          label: '💼 Jawatan' },
+        { key: 'TarikhMasukKerja', label: '📅 Tarikh Masuk Kerja' },
+        { key: 'TelefonNo',        label: '📱 Telefon No' },
+        { key: 'Email',            label: '✉️ Email' },
+        { key: 'ShiftType',        label: '🕐 Shift Type' },
+        { key: 'OffDay',           label: '🛌 Off Day' },
+        { key: 'AlamatTetap',      label: '🏠 Alamat Tetap' },
+        { key: 'NamaWaris',        label: '👨‍👩‍👧 Nama Waris' },
+        { key: 'AlamatWaris',      label: '🏠 Alamat Waris' },
+        { key: 'BankNama',         label: '🏦 Bank Nama' },
+        { key: 'BankAccountNo',    label: '💳 Bank Account No' },
+        { key: 'EPF',              label: 'EPF (kwsp) No' },
+        { key: 'PERKESO',          label: 'PERKESO No' },
+        { key: 'EIS',              label: 'EIS No' },
+        { key: 'Lindungan',        label: '24Jam Lindungan' },
+        { key: 'YellowCard',       label: '🟨 Kad Kebersihan (Yellow Card)' },
+        { key: 'LoginPassword',    label: '🔒 Login Password' },
+        { key: 'PhoneType',        label: '📱 Phone Type' }
+    ];
+
+    function openAddStaffModal() {
+        const box = document.getElementById('addStaffFields');
+        box.innerHTML = '';
+        ADD_FIELDS.forEach(f => {
+            const div = document.createElement('div');
+            div.className = 'profile-field';
+            const label = document.createElement('label');
+            label.textContent = f.label;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.dataset.field = f.key;
+            input.id = 'add_' + f.key;
+            input.placeholder = f.required ? 'Wajib diisi' : 'Optional';
+            div.appendChild(label);
+            div.appendChild(input);
+            box.appendChild(div);
+        });
+        document.getElementById('addStaffError').style.display = 'none';
+        document.getElementById('addStaffSuccess').style.display = 'none';
+        document.getElementById('addStaffBtn').disabled = false;
+        document.getElementById('addStaffBtn').textContent = '💾 Simpan Staf Baru';
+        document.getElementById('addStaffOverlay').classList.add('active');
+    }
+
+    function closeAddStaffModal() {
+        document.getElementById('addStaffOverlay').classList.remove('active');
+    }
+
+    function submitAddStaff() {
+        const btn = document.getElementById('addStaffBtn');
+        const errEl = document.getElementById('addStaffError');
+        const okEl = document.getElementById('addStaffSuccess');
+
+        const payload = { action: 'signup' };
+        ADD_FIELDS.forEach(f => {
+            const el = document.getElementById('add_' + f.key);
+            payload[f.key] = el ? el.value.trim() : '';
+        });
+
+        if (!payload.Code || !payload.Name) {
+            errEl.textContent = 'Code dan Name wajib diisi.';
+            errEl.style.display = 'block';
+            return;
+        }
+
+        if (allStaff.some(s => String(s.Code).trim() === payload.Code)) {
+            errEl.textContent = 'Code sudah wujud: ' + payload.Code;
+            errEl.style.display = 'block';
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span>Menyimpan...';
+        errEl.style.display = 'none';
+        okEl.style.display = 'none';
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams(payload)
+        })
+        .then(r => r.json())
+        .then(result => {
+            if (result.result === 'success') {
+                okEl.textContent = '✅ Staf berjaya ditambah!';
+                okEl.style.display = 'block';
+                setTimeout(async () => {
+                    closeAddStaffModal();
+                    await fetchStaffData();
+                    rebuildBranchDropdown();
+                    renderStaffList();
+                    showAlert('✅ Staf ' + payload.Code + ' berjaya ditambah', 'success');
+                }, 700);
+            } else {
+                errEl.textContent = '❌ ' + (result.message || result.error || 'Gagal');
+                errEl.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = '💾 Simpan Staf Baru';
+            }
+        })
+        .catch(err => {
+            errEl.textContent = '❌ Ralat: ' + err.message;
+            errEl.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = '💾 Simpan Staf Baru';
+        });
+    }
+
+    /* ============================================================
+       新增：删除员工
+       ============================================================ */
+    function deleteStaff(code) {
+        if (!confirm('Padam staf ' + code + '? Tindakan ini tidak boleh diundur.')) return;
+
+        updateStatus('⏳ Memadam ' + code + '...', 'saving');
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ action: 'delete', Code: code })
+        })
+        .then(r => r.json())
+        .then(result => {
+            if (result.result === 'success') {
+                allStaff = allStaff.filter(s => String(s.Code).trim() !== String(code).trim());
+                rebuildBranchDropdown();
+                renderStaffList();
+                updateStatus('✅ ' + code + ' dipadam', 'success');
+                showAlert('✅ Staf ' + code + ' berjaya dipadam', 'success');
+            } else {
+                updateStatus('❌ ' + (result.message || 'Gagal'), 'error');
+                showAlert('❌ ' + (result.message || 'Gagal memadam'), 'error');
+            }
+        })
+        .catch(err => {
+            updateStatus('❌ Ralat: ' + err.message, 'error');
+            showAlert('❌ Ralat: ' + err.message, 'error');
+        });
+    }
+
+    /* ============================================================
+       辅助：重建 Cawangan 下拉
+       ============================================================ */
+    function rebuildBranchDropdown() {
+        branchSelect.innerHTML = '<option value="">-- Pilih Cawangan --</option>';
+        branches = Array.from(new Set(allStaff.map(s => s.GroupName).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
+        branches.forEach(b => {
+            const opt = document.createElement('option');
+            opt.value = b; opt.textContent = b;
+            branchSelect.appendChild(opt);
+        });
+        const optOthers = document.createElement('option');
+        optOthers.value = 'Others';
+        optOthers.textContent = 'Others (Lain-lain)';
+        branchSelect.appendChild(optOthers);
+    }
+
     // ============================================================
     //  INIT（无需页面登录，直接加载）
     // ============================================================
@@ -1279,18 +1483,7 @@
         const success = await fetchStaffData();
 
         if (success && allStaff.length > 0) {
-            branchSelect.innerHTML = '<option value="">-- Pilih Cawangan --</option>';
-            branches.forEach(b => {
-                const opt = document.createElement('option');
-                opt.value = b;
-                opt.textContent = b;
-                branchSelect.appendChild(opt);
-            });
-            const optOthers = document.createElement('option');
-            optOthers.value = 'Others';
-            optOthers.textContent = 'Others (Lain-lain)';
-            branchSelect.appendChild(optOthers);
-
+            rebuildBranchDropdown();
             renderStaffList();
         } else {
             staffListEl.innerHTML = `
@@ -1305,19 +1498,20 @@
 
         branchSelect.addEventListener('change', handleBranchChange);
         statusSelect.addEventListener('change', renderStaffList);
+
+        // 弹窗外部点击关闭
+        const addOverlay = document.getElementById('addStaffOverlay');
+        if (addOverlay) {
+            addOverlay.addEventListener('click', function(e) {
+                if (e.target === this) closeAddStaffModal();
+            });
+        }
     }
 
     // ============================================================
     //  START（直接启动，无页面登录）
     // ============================================================
     init();
-
-    // 处理 window resize
-    let resizeTimer = null;
-    window.addEventListener('resize', () => {
-        if (resizeTimer) clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {}, 100);
-    });
 </script>
 </body>
 </html>
