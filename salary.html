@@ -518,7 +518,7 @@
   .divider-group { box-shadow: inset 1px 0 0 var(--epf-border) !important; }
 
   /* ============ 冻结列（水平 + 垂直 sticky）============
-     ⚠ 修复：tbody 的 .col-freeze 只做水平 sticky，绝对不设置 top，
+     ⚠ 修复：tbody 的 .col-freeze 只做水平 sticky，绝不设置 top，
      否则它会在垂直滚动时"上飘"并覆盖 filter-row。
      ==================================================== */
   body.freeze-on .col-freeze { position: sticky; z-index: 9; background: #ffffff; }
@@ -1394,7 +1394,7 @@ function aiReply(q) {
   if (has('手动', 'override', '✎', '覆盖')) return '【手动覆盖】\n每个 EPF / SOCSO / EIS / 24JAM 前面都有一个 ✎ 复选框：\n• 勾选 → 可手动输入\n• 取消勾选 → 恢复自动计算';
   if (has('cash', '现金', 'merchantrade')) return '【CASH / Merchantrade】\n若 SLR Bank Nama 为 CASH 或 Merchantrade，\nEPF / SOCSO / EIS / 24JAM 会自动归 0。';
   if (has('保存', 'sheet', 'simpan', 'google')) return '【保存资料到 Google Sheet】\n• 点顶部「💾 Simpan ke Sheet」→ 立即写入\n• 系统每 20 秒会自动同步一次（看右上角 AutoSync 徽章）\n• Backup ▾ → Muat dari Sheet → 重新拉取最新数据';
-  if (has('同步', 'auto', 'autosync', '自动')) return '【自动同步 AutoSync】\n• 每 20 秒把全部员工推送到 PayrollData\n• 推送格式与 Excel 导出一致（同样表头、同样列顺序）\n• 右上角徽章显示状态：\n  · 待机 = 等待中\n  · 同步中 = 正在推送\n  · 已同步 = 成功\n  · 错误 = 推送失败';
+  if (has('同步', 'auto', 'autosync', '自动')) return '【自动同步 AutoSync】\n• 每 20 秒把全部员工推送到 PayrollData\n• 推送格式与 Excel 导出一致（同样表头、同样列顺序）\n• 右上角徽章显示状态：待机 / 同步中 / 已同步 HH:MM:SS (行数) / 同步失败';
   if (has('导入', 'import', '导出', 'eksport', 'export')) return '【导入 / 导出】\n📥 Import：Backup ▾ → Import\n💾 Eksport：Backup ▾ → 选择 PDF / Excel / Text / Word';
   if (has('粮单', 'slip', 'payslip', '打印', 'print', '复印')) return '【粮单 PRINT 功能】\n• 📄 全部复印\n• 📁 根据 Group 复印\n• ☑️ 批量复印';
   if (has('筛选', 'filter', '搜索', '过滤')) return '【筛选功能】\n• 右上角 Kumpulan / Bank 多选\n• 表头第三行每栏都有 🔍 搜索框';
@@ -1433,6 +1433,10 @@ const SELECTED_EMP_KEY = 'payrollSelectedEmployee';
 
 /* ============================================================
    自动同步：每 20 秒把 PayrollData 完整推送到 Google Sheet
+   ⚠ 修复：去掉 mode:'no-cors'，改用 Content-Type: text/plain
+     - no-cors + application/json 会导致 body 被浏览器丢弃
+     - 用 text/plain 避免 CORS 预检失败，让 Apps Script 收到完整 JSON
+     - 并且可以真正读取响应，判断成功/失败
    ============================================================ */
 const AUTO_SYNC_INTERVAL_MS = 20000;
 let autoSyncTimer = null;
@@ -1472,20 +1476,25 @@ async function autoSyncToSheet(force = false) {
     // 顺便更新 localStorage
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
 
-    await fetch(APPS_SCRIPT_URL, {
+    // ✅ 关键修复：不用 no-cors，改用 text/plain 避免 CORS preflight
+    const res = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(payload)
     });
+    const result = await res.json();
+    if (result.status !== 'success') {
+      throw new Error(result.message || 'Server returned error');
+    }
+
     autoSyncCount++;
     autoSyncLastOk = Date.now();
     const hhmmss = new Date(autoSyncLastOk).toLocaleTimeString('zh-CN', { hour12: false });
-    setSyncBadge('ok', 'AutoSync: 已同步 ' + hhmmss);
-    console.log('[AutoSync] pushed ' + rows.length + ' rows (#' + autoSyncCount + ')');
+    setSyncBadge('ok', 'AutoSync: 已同步 ' + hhmmss + ' (' + rows.length + ')');
+    console.log('[AutoSync] pushed ' + rows.length + ' rows (#' + autoSyncCount + ')', result);
   } catch (err) {
     console.warn('[AutoSync] failed:', err);
-    setSyncBadge('err', 'AutoSync: 同步失败');
+    setSyncBadge('err', 'AutoSync: 同步失败 - ' + (err.message || err));
   } finally {
     autoSyncInFlight = false;
   }
@@ -2209,18 +2218,22 @@ async function saveToSheet() {
   try {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
     setSyncBadge('busy', 'AutoSync: 手动推送中…');
-    await fetch(APPS_SCRIPT_URL, {
+
+    // ✅ 关键修复：不用 no-cors，改用 text/plain 避免 CORS preflight
+    const res = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ headers, rows })
     });
+    const result = await res.json();
+    if (result.status !== 'success') throw new Error(result.message || 'Server error');
+
     const hhmmss = new Date().toLocaleTimeString('zh-CN', { hour12: false });
-    setSyncBadge('ok', 'AutoSync: 已同步 ' + hhmmss);
+    setSyncBadge('ok', 'AutoSync: 已同步 ' + hhmmss + ' (' + rows.length + ')');
     toast(t('saved') + ' (' + rows.length + ' rows)');
   } catch (err) {
     console.error(err);
-    setSyncBadge('err', 'AutoSync: 同步失败');
+    setSyncBadge('err', 'AutoSync: 同步失败 - ' + (err.message || err));
     toast(t('failed'), false);
   }
 }
@@ -2900,8 +2913,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // 🚀 启动 20 秒自动同步
   startAutoSync();
-  // 首次延迟 5 秒后立刻同步一次，让 Sheet 拿到最新资料
-  setTimeout(() => autoSyncToSheet(), 5000);
+  // 首次延迟 8 秒后立刻同步一次（等 Sheet 载入完成 + 首次计算稳定）
+  setTimeout(() => autoSyncToSheet(), 8000);
 });
 
 // 分页关闭前，把最新资料存 localStorage（下次打开不会丢）
