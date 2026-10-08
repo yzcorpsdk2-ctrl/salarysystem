@@ -326,6 +326,38 @@
   .sync-badge.busy .dot { background: #f59e0b; animation: pulse 1s infinite; }
   .sync-badge.err .dot { background: #ef4444; }
 
+  /* ============ 自动同步开关 ============ */
+  .sync-switch {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    cursor: pointer; user-select: none;
+    padding: 0.3rem 0.75rem 0.3rem 0.55rem;
+    background: var(--epf-blue-soft);
+    border: 1px solid var(--epf-border-soft);
+    border-radius: 20px;
+    font-size: 0.7rem; color: var(--epf-muted);
+    font-weight: 600; white-space: nowrap;
+    transition: 0.15s;
+  }
+  .sync-switch:hover { background: var(--epf-blue-light); border-color: #b8cfe8; }
+  .sync-switch input { display: none; }
+  .sync-switch .slider {
+    position: relative; width: 34px; height: 18px;
+    background: #cbd5e1; border-radius: 10px;
+    transition: background 0.2s; flex-shrink: 0;
+  }
+  .sync-switch .slider::before {
+    content: ''; position: absolute;
+    top: 2px; left: 2px; width: 14px; height: 14px;
+    background: #fff; border-radius: 50%;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  }
+  .sync-switch input:checked + .slider { background: #22c55e; }
+  .sync-switch input:checked + .slider::before { transform: translateX(16px); }
+  .sync-switch.on {
+    color: #0f7a54; background: #e8f8ef; border-color: #b7e4c7;
+  }
+
   .container { max-width: 100%; margin: 0 auto; padding: 1.5rem 1.75rem; }
   .page-header {
     background: #ffffff; border: 1px solid var(--epf-border); border-radius: 8px;
@@ -434,7 +466,7 @@
     table-layout: fixed; width: 4690px; min-width: 4690px;
   }
 
-  /* ============ 表头 sticky（修复版：使用 CSS 变量 + 明确 z-index） ============ */
+  /* ============ 表头 sticky ============ */
   #mainTable {
     --sticky-main-top:   40px;
     --sticky-sub-top:    80px;
@@ -517,10 +549,6 @@
   tr:hover td { background: var(--epf-blue-soft); }
   .divider-group { box-shadow: inset 1px 0 0 var(--epf-border) !important; }
 
-  /* ============ 冻结列（水平 + 垂直 sticky）============
-     ⚠ 修复：tbody 的 .col-freeze 只做水平 sticky，绝不设置 top，
-     否则它会在垂直滚动时"上飘"并覆盖 filter-row。
-     ==================================================== */
   body.freeze-on .col-freeze { position: sticky; z-index: 9; background: #ffffff; }
   body.freeze-on .col-freeze.col-0 { left: 0px; }
   body.freeze-on .col-freeze.col-1 { left: 80px; }
@@ -539,7 +567,6 @@
   body.freeze-on tbody tr:nth-child(even) td.col-freeze.col-4 { background: #f5f7fb; }
   body.freeze-on tbody tr:hover td.col-freeze { background: var(--epf-blue-soft); }
 
-  /* 表头冻结列 z-index（确保 filter-row 在 tbody 之上）*/
   body.freeze-on .section-label-row th.col-freeze-group { z-index: 50 !important; }
   body.freeze-on .main-header-row  th.col-freeze         { z-index: 44 !important; }
   body.freeze-on .sub-header-row   th.col-freeze         { z-index: 39 !important; }
@@ -740,7 +767,6 @@
   }
   .modal-actions { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
 
-  /* 打印选择弹窗 */
   .print-list {
     max-height: 340px; overflow-y: auto;
     display: flex; flex-direction: column; gap: 0.3rem;
@@ -834,7 +860,8 @@
     <div class="nav-dropdown">
       <button class="nav-item" type="button">💾 Backup <span class="caret">▾</span></button>
       <div class="nav-dropdown-menu">
-        <a href="#" onclick="reloadFromSheet(); closeAllNavDropdowns(); return false;"><span class="dot"></span>🔄 Muat dari Sheet</a>
+        <a href="#" onclick="loadPayrollFromSheet(); closeAllNavDropdowns(); return false;"><span class="dot"></span>🔄 Muat dari Sheet (PayrollData)</a>
+        <a href="#" onclick="loadStaffBasics(); closeAllNavDropdowns(); return false;"><span class="dot"></span>👥 Muat Staff Basic</a>
         <a href="#" onclick="openImportModal(); closeAllNavDropdowns(); return false;"><span class="dot"></span>📥 Import</a>
         <div class="nav-menu-label">Eksport</div>
         <a href="#" onclick="exportToPDF(); closeAllNavDropdowns(); return false;"><span class="dot"></span>📄 PDF</a>
@@ -912,6 +939,7 @@
   <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
 
   <button class="btn btn-success" onclick="saveToSheet()" id="btnSaveSheet">💾 Simpan ke Sheet</button>
+  <button class="btn" onclick="loadPayrollFromSheet()" id="btnLoadPayroll" title="从 PayrollData 手动载入完整工资数据">📥 载入 PayrollData</button>
   <button class="btn" onclick="checkAll()" id="btnCheckAll">✅ Semak Semua</button>
 
   <div class="toolbar-dropdown" id="printDropdown">
@@ -925,8 +953,14 @@
     </div>
   </div>
 
-  <span class="sync-badge" id="syncBadge" title="每 20 秒自动同步到 Google Sheet">
-    <span class="dot"></span><span id="syncBadgeText">AutoSync: 待机</span>
+  <label class="sync-switch" id="syncSwitch" title="开启后每 30 秒自动推送数据到 Google Sheet">
+    <input type="checkbox" id="autoSyncToggle" onchange="toggleAutoSync(this.checked)">
+    <span class="slider"></span>
+    <span>自动 30s 同步</span>
+  </label>
+
+  <span class="sync-badge" id="syncBadge" title="自动同步状态">
+    <span class="dot"></span><span id="syncBadgeText">AutoSync: 手动模式</span>
   </span>
 
   <span class="spacer"></span>
@@ -1393,8 +1427,9 @@ function aiReply(q) {
   if (has('净薪', 'net', 'gaji bersih', '公式', '计算方式')) return '【净薪资公式】\nGaji Kasar = 基本薪资 + Allowance + Commission + Incentives + 全部 OT\nTotal Potongan = 请假扣款 + Pinjaman + EPF + SOCSO + EIS + 24JAM\nGaji Bersih = Gaji Kasar − Total Potongan';
   if (has('手动', 'override', '✎', '覆盖')) return '【手动覆盖】\n每个 EPF / SOCSO / EIS / 24JAM 前面都有一个 ✎ 复选框：\n• 勾选 → 可手动输入\n• 取消勾选 → 恢复自动计算';
   if (has('cash', '现金', 'merchantrade')) return '【CASH / Merchantrade】\n若 SLR Bank Nama 为 CASH 或 Merchantrade，\nEPF / SOCSO / EIS / 24JAM 会自动归 0。';
-  if (has('保存', 'sheet', 'simpan', 'google')) return '【保存资料到 Google Sheet】\n• 点顶部「💾 Simpan ke Sheet」→ 立即写入\n• 系统每 20 秒会自动同步一次（看右上角 AutoSync 徽章）\n• Backup ▾ → Muat dari Sheet → 重新拉取最新数据';
-  if (has('同步', 'auto', 'autosync', '自动')) return '【自动同步 AutoSync】\n• 每 20 秒把全部员工推送到 PayrollData\n• 推送格式与 Excel 导出一致（同样表头、同样列顺序）\n• 右上角徽章显示状态：待机 / 同步中 / 已同步 HH:MM:SS (行数) / 同步失败';
+  if (has('保存', 'sheet', 'simpan', 'google')) return '【保存资料到 Google Sheet】\n• 点顶部「💾 Simpan ke Sheet」→ 立即写入\n• 自动同步默认关闭，打开工具栏的「自动 30s 同步」开关即可每 30 秒推送\n• Backup ▾ → Muat dari Sheet → 重新拉取最新工资数据';
+  if (has('同步', 'auto', 'autosync', '自动')) return '【自动同步 AutoSync】\n• 默认「手动模式」，需要点工具栏开关才会启动\n• 开启后每 30 秒把全部员工推送到 PayrollData\n• 右上角徽章显示状态：手动模式 / 已开启 / 已同步 HH:MM:SS (行数) / 同步失败';
+  if (has('staff', '基础资料', '员工资料')) return '【员工基础资料】\n• 页面打开时自动从 STAFF LOGIN RECORD 载入\n• 包含 Situation / Code / Name / Group / Bank / SLR Bank Nama / SLR Bank Account No / SLR EPF / SLR SOCSO / SLR EIS\n• Backup ▾ → Muat Staff Basic 可手动重拉';
   if (has('导入', 'import', '导出', 'eksport', 'export')) return '【导入 / 导出】\n📥 Import：Backup ▾ → Import\n💾 Eksport：Backup ▾ → 选择 PDF / Excel / Text / Word';
   if (has('粮单', 'slip', 'payslip', '打印', 'print', '复印')) return '【粮单 PRINT 功能】\n• 📄 全部复印\n• 📁 根据 Group 复印\n• ☑️ 批量复印';
   if (has('筛选', 'filter', '搜索', '过滤')) return '【筛选功能】\n• 右上角 Kumpulan / Bank 多选\n• 表头第三行每栏都有 🔍 搜索框';
@@ -1432,17 +1467,15 @@ const SELECTED_CODE_KEY = 'payrollSelectedCode';
 const SELECTED_EMP_KEY = 'payrollSelectedEmployee';
 
 /* ============================================================
-   自动同步：每 20 秒把 PayrollData 完整推送到 Google Sheet
-   ⚠ 修复：去掉 mode:'no-cors'，改用 Content-Type: text/plain
-     - no-cors + application/json 会导致 body 被浏览器丢弃
-     - 用 text/plain 避免 CORS 预检失败，让 Apps Script 收到完整 JSON
-     - 并且可以真正读取响应，判断成功/失败
+   自动同步：默认关闭（手动），打开后每 30 秒推送
    ============================================================ */
-const AUTO_SYNC_INTERVAL_MS = 20000;
+const AUTO_SYNC_INTERVAL_MS = 30000;
 let autoSyncTimer = null;
 let autoSyncInFlight = false;
 let autoSyncCount = 0;
 let autoSyncLastOk = 0;
+let autoSyncEnabled = false;   // ⭐ 默认关闭
+let staffBasics = [];          // STAFF LOGIN RECORD 缓存
 
 function setSyncBadge(state, text) {
   const badge = document.getElementById('syncBadge');
@@ -1464,19 +1497,13 @@ async function autoSyncToSheet(force = false) {
   autoSyncInFlight = true;
   setSyncBadge('busy', 'AutoSync: 同步中…');
   try {
-    // 重算所有员工，确保最新
     employees.forEach(emp => recalcRow(emp));
-
-    // 表头 + 全部行（含被筛选隐藏的），格式与 Excel 导出完全一致
     const headers = getExportHeaders();
     const rows = getExportRows(true);
-
     const payload = { headers, rows };
 
-    // 顺便更新 localStorage
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
 
-    // ✅ 关键修复：不用 no-cors，改用 text/plain 避免 CORS preflight
     const res = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -1493,8 +1520,12 @@ async function autoSyncToSheet(force = false) {
     setSyncBadge('ok', 'AutoSync: 已同步 ' + hhmmss + ' (' + rows.length + ')');
     console.log('[AutoSync] pushed ' + rows.length + ' rows (#' + autoSyncCount + ')', result);
   } catch (err) {
-    console.warn('[AutoSync] failed:', err);
-    setSyncBadge('err', 'AutoSync: 同步失败 - ' + (err.message || err));
+    console.error('[AutoSync] failed:', err);
+    const msg = (err && err.message) ? err.message : String(err);
+    setSyncBadge('err', 'AutoSync: 同步失败 - ' + msg);
+    if (autoSyncCount === 0) {
+      toast('⚠️ 无法同步到 Google Sheet：' + msg, false);
+    }
   } finally {
     autoSyncInFlight = false;
   }
@@ -1502,18 +1533,271 @@ async function autoSyncToSheet(force = false) {
 
 function startAutoSync() {
   if (autoSyncTimer) clearInterval(autoSyncTimer);
-  setSyncBadge('', 'AutoSync: 待机');
+  setSyncBadge('ok', 'AutoSync: 已开启（30s）');
   autoSyncTimer = setInterval(() => autoSyncToSheet(), AUTO_SYNC_INTERVAL_MS);
   console.log('[AutoSync] started, interval=' + AUTO_SYNC_INTERVAL_MS + 'ms');
 }
 
 function stopAutoSync() {
   if (autoSyncTimer) { clearInterval(autoSyncTimer); autoSyncTimer = null; }
-  setSyncBadge('', 'AutoSync: 已停止');
+  setSyncBadge('', 'AutoSync: 手动模式');
+}
+
+/* ⭐ 开关：切换自动 / 手动 */
+function toggleAutoSync(enabled) {
+  const sw = document.getElementById('syncSwitch');
+  if (sw) sw.classList.toggle('on', enabled);
+  autoSyncEnabled = !!enabled;
+
+  if (enabled) {
+    const ok = confirm(
+      '⚠️ 开启自动同步（每 30 秒）\n\n' +
+      '系统会持续把当前页面的数据覆盖写入 Google Sheet 的 PayrollData。\n' +
+      '如果还没从 Sheet 载入过工资数据，可能会覆盖 Sheet 里的内容。\n\n' +
+      '确定要开启吗？'
+    );
+    if (!ok) {
+      const t = document.getElementById('autoSyncToggle');
+      if (t) t.checked = false;
+      if (sw) sw.classList.remove('on');
+      autoSyncEnabled = false;
+      return;
+    }
+    startAutoSync();
+    toast('✅ 自动同步已开启（每 30 秒）');
+  } else {
+    stopAutoSync();
+    toast('⏸️ 已切换到手动同步模式（点「💾 Simpan ke Sheet」才推送）');
+  }
 }
 
 /* ============================================================
-   统一导出表头 —— 与 Google Sheet PayrollData 完全一致
+   从 STAFF LOGIN RECORD 载入员工基础资料
+   ============================================================ */
+async function loadStaffBasics() {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
+    setSyncBadge('', 'AutoSync: 手动模式');
+    return [];
+  }
+  setSyncBadge('busy', '载入基础资料…');
+  try {
+    const res = await fetch(APPS_SCRIPT_URL + '?action=staff');
+    const j = await res.json();
+    if (j.status !== 'success') throw new Error(j.message || '读取失败');
+    const list = Array.isArray(j.data) ? j.data : [];
+    if (!list.length) {
+      setSyncBadge('', '基础资料：无数据');
+      toast('⚠️ STAFF LOGIN RECORD 无资料', false);
+      return [];
+    }
+    staffBasics = list;
+    applyStaffBasicsToEmployees();
+    setSyncBadge('ok', '基础资料已载入 (' + list.length + ' 人)');
+    toast('✅ 已载入 ' + list.length + ' 位员工基础资料');
+    return list;
+  } catch (err) {
+    console.error('[Staff] load failed:', err);
+    setSyncBadge('err', '基础资料载入失败');
+    toast('❌ 无法载入员工基础资料：' + (err.message || err), false);
+    return [];
+  }
+}
+
+/* 把基础资料合并到 employees（保留已有的工资数据） */
+function applyStaffBasicsToEmployees() {
+  if (!staffBasics.length) return;
+
+  const byCode = new Map();
+  employees.forEach(e => { if (e && e.Code) byCode.set(String(e.Code).trim(), e); });
+
+  const merged = [];
+  staffBasics.forEach(b => {
+    const code = String(b.Code || '').trim();
+    if (!code) return;
+    const sit = String(b.Situation || 'ACTIVE').trim().toUpperCase();
+    if (sit === 'UNACTIVE' || sit === 'INACTIVE') return;
+
+    const base = byCode.get(code) || {};
+    merged.push({
+      Situation:        sit,
+      Code:             code,
+      Name:             b.Name             || base.Name             || '',
+      GroupName:        b.GroupName        || base.GroupName        || '',
+      BankNama:         b.BankNama         || base.BankNama         || '',
+      SLRBankNama:      b.SLRBankNama      || base.SLRBankNama      || '',
+      SLRBankAccountNo: b.SLRBankAccountNo || base.SLRBankAccountNo || '',
+      SLREPF:           b.SLREPF           || base.SLREPF           || '',
+      SLRPERKESO:       b.SLRPERKESO       || base.SLRPERKESO       || '',
+      SLREIS:           b.SLREIS           || base.SLREIS           || '',
+
+      Basic:       num(base.Basic),
+      Allowance:   num(base.Allowance),
+      Allowance2:  num(base.Allowance2),
+      Commission:  num(base.Commission),
+      Incentives:  num(base.Incentives),
+      EPFSalary:   (base.EPFSalary   === undefined || base.EPFSalary   === null) ? '' : base.EPFSalary,
+      SOCSOSalary: (base.SOCSOSalary === undefined || base.SOCSOSalary === null) ? '' : base.SOCSOSalary,
+      EISSalary:   (base.EISSalary   === undefined || base.EISSalary   === null) ? '' : base.EISSalary,
+      LindungSalary: (base.LindungSalary === undefined || base.LindungSalary === null) ? '' : base.LindungSalary,
+      NormalOT:    num(base.NormalOT),
+      RestOT:      num(base.RestOT),
+      PublicOT:    num(base.PublicOT),
+      OtherOT:     num(base.OtherOT),
+      AnnualLeaveDays: num(base.AnnualLeaveDays),
+      AnnualLeave:     num(base.AnnualLeave),
+      UnpaidLeaveDays: num(base.UnpaidLeaveDays),
+      UnpaidLeave:     num(base.UnpaidLeave),
+      SickLeaveDays:   num(base.SickLeaveDays),
+      SickLeave:       num(base.SickLeave),
+      HalfDaysDays:    num(base.HalfDaysDays),
+      HalfDays:        num(base.HalfDays),
+      Pinjaman:        num(base.Pinjaman),
+      Deduction:       num(base.Deduction),
+      Others:          num(base.Others),
+      Age:  base.Age || 30,
+      EPF:  base.EPF  || 'YES',
+      PERKESO: base.PERKESO || 'YES',
+      EIS:  base.EIS  || 'YES',
+      Lindungan: base.Lindungan || 'YES',
+      EPF_Employee:   num(base.EPF_Employee),
+      EPF_Employer:   num(base.EPF_Employer),
+      SOCSO_Employee: num(base.SOCSO_Employee),
+      SOCSO_Employer: num(base.SOCSO_Employer),
+      EIS_Employee:   num(base.EIS_Employee),
+      EIS_Employer:   num(base.EIS_Employer),
+      Lindung24Jam:   num(base.Lindung24Jam),
+      manualEPF:   !!base.manualEPF,
+      manualSOCSO: !!base.manualSOCSO,
+      manualEIS:   !!base.manualEIS,
+      manual24JAM: !!base.manual24JAM,
+      manualSLRBankNama:      !!base.manualSLRBankNama,
+      manualSLRBankAccountNo: !!base.manualSLRBankAccountNo,
+      manualSLREPF:           !!base.manualSLREPF,
+      manualSLRPERKESO:       !!base.manualSLRPERKESO,
+      manualSLREIS:           !!base.manualSLREIS
+    });
+  });
+
+  employees = merged;
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
+  renderTable();
+}
+
+/* 把 Sheet 返回的 1 行转成 employee 对象 */
+function mapSheetRowToEmployee(row) {
+  return {
+    Situation:        String(row.Situation || 'ACTIVE').trim().toUpperCase(),
+    Code:             row.Code, Name: row.Name, GroupName: row.GroupName || '',
+    BankNama:         row.BankNama || row.Bank || '',
+    Basic:            Number(row.Salary || row.Basic) || 0,
+    Allowance:        Number(row.Allowance) || 0,
+    Allowance2:       Number(row.Allowance2 !== undefined && row.Allowance2 !== '' ? row.Allowance2 : row.Allowance) || 0,
+    Commission:       Number(row.Commission) || 0,
+    Incentives:       Number(row.Incentives) || 0,
+    EPFSalary:        row.EPFSalary   !== undefined && row.EPFSalary   !== null && row.EPFSalary   !== '' ? Number(row.EPFSalary)   : '',
+    SOCSOSalary:      row.SOCSOSalary !== undefined && row.SOCSOSalary !== null && row.SOCSOSalary !== '' ? Number(row.SOCSOSalary) : '',
+    EISSalary:        row.EISSalary   !== undefined && row.EISSalary   !== null && row.EISSalary   !== '' ? Number(row.EISSalary)   : '',
+    LindungSalary:    row.LindungSalary !== undefined && row.LindungSalary !== null && row.LindungSalary !== '' ? Number(row.LindungSalary) : '',
+    AnnualLeaveDays:  Number(row.AnnualLeaveDays) || 0,
+    AnnualLeave:      Number(row.AnnualLeave) || 0,
+    UnpaidLeaveDays:  Number(row.UnpaidLeaveDays) || 0,
+    UnpaidLeave:      Number(row.UnpaidLeave) || 0,
+    SickLeaveDays:    Number(row.SickLeaveDays) || 0,
+    SickLeave:        Number(row.SickLeave) || 0,
+    HalfDaysDays:     Number(row.HalfDaysDays) || 0,
+    HalfDays:         Number(row.HalfDays) || 0,
+    Deduction:        Number(row.Deduction) || 0,
+    NormalOT:         Number(row.NormalOT) || 0,
+    RestOT:           Number(row.RestOT) || 0,
+    PublicOT:         Number(row.PublicOT) || 0,
+    OtherOT:          Number(row.OtherOT) || 0,
+    Pinjaman:         Number(row.Pinjaman) || 0,
+    Others: 0, Age: 30,
+    EPF: row.EPF || 'YES', PERKESO: row.PERKESO || 'YES',
+    EIS: row.EIS || 'YES', Lindungan: row.Lindungan || 'YES',
+    EPF_Employee:    Number(row.EPF_Employee)    || 0,
+    EPF_Employer:    Number(row.EPF_Employer)    || 0,
+    SOCSO_Employee:  Number(row.SOCSO_Employee)  || 0,
+    SOCSO_Employer:  Number(row.SOCSO_Employer)  || 0,
+    EIS_Employee:    Number(row.EIS_Employee)    || 0,
+    EIS_Employer:    Number(row.EIS_Employer)    || 0,
+    Lindung24Jam:    Number(row.Lindung24Jam)    || 0,
+    manualEPF:   !!row.manualEPF,   manualSOCSO: !!row.manualSOCSO,
+    manualEIS:   !!row.manualEIS,   manual24JAM: !!row.manual24JAM,
+    SLRBankNama:      String(row.SLRBankNama || row.BankNama || row.Bank || '').trim(),
+    SLRBankAccountNo: String(row.SLRBankAccountNo || row.BankAccountNo || row.BankAcc || '').trim(),
+    SLREPF:           String(row.SLREPF || row.EPF || '').trim(),
+    SLRPERKESO:       String(row.SLRPERKESO || row.SOCSO || row.PERKESO || '').trim(),
+    SLREIS:           String(row.SLREIS || row.EIS || '').trim(),
+    manualSLRBankNama: false, manualSLRBankAccountNo: false,
+    manualSLREPF: false, manualSLRPERKESO: false, manualSLREIS: false
+  };
+}
+
+/* ============================================================
+   📥 手动：从 PayrollData 载入完整工资数据
+   ============================================================ */
+async function loadPayrollFromSheet() {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
+    toast('请先设置 APPS_SCRIPT_URL', false); return;
+  }
+  if (!confirm(
+    '从 Google Sheet 的 PayrollData 载入完整工资数据？\n\n' +
+    '⚠️ 这会覆盖当前页面上的工资数据（基础资料会保留）。\n' +
+    '如果当前有未推送的修改，建议先点「💾 Simpan ke Sheet」。'
+  )) return;
+
+  setSyncBadge('busy', '载入 PayrollData…');
+  try {
+    const res = await fetch(APPS_SCRIPT_URL);
+    const j = await res.json();
+    if (j.status !== 'success' || !Array.isArray(j.data)) {
+      throw new Error(j.message || '数据格式错误');
+    }
+    if (!j.data.length) {
+      setSyncBadge('', 'PayrollData：无数据');
+      toast('⚠️ PayrollData 里没有数据', false);
+      return;
+    }
+    const fromSheet = j.data.map(mapSheetRowToEmployee).filter(e => e && e.Code);
+
+    const basicsByCode = new Map();
+    staffBasics.forEach(b => { if (b.Code) basicsByCode.set(String(b.Code).trim(), b); });
+
+    employees = fromSheet.map(e => {
+      const b = basicsByCode.get(String(e.Code).trim());
+      if (b) {
+        e.Situation        = String(b.Situation || e.Situation || 'ACTIVE').toUpperCase();
+        e.Name             = b.Name             || e.Name;
+        e.GroupName        = b.GroupName        || e.GroupName;
+        e.BankNama         = b.BankNama         || e.BankNama;
+        e.SLRBankNama      = b.SLRBankNama      || e.SLRBankNama;
+        e.SLRBankAccountNo = b.SLRBankAccountNo || e.SLRBankAccountNo;
+        e.SLREPF           = b.SLREPF           || e.SLREPF;
+        e.SLRPERKESO       = b.SLRPERKESO       || e.SLRPERKESO;
+        e.SLREIS           = b.SLREIS           || e.SLREIS;
+      }
+      return e;
+    }).filter(e => e.Situation !== 'UNACTIVE' && e.Situation !== 'INACTIVE');
+
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
+    renderTable();
+    setSyncBadge('ok', 'PayrollData 已载入 (' + employees.length + ')');
+    toast('✅ 已从 PayrollData 载入 ' + employees.length + ' 笔工资数据');
+  } catch (err) {
+    console.error('[Payroll] load failed:', err);
+    setSyncBadge('err', '载入失败：' + (err.message || err));
+    toast('❌ 载入失败：' + (err.message || err), false);
+  }
+}
+
+/* 兼容旧代码 */
+async function reloadFromSheet() {
+  return loadPayrollFromSheet();
+}
+
+/* ============================================================
+   统一导出表头
    ============================================================ */
 function getExportHeaders() {
   return [
@@ -1621,15 +1905,7 @@ window.addEventListener('message', (ev) => {
   }
 });
 
-/* ============================================================
-   Sticky 偏移（修复版）
-   ------------------------------------------------------------
-   问题：旧版会给 tbody td.col-freeze 设置 top，导致垂直滚动时
-        这些冻结列会"上飘"，覆盖 filter-row（BASIC SALARY 下方的
-        搜索行）。
-   修复：使用 CSS 变量控制各段表头 top，tbody 冻结列完全
-        不参与垂直 sticky。
-   ============================================================ */
+/* ============ Sticky 偏移 ============ */
 function updateStickyOffsets() {
   requestAnimationFrame(() => {
     const table = document.getElementById('mainTable');
@@ -1645,15 +1921,11 @@ function updateStickyOffsets() {
     const hMain    = mainRow.offsetHeight;
     const hSub     = subRow.offsetHeight;
 
-    // 写入 CSS 变量（table 上）
     table.style.setProperty('--sticky-main-top',   hSection + 'px');
     table.style.setProperty('--sticky-sub-top',    (hSection + hMain) + 'px');
     table.style.setProperty('--sticky-filter-top', (hSection + hMain + hSub) + 'px');
 
-    // 清掉旧版遗留的 inline top，避免与 CSS 变量冲突
     thead.querySelectorAll('th').forEach(th => { th.style.top = ''; });
-
-    // ⚠ 关键修复：tbody 冻结列绝不能有垂直 top
     document.querySelectorAll('#tbody td.col-freeze').forEach(td => {
       if (td.style.top) td.style.top = '';
     });
@@ -2206,7 +2478,7 @@ function checkAll() {
   toast('Semakan selesai');
 }
 
-/* ============ 保存到 Google Sheet（与自动同步相同格式）============ */
+/* ============ 保存到 Google Sheet（手动） ============ */
 async function saveToSheet() {
   if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
     toast('Sila tetapkan APPS_SCRIPT_URL dahulu!', false); return;
@@ -2219,7 +2491,6 @@ async function saveToSheet() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
     setSyncBadge('busy', 'AutoSync: 手动推送中…');
 
-    // ✅ 关键修复：不用 no-cors，改用 text/plain 避免 CORS preflight
     const res = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -2229,22 +2500,13 @@ async function saveToSheet() {
     if (result.status !== 'success') throw new Error(result.message || 'Server error');
 
     const hhmmss = new Date().toLocaleTimeString('zh-CN', { hour12: false });
-    setSyncBadge('ok', 'AutoSync: 已同步 ' + hhmmss + ' (' + rows.length + ')');
+    setSyncBadge(autoSyncEnabled ? 'ok' : '', (autoSyncEnabled ? 'AutoSync: 已同步 ' : '已手动推送 ') + hhmmss + ' (' + rows.length + ')');
     toast(t('saved') + ' (' + rows.length + ' rows)');
   } catch (err) {
     console.error(err);
     setSyncBadge('err', 'AutoSync: 同步失败 - ' + (err.message || err));
     toast(t('failed'), false);
   }
-}
-
-/* ============ 从 Google Sheet 手动重新拉取 ============ */
-async function reloadFromSheet() {
-  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
-    toast('Sila tetapkan APPS_SCRIPT_URL dahulu!', false); return;
-  }
-  toast('Memuat semula dari Sheet...');
-  await loadEmployees({ forceRemote: true });
 }
 
 /* ============ 导入 ============ */
@@ -2449,7 +2711,7 @@ function downloadTemplate(format) {
   }
 }
 
-/* ============ 导出（Excel / CSV / TXT / DOC / PDF）============ */
+/* ============ 导出 ============ */
 function getExportRows(includeAll = false) {
   const rows = [];
   const trs = document.querySelectorAll('#tbody tr');
@@ -2587,126 +2849,6 @@ function exportToDOC() {
   html += '</tbody></table></body></html>';
   downloadBlob(html, 'payroll_' + todayStr() + '.doc', 'application/msword');
   toast('Word berjaya dieksport');
-}
-
-/* ============================================================
-   加载：优先从 Google Sheet 拉取 → 失败则 localStorage → 再失败用示例
-   ============================================================ */
-async function loadEmployees(opts = {}) {
-  const forceRemote = !!opts.forceRemote;
-  const useRemote = APPS_SCRIPT_URL && !APPS_SCRIPT_URL.includes('PASTE_YOUR');
-
-  if (useRemote) {
-    try {
-      const res = await fetch(APPS_SCRIPT_URL);
-      const json = await res.json();
-      if (json.status === 'success' && Array.isArray(json.data)) {
-        employees = json.data.map(row => ({
-          Situation: String(row.Situation || 'ACTIVE').trim().toUpperCase(),
-          Code: row.Code, Name: row.Name, GroupName: row.GroupName || '',
-          BankNama: row.BankNama || row.Bank || '',
-          Basic: Number(row.Salary || row.Basic) || 0,
-          Allowance: Number(row.Allowance) || 0,
-          Allowance2: Number(row.Allowance2 !== undefined && row.Allowance2 !== '' ? row.Allowance2 : row.Allowance) || 0,
-          Commission: Number(row.Commission) || 0,
-          Incentives: Number(row.Incentives) || 0,
-          EPFSalary: row.EPFSalary !== undefined && row.EPFSalary !== null && row.EPFSalary !== '' ? Number(row.EPFSalary) : '',
-          SOCSOSalary: row.SOCSOSalary !== undefined && row.SOCSOSalary !== null && row.SOCSOSalary !== '' ? Number(row.SOCSOSalary) : '',
-          EISSalary: row.EISSalary !== undefined && row.EISSalary !== null && row.EISSalary !== '' ? Number(row.EISSalary) : '',
-          LindungSalary: row.LindungSalary !== undefined && row.LindungSalary !== null && row.LindungSalary !== '' ? Number(row.LindungSalary) : '',
-          AnnualLeaveDays: Number(row.AnnualLeaveDays) || 0,
-          AnnualLeave: Number(row.AnnualLeave) || 0,
-          UnpaidLeaveDays: Number(row.UnpaidLeaveDays) || 0,
-          UnpaidLeave: Number(row.UnpaidLeave) || 0,
-          SickLeaveDays: Number(row.SickLeaveDays) || 0,
-          SickLeave: Number(row.SickLeave) || 0,
-          HalfDaysDays: Number(row.HalfDaysDays) || 0,
-          HalfDays: Number(row.HalfDays) || 0,
-          Deduction: Number(row.Deduction) || 0,
-          NormalOT: Number(row.NormalOT) || 0,
-          RestOT: Number(row.RestOT) || 0,
-          PublicOT: Number(row.PublicOT) || 0,
-          OtherOT: Number(row.OtherOT) || 0,
-          Pinjaman: Number(row.Pinjaman) || 0, Others: 0, Age: 30,
-          EPF: row.EPF || 'YES', PERKESO: row.PERKESO || 'YES',
-          EIS: row.EIS || 'YES', Lindungan: row.Lindungan || 'YES',
-          EPF_Employee: Number(row.EPF_Employee) || 0,
-          EPF_Employer: Number(row.EPF_Employer) || 0,
-          SOCSO_Employee: Number(row.SOCSO_Employee) || 0,
-          SOCSO_Employer: Number(row.SOCSO_Employer) || 0,
-          EIS_Employee: Number(row.EIS_Employee) || 0,
-          EIS_Employer: Number(row.EIS_Employer) || 0,
-          Lindung24Jam: Number(row.Lindung24Jam) || 0,
-          manualEPF: !!row.manualEPF,
-          manualSOCSO: !!row.manualSOCSO,
-          manualEIS: !!row.manualEIS,
-          manual24JAM: !!row.manual24JAM,
-          SLRBankNama: String(row.SLRBankNama || row.BankNama || row.Bank || '').trim(),
-          SLRBankAccountNo: String(row.SLRBankAccountNo || row.BankAccountNo || row.BankAcc || '').trim(),
-          SLREPF: String(row.SLREPF || row.EPF || '').trim(),
-          SLRPERKESO: String(row.SLRPERKESO || row.SOCSO || row.PERKESO || '').trim(),
-          SLREIS: String(row.SLREIS || row.EIS || '').trim(),
-          manualSLRBankNama: false, manualSLRBankAccountNo: false,
-          manualSLREPF: false, manualSLRPERKESO: false, manualSLREIS: false
-        })).filter(e => e.Situation !== 'UNACTIVE' && e.Situation !== 'INACTIVE');
-
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
-        renderTable();
-        toast('已从 Google Sheet 载入 ' + employees.length + ' 位员工');
-        return;
-      } else {
-        console.warn('Sheet returned non-success:', json);
-        if (!forceRemote) toast('Sheet 载入失败，改用本地缓存', false);
-      }
-    } catch (err) {
-      console.error('Google Sheet fetch failed:', err);
-      if (!forceRemote) toast('无法从 Sheet 获取数据，改用本地缓存', false);
-      else toast('无法从 Sheet 获取数据', false);
-    }
-  }
-
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        employees = parsed.map(e => ({
-          ...e,
-          Situation: String(e.Situation || 'ACTIVE').trim().toUpperCase()
-        })).filter(e => e.Situation !== 'UNACTIVE' && e.Situation !== 'INACTIVE');
-        if (employees.length > 0) { renderTable(); return; }
-      }
-    }
-  } catch (err) { console.error('localStorage load failed', err); }
-
-  employees = [
-    { Situation:'ACTIVE',  Code:'EMP001', Name:'Ahmad bin Ali', GroupName:'YZ UFO', BankNama:'Maybank',
-      Basic:4500, Allowance:0, Allowance2:0, Commission:0, Incentives:0,
-      EPFSalary:4500, SOCSOSalary:4500, EISSalary:4500, LindungSalary:4500,
-      AnnualLeaveDays:0, AnnualLeave:0, UnpaidLeaveDays:0, UnpaidLeave:0,
-      SickLeaveDays:0, SickLeave:0, HalfDaysDays:0, HalfDays:0,
-      Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
-      OtherOT:0, Pinjaman:0, Others:0, Age:30, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES',
-      SLRBankNama:'Maybank', SLRBankAccountNo:'1234567890', SLREPF:'YES', SLRPERKESO:'YES', SLREIS:'YES' },
-    { Situation:'PENDING', Code:'EMP002', Name:'Siti Nurhaliza', GroupName:'YZ CYBER', BankNama:'CIMB',
-      Basic:3800, Allowance:0, Allowance2:200, Commission:150, Incentives:100,
-      EPFSalary:3800, SOCSOSalary:3800, EISSalary:3800, LindungSalary:3800,
-      AnnualLeaveDays:1, AnnualLeave:126.67, UnpaidLeaveDays:0, UnpaidLeave:0,
-      SickLeaveDays:0, SickLeave:0, HalfDaysDays:0, HalfDays:0,
-      Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
-      OtherOT:0, Pinjaman:0, Others:0, Age:28, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES',
-      SLRBankNama:'CIMB', SLRBankAccountNo:'9876543210', SLREPF:'YES', SLRPERKESO:'NO', SLREIS:'YES' },
-    { Situation:'ACTIVE', Code:'EMP003', Name:'Cash Worker', GroupName:'YZ UFO', BankNama:'CASH',
-      Basic:2500, Allowance:0, Allowance2:0, Commission:0, Incentives:0,
-      EPFSalary:'', SOCSOSalary:'', EISSalary:'', LindungSalary:'',
-      AnnualLeaveDays:0, AnnualLeave:0, UnpaidLeaveDays:0, UnpaidLeave:0,
-      SickLeaveDays:0, SickLeave:0, HalfDaysDays:0, HalfDays:0,
-      Deduction:0, NormalOT:0, RestOT:0, PublicOT:0,
-      OtherOT:0, Pinjaman:0, Others:0, Age:30, EPF:'YES', PERKESO:'YES', EIS:'YES', Lindungan:'YES',
-      SLRBankNama:'CASH', SLRBankAccountNo:'-', SLREPF:'NO', SLRPERKESO:'NO', SLREIS:'NO' }
-  ];
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
-  renderTable();
 }
 
 /* ============================================================
@@ -2901,23 +3043,45 @@ function switchLang(lang) {
 /* ============================================================
    初始化
    ============================================================ */
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
   const langSelect = document.getElementById('langSelect');
   if (langSelect) langSelect.value = currentLang;
   syncNavHeight();
-  loadEmployees();
+
+  // ① 默认：自动同步关闭（手动模式）
+  const toggle = document.getElementById('autoSyncToggle');
+  if (toggle) toggle.checked = false;
+  autoSyncEnabled = false;
+  setSyncBadge('', 'AutoSync: 手动模式');
+
+  // ② 先从 localStorage 恢复（避免刷新丢失未推送的编辑）
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        employees = parsed.map(e => ({
+          ...e,
+          Situation: String(e.Situation || 'ACTIVE').trim().toUpperCase()
+        })).filter(e => e.Situation !== 'UNACTIVE' && e.Situation !== 'INACTIVE');
+        renderTable();
+      }
+    }
+  } catch (e) { console.error('localStorage load failed', e); }
+
+  // ③ 自动从 STAFF LOGIN RECORD 拉取员工基础资料
+  await loadStaffBasics();
+
+  // ④ 布局刷新
   updateStickyOffsets();
   setTimeout(updateStickyOffsets, 200);
   setTimeout(updateStickyOffsets, 600);
   setTimeout(syncNavHeight, 300);
 
-  // 🚀 启动 20 秒自动同步
-  startAutoSync();
-  // 首次延迟 8 秒后立刻同步一次（等 Sheet 载入完成 + 首次计算稳定）
-  setTimeout(() => autoSyncToSheet(), 8000);
+  // 注意：不再自动启动 autoSync
 });
 
-// 分页关闭前，把最新资料存 localStorage（下次打开不会丢）
+/* 分页关闭前存 localStorage */
 window.addEventListener('beforeunload', () => {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
 });
