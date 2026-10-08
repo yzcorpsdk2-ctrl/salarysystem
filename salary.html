@@ -21,7 +21,6 @@
     -webkit-font-smoothing: antialiased; font-size: 14px;
   }
 
-  /* ==================== 顶部深色导航栏 ==================== */
   .navbar {
     position: sticky; top: 0; z-index: 200;
     display: flex; align-items: stretch; flex-wrap: wrap;
@@ -135,7 +134,6 @@
     100% { box-shadow: 0 0 0 0 rgba(110, 240, 168, 0); }
   }
 
-  /* ==================== REQUEST CHAT 面板 ==================== */
   .chat-panel {
     position: fixed; right: 1.5rem; bottom: 1.5rem;
     width: 390px; max-width: calc(100vw - 2rem);
@@ -243,7 +241,6 @@
   .chat-send:hover { background: #15406f; transform: translateY(-1px); }
   .chat-send:active { transform: translateY(0); }
 
-  /* ==================== 原有样式 ==================== */
   .topbar {
     position: sticky; top: var(--nav-h); z-index: 100; background: #ffffff;
     border-bottom: 1px solid var(--epf-border); padding: 0.65rem 1.75rem;
@@ -273,6 +270,8 @@
   .btn-primary:hover { background: #15406f; border-color: #15406f; }
   .btn-success { background: #0f7a54; border: 1px solid #0f7a54; color: #fff; }
   .btn-success:hover { background: #0c6a48; border-color: #0c6a48; }
+  .btn-danger { background: #b31b1b; border: 1px solid #b31b1b; color: #fff; }
+  .btn-danger:hover { background: #961616; border-color: #961616; }
   .btn-sm { padding: 0.25rem 0.7rem; font-size: 0.72rem; border-radius: 4px; }
   select.btn {
     cursor: pointer; padding-right: 1.8rem; appearance: none;
@@ -280,7 +279,6 @@
     background-repeat: no-repeat; background-position: right 0.7rem center;
   }
 
-  /* Toolbar Dropdown (PRINT) */
   .toolbar-dropdown { position: relative; display: inline-flex; }
   .toolbar-dropdown > .btn { cursor: pointer; }
   .toolbar-dropdown .caret {
@@ -310,7 +308,6 @@
     padding-left: 1rem;
   }
 
-  /* ============ 自动同步状态徽章 ============ */
   .sync-badge {
     display: inline-flex; align-items: center; gap: 0.35rem;
     background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft);
@@ -326,7 +323,6 @@
   .sync-badge.busy .dot { background: #f59e0b; animation: pulse 1s infinite; }
   .sync-badge.err .dot { background: #ef4444; }
 
-  /* ============ 自动同步开关 ============ */
   .sync-switch {
     display: inline-flex; align-items: center; gap: 0.5rem;
     cursor: pointer; user-select: none;
@@ -466,7 +462,6 @@
     table-layout: fixed; width: 4690px; min-width: 4690px;
   }
 
-  /* ============ 表头 sticky ============ */
   #mainTable {
     --sticky-main-top:   40px;
     --sticky-sub-top:    80px;
@@ -847,7 +842,6 @@
 </head>
 <body class="freeze-on">
 
-<!-- ==================== 深色顶部导航栏 ==================== -->
 <nav class="navbar" id="mainNav">
   <div class="nav-brand">
     <span class="logo">Y</span>
@@ -868,6 +862,8 @@
         <a href="#" onclick="exportToXLSX(); closeAllNavDropdowns(); return false;"><span class="dot"></span>📊 Excel (.xlsx)</a>
         <a href="#" onclick="exportToTXT(); closeAllNavDropdowns(); return false;"><span class="dot"></span>📝 Text (.txt)</a>
         <a href="#" onclick="exportToDOC(); closeAllNavDropdowns(); return false;"><span class="dot"></span>📘 Word (.doc)</a>
+        <div class="nav-menu-label">New Session</div>
+        <a href="#" onclick="resetNewSession(); closeAllNavDropdowns(); return false;"><span class="dot"></span>🆕 New Session（备份 + 清空 + 重载）</a>
       </div>
     </div>
 
@@ -906,7 +902,6 @@
   </button>
 </nav>
 
-<!-- ==================== REQUEST CHAT 面板 ==================== -->
 <div class="chat-panel" id="chatPanel">
   <div class="chat-head">
     <div class="chat-avatar">🤖</div>
@@ -933,7 +928,6 @@
   </div>
 </div>
 
-<!-- ==================== 工具栏 ==================== -->
 <div class="topbar">
   <div class="brand"><div class="logo">P</div> Payroll System</div>
   <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
@@ -941,6 +935,11 @@
   <button class="btn btn-success" onclick="saveToSheet()" id="btnSaveSheet">💾 Simpan ke Sheet</button>
   <button class="btn" onclick="loadPayrollFromSheet()" id="btnLoadPayroll" title="从 PayrollData 手动载入完整工资数据">📥 载入 PayrollData</button>
   <button class="btn" onclick="checkAll()" id="btnCheckAll">✅ Semak Semua</button>
+
+  <button class="btn btn-danger" onclick="resetNewSession()" id="btnNewSession"
+          title="导出 xlsx 备份 → 清空 PayrollData → 重载新页面">
+    🆕 New Session
+  </button>
 
   <div class="toolbar-dropdown" id="printDropdown">
     <button class="btn" type="button" onclick="toggleToolbarDropdown('printDropdown', event)">
@@ -1293,7 +1292,7 @@
 <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 /* ============================================================
-   顶部导航栏：下拉菜单 + 高度同步
+   顶部导航栏
    ============================================================ */
 function syncNavHeight() {
   const nav = document.getElementById('mainNav');
@@ -1324,9 +1323,6 @@ document.addEventListener('click', e => {
   }
 });
 
-/* ============================================================
-   Toolbar 下拉菜单（PRINT）
-   ============================================================ */
 function toggleToolbarDropdown(id, e) {
   if (e) e.stopPropagation();
   const el = document.getElementById(id);
@@ -1339,7 +1335,7 @@ function closeAllToolbarDropdowns() {
 }
 
 /* ============================================================
-   REQUEST CHAT · 在线 AI 助手
+   REQUEST CHAT
    ============================================================ */
 const CHAT_WELCOME =
   '👋 你好！我是 Payroll AI 助手。\n' +
@@ -1429,16 +1425,17 @@ function aiReply(q) {
   if (has('cash', '现金', 'merchantrade')) return '【CASH / Merchantrade】\n若 SLR Bank Nama 为 CASH 或 Merchantrade，\nEPF / SOCSO / EIS / 24JAM 会自动归 0。';
   if (has('保存', 'sheet', 'simpan', 'google')) return '【保存资料到 Google Sheet】\n• 点顶部「💾 Simpan ke Sheet」→ 立即写入\n• 自动同步默认关闭，打开工具栏的「自动 30s 同步」开关即可每 30 秒推送\n• Backup ▾ → Muat dari Sheet → 重新拉取最新工资数据';
   if (has('同步', 'auto', 'autosync', '自动')) return '【自动同步 AutoSync】\n• 默认「手动模式」，需要点工具栏开关才会启动\n• 开启后每 30 秒把全部员工推送到 PayrollData\n• 右上角徽章显示状态：手动模式 / 已开启 / 已同步 HH:MM:SS (行数) / 同步失败';
-  if (has('staff', '基础资料', '员工资料')) return '【员工基础资料】\n• 页面打开时自动从 STAFF LOGIN RECORD 载入\n• 包含 Situation / GroupName / Code / Name / Salary / BankNama / BankAccountNo / EPF / PERKESO / EIS\n• Backup ▾ → Muat Staff Basic 可手动重拉';
+  if (has('staff', '基础资料', '员工资料')) return '【员工基础资料】\n• 页面打开时自动从 STAFF LOGIN RECORD 载入\n• B=Situation, C=GroupName, D=Code, E=Name, I=Salary, U=BankNama, V=BankAccountNo, W=EPF, X=PERKESO, Y=EIS\n• Backup ▾ → Muat Staff Basic 可手动重拉';
+  if (has('new session', '新页面', '全新', '重置', 'reset', '清空')) return '【New Session】\n• 点工具栏「🆕 New Session」按钮\n• 步骤：① 自动下载 xlsx 备份 ② 清空 Google Sheet PayrollData ③ 重载页面\n• 重载后只保留基础资料，工资数据归零';
   if (has('导入', 'import', '导出', 'eksport', 'export')) return '【导入 / 导出】\n📥 Import：Backup ▾ → Import\n💾 Eksport：Backup ▾ → 选择 PDF / Excel / Text / Word';
   if (has('粮单', 'slip', 'payslip', '打印', 'print', '复印')) return '【粮单 PRINT 功能】\n• 📄 全部复印\n• 📁 根据 Group 复印\n• ☑️ 批量复印';
   if (has('筛选', 'filter', '搜索', '过滤')) return '【筛选功能】\n• 右上角 Kumpulan / Bank 多选\n• 表头第三行每栏都有 🔍 搜索框';
   if (has('检查', 'semak', 'check', '对账')) return '【检查功能】\n点「✅ Semak Semua」会重新核算 EPF / SOCSO / EIS / 24JAM。';
   if (has('冻结', 'freeze', 'lock', '锁')) return '【冻结列 Freeze】\n点「Gaji Asas」栏位右侧的 ⋮⋮ 把手 → 可锁定 / 解锁前 5 栏。';
   if (has('折叠', 'fold', '收起')) return '【折叠 GAJI UNTUK CARUMAN】\n点两边的 ▸ 把手，可折叠 / 展开 4 栏缴款薪资。';
-  if (has('导航', 'menu', '菜单')) return '【顶部导航栏】\n• BACKUP ▾ → Muat / Import / Eksport\n• DEDUCTION ▾ → Leave / Pinjaman / EPF / SOCSO / EIS / 24JAM\n• ADDITIONAL ▾ → OT / Pendapatan Tambahan\n• SETTING ▾ → Company / Payslip / HTML';
+  if (has('导航', 'menu', '菜单')) return '【顶部导航栏】\n• BACKUP ▾ → Muat / Import / Eksport / New Session\n• DEDUCTION ▾ → Leave / Pinjaman / EPF / SOCSO / EIS / 24JAM\n• ADDITIONAL ▾ → OT / Pendapatan Tambahan\n• SETTING ▾ → Company / Payslip / HTML';
   if (has('谢谢', 'thank', 'terima kasih', 'thanks')) return '不客气！😊 还有其他问题随时问我。';
-  return '我暂时没有找到相关答案 🤔\n\n你可以试试这些关键词：\n• EPF / SOCSO / EIS / 24JAM\n• OT / Pinjaman / 请假扣款\n• 保存 Sheet / 导入导出 / 粮单\n• 筛选 / 检查 / 冻结 / 折叠';
+  return '我暂时没有找到相关答案 🤔\n\n你可以试试这些关键词：\n• EPF / SOCSO / EIS / 24JAM\n• OT / Pinjaman / 请假扣款\n• 保存 Sheet / New Session / 导入导出 / 粮单\n• 筛选 / 检查 / 冻结 / 折叠';
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -1466,9 +1463,6 @@ const STORAGE_KEY = 'payrollEmployees';
 const SELECTED_CODE_KEY = 'payrollSelectedCode';
 const SELECTED_EMP_KEY = 'payrollSelectedEmployee';
 
-/* ============================================================
-   自动同步：默认关闭（手动），打开后每 30 秒推送
-   ============================================================ */
 const AUTO_SYNC_INTERVAL_MS = 30000;
 let autoSyncTimer = null;
 let autoSyncInFlight = false;
@@ -1523,9 +1517,7 @@ async function autoSyncToSheet(force = false) {
     console.error('[AutoSync] failed:', err);
     const msg = (err && err.message) ? err.message : String(err);
     setSyncBadge('err', 'AutoSync: 同步失败 - ' + msg);
-    if (autoSyncCount === 0) {
-      toast('⚠️ 无法同步到 Google Sheet：' + msg, false);
-    }
+    if (autoSyncCount === 0) toast('⚠️ 无法同步到 Google Sheet：' + msg, false);
   } finally {
     autoSyncInFlight = false;
   }
@@ -1535,27 +1527,17 @@ function startAutoSync() {
   if (autoSyncTimer) clearInterval(autoSyncTimer);
   setSyncBadge('ok', 'AutoSync: 已开启（30s）');
   autoSyncTimer = setInterval(() => autoSyncToSheet(), AUTO_SYNC_INTERVAL_MS);
-  console.log('[AutoSync] started, interval=' + AUTO_SYNC_INTERVAL_MS + 'ms');
 }
-
 function stopAutoSync() {
   if (autoSyncTimer) { clearInterval(autoSyncTimer); autoSyncTimer = null; }
   setSyncBadge('', 'AutoSync: 手动模式');
 }
-
-/* ⭐ 开关：切换自动 / 手动 */
 function toggleAutoSync(enabled) {
   const sw = document.getElementById('syncSwitch');
   if (sw) sw.classList.toggle('on', enabled);
   autoSyncEnabled = !!enabled;
-
   if (enabled) {
-    const ok = confirm(
-      '⚠️ 开启自动同步（每 30 秒）\n\n' +
-      '系统会持续把当前页面的数据覆盖写入 Google Sheet 的 PayrollData。\n' +
-      '如果还没从 Sheet 载入过工资数据，可能会覆盖 Sheet 里的内容。\n\n' +
-      '确定要开启吗？'
-    );
+    const ok = confirm('⚠️ 开启自动同步（每 30 秒）\n\n系统会持续把当前页面的数据覆盖写入 Google Sheet 的 PayrollData。\n确定要开启吗？');
     if (!ok) {
       const t = document.getElementById('autoSyncToggle');
       if (t) t.checked = false;
@@ -1567,7 +1549,7 @@ function toggleAutoSync(enabled) {
     toast('✅ 自动同步已开启（每 30 秒）');
   } else {
     stopAutoSync();
-    toast('⏸️ 已切换到手动同步模式（点「💾 Simpan ke Sheet」才推送）');
+    toast('⏸️ 已切换到手动同步模式');
   }
 }
 
@@ -1609,16 +1591,16 @@ async function loadStaffBasics() {
    ┌──────────────────────────────────────────────────────────┐
    │ STAFF LOGIN RECORD 列  →  HTML 页面字段                  │
    ├──────────────────────────────────────────────────────────┤
-   │ Situation     (B)      →  Situation                      │
-   │ GroupName     (C)      →  GroupName (Kumpulan)           │
-   │ Code          (D)      →  Code (Kod)                     │
-   │ Name          (E)      →  Name (Nama)                    │
-   │ Salary        (I)      →  Basic (Gaji Asas)              │
-   │ BankNama      (U)      →  BankNama + SLRBankNama         │
-   │ BankAccountNo (V)      →  SLRBankAccountNo               │
-   │ EPF           (W)      →  SLREPF                         │
-   │ PERKESO       (X)      →  SLRPERKESO                     │
-   │ EIS           (Y)      →  SLREIS                         │
+   │ B: Situation     →  Situation                            │
+   │ C: GroupName     →  GroupName (Kumpulan)                 │
+   │ D: Code          →  Code (Kod)                           │
+   │ E: Name          →  Name (Nama)                          │
+   │ I: Salary        →  Basic (Gaji Asas)                    │
+   │ U: BankNama      →  BankNama + SLRBankNama               │
+   │ V: BankAccountNo →  SLRBankAccountNo                     │
+   │ W: EPF           →  SLREPF                               │
+   │ X: PERKESO       →  SLRPERKESO (SLR SOCSO)               │
+   │ Y: EIS           →  SLREIS                               │
    └──────────────────────────────────────────────────────────┘ */
 function applyStaffBasicsToEmployees() {
   if (!staffBasics.length) return;
@@ -1635,15 +1617,12 @@ function applyStaffBasicsToEmployees() {
 
     const base = byCode.get(code) || {};
 
-    // ⭐ Salary（STAFF 的 I 列）→ Gaji Asas (Basic)
     const salaryFromStaff = Number(b.Salary) || 0;
     const basicFinal = salaryFromStaff > 0 ? salaryFromStaff : num(base.Basic);
-
-    // ⭐ BankNama（STAFF 的 U 列）→ Bank 和 SLR Bank Nama 两列
     const bankFromStaff = String(b.BankNama || '').trim();
 
     merged.push({
-      // ============ 基础资料（STAFF LOGIN RECORD 为准）============
+      // 基础资料（STAFF 为准）
       Situation:        sit,
       GroupName:        String(b.GroupName || base.GroupName || ''),
       Code:             code,
@@ -1655,7 +1634,7 @@ function applyStaffBasicsToEmployees() {
       SLRPERKESO:       String(b.PERKESO || base.SLRPERKESO || ''),
       SLREIS:           String(b.EIS || base.SLREIS || ''),
 
-      // ============ 工资数据（保留原有 / 首次为 0）============
+      // 工资数据
       Basic:       basicFinal,
       Allowance:   num(base.Allowance),
       Allowance2:  num(base.Allowance2),
@@ -1708,7 +1687,7 @@ function applyStaffBasicsToEmployees() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
   renderTable();
   console.log('[Staff] Applied ' + merged.length + ' employees');
-  if (merged.length) console.log('[Staff] Sample: ' + JSON.stringify(merged[0]));
+  if (merged.length) console.log('[Staff] Sample:', merged[0]);
 }
 
 /* 把 Sheet 返回的 1 行转成 employee 对象 */
@@ -1789,18 +1768,16 @@ async function loadPayrollFromSheet() {
     }
     const fromSheet = j.data.map(mapSheetRowToEmployee).filter(e => e && e.Code);
 
-    // 用 STAFF LOGIN RECORD 覆盖基础资料
     const basicsByCode = new Map();
     staffBasics.forEach(b => { if (b.Code) basicsByCode.set(String(b.Code).trim(), b); });
 
     employees = fromSheet.map(e => {
       const b = basicsByCode.get(String(e.Code).trim());
       if (b) {
-        // 严格按列映射覆盖
         e.Situation = String(b.Situation || e.Situation || 'ACTIVE').toUpperCase();
         e.GroupName = b.GroupName || e.GroupName;
         e.Name      = b.Name      || e.Name;
-        if (Number(b.Salary) > 0) e.Basic = Number(b.Salary);       // ⭐ Salary → Gaji Asas
+        if (Number(b.Salary) > 0) e.Basic = Number(b.Salary);
         const bankFromStaff = String(b.BankNama || '').trim();
         e.BankNama         = bankFromStaff || e.BankNama;
         e.SLRBankNama      = bankFromStaff || e.SLRBankNama;
@@ -1823,9 +1800,71 @@ async function loadPayrollFromSheet() {
   }
 }
 
-/* 兼容旧代码 */
 async function reloadFromSheet() {
   return loadPayrollFromSheet();
+}
+
+/* ============================================================
+   🆕 New Session —— 备份 xlsx + 清空 Sheet + 重载页面
+   ============================================================ */
+async function resetNewSession() {
+  // 第 1 步：确认
+  if (!confirm(
+    '🆕 New Session —— 全新开始\n\n' +
+    '这个操作会执行：\n' +
+    '① 自动导出一份 .xlsx 备份（会立刻下载）\n' +
+    '② 清空 Google Sheet 的 PayrollData 所有数据\n' +
+    '③ 重载页面，工资数据归零（仅保留 STAFF LOGIN RECORD 基础资料）\n\n' +
+    '⚠️ 此操作不可撤销，确定继续吗？'
+  )) return;
+
+  // 第 2 步：自动导出 xlsx 备份
+  try {
+    if (employees && employees.length > 0) {
+      setSyncBadge('busy', '导出 xlsx 备份…');
+      toast('📊 正在导出备份…');
+      exportToXLSX();
+      // 等浏览器把下载 popup 打开
+      await new Promise(r => setTimeout(r, 1000));
+    } else {
+      console.warn('[NewSession] No employees to export');
+      toast('ℹ️ 当前没有数据可备份，直接进入清空', false);
+      await new Promise(r => setTimeout(r, 600));
+    }
+  } catch (e) {
+    console.error('[NewSession] Export failed:', e);
+    toast('⚠️ 备份导出失败：' + (e.message || e), false);
+    if (!confirm('备份导出失败，仍要继续清空 Google Sheet 并重载吗？')) return;
+  }
+
+  // 第 3 步：清空 Google Sheet PayrollData
+  try {
+    setSyncBadge('busy', '清空 Google Sheet…');
+    const res = await fetch(APPS_SCRIPT_URL + '?action=clear');
+    const j = await res.json();
+    if (j.status !== 'success') throw new Error(j.message || '清空失败');
+    console.log('[NewSession] Sheet cleared, rows=', j.clearedRows);
+    toast('✅ Google Sheet 已清空');
+  } catch (e) {
+    console.error('[NewSession] Clear failed:', e);
+    toast('⚠️ 清空 Google Sheet 失败：' + (e.message || e), false);
+    if (!confirm('清空 Google Sheet 失败，仍要继续重载页面吗？')) return;
+  }
+
+  // 第 4 步：清空 localStorage（页面重载后会从 STAFF 重新拉基础资料）
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(SELECTED_CODE_KEY);
+    localStorage.removeItem(SELECTED_EMP_KEY);
+    console.log('[NewSession] localStorage cleared');
+  } catch (e) { console.error('[NewSession] localStorage clear failed:', e); }
+
+  // 第 5 步：提示并重载页面
+  toast('🔄 正在重载页面…');
+  setTimeout(() => {
+    // 用替换 URL 的方式，避免保留浏览器后退历史里的旧状态
+    location.replace(location.pathname + location.search);
+  }, 800);
 }
 
 /* ============================================================
@@ -1879,7 +1918,7 @@ function toast(msg, ok = true) {
   el.textContent = msg;
   el.style.background = ok ? '#1a4f8a' : '#a02020';
   el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2500);
+  setTimeout(() => el.classList.remove('show'), 3000);
 }
 function escapeHtml(s) {
   if (s === null || s === undefined) return '';
@@ -2829,7 +2868,7 @@ function exportToXLSX() {
   ws['!cols'] = getExportHeaders().map(() => ({ wch: 14 }));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Payroll');
-  XLSX.writeFile(wb, 'payroll_' + todayStr() + '.xlsx');
+  XLSX.writeFile(wb, 'payroll_backup_' + todayStr() + '.xlsx');
   toast('Excel berjaya dieksport');
 }
 function exportToCSV() {
@@ -2896,7 +2935,7 @@ function showPayslip(code) {
 }
 
 /* ============================================================
-   PRINT 下拉：全部复印
+   PRINT 下拉
    ============================================================ */
 function printAll() {
   closeAllToolbarDropdowns();
@@ -2911,9 +2950,6 @@ function printAll() {
   setTimeout(() => window.print(), 120);
 }
 
-/* ============================================================
-   PRINT 下拉：根据 Group 复印
-   ============================================================ */
 function printByGroup() {
   closeAllToolbarDropdowns();
   const activeList = employees.filter(e => {
@@ -2964,9 +3000,6 @@ function confirmGroupPrint() {
   setTimeout(() => window.print(), 120);
 }
 
-/* ============================================================
-   PRINT 下拉：批量复印
-   ============================================================ */
 function printBatch() {
   closeAllToolbarDropdowns();
   const activeList = employees.filter(e => {
@@ -3008,9 +3041,6 @@ function confirmBatchPrint() {
   setTimeout(() => window.print(), 120);
 }
 
-/* ============================================================
-   构建粮单
-   ============================================================ */
 function buildPayslip(emp) {
   const fmt = n => Number(n || 0).toFixed(2);
   const ot = num(emp.NormalOT) + num(emp.RestOT) + num(emp.PublicOT) + num(emp.OtherOT);
@@ -3080,13 +3110,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (langSelect) langSelect.value = currentLang;
   syncNavHeight();
 
-  // ① 默认：自动同步关闭（手动模式）
   const toggle = document.getElementById('autoSyncToggle');
   if (toggle) toggle.checked = false;
   autoSyncEnabled = false;
   setSyncBadge('', 'AutoSync: 手动模式');
 
-  // ② 先从 localStorage 恢复（避免刷新丢失未推送的编辑）
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
@@ -3101,17 +3129,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   } catch (e) { console.error('localStorage load failed', e); }
 
-  // ③ 自动从 STAFF LOGIN RECORD 拉取员工基础资料
   await loadStaffBasics();
 
-  // ④ 布局刷新
   updateStickyOffsets();
   setTimeout(updateStickyOffsets, 200);
   setTimeout(updateStickyOffsets, 600);
   setTimeout(syncNavHeight, 300);
 });
 
-/* 分页关闭前存 localStorage */
 window.addEventListener('beforeunload', () => {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
 });
