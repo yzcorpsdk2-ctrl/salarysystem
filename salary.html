@@ -1429,7 +1429,7 @@ function aiReply(q) {
   if (has('cash', '现金', 'merchantrade')) return '【CASH / Merchantrade】\n若 SLR Bank Nama 为 CASH 或 Merchantrade，\nEPF / SOCSO / EIS / 24JAM 会自动归 0。';
   if (has('保存', 'sheet', 'simpan', 'google')) return '【保存资料到 Google Sheet】\n• 点顶部「💾 Simpan ke Sheet」→ 立即写入\n• 自动同步默认关闭，打开工具栏的「自动 30s 同步」开关即可每 30 秒推送\n• Backup ▾ → Muat dari Sheet → 重新拉取最新工资数据';
   if (has('同步', 'auto', 'autosync', '自动')) return '【自动同步 AutoSync】\n• 默认「手动模式」，需要点工具栏开关才会启动\n• 开启后每 30 秒把全部员工推送到 PayrollData\n• 右上角徽章显示状态：手动模式 / 已开启 / 已同步 HH:MM:SS (行数) / 同步失败';
-  if (has('staff', '基础资料', '员工资料')) return '【员工基础资料】\n• 页面打开时自动从 STAFF LOGIN RECORD 载入\n• 包含 Situation / Code / Name / Group / Bank / SLR Bank Nama / SLR Bank Account No / SLR EPF / SLR SOCSO / SLR EIS\n• Backup ▾ → Muat Staff Basic 可手动重拉';
+  if (has('staff', '基础资料', '员工资料')) return '【员工基础资料】\n• 页面打开时自动从 STAFF LOGIN RECORD 载入\n• 包含 Situation / GroupName / Code / Name / Salary / BankNama / BankAccountNo / EPF / PERKESO / EIS\n• Backup ▾ → Muat Staff Basic 可手动重拉';
   if (has('导入', 'import', '导出', 'eksport', 'export')) return '【导入 / 导出】\n📥 Import：Backup ▾ → Import\n💾 Eksport：Backup ▾ → 选择 PDF / Excel / Text / Word';
   if (has('粮单', 'slip', 'payslip', '打印', 'print', '复印')) return '【粮单 PRINT 功能】\n• 📄 全部复印\n• 📁 根据 Group 复印\n• ☑️ 批量复印';
   if (has('筛选', 'filter', '搜索', '过滤')) return '【筛选功能】\n• 右上角 Kumpulan / Bank 多选\n• 表头第三行每栏都有 🔍 搜索框';
@@ -1474,8 +1474,8 @@ let autoSyncTimer = null;
 let autoSyncInFlight = false;
 let autoSyncCount = 0;
 let autoSyncLastOk = 0;
-let autoSyncEnabled = false;   // ⭐ 默认关闭
-let staffBasics = [];          // STAFF LOGIN RECORD 缓存
+let autoSyncEnabled = false;
+let staffBasics = [];
 
 function setSyncBadge(state, text) {
   const badge = document.getElementById('syncBadge');
@@ -1585,6 +1585,8 @@ async function loadStaffBasics() {
     const j = await res.json();
     if (j.status !== 'success') throw new Error(j.message || '读取失败');
     const list = Array.isArray(j.data) ? j.data : [];
+    console.log('[Staff] received ' + list.length + ' rows');
+    if (list.length) console.log('[Staff] first row:', list[0]);
     if (!list.length) {
       setSyncBadge('', '基础资料：无数据');
       toast('⚠️ STAFF LOGIN RECORD 无资料', false);
@@ -1603,7 +1605,21 @@ async function loadStaffBasics() {
   }
 }
 
-/* 把基础资料合并到 employees（保留已有的工资数据） */
+/* 把基础资料合并到 employees（严格按列映射）
+   ┌──────────────────────────────────────────────────────────┐
+   │ STAFF LOGIN RECORD 列  →  HTML 页面字段                  │
+   ├──────────────────────────────────────────────────────────┤
+   │ Situation     (B)      →  Situation                      │
+   │ GroupName     (C)      →  GroupName (Kumpulan)           │
+   │ Code          (D)      →  Code (Kod)                     │
+   │ Name          (E)      →  Name (Nama)                    │
+   │ Salary        (I)      →  Basic (Gaji Asas)              │
+   │ BankNama      (U)      →  BankNama + SLRBankNama         │
+   │ BankAccountNo (V)      →  SLRBankAccountNo               │
+   │ EPF           (W)      →  SLREPF                         │
+   │ PERKESO       (X)      →  SLRPERKESO                     │
+   │ EIS           (Y)      →  SLREIS                         │
+   └──────────────────────────────────────────────────────────┘ */
 function applyStaffBasicsToEmployees() {
   if (!staffBasics.length) return;
 
@@ -1618,19 +1634,29 @@ function applyStaffBasicsToEmployees() {
     if (sit === 'UNACTIVE' || sit === 'INACTIVE') return;
 
     const base = byCode.get(code) || {};
-    merged.push({
-      Situation:        sit,
-      Code:             code,
-      Name:             b.Name             || base.Name             || '',
-      GroupName:        b.GroupName        || base.GroupName        || '',
-      BankNama:         b.BankNama         || base.BankNama         || '',
-      SLRBankNama:      b.SLRBankNama      || base.SLRBankNama      || '',
-      SLRBankAccountNo: b.SLRBankAccountNo || base.SLRBankAccountNo || '',
-      SLREPF:           b.SLREPF           || base.SLREPF           || '',
-      SLRPERKESO:       b.SLRPERKESO       || base.SLRPERKESO       || '',
-      SLREIS:           b.SLREIS           || base.SLREIS           || '',
 
-      Basic:       num(base.Basic),
+    // ⭐ Salary（STAFF 的 I 列）→ Gaji Asas (Basic)
+    const salaryFromStaff = Number(b.Salary) || 0;
+    const basicFinal = salaryFromStaff > 0 ? salaryFromStaff : num(base.Basic);
+
+    // ⭐ BankNama（STAFF 的 U 列）→ Bank 和 SLR Bank Nama 两列
+    const bankFromStaff = String(b.BankNama || '').trim();
+
+    merged.push({
+      // ============ 基础资料（STAFF LOGIN RECORD 为准）============
+      Situation:        sit,
+      GroupName:        String(b.GroupName || base.GroupName || ''),
+      Code:             code,
+      Name:             String(b.Name || base.Name || ''),
+      BankNama:         bankFromStaff || base.BankNama || '',
+      SLRBankNama:      bankFromStaff || base.SLRBankNama || '',
+      SLRBankAccountNo: String(b.BankAccountNo || base.SLRBankAccountNo || ''),
+      SLREPF:           String(b.EPF || base.SLREPF || ''),
+      SLRPERKESO:       String(b.PERKESO || base.SLRPERKESO || ''),
+      SLREIS:           String(b.EIS || base.SLREIS || ''),
+
+      // ============ 工资数据（保留原有 / 首次为 0）============
+      Basic:       basicFinal,
       Allowance:   num(base.Allowance),
       Allowance2:  num(base.Allowance2),
       Commission:  num(base.Commission),
@@ -1681,6 +1707,8 @@ function applyStaffBasicsToEmployees() {
   employees = merged;
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
   renderTable();
+  console.log('[Staff] Applied ' + merged.length + ' employees');
+  if (merged.length) console.log('[Staff] Sample: ' + JSON.stringify(merged[0]));
 }
 
 /* 把 Sheet 返回的 1 行转成 employee 对象 */
@@ -1761,21 +1789,25 @@ async function loadPayrollFromSheet() {
     }
     const fromSheet = j.data.map(mapSheetRowToEmployee).filter(e => e && e.Code);
 
+    // 用 STAFF LOGIN RECORD 覆盖基础资料
     const basicsByCode = new Map();
     staffBasics.forEach(b => { if (b.Code) basicsByCode.set(String(b.Code).trim(), b); });
 
     employees = fromSheet.map(e => {
       const b = basicsByCode.get(String(e.Code).trim());
       if (b) {
-        e.Situation        = String(b.Situation || e.Situation || 'ACTIVE').toUpperCase();
-        e.Name             = b.Name             || e.Name;
-        e.GroupName        = b.GroupName        || e.GroupName;
-        e.BankNama         = b.BankNama         || e.BankNama;
-        e.SLRBankNama      = b.SLRBankNama      || e.SLRBankNama;
-        e.SLRBankAccountNo = b.SLRBankAccountNo || e.SLRBankAccountNo;
-        e.SLREPF           = b.SLREPF           || e.SLREPF;
-        e.SLRPERKESO       = b.SLRPERKESO       || e.SLRPERKESO;
-        e.SLREIS           = b.SLREIS           || e.SLREIS;
+        // 严格按列映射覆盖
+        e.Situation = String(b.Situation || e.Situation || 'ACTIVE').toUpperCase();
+        e.GroupName = b.GroupName || e.GroupName;
+        e.Name      = b.Name      || e.Name;
+        if (Number(b.Salary) > 0) e.Basic = Number(b.Salary);       // ⭐ Salary → Gaji Asas
+        const bankFromStaff = String(b.BankNama || '').trim();
+        e.BankNama         = bankFromStaff || e.BankNama;
+        e.SLRBankNama      = bankFromStaff || e.SLRBankNama;
+        e.SLRBankAccountNo = b.BankAccountNo || e.SLRBankAccountNo;
+        e.SLREPF           = b.EPF           || e.SLREPF;
+        e.SLRPERKESO       = b.PERKESO       || e.SLRPERKESO;
+        e.SLREIS           = b.EIS           || e.SLREIS;
       }
       return e;
     }).filter(e => e.Situation !== 'UNACTIVE' && e.Situation !== 'INACTIVE');
@@ -3077,8 +3109,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   setTimeout(updateStickyOffsets, 200);
   setTimeout(updateStickyOffsets, 600);
   setTimeout(syncNavHeight, 300);
-
-  // 注意：不再自动启动 autoSync
 });
 
 /* 分页关闭前存 localStorage */
