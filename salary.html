@@ -1,3 +1,1296 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payroll System · 薪资系统</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --epf-blue: #1a4f8a; --epf-blue-light: #e8f0fa; --epf-blue-soft: #f4f8fd;
+    --epf-border: #d4e0ee; --epf-border-soft: #e6eef7;
+    --epf-text: #1f2d3d; --epf-muted: #64748b; --epf-bg: #f7fafd;
+    --nav-h: 52px;
+    --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover: #16345c;
+    --nav-text: #cbd9ea; --nav-accent: #4d9fff;
+  }
+  body {
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--epf-bg); color: var(--epf-text);
+    padding: 0 0 3rem 0; min-height: 100vh; line-height: 1.5;
+    -webkit-font-smoothing: antialiased; font-size: 14px;
+  }
+
+  .navbar {
+    position: sticky; top: 0; z-index: 200;
+    display: flex; align-items: stretch; flex-wrap: wrap;
+    background: linear-gradient(90deg, var(--nav-bg-1) 0%, var(--nav-bg-2) 100%);
+    padding: 0 1rem; min-height: var(--nav-h);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid rgba(77, 159, 255, 0.18);
+  }
+  .navbar .nav-brand {
+    display: flex; align-items: center; gap: 0.55rem;
+    color: #fff; font-weight: 800; font-size: 0.78rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding-right: 1.1rem; margin-right: 0.5rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.12);
+    white-space: nowrap;
+  }
+  .navbar .nav-brand .logo {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: linear-gradient(135deg, #4d9fff, #1a4f8a);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 0.85rem; font-weight: 800;
+    box-shadow: 0 2px 6px rgba(77, 159, 255, 0.35);
+  }
+  .nav-links { display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px; }
+  .nav-item {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    padding: 0 0.85rem; min-height: var(--nav-h);
+    color: var(--nav-text); text-decoration: none;
+    font-family: inherit; font-size: 0.73rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    background: transparent; border: none; cursor: pointer;
+    white-space: nowrap; transition: background 0.15s, color 0.15s;
+    position: relative;
+  }
+  .nav-item:hover { background: var(--nav-hover); color: #fff; }
+  .nav-item::after {
+    content: ''; position: absolute; left: 0.85rem; right: 0.85rem; bottom: 0;
+    height: 2px; background: var(--nav-accent); transform: scaleX(0);
+    transform-origin: left; transition: transform 0.2s;
+  }
+  .nav-item:hover::after { transform: scaleX(1); }
+
+  .nav-dropdown { position: relative; display: flex; align-items: stretch; }
+  .nav-dropdown > .nav-item { cursor: pointer; }
+  .nav-dropdown > .nav-item .caret {
+    font-size: 0.55rem; margin-left: 0.3rem; opacity: 0.8;
+    transition: transform 0.18s; display: inline-block;
+  }
+  .nav-dropdown:hover > .nav-item .caret,
+  .nav-dropdown.open > .nav-item .caret { transform: rotate(180deg); }
+  .nav-dropdown:hover > .nav-item,
+  .nav-dropdown.open > .nav-item { background: var(--nav-hover); color: #fff; }
+
+  .nav-dropdown-menu {
+    position: absolute; top: 100%; left: 0; min-width: 220px;
+    background: #ffffff; border: 1px solid var(--epf-border);
+    border-radius: 0 0 9px 9px;
+    box-shadow: 0 18px 36px -12px rgba(11, 27, 48, 0.42);
+    padding: 0.4rem; display: none; flex-direction: column;
+    z-index: 220;
+  }
+  .nav-dropdown:hover .nav-dropdown-menu,
+  .nav-dropdown.open .nav-dropdown-menu { display: flex; }
+  .nav-dropdown-menu a {
+    display: flex; align-items: center; gap: 0.55rem;
+    padding: 0.5rem 0.8rem; border-radius: 5px;
+    color: var(--epf-text); text-decoration: none;
+    font-size: 0.78rem; font-weight: 500; white-space: nowrap;
+    transition: background 0.13s, color 0.13s, padding-left 0.13s;
+  }
+  .nav-dropdown-menu a .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--epf-blue); opacity: 0.45; flex-shrink: 0;
+    transition: opacity 0.13s, transform 0.13s;
+  }
+  .nav-dropdown-menu a:hover {
+    background: var(--epf-blue-light); color: var(--epf-blue);
+    padding-left: 1rem;
+  }
+  .nav-dropdown-menu a:hover .dot { opacity: 1; transform: scale(1.35); }
+  .nav-menu-label {
+    padding: 0.5rem 0.8rem 0.2rem; font-size: 0.62rem;
+    color: var(--epf-muted); text-transform: uppercase;
+    letter-spacing: 0.08em; font-weight: 700;
+    border-top: 1px solid var(--epf-border-soft); margin-top: 0.25rem;
+  }
+
+  .nav-chat {
+    margin-left: auto; align-self: center;
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    padding: 0.5rem 1rem; border: none; border-radius: 20px;
+    background: linear-gradient(135deg, #2f7fe0 0%, #1a4f8a 100%);
+    color: #fff; font-family: inherit; font-size: 0.73rem;
+    font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer; white-space: nowrap;
+    box-shadow: 0 3px 12px rgba(47, 127, 224, 0.4);
+    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+  }
+  .nav-chat:hover {
+    filter: brightness(1.12); transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(47, 127, 224, 0.5);
+  }
+  .nav-chat .pulse {
+    width: 7px; height: 7px; border-radius: 50%; background: #6ef0a8;
+    box-shadow: 0 0 0 0 rgba(110, 240, 168, 0.75);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(110, 240, 168, 0.7); }
+    70%  { box-shadow: 0 0 0 7px rgba(110, 240, 168, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(110, 240, 168, 0); }
+  }
+
+  .chat-panel {
+    position: fixed; right: 1.5rem; bottom: 1.5rem;
+    width: 390px; max-width: calc(100vw - 2rem);
+    height: 560px; max-height: calc(100vh - 6rem);
+    background: #fff; border: 1px solid var(--epf-border);
+    border-radius: 14px; overflow: hidden;
+    display: none; flex-direction: column;
+    box-shadow: 0 26px 64px -18px rgba(11, 27, 48, 0.5);
+    z-index: 9997;
+  }
+  .chat-panel.open { display: flex; animation: chatIn 0.22s cubic-bezier(0.2, 0.9, 0.3, 1); }
+  @keyframes chatIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to   { opacity: 1; transform: none; }
+  }
+  .chat-head {
+    background: linear-gradient(90deg, var(--nav-bg-1), var(--nav-bg-2));
+    color: #fff; padding: 0.7rem 0.9rem;
+    display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0;
+  }
+  .chat-head .chat-avatar {
+    width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+    background: linear-gradient(135deg, #4d9fff, #1a4f8a);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem;
+  }
+  .chat-head .chat-title { flex: 1; line-height: 1.25; }
+  .chat-head .chat-title strong { font-size: 0.82rem; letter-spacing: 0.02em; display: block; }
+  .chat-head .chat-title small { font-size: 0.65rem; color: #8fb4dd; letter-spacing: 0.03em; }
+  .chat-icon-btn {
+    background: rgba(255, 255, 255, 0.1); border: none; color: #dbe8f7;
+    width: 26px; height: 26px; border-radius: 6px; cursor: pointer;
+    font-size: 0.8rem; line-height: 1; display: flex;
+    align-items: center; justify-content: center; transition: 0.15s;
+    font-family: inherit;
+  }
+  .chat-icon-btn:hover { background: rgba(255, 255, 255, 0.22); color: #fff; }
+
+  .chat-body {
+    flex: 1; overflow-y: auto; padding: 0.9rem;
+    background: var(--epf-bg); display: flex;
+    flex-direction: column; gap: 0.6rem;
+  }
+  .chat-body::-webkit-scrollbar { width: 6px; }
+  .chat-body::-webkit-scrollbar-thumb { background: #c2d4e6; border-radius: 3px; }
+  .chat-msg {
+    max-width: 86%; padding: 0.6rem 0.82rem; border-radius: 13px;
+    font-size: 0.79rem; line-height: 1.6; word-break: break-word;
+    animation: msgIn 0.2s ease;
+  }
+  @keyframes msgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .chat-msg.bot {
+    align-self: flex-start; background: #fff; color: var(--epf-text);
+    border: 1px solid var(--epf-border); border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 3px rgba(26, 79, 138, 0.06);
+  }
+  .chat-msg.user {
+    align-self: flex-end; background: var(--epf-blue); color: #fff;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 2px 8px -2px rgba(26, 79, 138, 0.45);
+  }
+  .chat-msg.bot a { color: var(--epf-blue); font-weight: 600; }
+  .chat-msg.typing { display: flex; gap: 4px; align-items: center; padding: 0.75rem 0.9rem; }
+  .chat-msg.typing span {
+    width: 6px; height: 6px; border-radius: 50%; background: #9db8d2;
+    animation: blink 1.2s infinite ease-in-out;
+  }
+  .chat-msg.typing span:nth-child(2) { animation-delay: 0.18s; }
+  .chat-msg.typing span:nth-child(3) { animation-delay: 0.36s; }
+  @keyframes blink { 0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); } 40% { opacity: 1; transform: scale(1); } }
+
+  .chat-suggest {
+    display: flex; gap: 0.35rem; flex-wrap: wrap;
+    padding: 0.55rem 0.8rem 0.15rem; background: #fff;
+    border-top: 1px solid var(--epf-border-soft); flex-shrink: 0;
+  }
+  .chat-suggest button {
+    background: var(--epf-blue-soft); border: 1px solid var(--epf-border);
+    color: var(--epf-blue); padding: 0.28rem 0.65rem; border-radius: 14px;
+    font-size: 0.68rem; font-family: inherit; font-weight: 600;
+    cursor: pointer; transition: 0.14s; white-space: nowrap;
+  }
+  .chat-suggest button:hover { background: var(--epf-blue-light); border-color: #b8cfe8; }
+
+  .chat-input-row {
+    display: flex; gap: 0.5rem; align-items: flex-end;
+    padding: 0.65rem 0.8rem 0.8rem; background: #fff; flex-shrink: 0;
+  }
+  .chat-input-row textarea {
+    flex: 1; resize: none; min-height: 40px; max-height: 110px;
+    border: 1px solid var(--epf-border); border-radius: 10px;
+    padding: 0.6rem 0.75rem; font-family: inherit; font-size: 0.8rem;
+    color: var(--epf-text); line-height: 1.45; transition: 0.15s;
+  }
+  .chat-input-row textarea:focus {
+    outline: none; border-color: var(--epf-blue);
+    box-shadow: 0 0 0 2px rgba(26, 79, 138, 0.1);
+  }
+  .chat-send {
+    width: 40px; height: 40px; flex-shrink: 0; border: none;
+    border-radius: 10px; background: var(--epf-blue); color: #fff;
+    font-size: 1rem; cursor: pointer; transition: 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .chat-send:hover { background: #15406f; transform: translateY(-1px); }
+  .chat-send:active { transform: translateY(0); }
+
+  .topbar {
+    position: sticky; top: var(--nav-h); z-index: 100; background: #ffffff;
+    border-bottom: 1px solid var(--epf-border); padding: 0.65rem 1.75rem;
+    display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+    box-shadow: 0 1px 2px rgba(26, 79, 138, 0.04);
+  }
+  .topbar .spacer { flex: 1; }
+  .topbar .brand {
+    font-weight: 700; font-size: 0.95rem; color: var(--epf-blue);
+    display: flex; align-items: center; gap: 0.6rem;
+    margin-right: 0.5rem; letter-spacing: -0.01em;
+  }
+  .topbar .brand .logo {
+    width: 32px; height: 32px; background: var(--epf-blue); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 0.95rem; font-weight: 800;
+  }
+  .btn {
+    background: #ffffff; border: 1px solid var(--epf-border);
+    padding: 0.42rem 0.9rem; border-radius: 5px; font-size: 0.78rem;
+    font-weight: 500; cursor: pointer; color: var(--epf-blue);
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    transition: all 0.15s ease; white-space: nowrap; font-family: inherit;
+  }
+  .btn:hover { background: var(--epf-blue-soft); border-color: #b8cfe8; }
+  .btn-primary { background: var(--epf-blue); border: 1px solid var(--epf-blue); color: #fff; }
+  .btn-primary:hover { background: #15406f; border-color: #15406f; }
+  .btn-success { background: #0f7a54; border: 1px solid #0f7a54; color: #fff; }
+  .btn-success:hover { background: #0c6a48; border-color: #0c6a48; }
+  .btn-danger { background: #b31b1b; border: 1px solid #b31b1b; color: #fff; }
+  .btn-danger:hover { background: #961616; border-color: #961616; }
+  .btn-danger:disabled { opacity: 0.6; cursor: not-allowed; }
+  .btn-sm { padding: 0.25rem 0.7rem; font-size: 0.72rem; border-radius: 4px; }
+  select.btn {
+    cursor: pointer; padding-right: 1.8rem; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%231a4f8a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 0.7rem center;
+  }
+
+  .toolbar-dropdown { position: relative; display: inline-flex; }
+  .toolbar-dropdown > .btn { cursor: pointer; }
+  .toolbar-dropdown .caret {
+    font-size: 0.6rem; margin-left: 0.15rem; opacity: 0.8;
+    transition: transform 0.18s; display: inline-block;
+  }
+  .toolbar-dropdown.open .caret { transform: rotate(180deg); }
+  .toolbar-dropdown-menu {
+    position: absolute; top: calc(100% + 5px); left: 0;
+    background: #ffffff; border: 1px solid var(--epf-border);
+    border-radius: 8px;
+    box-shadow: 0 14px 36px -12px rgba(26, 79, 138, 0.35);
+    min-width: 220px; padding: 0.35rem;
+    display: none; flex-direction: column; z-index: 400;
+  }
+  .toolbar-dropdown.open .toolbar-dropdown-menu { display: flex; }
+  .toolbar-dropdown-menu button {
+    display: flex; align-items: center; gap: 0.55rem;
+    padding: 0.55rem 0.85rem; border: none; background: transparent;
+    border-radius: 5px; font-size: 0.79rem; text-align: left;
+    cursor: pointer; font-family: inherit; color: var(--epf-text);
+    font-weight: 500; transition: background 0.13s, color 0.13s, padding-left 0.13s;
+    white-space: nowrap;
+  }
+  .toolbar-dropdown-menu button:hover {
+    background: var(--epf-blue-light); color: var(--epf-blue);
+    padding-left: 1rem;
+  }
+
+  .sync-badge {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft);
+    padding: 0.3rem 0.7rem; border-radius: 20px;
+    font-size: 0.68rem; font-weight: 600; color: var(--epf-muted);
+    white-space: nowrap;
+  }
+  .sync-badge .dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #9db8d2;
+    transition: background 0.2s;
+  }
+  .sync-badge.ok .dot { background: #22c55e; }
+  .sync-badge.busy .dot { background: #f59e0b; animation: pulse 1s infinite; }
+  .sync-badge.err .dot { background: #ef4444; }
+
+  .sync-switch {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    cursor: pointer; user-select: none;
+    padding: 0.3rem 0.75rem 0.3rem 0.55rem;
+    background: var(--epf-blue-soft);
+    border: 1px solid var(--epf-border-soft);
+    border-radius: 20px;
+    font-size: 0.7rem; color: var(--epf-muted);
+    font-weight: 600; white-space: nowrap;
+    transition: 0.15s;
+  }
+  .sync-switch:hover { background: var(--epf-blue-light); border-color: #b8cfe8; }
+  .sync-switch input { display: none; }
+  .sync-switch .slider {
+    position: relative; width: 34px; height: 18px;
+    background: #cbd5e1; border-radius: 10px;
+    transition: background 0.2s; flex-shrink: 0;
+  }
+  .sync-switch .slider::before {
+    content: ''; position: absolute;
+    top: 2px; left: 2px; width: 14px; height: 14px;
+    background: #fff; border-radius: 50%;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  }
+  .sync-switch input:checked + .slider { background: #22c55e; }
+  .sync-switch input:checked + .slider::before { transform: translateX(16px); }
+  .sync-switch.on {
+    color: #0f7a54; background: #e8f8ef; border-color: #b7e4c7;
+  }
+
+  .container { max-width: 100%; margin: 0 auto; padding: 1.5rem 1.75rem; }
+  .page-header {
+    background: #ffffff; border: 1px solid var(--epf-border); border-radius: 8px;
+    padding: 1.4rem 1.75rem; margin-bottom: 1.25rem;
+    display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
+    justify-content: space-between; box-shadow: 0 1px 3px rgba(26, 79, 138, 0.04);
+  }
+  .page-header .info { flex: 1; min-width: 240px; }
+  .page-header h1 {
+    font-size: 1.45rem; font-weight: 700; margin-bottom: 0.35rem;
+    color: var(--epf-blue); letter-spacing: -0.015em;
+  }
+  .page-header p { font-size: 0.85rem; color: var(--epf-muted); line-height: 1.6; }
+  .page-header .badge {
+    display: inline-block; background: var(--epf-blue-light); color: var(--epf-blue);
+    padding: 0.25rem 0.85rem; border-radius: 4px; font-size: 0.7rem;
+    font-weight: 600; margin-top: 0.6rem; border: 1px solid #cfe0f2;
+  }
+  .stat-badges { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: stretch; }
+  .stat-pill {
+    background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft);
+    border-radius: 6px; padding: 0.55rem 1rem; font-size: 0.78rem; min-width: 110px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .stat-pill .label {
+    font-size: 0.62rem; color: var(--epf-muted); text-transform: uppercase;
+    letter-spacing: 0.06em; font-weight: 600; margin-bottom: 0.1rem;
+  }
+  .stat-pill .value {
+    font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums;
+    color: var(--epf-blue); white-space: nowrap;
+  }
+  .multiselect { position: relative; display: inline-flex; }
+  .ms-btn {
+    background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft);
+    border-radius: 6px; padding: 0.55rem 0.85rem 0.55rem 1rem;
+    min-width: 150px; font-size: 0.78rem; cursor: pointer; color: var(--epf-text);
+    display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;
+    font-family: inherit; transition: 0.15s; text-align: left;
+  }
+  .ms-btn:hover { background: var(--epf-blue-light); border-color: #b8cfe8; }
+  .multiselect.open .ms-btn { background: var(--epf-blue-light); border-color: var(--epf-blue); }
+  .ms-btn-inner { display: flex; flex-direction: column; line-height: 1.25; }
+  .ms-btn-inner .ms-label {
+    font-size: 0.62rem; color: var(--epf-muted); text-transform: uppercase;
+    letter-spacing: 0.06em; font-weight: 600;
+  }
+  .ms-btn-inner .ms-text {
+    color: var(--epf-blue); font-weight: 600; font-size: 0.82rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;
+  }
+  .ms-arrow { color: var(--epf-blue); font-size: 0.7rem; transition: transform 0.15s; }
+  .multiselect.open .ms-arrow { transform: rotate(180deg); }
+  .ms-panel {
+    position: absolute; top: calc(100% + 4px); right: 0; background: #ffffff;
+    border: 1px solid var(--epf-border); border-radius: 6px;
+    box-shadow: 0 12px 32px -10px rgba(26, 79, 138, 0.28);
+    z-index: 300; min-width: 240px; display: none; flex-direction: column; overflow: hidden;
+  }
+  .multiselect.open .ms-panel { display: flex; }
+  .ms-actions {
+    display: flex; gap: 0.35rem; padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid var(--epf-border-soft); background: var(--epf-blue-soft);
+  }
+  .ms-actions button {
+    background: #fff; border: 1px solid var(--epf-border);
+    padding: 0.22rem 0.6rem; border-radius: 4px; font-size: 0.7rem;
+    cursor: pointer; color: var(--epf-blue); font-family: inherit; font-weight: 500;
+  }
+  .ms-actions button:hover { background: var(--epf-blue-light); }
+  .ms-list { overflow-y: auto; max-height: 260px; padding: 0.3rem 0; }
+  .ms-list::-webkit-scrollbar { width: 6px; }
+  .ms-list::-webkit-scrollbar-thumb { background: #c2d4e6; border-radius: 3px; }
+  .ms-item {
+    display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.75rem;
+    font-size: 0.78rem; cursor: pointer; color: var(--epf-text); user-select: none;
+  }
+  .ms-item:hover { background: var(--epf-blue-soft); }
+  .ms-item input[type="checkbox"] {
+    accent-color: var(--epf-blue); width: 14px; height: 14px; cursor: pointer; flex-shrink: 0;
+  }
+  .ms-item .ms-item-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ms-item .ms-count {
+    font-size: 0.65rem; color: var(--epf-blue); background: var(--epf-blue-light);
+    padding: 0.1rem 0.45rem; border-radius: 3px; font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .ms-empty { padding: 1rem; text-align: center; color: #a7b7c9; font-size: 0.75rem; }
+  .section-legend { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .section-legend .item {
+    display: inline-flex; align-items: center; gap: 0.45rem; background: #ffffff;
+    border: 1px solid var(--epf-border-soft); padding: 0.35rem 0.85rem;
+    border-radius: 4px; font-size: 0.72rem; color: var(--epf-muted); font-weight: 500;
+  }
+  .section-legend .dot {
+    width: 10px; height: 10px; border-radius: 2px; border: 1px solid rgba(0,0,0,0.05);
+  }
+  .card {
+    background: #ffffff; border-radius: 8px; border: 1px solid var(--epf-border);
+    overflow: hidden; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(26, 79, 138, 0.04);
+  }
+  .card-body { padding: 0; }
+  .table-wrap { overflow: auto; max-height: calc(100vh - 350px); background: #ffffff; }
+  table {
+    border-collapse: separate; border-spacing: 0; font-size: 0.8rem;
+    table-layout: fixed; width: 4690px; min-width: 4690px;
+  }
+
+  #mainTable {
+    --sticky-main-top:   40px;
+    --sticky-sub-top:    80px;
+    --sticky-filter-top: 120px;
+  }
+  th {
+    background: var(--epf-blue-soft); padding: 0.5rem 0.5rem; text-align: left;
+    font-weight: 600; color: var(--epf-blue); border-bottom: 1px solid var(--epf-border);
+    white-space: normal; font-size: 0.7rem; vertical-align: middle;
+    word-break: break-word; overflow-wrap: anywhere; position: relative;
+  }
+  th > div { word-break: break-word; overflow-wrap: anywhere; }
+  .bg-slate   { background: #f0f4f9 !important; color: var(--epf-blue) !important; }
+  .bg-emerald { background: #f0f9f4 !important; color: #14663f !important; }
+  .bg-cyan    { background: #ecf9fc !important; color: #0e5c6e !important; }
+  .bg-rose    { background: #fdf2f5 !important; color: #8b2b48 !important; }
+  .bg-violet  { background: #f4f1fb !important; color: #4a3a8a !important; }
+  .bg-amber   { background: #fdf8ec !important; color: #7a5a12 !important; }
+  .bg-blue    { background: #eef5fd !important; color: var(--epf-blue) !important; }
+  .bg-gray    { background: #f4f6f9 !important; color: var(--epf-muted) !important; }
+  .bg-rose-deep { background: #f7d4e0 !important; color: #7a1f3d !important; }
+  .col-split-left { border-left: 2px solid #c97a9b !important; }
+  td { z-index: 1; }
+
+  .section-label-row th {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 45 !important;
+    padding: 0.45rem 0.6rem; font-size: 0.68rem; font-weight: 700;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    border-bottom: 1px solid var(--epf-border); text-align: center;
+  }
+  .section-label-row th .sec-title {
+    display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+  }
+  .main-header-row th {
+    position: sticky !important;
+    top: var(--sticky-main-top) !important;
+    z-index: 40 !important;
+    text-align: left;
+  }
+  .sub-header-row th {
+    position: sticky !important;
+    top: var(--sticky-sub-top) !important;
+    z-index: 35 !important;
+    text-align: center; padding: 0.35rem 0.5rem;
+  }
+  .filter-row th {
+    position: sticky !important;
+    top: var(--sticky-filter-top) !important;
+    z-index: 30 !important;
+    background: #ffffff; padding: 0.35rem 0.4rem;
+    border-bottom: 1px solid var(--epf-border); text-align: left;
+  }
+  .filter-row th::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+    background: var(--epf-blue); pointer-events: none; opacity: 0.85;
+  }
+  .filter-row .th-filter {
+    display: block; width: 100%; padding: 4px 8px 4px 24px;
+    font-size: 0.7rem; font-weight: 400; border: 1px solid var(--epf-border);
+    border-radius: 4px;
+    background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%231a4f8a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E") no-repeat left 6px center;
+    background-size: 11px 11px; color: var(--epf-text);
+    font-family: inherit; transition: 0.15s; margin: 0;
+  }
+  .filter-row .th-filter:focus {
+    outline: none; border-color: var(--epf-blue);
+    box-shadow: 0 0 0 2px rgba(26, 79, 138, 0.10);
+  }
+  .filter-row .th-filter::placeholder { color: #a7b7c9; font-weight: 400; }
+  .filter-row th.no-filter { background: var(--epf-blue-soft); }
+  .filter-row .unfold-handle { display: none !important; }
+  td {
+    padding: 0.4rem 0.45rem; border-bottom: 1px solid var(--epf-border-soft);
+    vertical-align: middle; background: #ffffff; transition: background 0.15s;
+    position: relative;
+  }
+  tr:nth-child(even) td { background: #fbfdff; }
+  tr:hover td { background: var(--epf-blue-soft); }
+  .divider-group { box-shadow: inset 1px 0 0 var(--epf-border) !important; }
+
+  body.freeze-on .col-freeze { position: sticky; z-index: 9; background: #ffffff; }
+  body.freeze-on .col-freeze.col-0 { left: 0px; }
+  body.freeze-on .col-freeze.col-1 { left: 80px; }
+  body.freeze-on .col-freeze.col-2 { left: 150px; }
+  body.freeze-on .col-freeze.col-3 { left: 310px; }
+  body.freeze-on .col-freeze.col-4 { left: 420px; }
+  body.freeze-on tbody td.col-freeze.col-0 { background: #ffffff; }
+  body.freeze-on tbody td.col-freeze.col-1 { background: #ffffff; }
+  body.freeze-on tbody td.col-freeze.col-2 { background: #ffffff; }
+  body.freeze-on tbody td.col-freeze.col-3 { background: #ffffff; }
+  body.freeze-on tbody td.col-freeze.col-4 { background: #f0f4f9; }
+  body.freeze-on tbody tr:nth-child(even) td.col-freeze.col-0,
+  body.freeze-on tbody tr:nth-child(even) td.col-freeze.col-1,
+  body.freeze-on tbody tr:nth-child(even) td.col-freeze.col-2,
+  body.freeze-on tbody tr:nth-child(even) td.col-freeze.col-3 { background: #fbfdff; }
+  body.freeze-on tbody tr:nth-child(even) td.col-freeze.col-4 { background: #f5f7fb; }
+  body.freeze-on tbody tr:hover td.col-freeze { background: var(--epf-blue-soft); }
+
+  body.freeze-on .section-label-row th.col-freeze-group { z-index: 50 !important; }
+  body.freeze-on .main-header-row  th.col-freeze         { z-index: 44 !important; }
+  body.freeze-on .sub-header-row   th.col-freeze         { z-index: 39 !important; }
+  body.freeze-on .filter-row       th.col-freeze         { z-index: 34 !important; }
+  body.freeze-on th.col-freeze .freeze-line { z-index: 30 !important; }
+  body.freeze-on th.col-freeze .th-filter   { position: relative; z-index: 3; }
+
+  body.freeze-on thead .col-freeze.bg-slate   { background: #f0f4f9 !important; }
+  body.freeze-on thead .col-freeze.bg-amber   { background: #fdf8ec !important; }
+  body.freeze-on thead .col-freeze.bg-emerald { background: #f0f9f4 !important; }
+  body.freeze-on thead .col-freeze.bg-violet  { background: #f4f1fb !important; }
+  body.freeze-on thead .col-freeze.bg-blue    { background: #eef5fd !important; }
+  body.freeze-on thead .col-freeze.bg-gray    { background: #f4f6f9 !important; }
+  body.freeze-on thead .filter-row th.col-freeze { background: #ffffff !important; }
+  body.freeze-on thead .filter-row th.col-freeze.no-filter { background: var(--epf-blue-soft) !important; }
+  body.freeze-on .section-label-row th.col-freeze-group {
+    position: sticky !important; left: 0 !important; z-index: 50 !important;
+  }
+
+  .lock-edge-right { border-right: 2px solid var(--epf-blue) !important; z-index: 25 !important; }
+  .fold-line {
+    position: absolute; top: 0; bottom: 0; width: 12px;
+    background: linear-gradient(to right, rgba(14,92,110,0) 0%, rgba(14,92,110,0.06) 60%, rgba(14,92,110,0.15) 100%);
+    cursor: pointer; z-index: 26; pointer-events: auto; transition: 0.15s;
+  }
+  .fold-line:hover {
+    background: linear-gradient(to right, rgba(14,92,110,0.05) 0%, rgba(14,92,110,0.20) 60%, rgba(14,92,110,0.30) 100%);
+  }
+  .fold-line.left { left: 0; transform: scaleX(-1); }
+  .fold-line.right { right: 0; }
+  .fold-line::before {
+    content: '▸'; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); color: #0e5c6e;
+    font-size: 0.75rem; font-weight: 700; line-height: 1; opacity: 0.5; transition: 0.15s;
+  }
+  .fold-line:hover::before { opacity: 1; }
+  body.salary-folded .fold-line::before { content: '▾'; }
+  body.salary-folded .foldable-col { display: none !important; }
+  .unfold-handle {
+    display: none; position: absolute; top: 50%; right: 0;
+    transform: translate(50%, -50%); width: 16px; height: 24px;
+    background: linear-gradient(135deg, #e6f4f8 0%, #c7e6ef 100%);
+    border: 1px solid #a3d8e3; border-radius: 3px;
+    cursor: pointer; z-index: 40; transition: 0.15s;
+    align-items: center; justify-content: center;
+    box-shadow: 0 1px 3px rgba(14, 92, 110, 0.15);
+  }
+  .unfold-handle::before { content: '▸'; color: #0e5c6e; font-size: 0.66rem; font-weight: 700; line-height: 1; }
+  .unfold-handle:hover {
+    background: linear-gradient(135deg, #c7e6ef 0%, #a3d8e3 100%);
+    border-color: #6fbcd0;
+  }
+  body.salary-folded .unfold-handle { display: flex; }
+  .freeze-line {
+    position: absolute; top: 0; bottom: 0; right: 0; width: 14px;
+    background: linear-gradient(to right, rgba(26,79,138,0) 0%, rgba(26,79,138,0.05) 60%, rgba(26,79,138,0.12) 100%);
+    cursor: pointer; z-index: 26; pointer-events: auto; transition: 0.15s;
+  }
+  .freeze-line:hover {
+    background: linear-gradient(to right, rgba(26,79,138,0.04) 0%, rgba(26,79,138,0.16) 60%, rgba(26,79,138,0.24) 100%);
+  }
+  .freeze-line::before {
+    content: '⋮⋮'; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); color: var(--epf-blue);
+    font-size: 0.7rem; font-weight: 700; letter-spacing: -2px;
+    line-height: 1; opacity: 0.35; transition: 0.15s;
+  }
+  .freeze-line:hover::before { opacity: 0.9; }
+  .td-chk { text-align: center; vertical-align: middle; padding: 0.4rem 0.15rem !important; }
+  .td-chk input[type="checkbox"] {
+    width: 15px; height: 15px; cursor: pointer;
+    accent-color: var(--epf-blue); border-radius: 3px;
+  }
+  .td-chk-sm { text-align: center; vertical-align: middle; padding: 0.4rem 0.1rem !important; }
+  .td-chk-sm input[type="checkbox"] {
+    width: 14px; height: 14px; cursor: pointer;
+    accent-color: var(--epf-blue); border-radius: 3px;
+  }
+  .td-text { vertical-align: middle !important; padding: 0.4rem 0.45rem !important; }
+  .text-cell {
+    font-size: 0.78rem; line-height: 1.4; white-space: normal;
+    word-break: break-word; overflow-wrap: anywhere; color: var(--epf-text);
+  }
+  .text-cell.center { text-align: center; }
+  .emp-link {
+    color: var(--epf-blue); text-decoration: none; font-weight: 600;
+    border-bottom: 1px dashed rgba(26, 79, 138, 0.35);
+    cursor: pointer; transition: 0.15s;
+    display: inline-flex; align-items: center; gap: 3px;
+  }
+  .emp-link:hover {
+    color: #0d3a6b; border-bottom-color: #0d3a6b; border-bottom-style: solid;
+  }
+  .emp-link::after {
+    content: '↗'; font-size: 0.72em; opacity: 0.55;
+    transform: translateY(-1px); transition: 0.15s;
+  }
+  .emp-link:hover::after { opacity: 1; transform: translateY(-1px) translateX(1px); }
+  .input {
+    width: 100%; min-width: 0; border: 1px solid var(--epf-border);
+    border-radius: 4px; padding: 0.3rem 0.55rem; font-size: 0.78rem;
+    background: #ffffff; transition: 0.15s; font-family: inherit; color: var(--epf-text);
+  }
+  .input:focus {
+    outline: none; border-color: var(--epf-blue);
+    box-shadow: 0 0 0 2px rgba(26, 79, 138, 0.10);
+  }
+  .input[readonly] { background: var(--epf-blue-soft); color: var(--epf-muted); border-color: var(--epf-border-soft); }
+  .input.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .input[readonly].num { background: #eef3f9; }
+  .cell-bad { background: #fdeaea !important; border-color: #f0b4b4 !important; }
+  .cell-ok  { background: #e3f5ea !important; }
+  .input.first-total {
+    background: #eafaf1 !important; color: #14663f !important;
+    font-weight: 700; border-color: #b7e4c7 !important;
+  }
+  td.bg-slate-basic .input.num { background: #fffaf0; border-color: #f0d8a8; }
+  td.bg-slate-basic .input.num:focus {
+    background: #ffffff; border-color: #8a6a14;
+    box-shadow: 0 0 0 2px rgba(138, 106, 20, 0.12);
+  }
+  td.bg-cyan .input.num { background: #f6fdff; border-color: #c7e6ef; }
+  td.bg-cyan .input.num:focus {
+    background: #ffffff; border-color: #0e5c6e;
+    box-shadow: 0 0 0 2px rgba(14, 92, 110, 0.12);
+  }
+  td.bg-rose .input.num { background: #fff8fa; border-color: #f0c7d3; }
+  td.bg-rose .input.num:focus {
+    background: #ffffff; border-color: #8b2b48;
+    box-shadow: 0 0 0 2px rgba(139, 43, 72, 0.12);
+  }
+  td.bg-rose-deep .input.num { background: #fdf0f5; border-color: #e3b0c6; }
+  td.bg-rose-deep .input.num:focus {
+    background: #ffffff; border-color: #7a1f3d;
+    box-shadow: 0 0 0 2px rgba(122, 31, 61, 0.14);
+  }
+  td.leave-days .input.num { background: #fffafc; border-color: #f0c7d3; }
+  td.leave-days .input.num:focus {
+    background: #ffffff; border-color: #8b2b48;
+    box-shadow: 0 0 0 2px rgba(139, 43, 72, 0.12);
+  }
+  .input.slr-plain { background: transparent !important; border-color: transparent !important; padding: 0.3rem 0.3rem; color: var(--epf-text); }
+  .input.slr-plain[readonly] { color: var(--epf-text); }
+  .input.slr-plain:not([readonly]) { background: #fff !important; border-color: var(--epf-border) !important; }
+  .input.slr-plain:not([readonly]):focus {
+    border-color: var(--epf-blue) !important;
+    box-shadow: 0 0 0 2px rgba(26, 79, 138, 0.10);
+  }
+  .legend { font-size: 0.75rem; color: var(--epf-muted); margin-top: 0.75rem; padding-left: 0.25rem; line-height: 1.7; }
+  .legend strong { color: var(--epf-text); }
+  .toast {
+    position: fixed; bottom: 1.8rem; right: 1.8rem; background: var(--epf-blue); color: #fff;
+    padding: 0.85rem 1.5rem; border-radius: 6px; font-size: 0.85rem; font-weight: 500;
+    z-index: 9999; opacity: 0; transform: translateY(12px);
+    transition: 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); pointer-events: none;
+    max-width: 380px; box-shadow: 0 8px 24px -8px rgba(26, 79, 138, 0.35);
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.error { background: #a02020; }
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(26, 79, 138, 0.25);
+    z-index: 9998; display: flex; align-items: center; justify-content: center; padding: 1rem;
+  }
+  .modal-box {
+    background: #ffffff; border-radius: 8px; padding: 1.6rem;
+    width: 100%; max-width: 560px;
+    box-shadow: 0 20px 40px -12px rgba(26, 79, 138, 0.25);
+    display: flex; flex-direction: column; gap: 1.1rem; border: 1px solid var(--epf-border);
+  }
+  .modal-box.compact { max-width: 400px; padding: 1.8rem; text-align: center; }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; }
+  .modal-header h3 { font-size: 1.1rem; font-weight: 700; color: var(--epf-blue); }
+  .modal-close {
+    background: none; border: none; font-size: 1.3rem; cursor: pointer;
+    color: var(--epf-muted); padding: 0.2rem 0.6rem; border-radius: 4px;
+    line-height: 1; transition: 0.15s;
+  }
+  .modal-close:hover { background: var(--epf-blue-soft); color: var(--epf-blue); }
+  .modal-dropzone {
+    border: 2px dashed var(--epf-border); border-radius: 8px;
+    padding: 2.4rem 1.2rem; text-align: center;
+    cursor: pointer; transition: 0.2s; background: var(--epf-blue-soft);
+  }
+  .modal-dropzone:hover, .modal-dropzone.drag-over {
+    border-color: var(--epf-blue); background: var(--epf-blue-light);
+  }
+  .modal-dropzone p { font-size: 0.9rem; color: var(--epf-text); margin: 0.3rem 0; }
+  .modal-dropzone .hint { font-size: 0.72rem; color: var(--epf-muted); }
+  .modal-dropzone .icon { font-size: 2.4rem; margin-bottom: 0.4rem; opacity: 0.8; }
+  .modal-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 0.5rem; flex-wrap: wrap;
+    padding-top: 0.8rem; border-top: 1px solid var(--epf-border-soft);
+  }
+  .template-download {
+    display: flex; align-items: center; gap: 0.4rem;
+    flex-wrap: wrap; font-size: 0.75rem; color: var(--epf-muted);
+  }
+  .modal-actions { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+
+  .print-list {
+    max-height: 340px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 0.3rem;
+    border: 1px solid var(--epf-border-soft); border-radius: 6px;
+    padding: 0.5rem; background: #fbfdff;
+  }
+  .print-list::-webkit-scrollbar { width: 6px; }
+  .print-list::-webkit-scrollbar-thumb { background: #c2d4e6; border-radius: 3px; }
+  .print-list-item {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.5rem 0.75rem; border: 1px solid var(--epf-border-soft);
+    border-radius: 5px; background: #fff; font-size: 0.78rem;
+    cursor: pointer; transition: 0.13s; user-select: none;
+  }
+  .print-list-item:hover { background: var(--epf-blue-soft); border-color: var(--epf-border); }
+  .print-list-item input[type="checkbox"] {
+    accent-color: var(--epf-blue); width: 15px; height: 15px; cursor: pointer; flex-shrink: 0;
+  }
+  .print-list-item .pl-name { flex: 1; }
+  .print-list-item .pl-badge {
+    font-size: 0.65rem; color: var(--epf-blue); background: var(--epf-blue-light);
+    padding: 0.12rem 0.5rem; border-radius: 3px; font-weight: 600;
+  }
+  .print-modal-hint {
+    font-size: 0.72rem; color: var(--epf-muted);
+    padding: 0.4rem 0.2rem;
+  }
+
+  #printArea { display: none; }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .navbar, .topbar, .container, .toast, .modal-overlay, .section-legend, .chat-panel { display: none !important; }
+    #printArea { display: block !important; }
+    .payslip { page-break-after: always; padding: 12mm; font-size: 10pt; font-family: Arial, sans-serif; color: #000; }
+    .payslip:last-child { page-break-after: auto; }
+    .ps-header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 4mm; margin-bottom: 4mm; }
+    .ps-title { font-size: 14pt; font-weight: bold; }
+    .ps-info { font-size: 9pt; line-height: 1.5; }
+    .ps-section { margin-bottom: 4mm; }
+    .ps-section h4 { font-size: 10pt; margin-bottom: 1.5mm; border-bottom: 1px solid #999; padding-bottom: 1mm; }
+    .ps-row { display: flex; justify-content: space-between; padding: 0.8mm 0; }
+    .ps-row.total { font-weight: bold; border-top: 1px solid #000; padding-top: 1.5mm; margin-top: 1.5mm; }
+    .ps-cols { display: flex; gap: 6mm; }
+    .ps-cols > div { flex: 1; }
+    .ps-sign { margin-top: 8mm; display: flex; justify-content: space-between; font-size: 9pt; }
+    .ps-sign div { border-top: 1px solid #000; padding-top: 1mm; width: 45%; text-align: center; }
+    .export-print { padding: 6mm; font-family: Arial, sans-serif; color: #000; }
+    .export-table { border-collapse: collapse; width: 100%; font-size: 8.5pt; }
+    .export-table th, .export-table td { border: 1px solid #999; padding: 3px 4px; }
+    .export-table th { background: #eef5fd; text-align: left; }
+    .export-table td.num { text-align: right; }
+    .export-table tr { page-break-inside: avoid; }
+  }
+  .table-wrap::-webkit-scrollbar { width: 8px; height: 8px; }
+  .table-wrap::-webkit-scrollbar-track { background: var(--epf-blue-soft); }
+  .table-wrap::-webkit-scrollbar-thumb { background: #c2d4e6; border-radius: 4px; }
+  .table-wrap::-webkit-scrollbar-thumb:hover { background: #9db8d2; }
+  @media (max-width: 768px) {
+    .navbar { padding: 0 0.5rem; }
+    .navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
+    .navbar .nav-brand span.brand-text { display: none; }
+    .nav-item { padding: 0 0.6rem; font-size: 0.68rem; }
+    .nav-chat { padding: 0.45rem 0.75rem; font-size: 0.66rem; }
+    .topbar { padding: 0.6rem 1rem; }
+    .container { padding: 1rem; }
+    .page-header { padding: 1.2rem 1.2rem; }
+    .page-header h1 { font-size: 1.2rem; }
+    .section-legend .item { font-size: 0.65rem; padding: 0.25rem 0.6rem; }
+    .stat-pill { padding: 0.4rem 0.8rem; min-width: 90px; }
+    .stat-pill .value { font-size: 1rem; }
+    .ms-btn { min-width: 130px; }
+    .chat-panel {
+      right: 0.5rem; left: 0.5rem; bottom: 0.5rem;
+      width: auto; max-width: none; height: 72vh;
+    }
+  }
+</style>
+</head>
+<body class="freeze-on">
+
+<nav class="navbar" id="mainNav">
+  <div class="nav-brand">
+    <span class="logo">Y</span>
+    <span class="brand-text">YZ Payroll</span>
+  </div>
+
+  <div class="nav-links">
+    <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/salarysystem/staffinfo.html">👥 Employees</a>
+
+    <div class="nav-dropdown">
+      <button class="nav-item" type="button">💾 Backup <span class="caret">▾</span></button>
+      <div class="nav-dropdown-menu">
+        <a href="#" onclick="loadPayrollFromSheet(); closeAllNavDropdowns(); return false;"><span class="dot"></span>🔄 Muat dari Sheet (PayrollData)</a>
+        <a href="#" onclick="loadStaffBasics(); closeAllNavDropdowns(); return false;"><span class="dot"></span>👥 Muat Staff Basic</a>
+        <a href="#" onclick="openImportModal(); closeAllNavDropdowns(); return false;"><span class="dot"></span>📥 Import</a>
+        <div class="nav-menu-label">Eksport</div>
+        <a href="#" onclick="exportToPDF(); closeAllNavDropdowns(); return false;"><span class="dot"></span>📄 PDF</a>
+        <a href="#" onclick="exportToXLSX(); closeAllNavDropdowns(); return false;"><span class="dot"></span>📊 Excel (.xlsx)</a>
+        <a href="#" onclick="exportToTXT(); closeAllNavDropdowns(); return false;"><span class="dot"></span>📝 Text (.txt)</a>
+        <a href="#" onclick="exportToDOC(); closeAllNavDropdowns(); return false;"><span class="dot"></span>📘 Word (.doc)</a>
+        <div class="nav-menu-label">New Session</div>
+        <a href="#" onclick="resetNewSession(); closeAllNavDropdowns(); return false;"><span class="dot"></span>🆕 New Session（备份 + 清空 + 重载）</a>
+      </div>
+    </div>
+
+    <div class="nav-dropdown">
+      <button class="nav-item" type="button">➖ Deduction <span class="caret">▾</span></button>
+      <div class="nav-dropdown-menu">
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/leave.html"><span class="dot"></span>Leave</a>
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/pinjaman.html"><span class="dot"></span>Pinjaman</a>
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/epf.html"><span class="dot"></span>EPF</a>
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/socso.html"><span class="dot"></span>SOCSO</a>
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/eis.html"><span class="dot"></span>EIS</a>
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/lindungan.html"><span class="dot"></span>24 Jam Lindungan</a>
+      </div>
+    </div>
+
+    <div class="nav-dropdown">
+      <button class="nav-item" type="button">➕ Additional <span class="caret">▾</span></button>
+      <div class="nav-dropdown-menu">
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/overtime.html"><span class="dot"></span>Over Time</a>
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/pendapatantambahan.html"><span class="dot"></span>Pendapatan Tambahan</a>
+      </div>
+    </div>
+
+    <div class="nav-dropdown">
+      <button class="nav-item" type="button">⚙️ Setting <span class="caret">▾</span></button>
+      <div class="nav-dropdown-menu">
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/company.html"><span class="dot"></span>Company</a>
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/payslip.html"><span class="dot"></span>Payslip</a>
+        <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/htmlshow.html"><span class="dot"></span>HTML</a>
+      </div>
+    </div>
+  </div>
+
+  <button class="nav-chat" type="button" onclick="toggleChat()">
+    <span class="pulse"></span> 💬 Request Chat
+  </button>
+</nav>
+
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-head">
+    <div class="chat-avatar">🤖</div>
+    <div class="chat-title">
+      <strong>Request Chat · AI 助手</strong>
+      <small>Payroll Assistant · 在线</small>
+    </div>
+    <button class="chat-icon-btn" type="button" onclick="clearChat()" title="清空对话">🗑</button>
+    <button class="chat-icon-btn" type="button" onclick="closeChat()" title="关闭">✕</button>
+  </div>
+
+  <div class="chat-body" id="chatBody"></div>
+
+  <div class="chat-suggest" id="chatSuggest">
+    <button type="button" onclick="askChat('EPF 怎么算？')">EPF 怎么算？</button>
+    <button type="button" onclick="askChat('OT 如何计算？')">OT 怎么算？</button>
+    <button type="button" onclick="askChat('如何保存到 Sheet？')">保存到 Sheet</button>
+    <button type="button" onclick="askChat('借粮 Pinjaman 怎么扣？')">Pinjaman</button>
+  </div>
+
+  <div class="chat-input-row">
+    <textarea id="chatInput" rows="1" placeholder="输入你的问题… (Enter 发送 / Shift+Enter 换行)"></textarea>
+    <button class="chat-send" type="button" onclick="sendChat()" title="发送">➤</button>
+  </div>
+</div>
+
+<div class="topbar">
+  <div class="brand"><div class="logo">P</div> Payroll System</div>
+  <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
+
+  <button class="btn btn-success" onclick="saveToSheet()" id="btnSaveSheet">💾 Simpan ke Sheet</button>
+  <button class="btn" onclick="loadPayrollFromSheet()" id="btnLoadPayroll" title="从 PayrollData 手动载入完整工资数据">📥 载入 PayrollData</button>
+  <button class="btn" onclick="checkAll()" id="btnCheckAll">✅ Semak Semua</button>
+
+  <button class="btn btn-danger" onclick="resetNewSession()" id="btnNewSession"
+          title="导出 xlsx 备份 → 清空 PayrollData → 重载新页面">
+    🆕 New Session
+  </button>
+
+  <div class="toolbar-dropdown" id="printDropdown">
+    <button class="btn" type="button" onclick="toggleToolbarDropdown('printDropdown', event)">
+      🖨️ Print <span class="caret">▾</span>
+    </button>
+    <div class="toolbar-dropdown-menu">
+      <button type="button" onclick="printAll()">📄 全部复印</button>
+      <button type="button" onclick="printByGroup()">📁 根据 Group 复印</button>
+      <button type="button" onclick="printBatch()">☑️ 批量复印</button>
+    </div>
+  </div>
+
+  <label class="sync-switch" id="syncSwitch" title="开启后每 30 秒自动推送数据到 Google Sheet">
+    <input type="checkbox" id="autoSyncToggle" onchange="toggleAutoSync(this.checked)">
+    <span class="slider"></span>
+    <span>自动 30s 同步</span>
+  </label>
+
+  <span class="sync-badge" id="syncBadge" title="自动同步状态">
+    <span class="dot"></span><span id="syncBadgeText">AutoSync: 手动模式</span>
+  </span>
+
+  <span class="spacer"></span>
+  <select id="langSelect" class="btn" onchange="switchLang(this.value)">
+    <option value="ms">🇲🇾 Bahasa Melayu</option>
+    <option value="en">🇬🇧 English</option>
+    <option value="zh">🇨🇳 中文</option>
+  </select>
+</div>
+
+<div class="container">
+  <div class="page-header">
+    <div class="info">
+      <h1 id="pageTitle">Sistem Penggajian</h1>
+      <p id="pageDesc">Pengurusan gaji pekerja dengan pengiraan automatik EPF, SOCSO, EIS &amp; 24JAM Lindungan.</p>
+      <span class="badge" id="pageBadge">Auto kira caruman statutori · Manual override dengan kotak semak</span>
+    </div>
+    <div class="stat-badges">
+      <div class="multiselect" id="msGroup">
+        <button class="ms-btn" onclick="toggleMS('msGroup', event)">
+          <div class="ms-btn-inner">
+            <span class="ms-label" id="msGroupLabel">Kumpulan</span>
+            <span class="ms-text" id="msGroupText">Semua</span>
+          </div>
+          <span class="ms-arrow">▾</span>
+        </button>
+        <div class="ms-panel">
+          <div class="ms-actions">
+            <button onclick="selectAllMS('group', event)" id="msGroupSelAll">Semua</button>
+            <button onclick="clearMS('group', event)" id="msGroupClear">Kosong</button>
+          </div>
+          <div class="ms-list" id="msGroupList"></div>
+        </div>
+      </div>
+      <div class="multiselect" id="msBank">
+        <button class="ms-btn" onclick="toggleMS('msBank', event)">
+          <div class="ms-btn-inner">
+            <span class="ms-label" id="msBankLabel">Bank</span>
+            <span class="ms-text" id="msBankText">Semua</span>
+          </div>
+          <span class="ms-arrow">▾</span>
+        </button>
+        <div class="ms-panel">
+          <div class="ms-actions">
+            <button onclick="selectAllMS('bank', event)" id="msBankSelAll">Semua</button>
+            <button onclick="clearMS('bank', event)" id="msBankClear">Kosong</button>
+          </div>
+          <div class="ms-list" id="msBankList"></div>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="label" id="statLabelMatched">Padan</div>
+        <div class="value" id="filteredCount">0</div>
+      </div>
+      <div class="stat-pill" style="min-width: 150px;">
+        <div class="label" id="statLabelNetTotal">Jumlah Bersih</div>
+        <div class="value" id="filteredNet">RM 0.00</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-legend">
+    <span class="item"><span class="dot bg-slate" style="border:1px solid #cbd5e1;"></span> <span id="legend1">1. Maklumat Asas + Basic Salary (Freeze)</span></span>
+    <span class="item"><span class="dot bg-emerald" style="border:1px solid #a7d7b8;"></span> <span id="legend2">2. Pendapatan (OT)</span></span>
+    <span class="item"><span class="dot bg-emerald" style="border:1px solid #a7d7b8;"></span> <span id="legend2b">2.5 Pendapatan Tambahan</span></span>
+    <span class="item"><span class="dot bg-rose" style="border:1px solid #f0c7d3;"></span> <span id="legend2d">2.8 Potongan (On Leave + Pinjaman)</span></span>
+    <span class="item"><span class="dot bg-cyan" style="border:1px solid #a3d8e3;"></span> <span id="legend2c">2.9 Gaji untuk Caruman (boleh lipat)</span></span>
+    <span class="item"><span class="dot bg-violet" style="border:1px solid #c4b8e8;"></span> <span id="legend3">3. Caruman Statutori</span></span>
+    <span class="item"><span class="dot bg-amber" style="border:1px solid #e8d48a;"></span> <span id="legend4">4. Staff Login Record (U-Y)</span></span>
+    <span class="item"><span class="dot bg-blue" style="border:1px solid #a8c4e8;"></span> <span id="legend5">5. Ringkasan Gaji</span></span>
+    <span class="item"><span class="dot bg-gray" style="border:1px solid #cbd5e1;"></span> <span id="legend6">6. Tindakan</span></span>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="table-wrap">
+        <table id="mainTable">
+          <colgroup>
+            <col class="col-freeze col-0" style="width:80px">
+            <col class="col-freeze col-1" style="width:70px">
+            <col class="col-freeze col-2" style="width:160px">
+            <col class="col-freeze col-3" style="width:110px">
+            <col class="col-freeze col-4" style="width:110px">
+            <col style="width:85px"><col style="width:85px"><col style="width:85px"><col style="width:85px">
+            <col style="width:130px"><col style="width:130px"><col style="width:130px"><col style="width:130px">
+            <col style="width:80px"><col style="width:95px">
+            <col style="width:80px"><col style="width:95px">
+            <col style="width:80px"><col style="width:95px">
+            <col style="width:80px"><col style="width:95px">
+            <col style="width:110px">
+            <col style="width:130px"><col style="width:130px">
+            <col style="width:130px"><col style="width:130px">
+            <col style="width:40px"><col style="width:85px"><col style="width:85px">
+            <col style="width:40px"><col style="width:85px"><col style="width:85px">
+            <col style="width:40px"><col style="width:85px"><col style="width:85px">
+            <col style="width:40px"><col style="width:80px">
+            <col style="width:40px"><col style="width:130px">
+            <col style="width:40px"><col style="width:130px">
+            <col style="width:40px"><col style="width:130px">
+            <col style="width:40px"><col style="width:130px">
+            <col style="width:40px"><col style="width:130px">
+            <col style="width:95px"><col style="width:95px"><col style="width:95px">
+            <col style="width:80px">
+          </colgroup>
+          <thead>
+            <tr class="section-label-row">
+              <th colspan="5" class="bg-slate col-freeze-group lock-edge-right">
+                <div class="sec-title" id="sec1">📌 1. MAKLUMAT ASAS + 💵 BASIC SALARY (FREEZE)</div>
+              </th>
+              <th colspan="4" class="bg-emerald divider-group"><div class="sec-title" id="sec2">💰 2. PENDAPATAN / ELAUN (OT)</div></th>
+              <th colspan="4" class="bg-emerald divider-group"><div class="sec-title" id="sec2b">➕ PENDAPATAN TAMBAHAN</div></th>
+              <th colspan="9" class="bg-rose divider-group" style="position: relative;">
+                <div class="sec-title" id="sec2d">➖ POTONGAN (ON LEAVE + PINJAMAN)</div>
+                <div class="unfold-handle" onclick="toggleSalaryFold(event)" title="Unfold / Expand"></div>
+              </th>
+              <th colspan="4" class="bg-cyan divider-group foldable-col" style="position: relative;">
+                <div class="fold-line left" onclick="toggleSalaryFold(event)" title="Fold / Unfold"></div>
+                <div class="sec-title" id="sec2c">📐 GAJI UNTUK CARUMAN</div>
+                <div class="fold-line right" onclick="toggleSalaryFold(event)" title="Fold / Unfold"></div>
+              </th>
+              <th colspan="11" class="bg-violet divider-group"><div class="sec-title" id="sec3">🏛️ 3. CARUMAN STATUTORI (EPF / SOCSO / EIS / 24JAM)</div></th>
+              <th colspan="10" class="bg-amber divider-group"><div class="sec-title" id="sec4">📋 4. STAFF LOGIN RECORD (U-Y)</div></th>
+              <th colspan="3" class="bg-blue divider-group"><div class="sec-title" id="sec5">🧮 5. RINGKASAN GAJI</div></th>
+              <th colspan="1" class="bg-gray divider-group"><div class="sec-title" id="sec6">⚙️ 6. TINDAKAN</div></th>
+            </tr>
+            <tr class="main-header-row">
+              <th class="col-freeze col-0 bg-slate" rowspan="2" id="thSituation">Situation</th>
+              <th class="col-freeze col-1 bg-slate" rowspan="2" id="thKod">Kod</th>
+              <th class="col-freeze col-2 bg-slate" rowspan="2" id="thNama">Nama</th>
+              <th class="col-freeze col-3 bg-slate" rowspan="2" id="thKumpulan">Kumpulan</th>
+              <th class="col-freeze col-4 bg-slate lock-edge-right" rowspan="2" id="thBasic">
+                Gaji Asas
+                <div class="freeze-line" onclick="openFreezeModal()" title="Toggle freeze"></div>
+              </th>
+              <th class="bg-emerald divider-group" rowspan="2" id="thNormalOT">OT Biasa</th>
+              <th class="bg-emerald" rowspan="2" id="thRestOT">OT Rehat</th>
+              <th class="bg-emerald" rowspan="2" id="thPublicOT">OT Awam</th>
+              <th class="bg-emerald" rowspan="2" id="thOtherOT">OT Lain</th>
+              <th class="bg-emerald divider-group" rowspan="2" id="thAllowance2">ALLOWANCE</th>
+              <th class="bg-emerald" rowspan="2" id="thCommission">COMMISION</th>
+              <th class="bg-emerald" rowspan="2" id="thIncentives">INCENTIVES</th>
+              <th class="bg-emerald" rowspan="2" id="thFirstCalcTotal">FIRST CALCULATION TOTAL</th>
+              <th class="bg-rose divider-group" colspan="2" id="thAnnualLeave">ANNUAL LEAVE</th>
+              <th class="bg-rose" colspan="2" id="thUnpaidLeave">UNPAID LEAVE</th>
+              <th class="bg-rose" colspan="2" id="thSickLeave">SICK LEAVE</th>
+              <th class="bg-rose" colspan="2" id="thHalfDays">HALF DAYS LEAVE (HOURS)</th>
+              <th class="bg-rose-deep col-split-left" rowspan="2" id="thPinjaman">PINJAMAN</th>
+              <th class="bg-cyan divider-group foldable-col" rowspan="2" id="thEPFSalary">Salary for EPF Contributions<br><span style="font-weight:400;font-size:0.6rem;">(Gaji untuk caruman KWSP)</span></th>
+              <th class="bg-cyan foldable-col" rowspan="2" id="thSOCSOSalary">Salary for SOCSO Contributions<br><span style="font-weight:400;font-size:0.6rem;">(Gaji untuk caruman PERKESO)</span></th>
+              <th class="bg-cyan foldable-col" rowspan="2" id="thEISSalary">Salary for EIS Contributions<br><span style="font-weight:400;font-size:0.6rem;">(Gaji untuk caruman EIS)</span></th>
+              <th class="bg-cyan foldable-col" rowspan="2" id="thLindungSalary">Salary for 24JAM Contributions<br><span style="font-weight:400;font-size:0.6rem;">(Gaji untuk caruman 24JAM)</span></th>
+              <th class="bg-violet divider-group" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-violet" colspan="2" style="text-align:center;">EPF</th>
+              <th class="bg-violet" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-violet" colspan="2" style="text-align:center;">SOCSO</th>
+              <th class="bg-violet" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-violet" colspan="2" style="text-align:center;">EIS</th>
+              <th class="bg-violet" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-violet" rowspan="2" id="th24JAM">24JAM</th>
+              <th class="bg-amber divider-group" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-amber" rowspan="2"><div style="font-size:0.72rem;" id="thBankNama">Bank Nama<br><span style="font-weight:400;font-size:0.6rem;">(U)</span></div></th>
+              <th class="bg-amber" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-amber" rowspan="2"><div style="font-size:0.72rem;" id="thBankAcc">Bank Acc<br><span style="font-weight:400;font-size:0.6rem;">(V)</span></div></th>
+              <th class="bg-amber" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-amber" rowspan="2" style="text-align:center;"><div style="font-size:0.72rem;" id="thEPF">EPF<br><span style="font-weight:400;font-size:0.6rem;">(W)</span></div></th>
+              <th class="bg-amber" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-amber" rowspan="2" style="text-align:center;"><div style="font-size:0.72rem;" id="thSOCSO">SOCSO<br><span style="font-weight:400;font-size:0.6rem;">(X)</span></div></th>
+              <th class="bg-amber" rowspan="2" style="text-align:center;">✎</th>
+              <th class="bg-amber" rowspan="2" style="text-align:center;"><div style="font-size:0.72rem;" id="thEIS">EIS<br><span style="font-weight:400;font-size:0.6rem;">(Y)</span></div></th>
+              <th class="bg-blue divider-group" rowspan="2" id="thGross">Gaji Kasar</th>
+              <th class="bg-blue" rowspan="2" id="thTotalDed">Total Potongan</th>
+              <th class="bg-blue" rowspan="2" id="thNet">Gaji Bersih</th>
+              <th class="bg-gray divider-group" rowspan="2" style="text-align:center;" id="thAction">Tindakan</th>
+            </tr>
+            <tr class="sub-header-row">
+              <th class="bg-rose" id="subALDays">DAYS (D)</th>
+              <th class="bg-rose" id="subALAmt">AMOUNT (-RM)</th>
+              <th class="bg-rose" id="subULDays">DAYS (D)</th>
+              <th class="bg-rose" id="subULAmt">AMOUNT (-RM)</th>
+              <th class="bg-rose" id="subSLDays">DAYS (D)</th>
+              <th class="bg-rose" id="subSLAmt">AMOUNT (-RM)</th>
+              <th class="bg-rose" id="subHDDays">DAYS (D)</th>
+              <th class="bg-rose" id="subHDAmt">AMOUNT (-RM)</th>
+              <th class="bg-violet" id="subEPFE">Pekerja</th>
+              <th class="bg-violet" id="subEPFR">Majikan</th>
+              <th class="bg-violet" id="subSOCSOE">Pekerja</th>
+              <th class="bg-violet" id="subSOCSOR">Majikan</th>
+              <th class="bg-violet" id="subEISE">Pekerja</th>
+              <th class="bg-violet" id="subEISR">Majikan</th>
+            </tr>
+            <tr class="filter-row">
+              <th class="col-freeze col-0 bg-slate"><input class="th-filter" data-col="0" placeholder="🔍"></th>
+              <th class="col-freeze col-1 bg-slate"><input class="th-filter" data-col="1" placeholder="🔍"></th>
+              <th class="col-freeze col-2 bg-slate"><input class="th-filter" data-col="2" placeholder="🔍"></th>
+              <th class="col-freeze col-3 bg-slate"><input class="th-filter" data-col="3" placeholder="🔍"></th>
+              <th class="col-freeze col-4 bg-slate lock-edge-right"><input class="th-filter" data-col="4" placeholder="🔍"></th>
+              <th class="bg-emerald divider-group"><input class="th-filter" data-col="5" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="6" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="7" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="8" placeholder="🔍"></th>
+              <th class="bg-emerald divider-group"><input class="th-filter" data-col="9" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="10" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="11" placeholder="🔍"></th>
+              <th class="bg-emerald"><input class="th-filter" data-col="12" placeholder="🔍"></th>
+              <th class="bg-rose divider-group"><input class="th-filter" data-col="13" placeholder="🔍"></th>
+              <th class="bg-rose"><input class="th-filter" data-col="14" placeholder="🔍"></th>
+              <th class="bg-rose"><input class="th-filter" data-col="15" placeholder="🔍"></th>
+              <th class="bg-rose"><input class="th-filter" data-col="16" placeholder="🔍"></th>
+              <th class="bg-rose"><input class="th-filter" data-col="17" placeholder="🔍"></th>
+              <th class="bg-rose"><input class="th-filter" data-col="18" placeholder="🔍"></th>
+              <th class="bg-rose"><input class="th-filter" data-col="19" placeholder="🔍"></th>
+              <th class="bg-rose"><input class="th-filter" data-col="20" placeholder="🔍"></th>
+              <th class="bg-rose-deep col-split-left"><input class="th-filter" data-col="21" placeholder="🔍"></th>
+              <th class="bg-cyan divider-group foldable-col"><input class="th-filter" data-col="22" placeholder="🔍"></th>
+              <th class="bg-cyan foldable-col"><input class="th-filter" data-col="23" placeholder="🔍"></th>
+              <th class="bg-cyan foldable-col"><input class="th-filter" data-col="24" placeholder="🔍"></th>
+              <th class="bg-cyan foldable-col"><input class="th-filter" data-col="25" placeholder="🔍"></th>
+              <th class="bg-violet divider-group no-filter"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="27" placeholder="🔍"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="28" placeholder="🔍"></th>
+              <th class="bg-violet no-filter"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="30" placeholder="🔍"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="31" placeholder="🔍"></th>
+              <th class="bg-violet no-filter"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="33" placeholder="🔍"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="34" placeholder="🔍"></th>
+              <th class="bg-violet no-filter"></th>
+              <th class="bg-violet"><input class="th-filter" data-col="36" placeholder="🔍"></th>
+              <th class="bg-amber divider-group no-filter"></th>
+              <th class="bg-amber"><input class="th-filter" data-col="38" placeholder="🔍"></th>
+              <th class="bg-amber no-filter"></th>
+              <th class="bg-amber"><input class="th-filter" data-col="40" placeholder="🔍"></th>
+              <th class="bg-amber no-filter"></th>
+              <th class="bg-amber"><input class="th-filter" data-col="42" placeholder="🔍"></th>
+              <th class="bg-amber no-filter"></th>
+              <th class="bg-amber"><input class="th-filter" data-col="44" placeholder="🔍"></th>
+              <th class="bg-amber no-filter"></th>
+              <th class="bg-amber"><input class="th-filter" data-col="46" placeholder="🔍"></th>
+              <th class="bg-blue divider-group"><input class="th-filter" data-col="47" placeholder="🔍"></th>
+              <th class="bg-blue"><input class="th-filter" data-col="48" placeholder="🔍"></th>
+              <th class="bg-blue"><input class="th-filter" data-col="49" placeholder="🔍"></th>
+              <th class="bg-gray divider-group no-filter"></th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="legend" id="legend"></div>
+</div>
+
+<div id="printArea"></div>
+<div id="toast" class="toast"></div>
+
+<div id="freezeModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box compact">
+    <h3 style="justify-content:center; font-size:1.05rem; margin-bottom:0.3rem; color:var(--epf-blue);" id="freezeTitle">🔒 Tetapan Freeze Kolum</h3>
+    <p style="color:var(--epf-muted); font-size:0.82rem; margin-bottom:1rem;" id="freezeDesc">Pilih sama ada mahu kunci kolum pertama (Situation → Gaji Asas) supaya sentiasa kelihatan semasa scroll, atau buka kunci sepenuhnya.</p>
+    <div class="modal-actions">
+      <button class="btn" onclick="setFreeze(false)" id="freezeUnlockBtn">🔓 Buka Kunci</button>
+      <button class="btn btn-primary" onclick="setFreeze(true)" id="freezeLockBtn">🔒 Kunci Kolum</button>
+    </div>
+    <button class="btn btn-sm" style="margin-top:0.6rem;" onclick="closeFreezeModal()" id="freezeCancelBtn">Batal</button>
+  </div>
+</div>
+
+<div id="importModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="importTitle">📥 Import Data / 导入资料</h3>
+      <button class="modal-close" onclick="closeImportModal()">✕</button>
+    </div>
+    <div class="modal-dropzone" id="dropzone">
+      <div class="icon">📁</div>
+      <p><strong id="importDrop">拖入文件或点击选择</strong></p>
+      <p class="hint" id="importDropHint">Drag & drop file here, or click to browse</p>
+      <p class="hint" id="importFormatHint">格式：.xlsx / .csv / .txt</p>
+      <input type="file" id="importFile" accept=".xlsx,.xls,.csv,.txt" style="display:none;">
+    </div>
+    <div class="modal-footer">
+      <div class="template-download">
+        <span id="importTemplate">📥 Template:</span>
+        <button class="btn btn-sm" onclick="downloadTemplate('xlsx')">Excel (.xlsx)</button>
+        <button class="btn btn-sm" onclick="downloadTemplate('doc')">Word (.doc)</button>
+      </div>
+      <button class="btn" onclick="closeImportModal()" id="importCloseBtn">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<div id="groupSelectModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>📁 选择 Group / 分店 复印</h3>
+      <button class="modal-close" onclick="closeGroupSelectModal()">✕</button>
+    </div>
+    <div style="display:flex; gap:0.5rem; margin-bottom:0.4rem;">
+      <button class="btn btn-sm" onclick="groupSelectAll(true)">全选</button>
+      <button class="btn btn-sm" onclick="groupSelectAll(false)">取消全选</button>
+    </div>
+    <p class="print-modal-hint">勾选想要复印的分店（可多选）：</p>
+    <div class="print-list" id="groupSelectList"></div>
+    <div class="modal-footer" style="justify-content:flex-end;">
+      <button class="btn" onclick="closeGroupSelectModal()">Batal</button>
+      <button class="btn btn-primary" onclick="confirmGroupPrint()">🖨️ Cetak</button>
+    </div>
+  </div>
+</div>
+
+<div id="batchPrintModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>☑️ 批量复印 - 选择员工</h3>
+      <button class="modal-close" onclick="closeBatchPrintModal()">✕</button>
+    </div>
+    <div style="display:flex; gap:0.5rem; margin-bottom:0.4rem;">
+      <button class="btn btn-sm" onclick="batchSelectAll(true)">全选</button>
+      <button class="btn btn-sm" onclick="batchSelectAll(false)">取消全选</button>
+    </div>
+    <p class="print-modal-hint">勾选想要复印的员工（可多选）：</p>
+    <div class="print-list" id="batchPrintList"></div>
+    <div class="modal-footer" style="justify-content:flex-end;">
+      <button class="btn" onclick="closeBatchPrintModal()">Batal</button>
+      <button class="btn btn-primary" onclick="confirmBatchPrint()">🖨️ Cetak</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 /* ============================================================
    顶部导航栏：下拉菜单 + 高度同步
@@ -261,6 +1554,17 @@ function toggleAutoSync(enabled) {
 
 /* ============================================================
    从 STAFF LOGIN RECORD 载入员工基础资料
+   映射（严格）：
+     Situation     (B) → Situation
+     GroupName     (C) → GroupName (Kumpulan)
+     Code          (D) → Code (Kod)
+     Name          (E) → Name (Nama)
+     Salary        (I) → Basic (Gaji Asas)
+     BankNama      (U) → BankNama + SLRBankNama
+     BankAccountNo (V) → SLRBankAccountNo
+     EPF           (W) → SLREPF
+     PERKESO       (X) → SLRPERKESO
+     EIS           (Y) → SLREIS
    ============================================================ */
 async function loadStaffBasics() {
   if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
@@ -293,21 +1597,7 @@ async function loadStaffBasics() {
   }
 }
 
-/* 把基础资料合并到 employees（严格按列映射）
-   ┌──────────────────────────────────────────────────────────┐
-   │ STAFF LOGIN RECORD 列  →  HTML 页面字段                  │
-   ├──────────────────────────────────────────────────────────┤
-   │ Situation     (B)      →  Situation                      │
-   │ GroupName     (C)      →  GroupName (Kumpulan)           │
-   │ Code          (D)      →  Code (Kod)                     │
-   │ Name          (E)      →  Name (Nama)                    │
-   │ Salary        (I)      →  Basic (Gaji Asas)              │
-   │ BankNama      (U)      →  BankNama + SLRBankNama         │
-   │ BankAccountNo (V)      →  SLRBankAccountNo               │
-   │ EPF           (W)      →  SLREPF                         │
-   │ PERKESO       (X)      →  SLRPERKESO                     │
-   │ EIS           (Y)      →  SLREIS                         │
-   └──────────────────────────────────────────────────────────┘ */
+/* 把基础资料合并到 employees（按列位置严格映射） */
 function applyStaffBasicsToEmployees() {
   if (!staffBasics.length) return;
 
@@ -323,25 +1613,28 @@ function applyStaffBasicsToEmployees() {
 
     const base = byCode.get(code) || {};
 
+    // ⭐ Salary (I 列) → Basic (Gaji Asas)
     const salaryFromStaff = Number(b.Salary) || 0;
     const basicFinal = salaryFromStaff > 0 ? salaryFromStaff : num(base.Basic);
+
+    // ⭐ BankNama (U 列) → BankNama + SLRBankNama
     const bankFromStaff = String(b.BankNama || '').trim();
 
     merged.push({
-      // 基础资料
-      Situation:        sit,
-      GroupName:        String(b.GroupName || base.GroupName || ''),
-      Code:             code,
-      Name:             String(b.Name || base.Name || ''),
-      BankNama:         bankFromStaff || base.BankNama || '',
-      SLRBankNama:      bankFromStaff || base.SLRBankNama || '',
-      SLRBankAccountNo: String(b.BankAccountNo || base.SLRBankAccountNo || ''),
-      SLREPF:           String(b.EPF || base.SLREPF || ''),
-      SLRPERKESO:       String(b.PERKESO || base.SLRPERKESO || ''),
-      SLREIS:           String(b.EIS || base.SLREIS || ''),
+      // ============ 基础资料（STAFF LOGIN RECORD 为准）============
+      Situation:        sit,                                                      // B
+      GroupName:        String(b.GroupName || base.GroupName || ''),              // C
+      Code:             code,                                                     // D
+      Name:             String(b.Name || base.Name || ''),                        // E
+      BankNama:         bankFromStaff || base.BankNama || '',                     // U → Bank
+      SLRBankNama:      bankFromStaff || base.SLRBankNama || '',                  // U → SLR Bank Nama
+      SLRBankAccountNo: String(b.BankAccountNo || base.SLRBankAccountNo || ''),   // V
+      SLREPF:           String(b.EPF || base.SLREPF || ''),                       // W
+      SLRPERKESO:       String(b.PERKESO || base.SLRPERKESO || ''),               // X
+      SLREIS:           String(b.EIS || base.SLREIS || ''),                       // Y
 
-      // 工资数据
-      Basic:       basicFinal,
+      // ============ 工资数据（保留原有 / 首次为 0）============
+      Basic:       basicFinal,                                                    // I → Gaji Asas
       Allowance:   num(base.Allowance),
       Allowance2:  num(base.Allowance2),
       Commission:  num(base.Commission),
@@ -396,7 +1689,7 @@ function applyStaffBasicsToEmployees() {
   if (merged.length) console.log('[Staff] Sample: ' + JSON.stringify(merged[0]));
 }
 
-/* 把 Sheet 返回的 1 行转成 employee 对象 */
+/* 把 Sheet 返回的 1 行转成 employee 对象（PayrollData） */
 function mapSheetRowToEmployee(row) {
   return {
     Situation:        String(row.Situation || 'ACTIVE').trim().toUpperCase(),
@@ -529,7 +1822,7 @@ async function resetNewSession() {
     if (employees && employees.length > 0) {
       exportBackupXLSX('newsession_backup');
       toast('✅ 备份已导出，正在清空…');
-      await new Promise(r => setTimeout(r, 900));  // 等浏览器启动下载
+      await new Promise(r => setTimeout(r, 900));
     } else {
       console.log('[NewSession] 无数据可备份');
     }
@@ -574,7 +1867,7 @@ async function resetNewSession() {
   staffBasics = [];
   filterGroup.clear();
   filterBank.clear();
-  renderTable();  // 显示"加载中…"
+  renderTable();
 
   // ---------- ⑤ 重新从 STAFF LOGIN RECORD 载入 ----------
   await loadStaffBasics();
@@ -681,7 +1974,6 @@ function contribBase(emp, field, fallback) {
   return isNaN(n) ? fallback : n;
 }
 
-/* ============ 打开 Detail ============ */
 function openDetail(e, idx) {
   if (e) { e.preventDefault(); e.stopPropagation(); }
   const emp = employees[idx];
@@ -712,7 +2004,6 @@ window.addEventListener('storage', (ev) => {
   }
 });
 
-/* ============ Sticky 偏移 ============ */
 function updateStickyOffsets() {
   requestAnimationFrame(() => {
     const table = document.getElementById('mainTable');
@@ -746,7 +2037,6 @@ function toggleSalaryFold(e) {
   setTimeout(updateStickyOffsets, 30);
 }
 
-/* ============ 多选 ============ */
 function toggleMS(id, e) {
   if (e) e.stopPropagation();
   const el = document.getElementById(id);
@@ -865,7 +2155,6 @@ document.addEventListener('click', e => {
   }
 });
 
-/* ============ 冻结 ============ */
 function openFreezeModal() { document.getElementById('freezeModal').style.display = 'flex'; }
 function closeFreezeModal() { document.getElementById('freezeModal').style.display = 'none'; }
 function setFreeze(on) {
@@ -875,7 +2164,6 @@ function setFreeze(on) {
   toast(on ? t('freezeLocked') : t('freezeUnlocked'));
 }
 
-/* ============ 计算 ============ */
 const SOCSO_TABLE = [
   [30,0.10,0.40],[50,0.20,0.70],[70,0.30,1.10],[100,0.40,1.50],
   [140,0.60,2.10],[200,0.85,2.95],[300,1.25,4.35],[400,1.75,6.15],
@@ -973,7 +2261,6 @@ function recalcRow(emp) {
   return emp;
 }
 
-/* ============ 语言 ============ */
 function updateUILanguage() {
   document.getElementById('pageTitle').textContent = t('title');
   document.getElementById('pageDesc').textContent = t('desc');
@@ -1050,7 +2337,6 @@ function updateUILanguage() {
   document.querySelectorAll('.ms-empty').forEach(el => el.textContent = t('noOptions'));
 }
 
-/* ============ 渲染表格 ============ */
 function renderTable() {
   updateUILanguage();
   const tbody = document.getElementById('tbody');
@@ -1244,7 +2530,6 @@ document.addEventListener('input', e => {
   }
 });
 
-/* ============ 检查 ============ */
 function checkOne(type) {
   const rows = document.querySelectorAll('#tbody tr');
   rows.forEach((row, idx) => {
@@ -1285,7 +2570,6 @@ function checkAll() {
   toast('Semakan selesai');
 }
 
-/* ============ 保存到 Google Sheet ============ */
 async function saveToSheet() {
   if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
     toast('Sila tetapkan APPS_SCRIPT_URL dahulu!', false); return;
@@ -1316,7 +2600,6 @@ async function saveToSheet() {
   }
 }
 
-/* ============ 导入 ============ */
 function openImportModal() { document.getElementById('importModal').style.display = 'flex'; }
 function closeImportModal() {
   document.getElementById('importModal').style.display = 'none';
@@ -1518,7 +2801,6 @@ function downloadTemplate(format) {
   }
 }
 
-/* ============ 导出 ============ */
 function getExportRows(includeAll = false) {
   const rows = [];
   const trs = document.querySelectorAll('#tbody tr');
@@ -1658,9 +2940,6 @@ function exportToDOC() {
   toast('Word berjaya dieksport');
 }
 
-/* ============================================================
-   粮单打印
-   ============================================================ */
 function showPayslip(code) {
   const emp = employees.find(e => e.Code === code);
   if (!emp) return;
@@ -1827,7 +3106,7 @@ function switchLang(lang) {
 }
 
 /* ============================================================
-   初始化
+   初始化 —— 进入页面时优先从 STAFF LOGIN RECORD 载入基础资料
    ============================================================ */
 window.addEventListener('DOMContentLoaded', async () => {
   const langSelect = document.getElementById('langSelect');
@@ -1839,7 +3118,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   autoSyncEnabled = false;
   setSyncBadge('', 'AutoSync: 手动模式');
 
-  // 先从 localStorage 恢复
+  // 先从 localStorage 恢复工资数据（避免刷新丢失未推送的编辑）
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
@@ -1854,7 +3133,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   } catch (e) { console.error('localStorage load failed', e); }
 
-  // ✅ 优先从 STAFF LOGIN RECORD 拉取基础资料（覆盖本地）
+  // ✅ 优先从 STAFF LOGIN RECORD 拉取基础资料（无论什么状态都会执行）
   await loadStaffBasics();
 
   updateStickyOffsets();
@@ -1879,3 +3158,5 @@ if (document.fonts && document.fonts.ready) {
   document.fonts.ready.then(() => { updateStickyOffsets(); syncNavHeight(); });
 }
 </script>
+</body>
+</html>
