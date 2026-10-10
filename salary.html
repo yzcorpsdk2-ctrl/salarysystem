@@ -20,6 +20,7 @@
     padding: 0 0 3rem 0; min-height: 100vh; line-height: 1.5;
     -webkit-font-smoothing: antialiased; font-size: 14px;
   }
+
   .navbar {
     position: sticky; top: 0; z-index: 200;
     display: flex; align-items: stretch; flex-wrap: wrap;
@@ -61,6 +62,7 @@
     transform-origin: left; transition: transform 0.2s;
   }
   .nav-item:hover::after { transform: scaleX(1); }
+
   .nav-dropdown { position: relative; display: flex; align-items: stretch; }
   .nav-dropdown > .nav-item { cursor: pointer; }
   .nav-dropdown > .nav-item .caret {
@@ -71,6 +73,7 @@
   .nav-dropdown.open > .nav-item .caret { transform: rotate(180deg); }
   .nav-dropdown:hover > .nav-item,
   .nav-dropdown.open > .nav-item { background: var(--nav-hover); color: #fff; }
+
   .nav-dropdown-menu {
     position: absolute; top: 100%; left: 0; min-width: 220px;
     background: #ffffff; border: 1px solid var(--epf-border);
@@ -104,6 +107,7 @@
     letter-spacing: 0.08em; font-weight: 700;
     border-top: 1px solid var(--epf-border-soft); margin-top: 0.25rem;
   }
+
   .nav-chat {
     margin-left: auto; align-self: center;
     display: inline-flex; align-items: center; gap: 0.45rem;
@@ -129,6 +133,7 @@
     70%  { box-shadow: 0 0 0 7px rgba(110, 240, 168, 0); }
     100% { box-shadow: 0 0 0 0 rgba(110, 240, 168, 0); }
   }
+
   .chat-panel {
     position: fixed; right: 1.5rem; bottom: 1.5rem;
     width: 390px; max-width: calc(100vw - 2rem);
@@ -166,6 +171,7 @@
     font-family: inherit;
   }
   .chat-icon-btn:hover { background: rgba(255, 255, 255, 0.22); color: #fff; }
+
   .chat-body {
     flex: 1; overflow-y: auto; padding: 0.9rem;
     background: var(--epf-bg); display: flex;
@@ -198,6 +204,7 @@
   .chat-msg.typing span:nth-child(2) { animation-delay: 0.18s; }
   .chat-msg.typing span:nth-child(3) { animation-delay: 0.36s; }
   @keyframes blink { 0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); } 40% { opacity: 1; transform: scale(1); } }
+
   .chat-suggest {
     display: flex; gap: 0.35rem; flex-wrap: wrap;
     padding: 0.55rem 0.8rem 0.15rem; background: #fff;
@@ -210,6 +217,7 @@
     cursor: pointer; transition: 0.14s; white-space: nowrap;
   }
   .chat-suggest button:hover { background: var(--epf-blue-light); border-color: #b8cfe8; }
+
   .chat-input-row {
     display: flex; gap: 0.5rem; align-items: flex-end;
     padding: 0.65rem 0.8rem 0.8rem; background: #fff; flex-shrink: 0;
@@ -271,6 +279,7 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%231a4f8a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat; background-position: right 0.7rem center;
   }
+
   .toolbar-dropdown { position: relative; display: inline-flex; }
   .toolbar-dropdown > .btn { cursor: pointer; }
   .toolbar-dropdown .caret {
@@ -299,6 +308,7 @@
     background: var(--epf-blue-light); color: var(--epf-blue);
     padding-left: 1rem;
   }
+
   .sync-badge {
     display: inline-flex; align-items: center; gap: 0.35rem;
     background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft);
@@ -313,6 +323,7 @@
   .sync-badge.ok .dot { background: #22c55e; }
   .sync-badge.busy .dot { background: #f59e0b; animation: pulse 1s infinite; }
   .sync-badge.err .dot { background: #ef4444; }
+
   .sync-switch {
     display: inline-flex; align-items: center; gap: 0.5rem;
     cursor: pointer; user-select: none;
@@ -343,6 +354,7 @@
   .sync-switch.on {
     color: #0f7a54; background: #e8f8ef; border-color: #b7e4c7;
   }
+
   .container { max-width: 100%; margin: 0 auto; padding: 1.5rem 1.75rem; }
   .page-header {
     background: #ffffff; border: 1px solid var(--epf-border); border-radius: 8px;
@@ -450,6 +462,7 @@
     border-collapse: separate; border-spacing: 0; font-size: 0.8rem;
     table-layout: fixed; width: 4690px; min-width: 4690px;
   }
+
   #mainTable {
     --sticky-main-top:   40px;
     --sticky-sub-top:    80px;
@@ -473,6 +486,7 @@
   .bg-rose-deep { background: #f7d4e0 !important; color: #7a1f3d !important; }
   .col-split-left { border-left: 2px solid #c97a9b !important; }
   td { z-index: 1; }
+
   .section-label-row th {
     position: sticky !important;
     top: 0 !important;
@@ -530,6 +544,7 @@
   tr:nth-child(even) td { background: #fbfdff; }
   tr:hover td { background: var(--epf-blue-soft); }
   .divider-group { box-shadow: inset 1px 0 0 var(--epf-border) !important; }
+
   body.freeze-on .col-freeze { position: sticky; z-index: 9; background: #ffffff; }
   body.freeze-on .col-freeze.col-0 { left: 0px; }
   body.freeze-on .col-freeze.col-1 { left: 80px; }
@@ -547,12 +562,14 @@
   body.freeze-on tbody tr:nth-child(even) td.col-freeze.col-3 { background: #fbfdff; }
   body.freeze-on tbody tr:nth-child(even) td.col-freeze.col-4 { background: #f5f7fb; }
   body.freeze-on tbody tr:hover td.col-freeze { background: var(--epf-blue-soft); }
+
   body.freeze-on .section-label-row th.col-freeze-group { z-index: 50 !important; }
   body.freeze-on .main-header-row  th.col-freeze         { z-index: 44 !important; }
   body.freeze-on .sub-header-row   th.col-freeze         { z-index: 39 !important; }
   body.freeze-on .filter-row       th.col-freeze         { z-index: 34 !important; }
   body.freeze-on th.col-freeze .freeze-line { z-index: 30 !important; }
   body.freeze-on th.col-freeze .th-filter   { position: relative; z-index: 3; }
+
   body.freeze-on thead .col-freeze.bg-slate   { background: #f0f4f9 !important; }
   body.freeze-on thead .col-freeze.bg-amber   { background: #fdf8ec !important; }
   body.freeze-on thead .col-freeze.bg-emerald { background: #f0f9f4 !important; }
@@ -564,6 +581,7 @@
   body.freeze-on .section-label-row th.col-freeze-group {
     position: sticky !important; left: 0 !important; z-index: 50 !important;
   }
+
   .lock-edge-right { border-right: 2px solid var(--epf-blue) !important; z-index: 25 !important; }
   .fold-line {
     position: absolute; top: 0; bottom: 0; width: 12px;
@@ -744,6 +762,7 @@
     flex-wrap: wrap; font-size: 0.75rem; color: var(--epf-muted);
   }
   .modal-actions { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+
   .print-list {
     max-height: 340px; overflow-y: auto;
     display: flex; flex-direction: column; gap: 0.3rem;
@@ -771,6 +790,7 @@
     font-size: 0.72rem; color: var(--epf-muted);
     padding: 0.4rem 0.2rem;
   }
+
   #printArea { display: none; }
   @media print {
     body { background: #fff; padding: 0; }
@@ -828,8 +848,10 @@
     <span class="logo">Y</span>
     <span class="brand-text">YZ Payroll</span>
   </div>
+
   <div class="nav-links">
     <a class="nav-item" href="https://yzcorpsdk2-ctrl.github.io/salarysystem/staffinfo.html">👥 Employees</a>
+
     <div class="nav-dropdown">
       <button class="nav-item" type="button">💾 Backup <span class="caret">▾</span></button>
       <div class="nav-dropdown-menu">
@@ -845,6 +867,7 @@
         <a href="#" onclick="resetNewSession(); closeAllNavDropdowns(); return false;"><span class="dot"></span>🆕 New Session（备份 + 清空 + 重载）</a>
       </div>
     </div>
+
     <div class="nav-dropdown">
       <button class="nav-item" type="button">➖ Deduction <span class="caret">▾</span></button>
       <div class="nav-dropdown-menu">
@@ -856,6 +879,7 @@
         <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/lindungan.html"><span class="dot"></span>24 Jam Lindungan</a>
       </div>
     </div>
+
     <div class="nav-dropdown">
       <button class="nav-item" type="button">➕ Additional <span class="caret">▾</span></button>
       <div class="nav-dropdown-menu">
@@ -863,6 +887,7 @@
         <a href="https://yzcorpsdk2-ctrl.github.io/salarysystem/pendapatantambahan.html"><span class="dot"></span>Pendapatan Tambahan</a>
       </div>
     </div>
+
     <div class="nav-dropdown">
       <button class="nav-item" type="button">⚙️ Setting <span class="caret">▾</span></button>
       <div class="nav-dropdown-menu">
@@ -872,6 +897,7 @@
       </div>
     </div>
   </div>
+
   <button class="nav-chat" type="button" onclick="toggleChat()">
     <span class="pulse"></span> 💬 Request Chat
   </button>
@@ -887,13 +913,16 @@
     <button class="chat-icon-btn" type="button" onclick="clearChat()" title="清空对话">🗑</button>
     <button class="chat-icon-btn" type="button" onclick="closeChat()" title="关闭">✕</button>
   </div>
+
   <div class="chat-body" id="chatBody"></div>
+
   <div class="chat-suggest" id="chatSuggest">
     <button type="button" onclick="askChat('EPF 怎么算？')">EPF 怎么算？</button>
     <button type="button" onclick="askChat('OT 如何计算？')">OT 怎么算？</button>
     <button type="button" onclick="askChat('如何保存到 Sheet？')">保存到 Sheet</button>
     <button type="button" onclick="askChat('借粮 Pinjaman 怎么扣？')">Pinjaman</button>
   </div>
+
   <div class="chat-input-row">
     <textarea id="chatInput" rows="1" placeholder="输入你的问题… (Enter 发送 / Shift+Enter 换行)"></textarea>
     <button class="chat-send" type="button" onclick="sendChat()" title="发送">➤</button>
@@ -903,10 +932,16 @@
 <div class="topbar">
   <div class="brand"><div class="logo">P</div> Payroll System</div>
   <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
+
   <button class="btn btn-success" onclick="saveToSheet()" id="btnSaveSheet">💾 Simpan ke Sheet</button>
   <button class="btn" onclick="loadPayrollFromSheet()" id="btnLoadPayroll" title="从 PayrollData 手动载入完整工资数据">📥 载入 PayrollData</button>
   <button class="btn" onclick="checkAll()" id="btnCheckAll">✅ Semak Semua</button>
-  <button class="btn btn-danger" onclick="resetNewSession()" id="btnNewSession" title="导出 xlsx 备份 → 清空 PayrollData → 重载新页面">🆕 New Session</button>
+
+  <button class="btn btn-danger" onclick="resetNewSession()" id="btnNewSession"
+          title="导出 xlsx 备份 → 清空 PayrollData → 重载新页面">
+    🆕 New Session
+  </button>
+
   <div class="toolbar-dropdown" id="printDropdown">
     <button class="btn" type="button" onclick="toggleToolbarDropdown('printDropdown', event)">
       🖨️ Print <span class="caret">▾</span>
@@ -917,14 +952,17 @@
       <button type="button" onclick="printBatch()">☑️ 批量复印</button>
     </div>
   </div>
+
   <label class="sync-switch" id="syncSwitch" title="开启后每 30 秒自动推送数据到 Google Sheet">
     <input type="checkbox" id="autoSyncToggle" onchange="toggleAutoSync(this.checked)">
     <span class="slider"></span>
     <span>自动 30s 同步</span>
   </label>
+
   <span class="sync-badge" id="syncBadge" title="自动同步状态">
     <span class="dot"></span><span id="syncBadgeText">AutoSync: 手动模式</span>
   </span>
+
   <span class="spacer"></span>
   <select id="langSelect" class="btn" onchange="switchLang(this.value)">
     <option value="ms">🇲🇾 Bahasa Melayu</option>
@@ -1029,7 +1067,9 @@
           </colgroup>
           <thead>
             <tr class="section-label-row">
-              <th colspan="5" class="bg-slate col-freeze-group lock-edge-right"><div class="sec-title" id="sec1">📌 1. MAKLUMAT ASAS + 💵 BASIC SALARY (FREEZE)</div></th>
+              <th colspan="5" class="bg-slate col-freeze-group lock-edge-right">
+                <div class="sec-title" id="sec1">📌 1. MAKLUMAT ASAS + 💵 BASIC SALARY (FREEZE)</div>
+              </th>
               <th colspan="4" class="bg-emerald divider-group"><div class="sec-title" id="sec2">💰 2. PENDAPATAN / ELAUN (OT)</div></th>
               <th colspan="4" class="bg-emerald divider-group"><div class="sec-title" id="sec2b">➕ PENDAPATAN TAMBAHAN</div></th>
               <th colspan="9" class="bg-rose divider-group" style="position: relative;">
@@ -1253,31 +1293,7 @@
 <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 /* ============================================================
-   全局状态
-   ============================================================ */
-let employees = [];
-const filterGroup = new Set();
-const filterBank = new Set();
-let _newSessionLock = false;
-let staffBasics = [];
-
-/* ============================================================
-   常量
-   ============================================================ */
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4qjdz_E3vbwwkSSV7N-TB_OU2aLQ-tUlXN0tc3Ek5fIn9yuIemVXvkf0VJA6E1f3L/exec';
-const DETAIL_URL = 'https://yzcorpsdk2-ctrl.github.io/salarysystem/detail.html';
-const STORAGE_KEY = 'payrollEmployees';
-const SELECTED_CODE_KEY = 'payrollSelectedCode';
-const SELECTED_EMP_KEY = 'payrollSelectedEmployee';
-const AUTO_SYNC_INTERVAL_MS = 30000;
-let autoSyncTimer = null;
-let autoSyncInFlight = false;
-let autoSyncCount = 0;
-let autoSyncLastOk = 0;
-let autoSyncEnabled = false;
-
-/* ============================================================
-   工具函数
+   顶部导航栏：下拉菜单 + 高度同步
    ============================================================ */
 function syncNavHeight() {
   const nav = document.getElementById('mainNav');
@@ -1287,48 +1303,13 @@ function syncNavHeight() {
 function closeAllNavDropdowns() {
   document.querySelectorAll('.nav-dropdown.open').forEach(x => x.classList.remove('open'));
 }
-function toggleToolbarDropdown(id, e) {
-  if (e) e.stopPropagation();
-  const el = document.getElementById(id);
-  const wasOpen = el.classList.contains('open');
-  document.querySelectorAll('.toolbar-dropdown.open').forEach(x => x.classList.remove('open'));
-  if (!wasOpen) el.classList.add('open');
-}
-function closeAllToolbarDropdowns() {
-  document.querySelectorAll('.toolbar-dropdown.open').forEach(x => x.classList.remove('open'));
-}
-function toast(msg, ok = true) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.style.background = ok ? '#1a4f8a' : '#a02020';
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2500);
-}
-function escapeHtml(s) {
-  if (s === null || s === undefined) return '';
-  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-}
-function num(v) { return Number(v || 0); }
-function todayStr() {
-  const d = new Date();
-  const p = n => String(n).padStart(2, '0');
-  return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
-}
-function contribBase(emp, field, fallback) {
-  const v = emp[field];
-  if (v === undefined || v === null || v === '') return fallback;
-  const n = Number(v);
-  return isNaN(n) ? fallback : n;
-}
 
-/* ============================================================
-   顶部导航栏事件
-   ============================================================ */
 document.querySelectorAll('.nav-dropdown').forEach(dd => {
   const trigger = dd.querySelector('.nav-item');
   if (!trigger) return;
   trigger.addEventListener('click', e => {
-    e.preventDefault(); e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
     const wasOpen = dd.classList.contains('open');
     document.querySelectorAll('.nav-dropdown.open').forEach(x => x.classList.remove('open'));
     if (!wasOpen) dd.classList.add('open');
@@ -1344,13 +1325,28 @@ document.addEventListener('click', e => {
 });
 
 /* ============================================================
-   REQUEST CHAT
+   Toolbar 下拉菜单（PRINT）
+   ============================================================ */
+function toggleToolbarDropdown(id, e) {
+  if (e) e.stopPropagation();
+  const el = document.getElementById(id);
+  const wasOpen = el.classList.contains('open');
+  document.querySelectorAll('.toolbar-dropdown.open').forEach(x => x.classList.remove('open'));
+  if (!wasOpen) el.classList.add('open');
+}
+function closeAllToolbarDropdowns() {
+  document.querySelectorAll('.toolbar-dropdown.open').forEach(x => x.classList.remove('open'));
+}
+
+/* ============================================================
+   REQUEST CHAT · 在线 AI 助手
    ============================================================ */
 const CHAT_WELCOME =
   '👋 你好！我是 Payroll AI 助手。\n' +
   '我可以帮你解答：EPF / SOCSO / EIS / 24JAM 计算、OT 加班、借粮 Pinjaman、\n' +
   '保存到 Sheet、导入导出、粮单打印等等。\n\n' +
   '直接输入问题，或点下方快捷按钮 👇';
+
 let chatBusy = false;
 
 function toggleChat() {
@@ -1370,7 +1366,9 @@ function openChat() {
     if (inp && window.innerWidth > 768) inp.focus();
   }, 150);
 }
-function closeChat() { document.getElementById('chatPanel').classList.remove('open'); }
+function closeChat() {
+  document.getElementById('chatPanel').classList.remove('open');
+}
 function clearChat() {
   const body = document.getElementById('chatBody');
   body.innerHTML = '';
@@ -1394,17 +1392,27 @@ function addTyping() {
   body.scrollTop = body.scrollHeight;
   return div;
 }
-function askChat(q) { document.getElementById('chatInput').value = q; sendChat(); }
+function askChat(q) {
+  const inp = document.getElementById('chatInput');
+  inp.value = q;
+  sendChat();
+}
 function sendChat() {
   const inp = document.getElementById('chatInput');
   const q = (inp.value || '').trim();
   if (!q || chatBusy) return;
   chatBusy = true;
   addChatMsg('user', q);
-  inp.value = ''; inp.style.height = 'auto';
+  inp.value = '';
+  inp.style.height = 'auto';
   const typing = addTyping();
-  setTimeout(() => { typing.remove(); addChatMsg('bot', aiReply(q)); chatBusy = false; }, 420);
+  setTimeout(() => {
+    typing.remove();
+    addChatMsg('bot', aiReply(q));
+    chatBusy = false;
+  }, 420);
 }
+
 function aiReply(q) {
   const s = String(q).toLowerCase();
   const has = (...ks) => ks.some(k => s.includes(k));
@@ -1412,19 +1420,24 @@ function aiReply(q) {
   if (has('epf', 'kwsp')) return '【EPF / KWSP 计算】\n• 55 岁以下：员工 11%，雇主 12%（月薪 ≤ RM5,000 时雇主 13%）\n• 60 岁及以上：员工 0%，雇主 4%';
   if (has('socso', 'perkeso')) return '【SOCSO / PERKESO】\n• 按缴费表计算，薪资上限 RM6,000';
   if (has('eis')) return '【EIS 就业保险】\n• 员工 0.2% + 雇主 0.2%\n• 薪资上限 RM6,000，员工最高 RM11.90';
-  if (has('24jam', 'lindung')) return '【24 JAM LINDUNGAN】\n• 费率 0.7325%\n• 薪资上限 RM6,000';
+  if (has('24jam', '24 jam', 'lindung')) return '【24 JAM LINDUNGAN】\n• 费率 0.7325%\n• 薪资上限 RM6,000';
   if (has('ot', 'overtime', '加班')) return '【OT 加班计算】\n时薪 = 月薪 ÷ 26 ÷ 8';
-  if (has('pinjaman', '借粮')) return '【借粮 PINJAMAN】\n• 在 PINJAMAN 栏输入本期扣款金额';
-  if (has('newsession', 'new session')) return '【New Session】\n• 自动导出 .xlsx 备份\n• 清空页面 + 清空 PayrollData\n• 重新载入 STAFF LOGIN RECORD';
-  if (has('staff', '基础资料', '员工资料')) return '【员工基础资料】\n• 页面打开时自动从 STAFF LOGIN RECORD 载入';
-  if (has('谢谢', 'thank')) return '不客气！😊';
-  return '试试：EPF / SOCSO / EIS / 24JAM / OT / New Session';
+  if (has('pinjaman', '借粮', '借款')) return '【借粮 PINJAMAN】\n• 在 PINJAMAN 栏输入本期扣款金额';
+  if (has('保存', 'sheet', 'simpan')) return '【保存资料到 Google Sheet】\n• 点「💾 Simpan ke Sheet」→ 立即写入\n• 自动同步默认关闭';
+  if (has('newsession', 'new session', '新会话')) return '【New Session】\n• 自动导出 .xlsx 备份\n• 清空页面 + 清空 PayrollData\n• 重新载入 STAFF LOGIN RECORD';
+  if (has('staff', '基础资料', '员工资料')) return '【员工基础资料】\n• 页面打开时自动从 STAFF LOGIN RECORD 载入\n• 包含 Situation / GroupName / Code / Name / Salary / BankNama / BankAccountNo / EPF / PERKESO / EIS';
+  if (has('谢谢', 'thank', 'terima kasih')) return '不客气！😊';
+  return '我暂时没有找到相关答案 🤔\n\n试试：EPF / SOCSO / EIS / 24JAM / OT / New Session';
 }
+
 window.addEventListener('DOMContentLoaded', () => {
   const inp = document.getElementById('chatInput');
   if (inp) {
     inp.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendChat();
+      }
     });
     inp.addEventListener('input', () => {
       inp.style.height = 'auto';
@@ -1434,8 +1447,25 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ============================================================
+   核心常量
+   ============================================================ */
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4qjdz_E3vbwwkSSV7N-TB_OU2aLQ-tUlXN0tc3Ek5fIn9yuIemVXvkf0VJA6E1f3L/exec';
+const DETAIL_URL = 'https://yzcorpsdk2-ctrl.github.io/salarysystem/detail.html';
+const STORAGE_KEY = 'payrollEmployees';
+const SELECTED_CODE_KEY = 'payrollSelectedCode';
+const SELECTED_EMP_KEY = 'payrollSelectedEmployee';
+
+/* ============================================================
    自动同步
    ============================================================ */
+const AUTO_SYNC_INTERVAL_MS = 30000;
+let autoSyncTimer = null;
+let autoSyncInFlight = false;
+let autoSyncCount = 0;
+let autoSyncLastOk = 0;
+let autoSyncEnabled = false;
+let staffBasics = [];
+
 function setSyncBadge(state, text) {
   const badge = document.getElementById('syncBadge');
   const txt = document.getElementById('syncBadgeText');
@@ -1447,7 +1477,10 @@ function setSyncBadge(state, text) {
 
 async function autoSyncToSheet(force = false) {
   if (autoSyncInFlight && !force) return;
-  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) return;
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
+    setSyncBadge('err', 'AutoSync: 未设置 URL');
+    return;
+  }
   if (!employees || !employees.length) return;
 
   autoSyncInFlight = true;
@@ -1456,27 +1489,33 @@ async function autoSyncToSheet(force = false) {
     employees.forEach(emp => recalcRow(emp));
     const headers = getExportHeaders();
     const rows = getExportRows(true);
+    const payload = { headers, rows };
+
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
 
     const res = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ headers, rows })
+      body: JSON.stringify(payload)
     });
     const result = await res.json();
-    if (result.status !== 'success') throw new Error(result.message || 'Server error');
+    if (result.status !== 'success') throw new Error(result.message || 'Server returned error');
 
     autoSyncCount++;
     autoSyncLastOk = Date.now();
     const hhmmss = new Date(autoSyncLastOk).toLocaleTimeString('zh-CN', { hour12: false });
     setSyncBadge('ok', 'AutoSync: 已同步 ' + hhmmss + ' (' + rows.length + ')');
+    console.log('[AutoSync] pushed ' + rows.length + ' rows (#' + autoSyncCount + ')', result);
   } catch (err) {
     console.error('[AutoSync] failed:', err);
-    setSyncBadge('err', 'AutoSync: 同步失败 - ' + (err.message || err));
+    const msg = (err && err.message) ? err.message : String(err);
+    setSyncBadge('err', 'AutoSync: 同步失败 - ' + msg);
+    if (autoSyncCount === 0) toast('⚠️ 无法同步到 Google Sheet：' + msg, false);
   } finally {
     autoSyncInFlight = false;
   }
 }
+
 function startAutoSync() {
   if (autoSyncTimer) clearInterval(autoSyncTimer);
   setSyncBadge('ok', 'AutoSync: 已开启（30s）');
@@ -1486,12 +1525,18 @@ function stopAutoSync() {
   if (autoSyncTimer) { clearInterval(autoSyncTimer); autoSyncTimer = null; }
   setSyncBadge('', 'AutoSync: 手动模式');
 }
+
 function toggleAutoSync(enabled) {
   const sw = document.getElementById('syncSwitch');
   if (sw) sw.classList.toggle('on', enabled);
   autoSyncEnabled = !!enabled;
+
   if (enabled) {
-    const ok = confirm('⚠️ 开启自动同步（每 30 秒）\n\n系统会持续把当前页面的数据覆盖写入 Google Sheet 的 PayrollData。\n\n确定要开启吗？');
+    const ok = confirm(
+      '⚠️ 开启自动同步（每 30 秒）\n\n' +
+      '系统会持续把当前页面的数据覆盖写入 Google Sheet 的 PayrollData。\n\n' +
+      '确定要开启吗？'
+    );
     if (!ok) {
       const t = document.getElementById('autoSyncToggle');
       if (t) t.checked = false;
@@ -1508,67 +1553,53 @@ function toggleAutoSync(enabled) {
 }
 
 /* ============================================================
-   ⭐ 从 STAFF LOGIN RECORD 载入员工基础资料
+   从 STAFF LOGIN RECORD 载入员工基础资料
+   映射（严格）：
+     Situation     (B) → Situation
+     GroupName     (C) → GroupName (Kumpulan)
+     Code          (D) → Code (Kod)
+     Name          (E) → Name (Nama)
+     Salary        (I) → Basic (Gaji Asas)
+     BankNama      (U) → BankNama + SLRBankNama
+     BankAccountNo (V) → SLRBankAccountNo
+     EPF           (W) → SLREPF
+     PERKESO       (X) → SLRPERKESO
+     EIS           (Y) → SLREIS
    ============================================================ */
 async function loadStaffBasics() {
   if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
-    console.warn('[Staff] APPS_SCRIPT_URL 未设置');
-    setSyncBadge('err', '未设置 URL');
-    renderTable();
+    setSyncBadge('', 'AutoSync: 手动模式');
     return [];
   }
   setSyncBadge('busy', '载入基础资料…');
-  console.log('[Staff] ▶ 开始从 STAFF LOGIN RECORD 载入...');
-
   try {
     const res = await fetch(APPS_SCRIPT_URL + '?action=staff');
     const j = await res.json();
-    console.log('[Staff] 收到响应:', j);
-
     if (j.status !== 'success') throw new Error(j.message || '读取失败');
-
     const list = Array.isArray(j.data) ? j.data : [];
-    console.log('[Staff] 行数 = ' + list.length);
-    if (list.length) console.log('[Staff] 第一行:', list[0]);
-
-    staffBasics = list;
-
+    console.log('[Staff] received ' + list.length + ' rows');
+    if (list.length) console.log('[Staff] first row:', list[0]);
     if (!list.length) {
-      console.warn('[Staff] STAFF LOGIN RECORD 里没有数据');
-      employees = [];
-      renderTable();
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
       setSyncBadge('', '基础资料：无数据');
-      toast('⚠️ STAFF LOGIN RECORD 无资料，页面已清空', false);
+      toast('⚠️ STAFF LOGIN RECORD 无资料', false);
       return [];
     }
-
+    staffBasics = list;
     applyStaffBasicsToEmployees();
     setSyncBadge('ok', '基础资料已载入 (' + list.length + ' 人)');
     toast('✅ 已载入 ' + list.length + ' 位员工基础资料');
     return list;
   } catch (err) {
-    console.error('[Staff] ❌ 载入失败:', err);
-    employees = [];
-    renderTable();
+    console.error('[Staff] load failed:', err);
     setSyncBadge('err', '基础资料载入失败');
     toast('❌ 无法载入员工基础资料：' + (err.message || err), false);
     return [];
   }
 }
 
-/* ============================================================
-   ⭐ 合并基础资料（严格按列位置映射）
-   ============================================================ */
+/* 把基础资料合并到 employees（按列位置严格映射） */
 function applyStaffBasicsToEmployees() {
-  console.log('[Apply] ▶ 合并开始: staffBasics=' + staffBasics.length + ', employees=' + employees.length);
-
-  if (!staffBasics.length) {
-    console.warn('[Apply] staffBasics 为空');
-    employees = [];
-    renderTable();
-    return;
-  }
+  if (!staffBasics.length) return;
 
   const byCode = new Map();
   employees.forEach(e => { if (e && e.Code) byCode.set(String(e.Code).trim(), e); });
@@ -1581,23 +1612,29 @@ function applyStaffBasicsToEmployees() {
     if (sit === 'UNACTIVE' || sit === 'INACTIVE') return;
 
     const base = byCode.get(code) || {};
+
+    // ⭐ Salary (I 列) → Basic (Gaji Asas)
     const salaryFromStaff = Number(b.Salary) || 0;
     const basicFinal = salaryFromStaff > 0 ? salaryFromStaff : num(base.Basic);
+
+    // ⭐ BankNama (U 列) → BankNama + SLRBankNama
     const bankFromStaff = String(b.BankNama || '').trim();
 
     merged.push({
-      Situation:        sit,
-      GroupName:        String(b.GroupName || base.GroupName || ''),
-      Code:             code,
-      Name:             String(b.Name || base.Name || ''),
-      BankNama:         bankFromStaff || base.BankNama || '',
-      SLRBankNama:      bankFromStaff || base.SLRBankNama || '',
-      SLRBankAccountNo: String(b.BankAccountNo || base.SLRBankAccountNo || ''),
-      SLREPF:           String(b.EPF || base.SLREPF || ''),
-      SLRPERKESO:       String(b.PERKESO || base.SLRPERKESO || ''),
-      SLREIS:           String(b.EIS || base.SLREIS || ''),
+      // ============ 基础资料（STAFF LOGIN RECORD 为准）============
+      Situation:        sit,                                                      // B
+      GroupName:        String(b.GroupName || base.GroupName || ''),              // C
+      Code:             code,                                                     // D
+      Name:             String(b.Name || base.Name || ''),                        // E
+      BankNama:         bankFromStaff || base.BankNama || '',                     // U → Bank
+      SLRBankNama:      bankFromStaff || base.SLRBankNama || '',                  // U → SLR Bank Nama
+      SLRBankAccountNo: String(b.BankAccountNo || base.SLRBankAccountNo || ''),   // V
+      SLREPF:           String(b.EPF || base.SLREPF || ''),                       // W
+      SLRPERKESO:       String(b.PERKESO || base.SLRPERKESO || ''),               // X
+      SLREIS:           String(b.EIS || base.SLREIS || ''),                       // Y
 
-      Basic:       basicFinal,
+      // ============ 工资数据（保留原有 / 首次为 0）============
+      Basic:       basicFinal,                                                    // I → Gaji Asas
       Allowance:   num(base.Allowance),
       Allowance2:  num(base.Allowance2),
       Commission:  num(base.Commission),
@@ -1645,17 +1682,298 @@ function applyStaffBasicsToEmployees() {
     });
   });
 
-  console.log('[Apply] ✔ 合并完成: ' + merged.length + ' 位员工');
-  if (merged.length) console.log('[Apply] 第一行:', merged[0]);
-
   employees = merged;
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
   renderTable();
+  console.log('[Staff] Applied ' + merged.length + ' employees');
+  if (merged.length) console.log('[Staff] Sample: ' + JSON.stringify(merged[0]));
+}
+
+/* 把 Sheet 返回的 1 行转成 employee 对象（PayrollData） */
+function mapSheetRowToEmployee(row) {
+  return {
+    Situation:        String(row.Situation || 'ACTIVE').trim().toUpperCase(),
+    Code:             row.Code, Name: row.Name, GroupName: row.GroupName || '',
+    BankNama:         row.BankNama || row.Bank || '',
+    Basic:            Number(row.Salary || row.Basic) || 0,
+    Allowance:        Number(row.Allowance) || 0,
+    Allowance2:       Number(row.Allowance2 !== undefined && row.Allowance2 !== '' ? row.Allowance2 : row.Allowance) || 0,
+    Commission:       Number(row.Commission) || 0,
+    Incentives:       Number(row.Incentives) || 0,
+    EPFSalary:        row.EPFSalary   !== undefined && row.EPFSalary   !== null && row.EPFSalary   !== '' ? Number(row.EPFSalary)   : '',
+    SOCSOSalary:      row.SOCSOSalary !== undefined && row.SOCSOSalary !== null && row.SOCSOSalary !== '' ? Number(row.SOCSOSalary) : '',
+    EISSalary:        row.EISSalary   !== undefined && row.EISSalary   !== null && row.EISSalary   !== '' ? Number(row.EISSalary)   : '',
+    LindungSalary:    row.LindungSalary !== undefined && row.LindungSalary !== null && row.LindungSalary !== '' ? Number(row.LindungSalary) : '',
+    AnnualLeaveDays:  Number(row.AnnualLeaveDays) || 0,
+    AnnualLeave:      Number(row.AnnualLeave) || 0,
+    UnpaidLeaveDays:  Number(row.UnpaidLeaveDays) || 0,
+    UnpaidLeave:      Number(row.UnpaidLeave) || 0,
+    SickLeaveDays:    Number(row.SickLeaveDays) || 0,
+    SickLeave:        Number(row.SickLeave) || 0,
+    HalfDaysDays:     Number(row.HalfDaysDays) || 0,
+    HalfDays:         Number(row.HalfDays) || 0,
+    Deduction:        Number(row.Deduction) || 0,
+    NormalOT:         Number(row.NormalOT) || 0,
+    RestOT:           Number(row.RestOT) || 0,
+    PublicOT:         Number(row.PublicOT) || 0,
+    OtherOT:          Number(row.OtherOT) || 0,
+    Pinjaman:         Number(row.Pinjaman) || 0,
+    Others: 0, Age: 30,
+    EPF: row.EPF || 'YES', PERKESO: row.PERKESO || 'YES',
+    EIS: row.EIS || 'YES', Lindungan: row.Lindungan || 'YES',
+    EPF_Employee:    Number(row.EPF_Employee)    || 0,
+    EPF_Employer:    Number(row.EPF_Employer)    || 0,
+    SOCSO_Employee:  Number(row.SOCSO_Employee)  || 0,
+    SOCSO_Employer:  Number(row.SOCSO_Employer)  || 0,
+    EIS_Employee:    Number(row.EIS_Employee)    || 0,
+    EIS_Employer:    Number(row.EIS_Employer)    || 0,
+    Lindung24Jam:    Number(row.Lindung24Jam)    || 0,
+    manualEPF:   !!row.manualEPF,   manualSOCSO: !!row.manualSOCSO,
+    manualEIS:   !!row.manualEIS,   manual24JAM: !!row.manual24JAM,
+    SLRBankNama:      String(row.SLRBankNama || row.BankNama || row.Bank || '').trim(),
+    SLRBankAccountNo: String(row.SLRBankAccountNo || row.BankAccountNo || row.BankAcc || '').trim(),
+    SLREPF:           String(row.SLREPF || row.EPF || '').trim(),
+    SLRPERKESO:       String(row.SLRPERKESO || row.SOCSO || row.PERKESO || '').trim(),
+    SLREIS:           String(row.SLREIS || row.EIS || '').trim(),
+    manualSLRBankNama: false, manualSLRBankAccountNo: false,
+    manualSLREPF: false, manualSLRPERKESO: false, manualSLREIS: false
+  };
 }
 
 /* ============================================================
-   其他页面逻辑
+   📥 手动：从 PayrollData 载入完整工资数据
    ============================================================ */
+async function loadPayrollFromSheet() {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
+    toast('请先设置 APPS_SCRIPT_URL', false); return;
+  }
+  if (!confirm(
+    '从 Google Sheet 的 PayrollData 载入完整工资数据？\n\n' +
+    '⚠️ 这会覆盖当前页面上的工资数据（基础资料会保留）。'
+  )) return;
+
+  setSyncBadge('busy', '载入 PayrollData…');
+  try {
+    const res = await fetch(APPS_SCRIPT_URL);
+    const j = await res.json();
+    if (j.status !== 'success' || !Array.isArray(j.data)) {
+      throw new Error(j.message || '数据格式错误');
+    }
+    if (!j.data.length) {
+      setSyncBadge('', 'PayrollData：无数据');
+      toast('⚠️ PayrollData 里没有数据', false);
+      return;
+    }
+    const fromSheet = j.data.map(mapSheetRowToEmployee).filter(e => e && e.Code);
+
+    const basicsByCode = new Map();
+    staffBasics.forEach(b => { if (b.Code) basicsByCode.set(String(b.Code).trim(), b); });
+
+    employees = fromSheet.map(e => {
+      const b = basicsByCode.get(String(e.Code).trim());
+      if (b) {
+        e.Situation = String(b.Situation || e.Situation || 'ACTIVE').toUpperCase();
+        e.GroupName = b.GroupName || e.GroupName;
+        e.Name      = b.Name      || e.Name;
+        if (Number(b.Salary) > 0) e.Basic = Number(b.Salary);
+        const bankFromStaff = String(b.BankNama || '').trim();
+        e.BankNama         = bankFromStaff || e.BankNama;
+        e.SLRBankNama      = bankFromStaff || e.SLRBankNama;
+        e.SLRBankAccountNo = b.BankAccountNo || e.SLRBankAccountNo;
+        e.SLREPF           = b.EPF           || e.SLREPF;
+        e.SLRPERKESO       = b.PERKESO       || e.SLRPERKESO;
+        e.SLREIS           = b.EIS           || e.SLREIS;
+      }
+      return e;
+    }).filter(e => e.Situation !== 'UNACTIVE' && e.Situation !== 'INACTIVE');
+
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
+    renderTable();
+    setSyncBadge('ok', 'PayrollData 已载入 (' + employees.length + ')');
+    toast('✅ 已从 PayrollData 载入 ' + employees.length + ' 笔工资数据');
+  } catch (err) {
+    console.error('[Payroll] load failed:', err);
+    setSyncBadge('err', '载入失败：' + (err.message || err));
+    toast('❌ 载入失败：' + (err.message || err), false);
+  }
+}
+async function reloadFromSheet() { return loadPayrollFromSheet(); }
+
+/* ============================================================
+   🆕 New Session —— 备份 + 清空页面 + 清空 Sheet + 重载基础资料
+   ============================================================ */
+async function resetNewSession() {
+  const ok = confirm(
+    '🆕 New Session 会执行以下操作：\n\n' +
+    '1️⃣ 自动导出当前数据为 Excel (.xlsx) 备份\n' +
+    '2️⃣ 清空当前页面所有资料（回默认状态）\n' +
+    '3️⃣ 清空 Google Sheet 的 PayrollData\n' +
+    '4️⃣ 重新从 STAFF LOGIN RECORD 载入基础资料\n\n' +
+    '⚠️ 此操作不可撤销！确定继续吗？'
+  );
+  if (!ok) return;
+
+  const btn = document.getElementById('btnNewSession');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ 处理中…'; }
+  setSyncBadge('busy', 'New Session 处理中…');
+
+  // ---------- ① 导出 xlsx 备份 ----------
+  try {
+    if (employees && employees.length > 0) {
+      exportBackupXLSX('newsession_backup');
+      toast('✅ 备份已导出，正在清空…');
+      await new Promise(r => setTimeout(r, 900));
+    } else {
+      console.log('[NewSession] 无数据可备份');
+    }
+  } catch (e) {
+    console.error('[NewSession] 备份失败:', e);
+  }
+
+  // ---------- ② 清空 Google Sheet 的 PayrollData ----------
+  let sheetCleared = false;
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ headers: getExportHeaders(), rows: [] })
+    });
+    const j = await res.json();
+    if (j.status !== 'success') throw new Error(j.message || 'clear failed');
+    sheetCleared = true;
+    console.log('[NewSession] Sheet cleared:', j);
+  } catch (e) {
+    console.error('[NewSession] Sheet 清空失败:', e);
+    const cont = confirm(
+      '⚠️ Google Sheet 清空失败：' + (e.message || e) +
+      '\n\n是否继续清空页面？'
+    );
+    if (!cont) {
+      if (btn) { btn.disabled = false; btn.textContent = '🆕 New Session'; }
+      setSyncBadge('err', 'New Session 已中止');
+      return;
+    }
+  }
+
+  // ---------- ③ 清空 localStorage ----------
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(SELECTED_CODE_KEY);
+    localStorage.removeItem(SELECTED_EMP_KEY);
+  } catch (e) {}
+
+  // ---------- ④ 清空当前页 ----------
+  employees = [];
+  staffBasics = [];
+  filterGroup.clear();
+  filterBank.clear();
+  renderTable();
+
+  // ---------- ⑤ 重新从 STAFF LOGIN RECORD 载入 ----------
+  await loadStaffBasics();
+
+  if (btn) { btn.disabled = false; btn.textContent = '🆕 New Session'; }
+  if (sheetCleared) {
+    setSyncBadge('ok', 'New Session 完成 (Sheet 已清空)');
+    toast('✅ New Session 完成！页面 + Sheet 已清空，基础资料已重载');
+  } else {
+    setSyncBadge('ok', 'New Session 完成 (Sheet 未清空)');
+    toast('⚠️ 页面已清空，但 Sheet 清空失败');
+  }
+}
+
+/* 导出 xlsx 备份（供 New Session 使用） */
+function exportBackupXLSX(prefix) {
+  if (typeof XLSX === 'undefined') {
+    console.warn('[Backup] XLSX 未载入，跳过备份');
+    toast('⚠️ SheetJS 未载入，跳过备份', false);
+    return;
+  }
+  const rows = getExportRows(true);
+  if (!rows.length) { console.log('[Backup] 无数据，跳过'); return; }
+  const aoa = [getExportHeaders(), ...rows];
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = getExportHeaders().map(() => ({ wch: 14 }));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Payroll');
+  const ts = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  const stamp = ts.getFullYear() + pad(ts.getMonth()+1) + pad(ts.getDate()) +
+                '_' + pad(ts.getHours()) + pad(ts.getMinutes()) + pad(ts.getSeconds());
+  XLSX.writeFile(wb, (prefix || 'payroll_backup') + '_' + stamp + '.xlsx');
+  console.log('[Backup] exported: ' + (prefix || 'payroll_backup') + '_' + stamp + '.xlsx');
+}
+
+/* ============================================================
+   统一导出表头
+   ============================================================ */
+function getExportHeaders() {
+  return [
+    'Situation', 'Code', 'Name', 'Group', 'Bank', 'Basic',
+    'Normal OT', 'Rest OT', 'Public OT', 'Other OT',
+    'Allowance', 'Commission', 'Incentives', 'First Calculation Total',
+    'Annual Leave Days', 'Annual Leave',
+    'Unpaid Leave Days', 'Unpaid Leave',
+    'Sick Leave Days', 'Sick Leave',
+    'Half Days Leave Days', 'Half Days Leave',
+    'Pinjaman',
+    'Salary for EPF Contributions',
+    'Salary for SOCSO Contributions',
+    'Salary for EIS Contributions',
+    'Salary for 24JAM Contributions',
+    'EPF (Employee)', 'EPF (Employer)',
+    'SOCSO (Employee)', 'SOCSO (Employer)',
+    'EIS (Employee)', 'EIS (Employer)',
+    '24JAM',
+    'SLR Bank Nama', 'SLR Bank Account No',
+    'SLR EPF', 'SLR SOCSO', 'SLR EIS',
+    'Gross Pay', 'Total Deduction', 'Net Salary'
+  ];
+}
+
+const GROUP_FIELDS = {
+  EPF:   ['EPF_Employee', 'EPF_Employer'],
+  SOCSO: ['SOCSO_Employee', 'SOCSO_Employer'],
+  EIS:   ['EIS_Employee', 'EIS_Employer'],
+  '24JAM': ['Lindung24Jam']
+};
+
+const I18N = {
+  ms: { title:'Sistem Penggajian', desc:'Pengurusan gaji pekerja dengan pengiraan automatik EPF, SOCSO, EIS & 24JAM Lindungan.', badge:'Auto kira caruman statutori · Manual override dengan kotak semak', save:'Simpan ke Sheet', checkAll:'Semak Semua', legend1:'1. Maklumat Asas + Basic Salary (Freeze)', legend2:'2. Pendapatan (OT)', legend2b:'2.5 Pendapatan Tambahan', legend2d:'2.8 Potongan (On Leave + Pinjaman)', legend2c:'2.9 Gaji untuk Caruman (boleh lipat)', legend3:'3. Caruman Statutori', legend4:'4. Staff Login Record (U-Y)', legend5:'5. Ringkasan Gaji', legend6:'6. Tindakan', sec1:'📌 1. MAKLUMAT ASAS + 💵 BASIC SALARY (FREEZE)', sec2:'💰 2. PENDAPATAN / ELAUN (OT)', sec2b:'➕ PENDAPATAN TAMBAHAN', sec2d:'➖ POTONGAN (ON LEAVE + PINJAMAN)', sec2c:'📐 GAJI UNTUK CARUMAN', sec3:'🏛️ 3. CARUMAN STATUTORI (EPF / SOCSO / EIS / 24JAM)', sec4:'📋 4. STAFF LOGIN RECORD (U-Y)', sec5:'🧮 5. RINGKASAN GAJI', sec6:'⚙️ 6. TINDAKAN', situation:'Situation', kod:'Kod', nama:'Nama', kumpulan:'Kumpulan', basic:'Gaji Asas', normalOT:'OT Biasa', restOT:'OT Rehat', publicOT:'OT Awam', otherOT:'OT Lain', pinjaman:'PINJAMAN', annualLeave:'ANNUAL LEAVE', unpaidLeave:'UNPAID LEAVE', sickLeave:'SICK LEAVE', halfDays:'HALF DAYS LEAVE (HOURS)', allowance2:'ALLOWANCE', commission:'COMMISION', incentives:'INCENTIVES', firstCalcTotal:'FIRST CALCULATION TOTAL', epfSalary:'Salary for EPF Contributions', socsoSalary:'Salary for SOCSO Contributions', eisSalary:'Salary for EIS Contributions', lindungSalary:'Salary for 24JAM Contributions', epfE:'Pekerja', epfR:'Majikan', socsoE:'Pekerja', socsoR:'Majikan', eisE:'Pekerja', eisR:'Majikan', lindung:'24JAM', bankNama:'Bank Nama', bankAcc:'Bank Acc', epf:'EPF', socso:'SOCSO', eis:'EIS', gross:'Gaji Kasar', totalDed:'Total Potongan', net:'Gaji Bersih', action:'Tindakan', slip:'Slip', legend:'Nota: Klik pada Nama pekerja untuk buka halaman detail.', saved:'Berjaya disimpan ke Sheet', failed:'Gagal simpan', loading:'Memuatkan data...', importSuccess:'Berjaya import {n} pekerja', importFail:'Fail tidak sah atau kosong', importFormat:'Format fail tidak disokong', noData:'Tiada data untuk dieksport', freezeLocked:'Kolum dibekukan', freezeUnlocked:'Kolum dibuka', salaryFolded:'GAJI UNTUK CARUMAN dilipat', salaryUnfolded:'GAJI UNTUK CARUMAN dibuka', freezeTitle:'🔒 Tetapan Freeze Kolum', freezeDesc:'Pilih sama ada mahu kunci kolum pertama.', freezeUnlock:'🔓 Buka Kunci', freezeLock:'🔒 Kunci Kolum', freezeCancel:'Batal', importTitle:'📥 Import Data / 导入资料', importDrop:'Lepaskan fail di sini atau klik', importDropHint:'Drag & drop file here', importFormatHint:'Format: .xlsx / .csv / .txt', importTemplate:'📥 Template:', importClose:'Tutup', filterGroup:'Kumpulan', filterBank:'Bank', all:'Semua', selectedSuffix:' dipilih', matchedCount:'Padan', netTotal:'Jumlah Bersih', btnSelectAll:'Semua', btnClear:'Kosong', noOptions:'Tiada pilihan' },
+  en: { title:'Payroll System', desc:'Employee payroll management with automatic calculation.', badge:'Auto-calculate · Manual override', save:'Save to Sheet', checkAll:'Check All', legend1:'1. Basic Info + Basic Salary', legend2:'2. Income (OT)', legend2b:'2.5 Additional Income', legend2d:'2.8 Deductions', legend2c:'2.9 Salary for Contributions', legend3:'3. Statutory Contributions', legend4:'4. Staff Login Record', legend5:'5. Salary Summary', legend6:'6. Actions', sec1:'📌 1. BASIC INFO + 💵 BASIC SALARY', sec2:'💰 2. INCOME (OT)', sec2b:'➕ ADDITIONAL INCOME', sec2d:'➖ DEDUCTIONS', sec2c:'📐 SALARY FOR CONTRIBUTIONS', sec3:'🏛️ 3. STATUTORY CONTRIBUTIONS', sec4:'📋 4. STAFF LOGIN RECORD', sec5:'🧮 5. SALARY SUMMARY', sec6:'⚙️ 6. ACTIONS', situation:'Situation', kod:'Code', nama:'Name', kumpulan:'Group', basic:'Basic', normalOT:'Normal OT', restOT:'Rest OT', publicOT:'Public OT', otherOT:'Other OT', pinjaman:'LOAN', annualLeave:'ANNUAL LEAVE', unpaidLeave:'UNPAID LEAVE', sickLeave:'SICK LEAVE', halfDays:'HALF DAYS LEAVE', allowance2:'ALLOWANCE', commission:'COMMISSION', incentives:'INCENTIVES', firstCalcTotal:'FIRST CALC TOTAL', epfSalary:'Salary for EPF', socsoSalary:'Salary for SOCSO', eisSalary:'Salary for EIS', lindungSalary:'Salary for 24JAM', epfE:'Employee', epfR:'Employer', socsoE:'Employee', socsoR:'Employer', eisE:'Employee', eisR:'Employer', lindung:'24JAM', bankNama:'Bank Name', bankAcc:'Bank Acc', epf:'EPF', socso:'SOCSO', eis:'EIS', gross:'Gross', totalDed:'Total Ded', net:'Net', action:'Action', slip:'Payslip', legend:'Click employee Name to open detail.', saved:'Saved', failed:'Save failed', loading:'Loading...', importSuccess:'Imported {n}', importFail:'Invalid file', importFormat:'Unsupported', noData:'No data', freezeLocked:'Frozen', freezeUnlocked:'Unfrozen', salaryFolded:'Collapsed', salaryUnfolded:'Expanded', freezeTitle:'🔒 Freeze Setting', freezeDesc:'Lock first columns.', freezeUnlock:'Unlock', freezeLock:'Lock', freezeCancel:'Cancel', importTitle:'📥 Import Data', importDrop:'Drop file here', importDropHint:'Drag & drop', importFormatHint:'.xlsx / .csv / .txt', importTemplate:'Template:', importClose:'Close', filterGroup:'Group', filterBank:'Bank', all:'All', selectedSuffix:' selected', matchedCount:'Matched', netTotal:'Net Total', btnSelectAll:'All', btnClear:'Clear', noOptions:'No options' },
+  zh: { title:'薪资系统', desc:'员工薪资管理，自动计算 EPF、SOCSO、EIS 及 24JAM Lindungan。', badge:'自动计算法定缴款 · 使用复选框手动覆盖', save:'保存到 Sheet', checkAll:'检查全部', legend1:'1. 基本资料 + 基本薪资', legend2:'2. 收入 (OT)', legend2b:'2.5 额外收入', legend2d:'2.8 扣款', legend2c:'2.9 缴款薪资', legend3:'3. 法定缴款', legend4:'4. 员工登录记录', legend5:'5. 薪资汇总', legend6:'6. 操作', sec1:'📌 1. 基本资料 + 💵 基本薪资', sec2:'💰 2. 收入 (OT)', sec2b:'➕ 额外收入', sec2d:'➖ 扣款', sec2c:'📐 缴款薪资', sec3:'🏛️ 3. 法定缴款', sec4:'📋 4. 员工登录记录', sec5:'🧮 5. 薪资汇总', sec6:'⚙️ 6. 操作', situation:'状态', kod:'编号', nama:'姓名', kumpulan:'分店', basic:'基本薪资', normalOT:'普通加班', restOT:'休息日加班', publicOT:'公假加班', otherOT:'其他加班', pinjaman:'借粮', annualLeave:'年假', unpaidLeave:'无薪假', sickLeave:'病假', halfDays:'半天假', allowance2:'津贴', commission:'佣金', incentives:'奖励', firstCalcTotal:'首次计算总额', epfSalary:'EPF 缴款薪资', socsoSalary:'SOCSO 缴款薪资', eisSalary:'EIS 缴款薪资', lindungSalary:'24JAM 缴款薪资', epfE:'员工', epfR:'雇主', socsoE:'员工', socsoR:'雇主', eisE:'员工', eisR:'雇主', lindung:'24JAM', bankNama:'银行名', bankAcc:'银行账号', epf:'EPF', socso:'SOCSO', eis:'EIS', gross:'总薪资', totalDed:'总扣款', net:'净薪资', action:'操作', slip:'粮单', legend:'备注：点击员工姓名可打开详情页。', saved:'已保存到 Sheet', failed:'保存失败', loading:'加载中...', importSuccess:'成功导入 {n} 位', importFail:'文件无效', importFormat:'不支持格式', noData:'无可导出数据', freezeLocked:'已冻结', freezeUnlocked:'已解冻', salaryFolded:'已折叠', salaryUnfolded:'已展开', freezeTitle:'🔒 冻结列设置', freezeDesc:'锁定前几列。', freezeUnlock:'解锁', freezeLock:'锁定', freezeCancel:'取消', importTitle:'📥 导入资料', importDrop:'拖入文件或点击', importDropHint:'拖入或浏览', importFormatHint:'.xlsx / .csv / .txt', importTemplate:'模板：', importClose:'关闭', filterGroup:'分店', filterBank:'银行', all:'全部', selectedSuffix:' 项', matchedCount:'符合人数', netTotal:'净薪资合计', btnSelectAll:'全选', btnClear:'清除', noOptions:'暂无选项' }
+};
+let currentLang = 'ms';
+function t(key) { return I18N[currentLang][key] || key; }
+
+let employees = [];
+const filterGroup = new Set();
+const filterBank = new Set();
+
+function toast(msg, ok = true) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.background = ok ? '#1a4f8a' : '#a02020';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+function num(v) { return Number(v || 0); }
+function todayStr() {
+  const d = new Date();
+  const p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
+}
+function contribBase(emp, field, fallback) {
+  const v = emp[field];
+  if (v === undefined || v === null || v === '') return fallback;
+  const n = Number(v);
+  return isNaN(n) ? fallback : n;
+}
+
 function openDetail(e, idx) {
   if (e) { e.preventDefault(); e.stopPropagation(); }
   const emp = employees[idx];
@@ -1670,12 +1988,7 @@ function openDetail(e, idx) {
 }
 window.openDetail = openDetail;
 
-/* storage 事件监听（New Session 期间忽略） */
 window.addEventListener('storage', (ev) => {
-  if (_newSessionLock) {
-    console.log('[Storage] New Session 进行中，忽略 storage 事件');
-    return;
-  }
   if (ev.key === STORAGE_KEY && ev.newValue) {
     try {
       const updated = JSON.parse(ev.newValue);
@@ -1720,7 +2033,7 @@ function updateStickyOffsets() {
 function toggleSalaryFold(e) {
   if (e) e.stopPropagation();
   const folded = document.body.classList.toggle('salary-folded');
-  toast(folded ? 'GAJI UNTUK CARUMAN dilipat' : 'GAJI UNTUK CARUMAN dibuka');
+  toast(folded ? t('salaryFolded') : t('salaryUnfolded'));
   setTimeout(updateStickyOffsets, 30);
 }
 
@@ -1769,12 +2082,12 @@ function clearMS(type, e) {
 function updateMSLabels() {
   const txtG = document.getElementById('msGroupText');
   const txtB = document.getElementById('msBankText');
-  if (filterGroup.size === 0) txtG.textContent = 'Semua';
+  if (filterGroup.size === 0) txtG.textContent = t('all');
   else if (filterGroup.size === 1) txtG.textContent = Array.from(filterGroup)[0];
-  else txtG.textContent = filterGroup.size + ' dipilih';
-  if (filterBank.size === 0) txtB.textContent = 'Semua';
+  else txtG.textContent = filterGroup.size + t('selectedSuffix');
+  if (filterBank.size === 0) txtB.textContent = t('all');
   else if (filterBank.size === 1) txtB.textContent = Array.from(filterBank)[0];
-  else txtB.textContent = filterBank.size + ' dipilih';
+  else txtB.textContent = filterBank.size + t('selectedSuffix');
 }
 function getFilteredForStats() {
   let list = employees.filter(e => {
@@ -1810,7 +2123,7 @@ function buildFilterDropdowns() {
   const listG = document.getElementById('msGroupList');
   const sortedGroups = Array.from(groups.keys()).sort();
   if (sortedGroups.length === 0) {
-    listG.innerHTML = '<div class="ms-empty">Tiada pilihan</div>';
+    listG.innerHTML = `<div class="ms-empty">${t('noOptions')}</div>`;
   } else {
     listG.innerHTML = sortedGroups.map(g => `
       <label class="ms-item">
@@ -1823,7 +2136,7 @@ function buildFilterDropdowns() {
   const listB = document.getElementById('msBankList');
   const sortedBanks = Array.from(banks.keys()).sort();
   if (sortedBanks.length === 0) {
-    listB.innerHTML = '<div class="ms-empty">Tiada pilihan</div>';
+    listB.innerHTML = `<div class="ms-empty">${t('noOptions')}</div>`;
   } else {
     listB.innerHTML = sortedBanks.map(b => `
       <label class="ms-item">
@@ -1848,12 +2161,9 @@ function setFreeze(on) {
   document.body.classList.toggle('freeze-on', on);
   closeFreezeModal();
   updateStickyOffsets();
-  toast(on ? 'Kolum dibekukan' : 'Kolum dibuka');
+  toast(on ? t('freezeLocked') : t('freezeUnlocked'));
 }
 
-/* ============================================================
-   薪资计算
-   ============================================================ */
 const SOCSO_TABLE = [
   [30,0.10,0.40],[50,0.20,0.70],[70,0.30,1.10],[100,0.40,1.50],
   [140,0.60,2.10],[200,0.85,2.95],[300,1.25,4.35],[400,1.75,6.15],
@@ -1951,36 +2261,88 @@ function recalcRow(emp) {
   return emp;
 }
 
-/* ============================================================
-   语言
-   ============================================================ */
 function updateUILanguage() {
-  // 简单版：只更新统计栏，表格列头保持原文
-  const ms = {
-    msGroupLabel: 'Kumpulan', msBankLabel: 'Bank',
-    statLabelMatched: 'Padan', statLabelNetTotal: 'Jumlah Bersih'
-  };
-  Object.keys(ms).forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = ms[id];
+  document.getElementById('pageTitle').textContent = t('title');
+  document.getElementById('pageDesc').textContent = t('desc');
+  document.getElementById('pageBadge').textContent = t('badge');
+  ['legend1','legend2','legend2b','legend2d','legend2c','legend3','legend4','legend5','legend6',
+   'sec1','sec2','sec2b','sec2d','sec2c','sec3','sec4','sec5','sec6'].forEach(k => {
+    const el = document.getElementById(k);
+    if (el) el.textContent = t(k);
   });
-  const btnSave = document.getElementById('btnSaveSheet');
-  if (btnSave) btnSave.innerHTML = '💾 Simpan ke Sheet';
-  const btnCheck = document.getElementById('btnCheckAll');
-  if (btnCheck) btnCheck.innerHTML = '✅ Semak Semua';
-  const btnNS = document.getElementById('btnNewSession');
-  if (btnNS) btnNS.innerHTML = '🆕 New Session';
+  document.getElementById('thSituation').textContent = t('situation');
+  document.getElementById('thKod').textContent = t('kod');
+  document.getElementById('thNama').textContent = t('nama');
+  document.getElementById('thKumpulan').textContent = t('kumpulan');
+  const thBasic = document.getElementById('thBasic');
+  thBasic.childNodes[0].textContent = t('basic') + ' ';
+  document.getElementById('thNormalOT').textContent = t('normalOT');
+  document.getElementById('thRestOT').textContent = t('restOT');
+  document.getElementById('thPublicOT').textContent = t('publicOT');
+  document.getElementById('thOtherOT').textContent = t('otherOT');
+  document.getElementById('thAnnualLeave').textContent = t('annualLeave');
+  document.getElementById('thUnpaidLeave').textContent = t('unpaidLeave');
+  document.getElementById('thSickLeave').textContent = t('sickLeave');
+  document.getElementById('thHalfDays').textContent = t('halfDays');
+  document.getElementById('thPinjaman').textContent = t('pinjaman');
+  document.getElementById('thAllowance2').textContent = t('allowance2');
+  document.getElementById('thCommission').textContent = t('commission');
+  document.getElementById('thIncentives').textContent = t('incentives');
+  document.getElementById('thFirstCalcTotal').textContent = t('firstCalcTotal');
+  document.getElementById('thEPFSalary').innerHTML = t('epfSalary') + '<br><span style="font-weight:400;font-size:0.6rem;">(Gaji untuk caruman KWSP)</span>';
+  document.getElementById('thSOCSOSalary').innerHTML = t('socsoSalary') + '<br><span style="font-weight:400;font-size:0.6rem;">(Gaji untuk caruman PERKESO)</span>';
+  document.getElementById('thEISSalary').innerHTML = t('eisSalary') + '<br><span style="font-weight:400;font-size:0.6rem;">(Gaji untuk caruman EIS)</span>';
+  document.getElementById('thLindungSalary').innerHTML = t('lindungSalary') + '<br><span style="font-weight:400;font-size:0.6rem;">(Gaji untuk caruman 24JAM)</span>';
+  document.getElementById('subEPFE').textContent = t('epfE');
+  document.getElementById('subEPFR').textContent = t('epfR');
+  document.getElementById('subSOCSOE').textContent = t('socsoE');
+  document.getElementById('subSOCSOR').textContent = t('socsoR');
+  document.getElementById('subEISE').textContent = t('eisE');
+  document.getElementById('subEISR').textContent = t('eisR');
+  document.getElementById('th24JAM').textContent = t('lindung');
+  document.getElementById('thBankNama').innerHTML = t('bankNama') + '<br><span style="font-weight:400;font-size:0.6rem;">(U)</span>';
+  document.getElementById('thBankAcc').innerHTML = t('bankAcc') + '<br><span style="font-weight:400;font-size:0.6rem;">(V)</span>';
+  document.getElementById('thEPF').innerHTML = t('epf') + '<br><span style="font-weight:400;font-size:0.6rem;">(W)</span>';
+  document.getElementById('thSOCSO').innerHTML = t('socso') + '<br><span style="font-weight:400;font-size:0.6rem;">(X)</span>';
+  document.getElementById('thEIS').innerHTML = t('eis') + '<br><span style="font-weight:400;font-size:0.6rem;">(Y)</span>';
+  document.getElementById('thGross').textContent = t('gross');
+  document.getElementById('thTotalDed').textContent = t('totalDed');
+  document.getElementById('thNet').textContent = t('net');
+  document.getElementById('thAction').textContent = t('action');
+  document.getElementById('legend').textContent = t('legend');
+  const btnSaveSheet = document.getElementById('btnSaveSheet');
+  if (btnSaveSheet) btnSaveSheet.innerHTML = '💾 ' + t('save');
+  const btnCheckAll = document.getElementById('btnCheckAll');
+  if (btnCheckAll) btnCheckAll.innerHTML = '✅ ' + t('checkAll');
+  document.getElementById('freezeTitle').textContent = t('freezeTitle');
+  document.getElementById('freezeDesc').textContent = t('freezeDesc');
+  document.getElementById('freezeUnlockBtn').textContent = t('freezeUnlock');
+  document.getElementById('freezeLockBtn').textContent = t('freezeLock');
+  document.getElementById('freezeCancelBtn').textContent = t('freezeCancel');
+  document.getElementById('importTitle').textContent = t('importTitle');
+  document.getElementById('importDrop').textContent = t('importDrop');
+  document.getElementById('importDropHint').textContent = t('importDropHint');
+  document.getElementById('importFormatHint').textContent = t('importFormatHint');
+  document.getElementById('importTemplate').textContent = t('importTemplate');
+  document.getElementById('importCloseBtn').textContent = t('importClose');
+  document.getElementById('msGroupLabel').textContent = t('filterGroup');
+  document.getElementById('msBankLabel').textContent = t('filterBank');
+  document.getElementById('statLabelMatched').textContent = t('matchedCount');
+  document.getElementById('statLabelNetTotal').textContent = t('netTotal');
+  document.getElementById('msGroupSelAll').textContent = t('btnSelectAll');
+  document.getElementById('msGroupClear').textContent = t('btnClear');
+  document.getElementById('msBankSelAll').textContent = t('btnSelectAll');
+  document.getElementById('msBankClear').textContent = t('btnClear');
+  updateMSLabels();
+  document.querySelectorAll('.ms-empty').forEach(el => el.textContent = t('noOptions'));
 }
 
-/* ============================================================
-   渲染表格
-   ============================================================ */
 function renderTable() {
   updateUILanguage();
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
   if (!employees.length) {
-    tbody.innerHTML = '<tr><td colspan="51" style="text-align:center;padding:2.5rem;color:#a7b7c9;">Memuatkan data... (若一直显示此提示，请按 F12 查看 Console)</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="51" style="text-align:center;padding:2.5rem;color:#a7b7c9;">${t('loading')}</td></tr>`;
     buildFilterDropdowns();
     updateStickyOffsets();
     return;
@@ -2061,7 +2423,7 @@ function renderTable() {
       <td class="divider-group">${numInput('GrossPay', true)}</td>
       <td>${numInput('TotalDeduction', true)}</td>
       <td>${numInput('NetSalary', true)}</td>
-      <td class="divider-group" style="text-align:center;"><button class="btn btn-sm" onclick="showPayslip('${escapeHtml(emp.Code)}')">Slip</button></td>
+      <td class="divider-group" style="text-align:center;"><button class="btn btn-sm" onclick="showPayslip('${escapeHtml(emp.Code)}')">${t('slip')}</button></td>
     `;
     tbody.appendChild(tr);
   });
@@ -2110,7 +2472,10 @@ function renderTable() {
       employees[idx][manualKey] = e.target.checked;
       const row = e.target.closest('tr');
       const inp = row.querySelector(`input[data-slr-key="${key}"]`);
-      if (inp) { inp.readOnly = !e.target.checked; if (e.target.checked) inp.focus(); }
+      if (inp) {
+        inp.readOnly = !e.target.checked;
+        if (e.target.checked) inp.focus();
+      }
     });
   });
   tbody.querySelectorAll('input.slr-plain').forEach(inp => {
@@ -2135,13 +2500,6 @@ function renderTable() {
   buildFilterDropdowns();
   updateStickyOffsets();
 }
-
-const GROUP_FIELDS = {
-  EPF:   ['EPF_Employee', 'EPF_Employer'],
-  SOCSO: ['SOCSO_Employee', 'SOCSO_Employer'],
-  EIS:   ['EIS_Employee', 'EIS_Employer'],
-  '24JAM': ['Lindung24Jam']
-};
 
 function applyFilters() {
   const filters = [];
@@ -2172,9 +2530,6 @@ document.addEventListener('input', e => {
   }
 });
 
-/* ============================================================
-   检查 / 保存 / 导入 / 导出
-   ============================================================ */
 function checkOne(type) {
   const rows = document.querySelectorAll('#tbody tr');
   rows.forEach((row, idx) => {
@@ -2226,6 +2581,7 @@ async function saveToSheet() {
   try {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
     setSyncBadge('busy', 'AutoSync: 手动推送中…');
+
     const res = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -2233,38 +2589,216 @@ async function saveToSheet() {
     });
     const result = await res.json();
     if (result.status !== 'success') throw new Error(result.message || 'Server error');
+
     const hhmmss = new Date().toLocaleTimeString('zh-CN', { hour12: false });
     setSyncBadge(autoSyncEnabled ? 'ok' : '', (autoSyncEnabled ? 'AutoSync: 已同步 ' : '已手动推送 ') + hhmmss + ' (' + rows.length + ')');
-    toast('Berjaya disimpan (' + rows.length + ' rows)');
+    toast(t('saved') + ' (' + rows.length + ' rows)');
   } catch (err) {
     console.error(err);
     setSyncBadge('err', 'AutoSync: 同步失败 - ' + (err.message || err));
-    toast('保存失败', false);
+    toast(t('failed'), false);
   }
 }
 
-function getExportHeaders() {
-  return [
-    'Situation', 'Code', 'Name', 'Group', 'Bank', 'Basic',
-    'Normal OT', 'Rest OT', 'Public OT', 'Other OT',
-    'Allowance', 'Commission', 'Incentives', 'First Calculation Total',
-    'Annual Leave Days', 'Annual Leave',
-    'Unpaid Leave Days', 'Unpaid Leave',
-    'Sick Leave Days', 'Sick Leave',
-    'Half Days Leave Days', 'Half Days Leave',
-    'Pinjaman',
-    'Salary for EPF Contributions',
-    'Salary for SOCSO Contributions',
-    'Salary for EIS Contributions',
-    'Salary for 24JAM Contributions',
-    'EPF (Employee)', 'EPF (Employer)',
-    'SOCSO (Employee)', 'SOCSO (Employer)',
-    'EIS (Employee)', 'EIS (Employer)',
-    '24JAM',
-    'SLR Bank Nama', 'SLR Bank Account No',
-    'SLR EPF', 'SLR SOCSO', 'SLR EIS',
-    'Gross Pay', 'Total Deduction', 'Net Salary'
+function openImportModal() { document.getElementById('importModal').style.display = 'flex'; }
+function closeImportModal() {
+  document.getElementById('importModal').style.display = 'none';
+  const fi = document.getElementById('importFile');
+  if (fi) fi.value = '';
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const dz = document.getElementById('dropzone');
+  const fi = document.getElementById('importFile');
+  if (dz && fi) {
+    dz.addEventListener('click', e => { if (e.target !== fi) fi.click(); });
+    fi.addEventListener('change', e => { if (e.target.files && e.target.files[0]) handleImportFile(e.target.files[0]); });
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault(); dz.classList.remove('drag-over');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) handleImportFile(e.dataTransfer.files[0]);
+    });
+  }
+  const modal = document.getElementById('importModal');
+  if (modal) modal.addEventListener('click', e => { if (e.target.id === 'importModal') closeImportModal(); });
+  const fm = document.getElementById('freezeModal');
+  if (fm) fm.addEventListener('click', e => { if (e.target.id === 'freezeModal') closeFreezeModal(); });
+  const gm = document.getElementById('groupSelectModal');
+  if (gm) gm.addEventListener('click', e => { if (e.target.id === 'groupSelectModal') closeGroupSelectModal(); });
+  const bm = document.getElementById('batchPrintModal');
+  if (bm) bm.addEventListener('click', e => { if (e.target.id === 'batchPrintModal') closeBatchPrintModal(); });
+});
+
+function parseCSVLine(line) {
+  const cells = []; let cur = ''; let inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQ) {
+      if (ch === '"') { if (line[i+1] === '"') { cur += '"'; i++; } else inQ = false; }
+      else cur += ch;
+    } else {
+      if (ch === ',') { cells.push(cur); cur = ''; }
+      else if (ch === '"') inQ = true;
+      else cur += ch;
+    }
+  }
+  cells.push(cur); return cells;
+}
+function parseTextFile(text) {
+  const rows = []; const lines = text.split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    if (/^[=\-+\s]+$/.test(trimmed)) continue;
+    if (trimmed.startsWith('PAYROLL REPORT')) continue;
+    if (trimmed.startsWith('Total rows')) continue;
+    if (trimmed.includes('|')) rows.push(trimmed.split('|').map(s => s.trim()));
+    else rows.push(parseCSVLine(trimmed));
+  }
+  return rows;
+}
+
+async function handleImportFile(file) {
+  const name = file.name.toLowerCase();
+  let rows = [];
+  try {
+    if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
+      if (typeof XLSX === 'undefined') { toast('SheetJS tidak dimuat', false); return; }
+      const data = await file.arrayBuffer();
+      const wb = XLSX.read(data);
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+    } else if (name.endsWith('.csv') || name.endsWith('.txt')) {
+      const text = await file.text();
+      rows = parseTextFile(text);
+    } else { toast(t('importFormat'), false); return; }
+    if (!rows || rows.length < 2) { toast(t('importFail'), false); return; }
+    const headers = rows[0].map(h => String(h).trim());
+    const idx = {};
+    const WANTED = ['Situation','Code','Name','Group','Bank','Basic','Allowance','Allowance2','Deduction','Normal OT','Rest OT','Public OT','Other OT','Pinjaman','Others',
+      'Annual Leave Days','Annual Leave','Unpaid Leave Days','Unpaid Leave','Sick Leave Days','Sick Leave','Half Days Leave Days','Half Days Leave',
+      'Commission','Incentives','First Calculation Total','FirstCalcTotal',
+      'Salary for EPF Contributions','Salary for SOCSO Contributions','Salary for EIS Contributions','Salary for 24JAM Contributions',
+      'EPF (Employee)','EPF (Employer)','SOCSO (Employee)','SOCSO (Employer)','EIS (Employee)','EIS (Employer)','24JAM',
+      'SLR Bank Nama','SLR Bank Account No','SLR EPF','SLR SOCSO','SLR EIS'];
+    headers.forEach((h, i) => {
+      const lh = h.toLowerCase();
+      for (const w of WANTED) { if (lh === w.toLowerCase()) { idx[w] = i; break; } }
+    });
+    if (idx['Code'] === undefined) { toast('Fail mesti ada lajur "Code"', false); return; }
+    const get = (row, key) => idx[key] !== undefined ? row[idx[key]] : '';
+    const parseOpt = (row, key) => {
+      const v = get(row, key);
+      if (v === undefined || v === null || v === '') return '';
+      const n = parseFloat(v);
+      return isNaN(n) ? '' : n;
+    };
+    const imported = [];
+    for (let r = 1; r < rows.length; r++) {
+      const row = rows[r];
+      if (!row || row.length === 0) continue;
+      const code = String(get(row, 'Code') || '').trim();
+      if (!code) continue;
+      const sit = String(get(row, 'Situation') || 'ACTIVE').trim().toUpperCase();
+      if (sit === 'UNACTIVE' || sit === 'INACTIVE') continue;
+      const basic = parseFloat(get(row, 'Basic')) || 0;
+      const allowanceVal = parseFloat(get(row, 'Allowance')) || parseFloat(get(row, 'Allowance2')) || 0;
+      const epfSalary = parseOpt(row, 'Salary for EPF Contributions');
+      const socsoSalary = parseOpt(row, 'Salary for SOCSO Contributions');
+      const eisSalary = parseOpt(row, 'Salary for EIS Contributions');
+      const lindungSalary = parseOpt(row, 'Salary for 24JAM Contributions');
+      const epfBase = epfSalary === '' ? basic : epfSalary;
+      const socsoBase = socsoSalary === '' ? basic : socsoSalary;
+      const eisBase = eisSalary === '' ? basic : eisSalary;
+      const lindungBase = lindungSalary === '' ? basic : lindungSalary;
+      const autoEPF = calcEPF(epfBase, 30);
+      const autoSOCSO = calcSOCSO(socsoBase);
+      const autoEIS = calcEIS(eisBase);
+      const autoLindung = calcLindung(lindungBase);
+      const impEPFE = parseFloat(get(row, 'EPF (Employee)')) || 0;
+      const impEPFR = parseFloat(get(row, 'EPF (Employer)')) || 0;
+      const impSOCSOE = parseFloat(get(row, 'SOCSO (Employee)')) || 0;
+      const impSOCSOR = parseFloat(get(row, 'SOCSO (Employer)')) || 0;
+      const impEISE = parseFloat(get(row, 'EIS (Employee)')) || 0;
+      const impEISR = parseFloat(get(row, 'EIS (Employer)')) || 0;
+      const impLindung = parseFloat(get(row, '24JAM')) || 0;
+      const slrBankNama = String(get(row, 'SLR Bank Nama') || get(row, 'Bank') || '');
+      const slrBankAcc = String(get(row, 'SLR Bank Account No') || '');
+      const slrEPF = String(get(row, 'SLR EPF') || '');
+      const slrPERKESO = String(get(row, 'SLR SOCSO') || '');
+      const slrEIS = String(get(row, 'SLR EIS') || '');
+      imported.push({
+        Situation: sit, Code: code, Name: String(get(row, 'Name') || ''),
+        GroupName: String(get(row, 'Group') || ''), BankNama: String(get(row, 'Bank') || ''),
+        Basic: basic, Allowance: 0,
+        Allowance2: allowanceVal,
+        Commission: parseFloat(get(row, 'Commission')) || 0,
+        Incentives: parseFloat(get(row, 'Incentives')) || 0,
+        EPFSalary: epfSalary, SOCSOSalary: socsoSalary, EISSalary: eisSalary, LindungSalary: lindungSalary,
+        AnnualLeaveDays: parseFloat(get(row, 'Annual Leave Days')) || 0,
+        AnnualLeave: parseFloat(get(row, 'Annual Leave')) || 0,
+        UnpaidLeaveDays: parseFloat(get(row, 'Unpaid Leave Days')) || 0,
+        UnpaidLeave: parseFloat(get(row, 'Unpaid Leave')) || 0,
+        SickLeaveDays: parseFloat(get(row, 'Sick Leave Days')) || 0,
+        SickLeave: parseFloat(get(row, 'Sick Leave')) || 0,
+        HalfDaysDays: parseFloat(get(row, 'Half Days Leave Days')) || 0,
+        HalfDays: parseFloat(get(row, 'Half Days Leave')) || 0,
+        Deduction: parseFloat(get(row, 'Deduction')) || 0,
+        NormalOT: parseFloat(get(row, 'Normal OT')) || 0,
+        RestOT: parseFloat(get(row, 'Rest OT')) || 0,
+        PublicOT: parseFloat(get(row, 'Public OT')) || 0,
+        OtherOT: parseFloat(get(row, 'Other OT')) || 0,
+        Pinjaman: parseFloat(get(row, 'Pinjaman')) || 0,
+        Others: parseFloat(get(row, 'Others')) || 0, Age: 30,
+        EPF: 'YES', PERKESO: 'YES', EIS: 'YES', Lindungan: 'YES',
+        EPF_Employee: impEPFE, EPF_Employer: impEPFR,
+        SOCSO_Employee: impSOCSOE, SOCSO_Employer: impSOCSOR,
+        EIS_Employee: impEISE, EIS_Employer: impEISR, Lindung24Jam: impLindung,
+        SLRBankNama: slrBankNama, SLRBankAccountNo: slrBankAcc,
+        SLREPF: slrEPF, SLRPERKESO: slrPERKESO, SLREIS: slrEIS,
+        manualEPF:   Math.abs(impEPFE - autoEPF.employee) > 0.01 || Math.abs(impEPFR - autoEPF.employer) > 0.01,
+        manualSOCSO: Math.abs(impSOCSOE - autoSOCSO.employee) > 0.01 || Math.abs(impSOCSOR - autoSOCSO.employer) > 0.01,
+        manualEIS:   Math.abs(impEISE - autoEIS.employee) > 0.01 || Math.abs(impEISR - autoEIS.employer) > 0.01,
+        manual24JAM: Math.abs(impLindung - autoLindung) > 0.01,
+        manualSLRBankNama: false, manualSLRBankAccountNo: false,
+        manualSLREPF: false, manualSLRPERKESO: false, manualSLREIS: false
+      });
+    }
+    if (!imported.length) { toast(t('importFail'), false); return; }
+    employees = imported;
+    filterGroup.clear();
+    filterBank.clear();
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(employees)); } catch (e) {}
+    renderTable();
+    toast(t('importSuccess').replace('{n}', imported.length));
+    closeImportModal();
+  } catch (err) { console.error(err); toast('Import error: ' + err.message, false); }
+}
+
+function downloadTemplate(format) {
+  const headers = getExportHeaders();
+  const sample = [
+    ['ACTIVE','EMP001','Ahmad bin Ali','YZ UFO','Maybank',4500,0,0,0,0,0,0,0,5100,0,0,0,0,0,0,0,0,0,4500,4500,4500,4500,495,585,22.25,77.85,9,9,32.96,'Maybank','1234567890','YES','YES','YES',5100,1125.06,3974.94],
+    ['PENDING','EMP002','Siti Nurhaliza','YZ CYBER','CIMB',3800,0,0,0,0,200,150,100,4700,0,0,0,0,0,0,0,0,0,3800,3800,3800,3800,418,494,19.75,69.15,7.6,7.6,27.83,'CIMB','9876543210','YES','NO','YES',4700,930.93,3769.07]
   ];
+  if (format === 'xlsx') {
+    if (typeof XLSX === 'undefined') { toast('SheetJS tidak dimuat', false); return; }
+    const aoa = [headers, ...sample];
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols'] = headers.map(() => ({ wch: 14 }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Payroll');
+    XLSX.writeFile(wb, 'payroll_template.xlsx');
+    toast('Template Excel dimuat turun');
+  } else if (format === 'doc') {
+    let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><title>Payroll Template</title><style>body{font-family:Arial;font-size:9pt;}table{border-collapse:collapse;}th,td{border:1px solid #999;padding:3px 5px;}th{background:#eef5fd;}</style></head><body><h2>Payroll Import Template</h2><table><thead><tr>';
+    headers.forEach(h => { html += '<th>' + escapeHtml(h) + '</th>'; });
+    html += '</tr></thead><tbody>';
+    sample.forEach(r => { html += '<tr>'; r.forEach(c => { html += '<td>' + escapeHtml(c) + '</td>'; }); html += '</tr>'; });
+    html += '</tbody></table></body></html>';
+    downloadBlob(html, 'payroll_template.doc', 'application/msword');
+    toast('Template Word dimuat turun');
+  }
 }
 
 function getExportRows(includeAll = false) {
@@ -2310,196 +2844,102 @@ function downloadBlob(content, filename, mime) {
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
-
-/* 导出 xlsx 备份（New Session 专用） */
-function exportBackupXLSX(prefix) {
-  if (typeof XLSX === 'undefined') {
-    console.warn('[Backup] XLSX 未载入，跳过备份');
-    toast('⚠️ SheetJS 未载入，跳过备份', false);
-    return;
-  }
-  const rows = getExportRows(true);
-  if (!rows.length) { console.log('[Backup] 无数据，跳过'); return; }
+function buildExportTableHTML() {
+  const headers = getExportHeaders();
+  const rows = getExportRows();
+  let html = '<table class="export-table"><thead><tr>';
+  headers.forEach(h => { html += `<th>${escapeHtml(h)}</th>`; });
+  html += '</tr></thead><tbody>';
+  rows.forEach(r => {
+    html += '<tr>';
+    r.forEach((c, i) => {
+      const cls = (i >= 5 && i <= 33) ? ' class="num"' : '';
+      html += `<td${cls}>${escapeHtml(c)}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  return html;
+}
+let exportPrintCleanup = null;
+window.addEventListener('afterprint', () => {
+  if (exportPrintCleanup) { exportPrintCleanup(); exportPrintCleanup = null; }
+});
+function exportToPDF() {
+  const rows = getExportRows();
+  if (!rows.length) { toast(t('noData'), false); return; }
+  const printArea = document.getElementById('printArea');
+  printArea.innerHTML = `<div class="export-print"><h2 style="margin-bottom:6mm;font-size:14pt;color:#1a4f8a;">Payroll Report — ${new Date().toLocaleDateString('ms-MY')}</h2>${buildExportTableHTML()}</div>`;
+  const style = document.createElement('style');
+  style.textContent = '@page { size: A4 landscape; margin: 8mm; }';
+  document.head.appendChild(style);
+  exportPrintCleanup = () => { printArea.innerHTML = ''; style.remove(); };
+  toast('Sedia untuk cetak / simpan PDF');
+  setTimeout(() => window.print(), 100);
+}
+function exportToXLSX() {
+  const rows = getExportRows();
+  if (!rows.length) { toast(t('noData'), false); return; }
+  if (typeof XLSX === 'undefined') { exportToCSV(); return; }
   const aoa = [getExportHeaders(), ...rows];
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   ws['!cols'] = getExportHeaders().map(() => ({ wch: 14 }));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Payroll');
-  const ts = new Date();
-  const pad = n => String(n).padStart(2, '0');
-  const stamp = ts.getFullYear() + pad(ts.getMonth()+1) + pad(ts.getDate()) +
-                '_' + pad(ts.getHours()) + pad(ts.getMinutes()) + pad(ts.getSeconds());
-  XLSX.writeFile(wb, (prefix || 'payroll_backup') + '_' + stamp + '.xlsx');
-  console.log('[Backup] exported: ' + (prefix || 'payroll_backup') + '_' + stamp + '.xlsx');
+  XLSX.writeFile(wb, 'payroll_' + todayStr() + '.xlsx');
+  toast('Excel berjaya dieksport');
 }
-
-/* ============================================================
-   🆕 New Session
-   ============================================================ */
-async function resetNewSession() {
-  const ok = confirm(
-    '🆕 New Session 会执行以下操作：\n\n' +
-    '1️⃣ 自动导出当前数据为 Excel (.xlsx) 备份\n' +
-    '2️⃣ 清空当前页面所有资料\n' +
-    '3️⃣ 清空 Google Sheet 的 PayrollData\n' +
-    '4️⃣ 重新从 STAFF LOGIN RECORD 载入基础资料\n\n' +
-    '⚠️ 此操作不可撤销！确定继续吗？'
-  );
-  if (!ok) return;
-
-  _newSessionLock = true;
-  const btn = document.getElementById('btnNewSession');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ 处理中…'; }
-  setSyncBadge('busy', 'New Session 处理中…');
-  console.log('=== 🆕 New Session START ===');
-
-  // Step 1: 导出备份
-  try {
-    if (employees && employees.length > 0) {
-      exportBackupXLSX('newsession_backup');
-      console.log('[NewSession] Step 1: ✔ 备份已导出');
-      toast('✅ 备份已导出，正在清空…');
-      await new Promise(r => setTimeout(r, 900));
-    } else {
-      console.log('[NewSession] Step 1: 无数据，跳过备份');
-    }
-  } catch (e) {
-    console.error('[NewSession] Step 1 失败:', e);
-  }
-
-  // Step 2: 清空 Sheet
-  let sheetCleared = false;
-  try {
-    console.log('[NewSession] Step 2: 清空 Sheet...');
-    const res = await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ headers: getExportHeaders(), rows: [] })
+function exportToCSV() {
+  const headers = getExportHeaders();
+  const rows = getExportRows();
+  const esc = v => { const s = String(v ?? ''); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  let out = headers.map(esc).join(',') + '\n';
+  rows.forEach(r => { out += r.map(esc).join(',') + '\n'; });
+  downloadBlob(out, 'payroll_' + todayStr() + '.csv', 'text/csv');
+}
+function exportToTXT() {
+  const headers = getExportHeaders();
+  const rows = getExportRows();
+  if (!rows.length) { toast(t('noData'), false); return; }
+  const widths = headers.map((h, i) => {
+    let w = String(h).length;
+    rows.forEach(r => { const len = String(r[i] ?? '').length; if (len > w) w = len; });
+    return Math.min(w, 28);
+  });
+  const pad = (v, w) => {
+    let s = String(v ?? '');
+    if (s.length > w) s = s.slice(0, w - 1) + '…';
+    return s + ' '.repeat(Math.max(0, w - s.length));
+  };
+  let out = 'PAYROLL REPORT — ' + new Date().toLocaleString('ms-MY') + '\n';
+  out += '='.repeat(widths.reduce((a, b) => a + b + 3, 0)) + '\n';
+  out += headers.map((h, i) => pad(h, widths[i])).join(' | ') + '\n';
+  out += widths.map(w => '-'.repeat(w)).join('-+-') + '\n';
+  rows.forEach(r => { out += r.map((c, i) => pad(c, widths[i])).join(' | ') + '\n'; });
+  out += '\nTotal rows: ' + rows.length + '\n';
+  downloadBlob(out, 'payroll_' + todayStr() + '.txt', 'text/plain');
+  toast('Text berjaya dieksport');
+}
+function exportToDOC() {
+  const rows = getExportRows();
+  if (!rows.length) { toast(t('noData'), false); return; }
+  const headers = getExportHeaders();
+  let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><title>Payroll Report</title><style>body{font-family:Arial,sans-serif;font-size:9pt;}table{border-collapse:collapse;width:100%;}th,td{border:1px solid #999;padding:3px 5px;}th{background:#eef5fd;text-align:left;}td.num{text-align:right;}</style></head><body><h2 style="color:#1a4f8a;">Payroll Report — ' + new Date().toLocaleDateString('ms-MY') + '</h2><table><thead><tr>';
+  headers.forEach(h => { html += `<th>${escapeHtml(h)}</th>`; });
+  html += '</tr></thead><tbody>';
+  rows.forEach(r => {
+    html += '<tr>';
+    r.forEach((c, i) => {
+      const cls = (i >= 5 && i <= 33) ? ' class="num"' : '';
+      html += `<td${cls}>${escapeHtml(c)}</td>`;
     });
-    const j = await res.json();
-    if (j.status !== 'success') throw new Error(j.message || 'clear failed');
-    sheetCleared = true;
-    console.log('[NewSession] Step 2: ✔ Sheet 已清空', j);
-  } catch (e) {
-    console.error('[NewSession] Step 2 失败:', e);
-    const cont = confirm('⚠️ Sheet 清空失败：' + (e.message || e) + '\n\n是否继续清空页面？');
-    if (!cont) {
-      _newSessionLock = false;
-      if (btn) { btn.disabled = false; btn.textContent = '🆕 New Session'; }
-      setSyncBadge('err', 'New Session 已中止');
-      return;
-    }
-  }
-
-  // Step 3: 清空 localStorage + 页面
-  console.log('[NewSession] Step 3: 清空 localStorage + 页面');
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(SELECTED_CODE_KEY);
-    localStorage.removeItem(SELECTED_EMP_KEY);
-  } catch (e) {}
-
-  employees = [];
-  staffBasics = [];
-  filterGroup.clear();
-  filterBank.clear();
-  renderTable();
-
-  // Step 4: 从 STAFF LOGIN RECORD 重载
-  console.log('[NewSession] Step 4: 从 STAFF LOGIN RECORD 重载基础资料...');
-  try {
-    await loadStaffBasics();
-    console.log('[NewSession] Step 4: ✔ 完成，employees=' + employees.length);
-  } catch (e) {
-    console.error('[NewSession] Step 4 失败:', e);
-  }
-
-  // Step 5: 收尾
-  setTimeout(() => { _newSessionLock = false; console.log('[NewSession] 解锁'); }, 1500);
-  if (btn) { btn.disabled = false; btn.textContent = '🆕 New Session'; }
-
-  if (employees.length > 0) {
-    setSyncBadge('ok', 'New Session 完成 (' + employees.length + ' 人)');
-    toast('✅ New Session 完成！' + employees.length + ' 位员工已载入');
-  } else if (sheetCleared) {
-    setSyncBadge('ok', 'New Session 完成 (无员工)');
-    toast('⚠️ Sheet 已清空，但 STAFF LOGIN RECORD 里没有员工', false);
-  } else {
-    setSyncBadge('err', 'New Session 部分失败');
-    toast('⚠️ 页面已清空，但 Sheet 未清空', false);
-  }
-  console.log('=== 🆕 New Session END (employees=' + employees.length + ') ===');
+    html += '</tr>';
+  });
+  html += '</tbody></table></body></html>';
+  downloadBlob(html, 'payroll_' + todayStr() + '.doc', 'application/msword');
+  toast('Word berjaya dieksport');
 }
 
-/* ============================================================
-   📥 手动载入 PayrollData
-   ============================================================ */
-async function loadPayrollFromSheet() {
-  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
-    toast('请先设置 APPS_SCRIPT_URL', false); return;
-  }
-  if (!confirm('从 Google Sheet 的 PayrollData 载入完整工资数据？\n\n⚠️ 这会覆盖当前页面上的工资数据（基础资料会保留）。')) return;
-
-  setSyncBadge('busy', '载入 PayrollData…');
-  try {
-    const res = await fetch(APPS_SCRIPT_URL);
-    const j = await res.json();
-    if (j.status !== 'success' || !Array.isArray(j.data)) throw new Error(j.message || '数据格式错误');
-    if (!j.data.length) {
-      setSyncBadge('', 'PayrollData：无数据');
-      toast('⚠️ PayrollData 里没有数据', false);
-      return;
-    }
-    // 简化：直接重新用 STAFF LOGIN RECORD 载入
-    toast('PayrollData 已拉取，正在合并...');
-    await loadStaffBasics();
-  } catch (err) {
-    console.error('[Payroll] load failed:', err);
-    setSyncBadge('err', '载入失败：' + (err.message || err));
-    toast('❌ 载入失败：' + (err.message || err), false);
-  }
-}
-async function reloadFromSheet() { return loadPayrollFromSheet(); }
-
-/* ============================================================
-   导入 / 导出 / 打印（简版）
-   ============================================================ */
-function openImportModal() { document.getElementById('importModal').style.display = 'flex'; }
-function closeImportModal() {
-  document.getElementById('importModal').style.display = 'none';
-  const fi = document.getElementById('importFile');
-  if (fi) fi.value = '';
-}
-function openFreezeModal2() { openFreezeModal(); }
-function closeGroupSelectModal() { document.getElementById('groupSelectModal').style.display = 'none'; }
-function closeBatchPrintModal() { document.getElementById('batchPrintModal').style.display = 'none'; }
-
-window.addEventListener('DOMContentLoaded', () => {
-  const dz = document.getElementById('dropzone');
-  const fi = document.getElementById('importFile');
-  if (dz && fi) {
-    dz.addEventListener('click', e => { if (e.target !== fi) fi.click(); });
-    fi.addEventListener('change', e => {
-      if (e.target.files && e.target.files[0]) toast('Import 功能暂未启用', false);
-    });
-  }
-  const modal = document.getElementById('importModal');
-  if (modal) modal.addEventListener('click', e => { if (e.target.id === 'importModal') closeImportModal(); });
-  const fm = document.getElementById('freezeModal');
-  if (fm) fm.addEventListener('click', e => { if (e.target.id === 'freezeModal') closeFreezeModal(); });
-  const gm = document.getElementById('groupSelectModal');
-  if (gm) gm.addEventListener('click', e => { if (e.target.id === 'groupSelectModal') closeGroupSelectModal(); });
-  const bm = document.getElementById('batchPrintModal');
-  if (bm) bm.addEventListener('click', e => { if (e.target.id === 'batchPrintModal') closeBatchPrintModal(); });
-});
-
-function printAll() { toast('打印功能：请使用单张 Slip 按钮', false); closeAllToolbarDropdowns(); }
-function printByGroup() { toast('打印功能：请使用单张 Slip 按钮', false); closeAllToolbarDropdowns(); }
-function printBatch() { toast('打印功能：请使用单张 Slip 按钮', false); closeAllToolbarDropdowns(); }
-function groupSelectAll() {}
-function confirmGroupPrint() {}
-function batchSelectAll() {}
-function confirmBatchPrint() {}
 function showPayslip(code) {
   const emp = employees.find(e => e.Code === code);
   if (!emp) return;
@@ -2508,44 +2948,169 @@ function showPayslip(code) {
   printArea.innerHTML = buildPayslip(emp);
   window.print();
 }
+function printAll() {
+  closeAllToolbarDropdowns();
+  const list = employees.map(e => recalcRow({ ...e })).filter(e => {
+    const s = String(e.Situation || '').trim().toUpperCase();
+    return s !== 'UNACTIVE' && s !== 'INACTIVE';
+  });
+  if (!list.length) { toast('Tiada pekerja', false); return; }
+  const printArea = document.getElementById('printArea');
+  printArea.innerHTML = list.map(buildPayslip).join('');
+  toast('Sedia cetak ' + list.length + ' slip');
+  setTimeout(() => window.print(), 120);
+}
+function printByGroup() {
+  closeAllToolbarDropdowns();
+  const activeList = employees.filter(e => {
+    const s = String(e.Situation || '').trim().toUpperCase();
+    return s !== 'UNACTIVE' && s !== 'INACTIVE';
+  });
+  if (!activeList.length) { toast('Tiada pekerja', false); return; }
+  const map = new Map();
+  activeList.forEach(e => {
+    const g = String(e.GroupName || '(Tiada Group)').trim() || '(Tiada Group)';
+    map.set(g, (map.get(g) || 0) + 1);
+  });
+  const sorted = Array.from(map.keys()).sort();
+  const listEl = document.getElementById('groupSelectList');
+  listEl.innerHTML = sorted.map(g => `
+    <label class="print-list-item">
+      <input type="checkbox" class="group-print-chk" value="${escapeHtml(g)}">
+      <span class="pl-name">📁 ${escapeHtml(g)}</span>
+      <span class="pl-badge">${map.get(g)}</span>
+    </label>
+  `).join('');
+  document.getElementById('groupSelectModal').style.display = 'flex';
+}
+function closeGroupSelectModal() {
+  document.getElementById('groupSelectModal').style.display = 'none';
+}
+function groupSelectAll(checked) {
+  document.querySelectorAll('.group-print-chk').forEach(cb => cb.checked = checked);
+}
+function confirmGroupPrint() {
+  const selected = new Set();
+  document.querySelectorAll('.group-print-chk:checked').forEach(cb => selected.add(cb.value));
+  if (selected.size === 0) { toast('请至少选择一个 Group / 分店', false); return; }
+  const list = employees.map(e => recalcRow({ ...e })).filter(e => {
+    const s = String(e.Situation || '').trim().toUpperCase();
+    if (s === 'UNACTIVE' || s === 'INACTIVE') return false;
+    const g = String(e.GroupName || '(Tiada Group)').trim() || '(Tiada Group)';
+    return selected.has(g);
+  });
+  if (!list.length) { toast('Tiada pekerja dalam pilihan', false); return; }
+  closeGroupSelectModal();
+  const printArea = document.getElementById('printArea');
+  printArea.innerHTML = list.map(buildPayslip).join('');
+  toast('Sedia cetak ' + list.length + ' slip');
+  setTimeout(() => window.print(), 120);
+}
+function printBatch() {
+  closeAllToolbarDropdowns();
+  const activeList = employees.filter(e => {
+    const s = String(e.Situation || '').trim().toUpperCase();
+    return s !== 'UNACTIVE' && s !== 'INACTIVE';
+  });
+  if (!activeList.length) { toast('Tiada pekerja', false); return; }
+  const listEl = document.getElementById('batchPrintList');
+  listEl.innerHTML = activeList.map(e => {
+    const idx = employees.indexOf(e);
+    return `
+      <label class="print-list-item">
+        <input type="checkbox" class="batch-print-chk" value="${idx}" checked>
+        <span class="pl-name">${escapeHtml(e.Code || '')} · ${escapeHtml(e.Name || '')}</span>
+        <span class="pl-badge">${escapeHtml(e.GroupName || '-')}</span>
+      </label>
+    `;
+  }).join('');
+  document.getElementById('batchPrintModal').style.display = 'flex';
+}
+function closeBatchPrintModal() {
+  document.getElementById('batchPrintModal').style.display = 'none';
+}
+function batchSelectAll(checked) {
+  document.querySelectorAll('.batch-print-chk').forEach(cb => cb.checked = checked);
+}
+function confirmBatchPrint() {
+  const idxs = [];
+  document.querySelectorAll('.batch-print-chk:checked').forEach(cb => idxs.push(Number(cb.value)));
+  if (idxs.length === 0) { toast('请至少选择一位员工', false); return; }
+  const list = idxs.map(i => recalcRow({ ...employees[i] })).filter(Boolean);
+  if (!list.length) { toast('Tiada pekerja', false); return; }
+  closeBatchPrintModal();
+  const printArea = document.getElementById('printArea');
+  printArea.innerHTML = list.map(buildPayslip).join('');
+  toast('Sedia cetak ' + list.length + ' slip');
+  setTimeout(() => window.print(), 120);
+}
 function buildPayslip(emp) {
   const fmt = n => Number(n || 0).toFixed(2);
-  return `<div class="payslip">
+  const ot = num(emp.NormalOT) + num(emp.RestOT) + num(emp.PublicOT) + num(emp.OtherOT);
+  const L = I18N[currentLang];
+  const extraIncome = num(emp.Allowance2) + num(emp.Commission) + num(emp.Incentives);
+  const onLeave = num(emp.AnnualLeave) + num(emp.UnpaidLeave) + num(emp.SickLeave) + num(emp.HalfDays);
+  return `
+  <div class="payslip">
     <div class="ps-header">
-      <div><div class="ps-title">SLIP GAJI</div>
-      <div class="ps-info">${emp.GroupName || ''}<br>${emp.Name || ''}<br>${emp.SLRBankNama || emp.BankNama || ''}</div></div>
+      <div>
+        <div class="ps-title">SLIP GAJI</div>
+        <div class="ps-info">
+          ${emp.GroupName || ''}<br>${emp.Name || ''}<br>${emp.IC || ''} &nbsp;|&nbsp; ${emp.Jawatan || ''}<br>${emp.SLRBankNama || emp.BankNama || ''}
+        </div>
+      </div>
       <div class="ps-info" style="text-align:right;"><strong>${emp.Code}</strong><br>${new Date().toLocaleDateString('ms-MY')}</div>
     </div>
     <div class="ps-cols">
-      <div class="ps-section"><h4>PENDAPATAN</h4>
-        <div class="ps-row"><span>Gaji Asas</span><span>${fmt(emp.Basic)}</span></div>
-        <div class="ps-row total"><span>Gaji Kasar</span><span>${fmt(emp.GrossPay)}</span></div>
+      <div class="ps-section">
+        <h4>PENDAPATAN</h4>
+        <div class="ps-row"><span>${L.basic}</span><span>${fmt(emp.Basic)}</span></div>
+        ${extraIncome > 0 ? `<div class="ps-row"><span>${L.allowance2} / ${L.commission} / ${L.incentives}</span><span>${fmt(extraIncome)}</span></div>` : ''}
+        <div class="ps-row"><span>OT</span><span>${fmt(ot)}</span></div>
+        <div class="ps-row total"><span>${L.gross}</span><span>${fmt(emp.GrossPay)}</span></div>
+        <div class="ps-row" style="font-size:9pt;color:#666;"><span>${L.firstCalcTotal}</span><span>${fmt(emp.FirstCalcTotal)}</span></div>
       </div>
-      <div class="ps-section"><h4>POTONGAN</h4>
+      <div class="ps-section">
+        <h4>POTONGAN</h4>
+        ${onLeave > 0 ? `<div class="ps-row"><span>On Leave</span><span>${fmt(onLeave)}</span></div>` : ''}
+        <div class="ps-row"><span>${L.pinjaman}</span><span>${fmt(emp.Pinjaman)}</span></div>
         <div class="ps-row"><span>EPF</span><span>${fmt(emp.EPF_Employee)}</span></div>
         <div class="ps-row"><span>SOCSO</span><span>${fmt(emp.SOCSO_Employee)}</span></div>
         <div class="ps-row"><span>EIS</span><span>${fmt(emp.EIS_Employee)}</span></div>
-        <div class="ps-row"><span>24JAM</span><span>${fmt(emp.Lindung24Jam)}</span></div>
-        <div class="ps-row total"><span>Total Potongan</span><span>${fmt(emp.TotalDeduction)}</span></div>
+        <div class="ps-row"><span>${L.lindung}</span><span>${fmt(emp.Lindung24Jam)}</span></div>
+        <div class="ps-row total"><span>${L.totalDed}</span><span>${fmt(emp.TotalDeduction)}</span></div>
       </div>
     </div>
-    <div class="ps-section"><div class="ps-row total" style="font-size:12pt;"><span>Gaji Bersih</span><span>RM ${fmt(emp.NetSalary)}</span></div></div>
+    <div class="ps-section" style="margin-top:5mm;">
+      <div class="ps-row total" style="font-size:12pt;"><span>${L.net}</span><span>RM ${fmt(emp.NetSalary)}</span></div>
+    </div>
+    <div class="ps-section">
+      <h4>SUMBANGAN MAJIKAN (tidak ditolak)</h4>
+      <div class="ps-cols">
+        <div>
+          <div class="ps-row"><span>EPF (Majikan)</span><span>${fmt(emp.EPF_Employer)}</span></div>
+          <div class="ps-row"><span>SOCSO (Majikan)</span><span>${fmt(emp.SOCSO_Employer)}</span></div>
+          <div class="ps-row"><span>EIS (Majikan)</span><span>${fmt(emp.EIS_Employer)}</span></div>
+        </div>
+      </div>
+    </div>
     <div class="ps-sign"><div>Pekerja</div><div>Majikan</div></div>
   </div>`;
 }
-function downloadTemplate() { toast('Template 功能暂未启用', false); }
-function exportToPDF() { toast('导出功能暂未启用', false); closeAllNavDropdowns(); }
-function exportToXLSX() { exportBackupXLSX('payroll'); closeAllNavDropdowns(); }
-function exportToTXT() { toast('导出功能暂未启用', false); closeAllNavDropdowns(); }
-function exportToDOC() { toast('导出功能暂未启用', false); closeAllNavDropdowns(); }
-function switchLang(lang) { console.log('Language switched to', lang); }
+
+function switchLang(lang) {
+  currentLang = lang;
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
+  renderTable();
+  setTimeout(updateStickyOffsets, 60);
+}
 
 /* ============================================================
-   ⭐ 初始化 —— 进入页面时优先从 STAFF LOGIN RECORD 载入基础资料
+   初始化 —— 进入页面时优先从 STAFF LOGIN RECORD 载入基础资料
    ============================================================ */
 window.addEventListener('DOMContentLoaded', async () => {
   const langSelect = document.getElementById('langSelect');
-  if (langSelect) langSelect.value = 'ms';
+  if (langSelect) langSelect.value = currentLang;
   syncNavHeight();
 
   const toggle = document.getElementById('autoSyncToggle');
@@ -2553,7 +3118,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   autoSyncEnabled = false;
   setSyncBadge('', 'AutoSync: 手动模式');
 
-  // 恢复 localStorage（保留编辑）
+  // 先从 localStorage 恢复工资数据（避免刷新丢失未推送的编辑）
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
@@ -2568,7 +3133,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   } catch (e) { console.error('localStorage load failed', e); }
 
-  // ✅ 优先从 STAFF LOGIN RECORD 载入基础资料
+  // ✅ 优先从 STAFF LOGIN RECORD 拉取基础资料（无论什么状态都会执行）
   await loadStaffBasics();
 
   updateStickyOffsets();
