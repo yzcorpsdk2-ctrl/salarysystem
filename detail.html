@@ -1,498 +1,1063 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Detail Pekerja · Sistem Penggajian</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
-    body { background: #f2f5f9; padding: 24px 16px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
-    .payslip-container {
-      max-width: 1280px; width: 100%; background: white; border-radius: 20px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12); padding: 28px 30px 35px;
-      border: 1px solid #d9e1ec;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Slip Gaji Pekerja · Sistem Penggajian</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+  /* ============ Design tokens ============ */
+  :root{
+    --navy:#1e3a5f;
+    --navy-dark:#152c48;
+    --navy-soft:#eaf0f7;
+    --green:#0f7a4d;
+    --green-dark:#0b5c3a;
+    --green-light:#e6f4ec;
+    --red:#a52222;
+    --red-dark:#841a1a;
+    --red-light:#fbeaea;
+    --card:#ffffff;
+    --bg:#eef2f7;
+    --line:#dbe3ec;
+    --line-soft:#e8eef6;
+    --ink:#16233a;
+    --ink-2:#40556f;
+    --ink-3:#6b7f99;
+    --radius:14px;
+    --shadow-sm:0 1px 2px rgba(16,32,56,.05), 0 2px 10px rgba(16,32,56,.05);
+    --shadow-md:0 8px 24px rgba(16,32,56,.10);
+  }
+
+  *,*::before,*::after{ margin:0; padding:0; box-sizing:border-box; }
+  html{ -webkit-text-size-adjust:100%; }
+
+  body{
+    font-family:'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%, #e2eaf6 0%, #eef2f7 55%, #e9eef5 100%);
+    color:var(--ink);
+    font-size:15px;
+    line-height:1.5;
+    padding:26px 18px 60px;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    min-height:100vh;
+  }
+
+  /* ============ Container ============ */
+  .payslip-container{
+    width:100%;
+    max-width:1180px;
+    background:var(--card);
+    border:1px solid #e2e9f1;
+    border-radius:18px;
+    box-shadow:0 1px 2px rgba(16,32,56,.06), 0 18px 48px rgba(16,32,56,.12);
+    padding:30px 34px 34px;
+    position:relative;
+    overflow:hidden;
+  }
+  .payslip-container::before{
+    content:'';
+    position:absolute; inset:0 0 auto 0; height:4px;
+    background:linear-gradient(90deg, var(--navy) 0%, var(--navy) 58%, var(--green) 58%, var(--green) 100%);
+  }
+
+  /* ============ Header ============ */
+  .payslip-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:18px;
+    flex-wrap:wrap;
+    padding-bottom:16px;
+    margin-bottom:22px;
+    border-bottom:1px solid var(--line);
+    position:relative;
+  }
+  .payslip-header::after{
+    content:'';
+    position:absolute; left:0; bottom:-1px; width:110px; height:2px;
+    background:var(--green);
+  }
+  .brand{ display:flex; align-items:center; gap:14px; min-width:0; }
+  .brand-mark{
+    width:50px; height:50px; border-radius:14px; flex-shrink:0;
+    background:linear-gradient(145deg, var(--navy), #2a4f7c);
+    color:#fff; display:grid; place-items:center; font-size:1.2rem;
+    box-shadow:0 6px 14px rgba(30,58,95,.28);
+  }
+  .brand h1{
+    font-size:1.42rem; font-weight:700; color:var(--navy);
+    letter-spacing:-.02em; line-height:1.2;
+  }
+  .brand p{
+    font-size:.78rem; color:var(--ink-3); font-weight:500;
+    letter-spacing:.03em; margin-top:3px;
+  }
+  .header-badges{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+  .period-badge{
+    background:var(--navy); color:#fff; font-weight:700; font-size:.82rem;
+    padding:8px 18px; border-radius:999px; letter-spacing:.08em;
+    box-shadow:0 4px 10px rgba(30,58,95,.22); white-space:nowrap;
+  }
+  .sync-status{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:.74rem; font-weight:700; letter-spacing:.03em;
+    padding:7px 14px; border-radius:999px; white-space:nowrap;
+    background:#eef2f7; color:#41566f; border:1px solid transparent;
+    transition:.2s;
+  }
+  .sync-status::before{
+    content:''; width:7px; height:7px; border-radius:50%;
+    background:currentColor; opacity:.75; flex-shrink:0;
+  }
+  .sync-status.success{ background:var(--green-light); color:#116b43; border-color:#bfe3cd; }
+  .sync-status.error{ background:var(--red-light); color:#95201f; border-color:#f0c4c4; }
+
+  /* ============ Meta cards ============ */
+  .meta-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);
+    gap:16px;
+    margin-bottom:22px;
+  }
+  .meta-card{
+    background:linear-gradient(180deg, #f9fbfe, #f2f7fc);
+    border:1px solid #dae4f0;
+    border-radius:var(--radius);
+    padding:16px 18px 18px;
+    box-shadow:0 1px 2px rgba(16,32,56,.03);
+    min-width:0;
+  }
+  .card-head{
+    display:flex; align-items:center; gap:8px;
+    font-size:.7rem; font-weight:800; letter-spacing:.09em;
+    text-transform:uppercase; color:#4a6484; margin-bottom:14px;
+  }
+  .card-head i{ font-size:.8rem; color:var(--navy); opacity:.8; }
+
+  .field-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:12px 18px;
+  }
+  .field{ display:flex; flex-direction:column; gap:4px; min-width:0; }
+  .field-label{
+    font-size:.66rem; font-weight:800; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--ink-3);
+  }
+  .field-static{
+    font-size:.95rem; font-weight:600; color:var(--ink);
+    padding:7px 2px; word-break:break-word;
+  }
+  .field-input{
+    width:100%; padding:7px 10px;
+    border:1px solid transparent; background:rgba(255,255,255,.7);
+    border-radius:8px; font-size:.92rem; font-weight:600; color:var(--ink);
+    font-family:inherit; outline:none;
+    transition:border-color .15s, box-shadow .15s, background .15s;
+  }
+  .field-input:hover:not([readonly]){ border-color:#c6d6e8; background:#fff; }
+  .field-input:focus{
+    border-color:var(--navy); background:#fff;
+    box-shadow:0 0 0 3px rgba(30,58,95,.12);
+  }
+  .field-input[readonly]{ background:transparent; cursor:default; }
+
+  /* basic salary card */
+  .meta-card.basic-card{
+    background:linear-gradient(160deg, #1e3a5f 0%, #2b5580 55%, #1d4468 100%);
+    border-color:#1a3355;
+    display:flex; flex-direction:column; justify-content:space-between;
+  }
+  .meta-card.basic-card .card-head{ color:#a9c6e4; }
+  .meta-card.basic-card .card-head i{ color:#8fc0ea; opacity:1; }
+  .basic-display{
+    font-size:1.85rem; font-weight:800; letter-spacing:-.02em;
+    line-height:1.1; margin-bottom:14px; color:#fff;
+    font-variant-numeric:tabular-nums;
+  }
+  .basic-input-wrap{
+    display:flex; align-items:center; gap:8px;
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.25);
+    border-radius:10px; padding:7px 12px; transition:.15s;
+  }
+  .basic-input-wrap:focus-within{
+    background:rgba(255,255,255,.2);
+    border-color:rgba(255,255,255,.55);
+    box-shadow:0 0 0 3px rgba(255,255,255,.12);
+  }
+  .basic-input-wrap .cur{
+    font-size:.72rem; font-weight:800; letter-spacing:.06em; color:#bcd6ef;
+  }
+  .basic-input-wrap input{
+    flex:1; min-width:0; background:transparent; border:none; outline:none;
+    color:#fff; font-size:1rem; font-weight:700; text-align:right;
+    font-family:inherit; font-variant-numeric:tabular-nums;
+  }
+
+  /* ============ Columns ============ */
+  .columns{
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:20px; margin-bottom:20px;
+  }
+  .panel{
+    display:flex; flex-direction:column;
+    border:1px solid var(--line); border-radius:var(--radius);
+    background:#fff; overflow:hidden;
+    box-shadow:var(--shadow-sm);
+  }
+  .panel-head{
+    display:flex; align-items:center; gap:10px;
+    padding:12px 18px; border-bottom:1px solid var(--line);
+    background:#f7fafd;
+  }
+  .panel-icon{
+    width:28px; height:28px; border-radius:9px; flex-shrink:0;
+    display:grid; place-items:center; font-size:.76rem; color:#fff;
+  }
+  .panel-income .panel-icon{ background:linear-gradient(145deg,#0f7a4d,#0a5e3b); }
+  .panel-deduction .panel-icon{ background:linear-gradient(145deg,#a52222,#7d1717); }
+  .panel-head h2{
+    font-size:.78rem; font-weight:800; letter-spacing:.07em;
+    text-transform:uppercase;
+  }
+  .panel-income .panel-head h2{ color:#0e6b45; }
+  .panel-deduction .panel-head h2{ color:#8f1e1e; }
+
+  .panel-body{ padding:4px 18px 12px; flex:1; }
+
+  .line-item{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; padding:9px 0;
+    border-bottom:1px dashed var(--line-soft);
+  }
+  .line-item:last-child{ border-bottom:none; }
+  .line-item label{
+    display:flex; align-items:center; gap:8px; min-width:0;
+    font-size:.88rem; font-weight:600; color:var(--ink-2);
+    cursor:pointer;
+  }
+  .line-item label i{
+    width:16px; text-align:center; font-size:.76rem;
+    color:#7d93ad; flex-shrink:0;
+  }
+
+  /* amount input */
+  .amount{
+    display:flex; align-items:center; gap:5px;
+    flex:0 0 auto; width:132px;
+    background:#f6f9fd; border:1px solid var(--line);
+    border-radius:9px; padding:4px 10px;
+    transition:border-color .15s, box-shadow .15s, background .15s;
+  }
+  .amount:focus-within{
+    border-color:var(--navy); background:#fff;
+    box-shadow:0 0 0 3px rgba(30,58,95,.10);
+  }
+  .amount .cur{
+    font-size:.68rem; font-weight:800; letter-spacing:.05em;
+    color:var(--ink-3); flex-shrink:0;
+  }
+  .amount input{
+    width:100%; min-width:0; border:none; background:transparent; outline:none;
+    text-align:right; font-family:inherit;
+    font-size:.92rem; font-weight:700; color:var(--ink);
+    font-variant-numeric:tabular-nums; padding:3px 0;
+  }
+  .amount.text{ padding:4px 8px; }
+  .amount.text input{ text-align:left; font-size:.82rem; font-weight:600; }
+
+  /* hide number spinners */
+  .amount input::-webkit-outer-spin-button,
+  .amount input::-webkit-inner-spin-button,
+  .basic-input-wrap input::-webkit-outer-spin-button,
+  .basic-input-wrap input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+  .amount input[type=number],
+  .basic-input-wrap input[type=number]{ -moz-appearance:textfield; }
+
+  .panel-total{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:10px; padding:12px 18px;
+    font-size:.85rem; font-weight:800; letter-spacing:.02em;
+  }
+  .panel-income .panel-total{
+    background:var(--green-light); color:#0d6240; border-top:1px solid #c9e6d6;
+  }
+  .panel-deduction .panel-total{
+    background:var(--red-light); color:#8f1e1e; border-top:1px solid #f0cfcf;
+  }
+  .panel-total i{ margin-right:6px; opacity:.75; }
+  .panel-total strong{ font-size:1rem; font-variant-numeric:tabular-nums; }
+
+  /* ============ Extra cards ============ */
+  .extra-grid{
+    display:grid; grid-template-columns:repeat(3, minmax(0,1fr));
+    gap:16px; margin-bottom:22px;
+  }
+  .extra-card{
+    background:#fff; border:1px solid var(--line);
+    border-radius:var(--radius); padding:14px 16px 8px;
+    box-shadow:var(--shadow-sm); min-width:0;
+    transition:border-color .18s, box-shadow .18s;
+  }
+  .extra-card:hover{ border-color:#c2d4e6; box-shadow:var(--shadow-md); }
+  .extra-card h4{
+    display:flex; align-items:center; gap:7px;
+    font-size:.68rem; font-weight:800; letter-spacing:.08em;
+    text-transform:uppercase; color:#4a6484;
+    padding-bottom:10px; margin-bottom:4px;
+    border-bottom:1px solid var(--line);
+  }
+  .extra-card h4 i{ color:var(--navy); opacity:.8; }
+  .extra-card h4 span{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  .mini-btn{
+    margin-left:auto; flex-shrink:0;
+    display:inline-flex; align-items:center; gap:5px;
+    font-size:.6rem; font-weight:800; letter-spacing:.06em;
+    text-transform:uppercase; font-family:inherit;
+    padding:4px 9px; border-radius:6px; cursor:pointer;
+    border:1px solid #b9cfe4; background:#fff; color:var(--navy);
+    transition:.15s;
+  }
+  .mini-btn:hover{ background:var(--navy); color:#fff; border-color:var(--navy); }
+
+  .extra-card .line-item{
+    padding:6px 0; gap:8px;
+    border-bottom:1px dotted var(--line-soft);
+  }
+  .extra-card .line-item label{
+    flex:1 1 auto; font-size:.8rem; font-weight:500; line-height:1.35;
+  }
+  .extra-card .line-item label i{ display:none; }
+  .extra-card .amount{ width:108px; padding:3px 8px; }
+  .extra-card .amount .cur{ font-size:.62rem; }
+  .extra-card .amount input{ font-size:.85rem; }
+  .extra-card .amount.text{ width:100%; max-width:158px; }
+
+  /* ============ Summary ============ */
+  .summary{
+    display:grid; grid-template-columns:repeat(3, minmax(0,1fr));
+    gap:16px; margin-bottom:26px;
+  }
+  .sum-card{
+    position:relative; overflow:hidden;
+    display:flex; flex-direction:column; gap:6px;
+    padding:16px 20px; border-radius:var(--radius);
+    color:#fff; box-shadow:var(--shadow-md);
+  }
+  .sum-card::after{
+    content:''; position:absolute; right:-34px; top:-34px;
+    width:128px; height:128px; border-radius:50%;
+    background:rgba(255,255,255,.07);
+  }
+  .sum-label{
+    display:flex; align-items:center; gap:7px;
+    font-size:.68rem; font-weight:800; letter-spacing:.09em;
+    text-transform:uppercase; opacity:.88;
+  }
+  .sum-value{
+    font-size:1.45rem; font-weight:800; letter-spacing:-.01em;
+    font-variant-numeric:tabular-nums; position:relative; z-index:1;
+  }
+  .sum-gross{ background:linear-gradient(150deg,#22456e,#1a3555); }
+  .sum-ded{ background:linear-gradient(150deg,#a52222,#841a1a); }
+  .sum-net{ background:linear-gradient(150deg,#128552,#0b6540); }
+
+  /* ============ Action bar ============ */
+  .action-bar{
+    display:flex; justify-content:space-between; align-items:center;
+    gap:16px; flex-wrap:wrap;
+    padding-top:20px; border-top:1px solid var(--line);
+  }
+  .btn-group{ display:flex; gap:10px; flex-wrap:wrap; }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:10px 22px; border-radius:10px;
+    font-size:.86rem; font-weight:700; font-family:inherit;
+    border:1px solid transparent; cursor:pointer; white-space:nowrap;
+    transition:transform .12s, box-shadow .15s, background .15s, border-color .15s, color .15s;
+  }
+  .btn:active{ transform:translateY(1px); }
+  .btn i{ font-size:.82rem; }
+  .btn-primary{
+    background:var(--navy); color:#fff;
+    box-shadow:0 4px 12px rgba(30,58,95,.25);
+  }
+  .btn-primary:hover{ background:var(--navy-dark); box-shadow:0 6px 16px rgba(30,58,95,.32); }
+  .btn-outline{ background:#fff; border-color:#c6d5e6; color:var(--navy); }
+  .btn-outline:hover{ background:#f2f7fd; border-color:var(--navy); }
+  .btn-success{
+    background:var(--green); color:#fff;
+    box-shadow:0 4px 12px rgba(15,122,77,.28);
+  }
+  .btn-success:hover{ background:var(--green-dark); box-shadow:0 6px 16px rgba(15,122,77,.34); }
+  .btn-ghost{ background:#fff; border-color:#c6d5e6; color:var(--ink-2); }
+  .btn-ghost:hover{ background:#f2f7fd; border-color:var(--navy); color:var(--navy); }
+
+  .action-hint{
+    display:flex; align-items:center; gap:7px;
+    font-size:.76rem; color:var(--ink-3); line-height:1.45; max-width:430px;
+  }
+  .action-hint > i{ color:#8ea4bc; flex-shrink:0; }
+  kbd{
+    font-family:inherit; font-size:.68rem; font-weight:700;
+    background:#eef3f9; border:1px solid #d3dfec; border-bottom-width:2px;
+    border-radius:5px; padding:1px 5px; color:#3e5673;
+  }
+
+  /* ============ Signature ============ */
+  .signature-area{
+    display:flex; justify-content:space-between; gap:24px; flex-wrap:wrap;
+    margin-top:32px; padding-top:22px;
+    border-top:1px dashed #d5e0ec;
+  }
+  .signature-line{
+    flex:1 1 180px; max-width:280px;
+    display:flex; flex-direction:column; gap:6px;
+  }
+  .signature-line span:first-child{
+    font-size:.66rem; font-weight:800; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--ink-3);
+  }
+  .signature-line .line{
+    height:38px; border-bottom:1.5px solid #a8bcd2;
+  }
+  .signature-line .line-sub{
+    font-size:.68rem; color:#9aabc0; letter-spacing:.02em;
+  }
+
+  /* ============ Responsive ============ */
+  @media (max-width: 980px){
+    .meta-grid{ grid-template-columns:1fr; }
+    .extra-grid{ grid-template-columns:1fr 1fr; }
+  }
+  @media (max-width: 760px){
+    .columns{ grid-template-columns:1fr; }
+    .summary{ grid-template-columns:1fr; }
+    .extra-grid{ grid-template-columns:1fr; }
+    .payslip-container{ padding:24px 20px 28px; }
+    .brand h1{ font-size:1.2rem; }
+  }
+  @media (max-width: 540px){
+    body{ padding:14px 10px 40px; }
+    .payslip-container{ padding:20px 14px 24px; border-radius:14px; }
+    .field-grid{ grid-template-columns:1fr; }
+    .payslip-header{ flex-direction:column; }
+    .header-badges{ justify-content:flex-start; }
+    .btn-group{ width:100%; }
+    .btn{ flex:1 1 auto; }
+    .line-item{ flex-wrap:wrap; }
+    .amount{ width:100%; }
+    .extra-card .amount{ width:100%; }
+  }
+
+  /* ============ Print ============ */
+  @media print{
+    *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+    body{
+      background:#fff; padding:0; display:block; font-size:12px;
     }
-    .company-header {
-      display: flex; justify-content: space-between; align-items: baseline;
-      border-bottom: 3px solid #1e3a5f; padding-bottom: 8px; margin-bottom: 20px;
-      flex-wrap: wrap; gap: 10px;
+    .payslip-container{
+      box-shadow:none; border:none; border-radius:0;
+      max-width:none; padding:0;
     }
-    .company-name { font-size: 1.9rem; font-weight: 700; color: #1e3a5f; letter-spacing: -0.5px; }
-    .period-badge {
-      background: #1e3a5f; color: white; font-weight: 600; font-size: 1.1rem;
-      padding: 6px 18px; border-radius: 40px; letter-spacing: 0.5px;
+    .payslip-container::before{ display:none; }
+    .action-bar,
+    .mini-btn,
+    .no-print{ display:none !important; }
+    .sum-card,
+    .meta-card.basic-card{ box-shadow:none; }
+    .panel,
+    .extra-card,
+    .meta-card,
+    .sum-card{ break-inside:avoid; page-break-inside:avoid; }
+    .amount{
+      background:transparent !important;
+      border-color:#dde5ee !important;
+      box-shadow:none !important;
     }
-    .info-grid {
-      display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 12px 20px;
-      background: #f8faff; padding: 16px 18px; border-radius: 14px;
-      margin-bottom: 24px; border: 1px solid #cddaea;
-    }
-    .info-item { display: flex; align-items: baseline; font-size: 0.95rem; line-height: 1.6; color: #1e2b3c; }
-    .info-label { font-weight: 600; width: 120px; color: #2a4059; flex-shrink: 0; }
-    .info-value { font-weight: 500; color: #0a1a2b; word-break: break-word; width: 100%; }
-    .info-value input {
-      width: 100%; padding: 4px 8px; border: 1px solid #b6c8dd; border-radius: 8px;
-      font-size: 0.95rem; font-weight: 500; background: white; color: #0a1a2b; outline: none;
-    }
-    .info-value input:focus { border-color: #1e3a5f; box-shadow: 0 0 0 2px rgba(30,58,95,0.15); }
-    .columns { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
-    .col { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02); }
-    .col-header {
-      background: #e9eef6; padding: 12px 18px; font-weight: 700; font-size: 1.05rem;
-      color: #1e3a5f; border-bottom: 1px solid #b6c8dd;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .col-body { padding: 12px 18px 16px; }
-    .row-item {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 7px 0; border-bottom: 1px dashed #d8e1ed; font-size: 0.95rem;
-    }
-    .row-item:last-child { border-bottom: none; }
-    .row-label { color: #2f4055; font-weight: 500; display: flex; align-items: center; gap: 6px; }
-    .row-label i { color: #6b7f99; font-size: 0.8rem; width: 16px; }
-    .row-value {
-      font-weight: 600; color: #0e1c2e; background: #f4f8ff; padding: 2px 12px;
-      border-radius: 30px; font-size: 0.95rem; min-width: 90px; text-align: right;
-      border: 1px solid #dbe4f0;
-    }
-    .row-value input {
-      width: 100%; border: none; background: transparent; font-weight: 600;
-      font-size: 0.95rem; text-align: right; color: #0e1c2e; outline: none; font-family: inherit;
-    }
-    .row-value input:focus { background: #eef6ff; border-radius: 20px; padding: 2px 8px; margin: -2px -8px; }
-    .row-value input.text { text-align: left; }
-    .total-row {
-      display: flex; justify-content: space-between; align-items: center;
-      background: #1e3a5f; color: white; padding: 12px 18px; border-radius: 12px;
-      margin-top: 8px; font-weight: 700; font-size: 1.1rem;
-    }
-    .total-row .label { display: flex; align-items: center; gap: 8px; }
-    .total-row .value { background: #ffffff20; padding: 4px 16px; border-radius: 40px; letter-spacing: 0.5px; }
-    .extra-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-top: 12px; margin-bottom: 20px; }
-    .extra-card { background: #f8faff; border: 1px solid #cddaea; border-radius: 14px; padding: 12px 14px; }
-    .extra-card h4 {
-      font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;
-      color: #4e6b8a; margin-bottom: 8px; font-weight: 700;
-      display: flex; align-items: center; gap: 5px;
-    }
-    .extra-card .row-item { padding: 4px 0; font-size: 0.9rem; }
-    .action-bar {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-top: 24px; flex-wrap: wrap; gap: 12px;
-      border-top: 2px solid #e2eaf3; padding-top: 22px;
-    }
-    .btn-group { display: flex; gap: 12px; flex-wrap: wrap; }
-    .btn {
-      padding: 10px 28px; border-radius: 40px; font-weight: 600; font-size: 0.95rem;
-      border: none; cursor: pointer; display: inline-flex; align-items: center;
-      gap: 8px; transition: 0.2s;
-    }
-    .btn-primary { background: #1e3a5f; color: white; box-shadow: 0 4px 8px rgba(30, 58, 95, 0.25); }
-    .btn-primary:hover { background: #14304e; transform: translateY(-1px); }
-    .btn-outline { background: white; border: 1.5px solid #1e3a5f; color: #1e3a5f; }
-    .btn-outline:hover { background: #eef4fb; }
-    .btn-success { background: #1e7b4c; color: white; box-shadow: 0 4px 8px rgba(30, 123, 76, 0.25); }
-    .btn-success:hover { background: #14633c; }
-    .signature-area {
-      display: flex; justify-content: space-between; margin-top: 30px; padding-top: 18px;
-      border-top: 1px solid #cbdae9; font-size: 0.9rem; color: #2f4055;
-    }
-    .signature-line { display: flex; flex-direction: column; gap: 6px; }
-    .signature-line span:first-child { font-weight: 600; }
-    .signature-line .line { border-bottom: 1.5px solid #a0b8d0; width: 200px; height: 18px; }
-    .sync-status { font-size: 0.8rem; padding: 4px 10px; border-radius: 20px; background: #eef2f7; color: #3c5777; }
-    .sync-status.success { background: #d4edda; color: #155724; }
-    .sync-status.error { background: #f8d7da; color: #721c24; }
-    @media (max-width: 900px) {
-      .columns { grid-template-columns: 1fr; }
-      .info-grid { grid-template-columns: 1fr 1fr; }
-      .extra-grid { grid-template-columns: 1fr 1fr; }
-    }
-    @media (max-width: 600px) {
-      .payslip-container { padding: 18px; }
-      .info-grid, .extra-grid { grid-template-columns: 1fr; }
-      .company-name { font-size: 1.4rem; }
-      .period-badge { font-size: 0.9rem; }
-    }
-  </style>
+    .field-input{ background:transparent !important; }
+    .signature-area{ margin-top:22px; }
+  }
+</style>
 </head>
 <body>
-  <div class="payslip-container" id="payslipContainer">
-    <div class="company-header">
-      <div class="company-name" id="companyName">Sistem Penggajian Sdn Bhd</div>
-      <div class="period-badge" id="periodBadge">—</div>
-    </div>
 
-    <div class="info-grid">
-      <div class="info-item">
-        <span class="info-label">Situation</span>
-        <span class="info-value" id="infoSituation">—</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">Kod</span>
-        <span class="info-value"><input type="text" id="infoKod" readonly></span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">Nama</span>
-        <span class="info-value"><input type="text" id="infoNama" readonly></span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">Kumpulan</span>
-        <span class="info-value"><input type="text" id="infoKumpulan"></span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">Gaji Asas</span>
-        <span class="info-value" id="infoGajiAsas">RM 0.00</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">Gaji Asas (Edit)</span>
-        <span class="info-value"><input type="number" step="0.01" id="inputGajiAsas" value="0"></span>
+<div class="payslip-container" id="payslipContainer">
+
+  <!-- ============ HEADER ============ -->
+  <header class="payslip-header">
+    <div class="brand">
+      <div class="brand-mark"><i class="fas fa-file-invoice-dollar"></i></div>
+      <div>
+        <h1 id="companyName">Sistem Penggajian Sdn Bhd</h1>
+        <p>Slip Gaji Pekerja &middot; Penyata Pendapatan Bulanan</p>
       </div>
     </div>
+    <div class="header-badges">
+      <span class="period-badge" id="periodBadge">—</span>
+      <span class="sync-status" id="syncStatus">Sedia</span>
+    </div>
+  </header>
 
-    <div class="columns">
-      <div class="col">
-        <div class="col-header"><i class="fas fa-plus-circle" style="color:#1e7b4c;"></i> EARNINGS / INCOME</div>
-        <div class="col-body">
-          <div class="row-item"><span class="row-label"><i class="fas fa-clock"></i> OT Biasa</span><span class="row-value"><input type="number" step="0.01" id="otBiasa" value="0"></span></div>
-          <div class="row-item"><span class="row-label"><i class="fas fa-clock"></i> OT Rehat</span><span class="row-value"><input type="number" step="0.01" id="otRehat" value="0"></span></div>
-          <div class="row-item"><span class="row-label"><i class="fas fa-clock"></i> OT Awam</span><span class="row-value"><input type="number" step="0.01" id="otAwam" value="0"></span></div>
-          <div class="row-item"><span class="row-label"><i class="fas fa-clock"></i> OT Lain</span><span class="row-value"><input type="number" step="0.01" id="otLain" value="0"></span></div>
-          <div class="row-item"><span class="row-label"><i class="fas fa-hand-holding-usd"></i> ALLOWANCE</span><span class="row-value"><input type="number" step="0.01" id="allowance" value="0"></span></div>
-          <div class="row-item"><span class="row-label"><i class="fas fa-percent"></i> COMMISION</span><span class="row-value"><input type="number" step="0.01" id="commision" value="0"></span></div>
-          <div class="row-item"><span class="row-label"><i class="fas fa-gift"></i> INCENTIVES</span><span class="row-value"><input type="number" step="0.01" id="incentives" value="0"></span></div>
-          <div class="row-item" style="border-bottom: 2px solid #b6c8dd; margin-top: 4px; padding-top: 8px;">
-            <span class="row-label"><i class="fas fa-calculator"></i> FIRST CALCULATION TOTAL</span>
-            <span class="row-value" id="firstCalcTotal">RM 0.00</span>
-          </div>
+  <!-- ============ META ============ -->
+  <div class="meta-grid">
+
+    <section class="meta-card">
+      <div class="card-head"><i class="fas fa-id-card"></i> Maklumat Pekerja</div>
+      <div class="field-grid">
+        <div class="field">
+          <span class="field-label">Situation</span>
+          <div class="field-static" id="infoSituation">—</div>
+        </div>
+        <div class="field">
+          <span class="field-label">Kod</span>
+          <input type="text" class="field-input" id="infoKod" readonly>
+        </div>
+        <div class="field">
+          <span class="field-label">Nama</span>
+          <input type="text" class="field-input" id="infoNama" readonly>
+        </div>
+        <div class="field">
+          <span class="field-label">Kumpulan</span>
+          <input type="text" class="field-input" id="infoKumpulan">
         </div>
       </div>
+    </section>
 
-      <div class="col">
-        <div class="col-header"><i class="fas fa-minus-circle" style="color:#b22234;"></i> DEDUCTIONS / POTONGAN</div>
-        <div class="col-body">
-          <div class="row-item"><span class="row-label"><i class="fas fa-calendar-check"></i> ANNUAL LEAVE</span><span class="row-value"><input type="number" step="0.01" id="annualLeave" value="0"></span></div>
-          <div class="row-item"><span class="row-label"><i class="fas fa-calendar-times"></i> UNPAID LEAVE</span><span class="row-value"><input type="number" step="0.01" id="unpaidLeave" value="0"></span></div>
-          <div class="row-item"><span class="row-label"><i class="fas fa-notes-medical"></i> SICK LEAVE</span><span class="row-value"><input type="number" step="0.01" id="sickLeave" value="0"></span></div>
-          <div class="row-item"><span class="row-label"><i class="fas fa-hourglass-half"></i> HALF DAYS LEAVE (HOURS)</span><span class="row-value"><input type="number" step="0.01" id="halfDaysLeave" value="0"></span></div>
-          <div class="row-item"><span class="row-label"><i class="fas fa-hand-holding-usd"></i> PINJAMAN</span><span class="row-value"><input type="number" step="0.01" id="pinjaman" value="0"></span></div>
-          <div class="row-item" style="border-bottom: 2px solid #b6c8dd; margin-top: 4px; padding-top: 8px;">
-            <span class="row-label"><i class="fas fa-calculator"></i> TOTAL POTONGAN</span>
-            <span class="row-value" id="totalPotongan">RM 0.00</span>
-          </div>
+    <section class="meta-card basic-card">
+      <div class="card-head"><i class="fas fa-wallet"></i> Gaji Asas Bulanan</div>
+      <div class="basic-display" id="infoGajiAsas">RM 0.00</div>
+      <div class="basic-input-wrap">
+        <span class="cur">RM</span>
+        <input type="number" step="0.01" id="inputGajiAsas" value="0" inputmode="decimal">
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ============ INCOME / DEDUCTION ============ -->
+  <div class="columns">
+
+    <!-- INCOME -->
+    <section class="panel panel-income">
+      <div class="panel-head">
+        <span class="panel-icon"><i class="fas fa-plus"></i></span>
+        <h2>Pendapatan / Earnings</h2>
+      </div>
+      <div class="panel-body">
+        <div class="line-item">
+          <label for="otBiasa"><i class="fas fa-clock"></i> OT Biasa</label>
+          <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="otBiasa" value="0"></div>
+        </div>
+        <div class="line-item">
+          <label for="otRehat"><i class="fas fa-clock"></i> OT Rehat</label>
+          <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="otRehat" value="0"></div>
+        </div>
+        <div class="line-item">
+          <label for="otAwam"><i class="fas fa-clock"></i> OT Awam</label>
+          <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="otAwam" value="0"></div>
+        </div>
+        <div class="line-item">
+          <label for="otLain"><i class="fas fa-clock"></i> OT Lain</label>
+          <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="otLain" value="0"></div>
+        </div>
+        <div class="line-item">
+          <label for="allowance"><i class="fas fa-hand-holding-usd"></i> Allowance</label>
+          <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="allowance" value="0"></div>
+        </div>
+        <div class="line-item">
+          <label for="commision"><i class="fas fa-percent"></i> Commission</label>
+          <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="commision" value="0"></div>
+        </div>
+        <div class="line-item">
+          <label for="incentives"><i class="fas fa-gift"></i> Incentives</label>
+          <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="incentives" value="0"></div>
         </div>
       </div>
+      <div class="panel-total">
+        <span><i class="fas fa-calculator"></i> Jumlah Pendapatan</span>
+        <strong id="firstCalcTotal">RM 0.00</strong>
+      </div>
+    </section>
+
+    <!-- DEDUCTION -->
+    <section class="panel panel-deduction">
+      <div class="panel-head">
+        <span class="panel-icon"><i class="fas fa-minus"></i></span>
+        <h2>Potongan / Deductions</h2>
+      </div>
+      <div class="panel-body">
+        <div class="line-item">
+          <label for="annualLeave"><i class="fas fa-calendar-check"></i> Cuti Tahunan</label>
+          <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="annualLeave" value="0"></div>
+        </div>
+        <div class="line-item">
+          <label for="unpaidLeave"><i class="fas fa-calendar-times"></i> Cuti Tanpa Gaji</label>
+          <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="unpaidLeave" value="0"></div>
+        </div>
+        <div class="line-item">
+          <label for="sickLeave"><i class="fas fa-notes-medical"></i> Cuti Sakit</label>
+          <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="sickLeave" value="0"></div>
+        </div>
+        <div class="line-item">
+          <label for="halfDaysLeave"><i class="fas fa-hourglass-half"></i> Cuti Setengah Hari</label>
+          <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="halfDaysLeave" value="0"></div>
+        </div>
+        <div class="line-item">
+          <label for="pinjaman"><i class="fas fa-hand-holding-usd"></i> Pinjaman</label>
+          <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="pinjaman" value="0"></div>
+        </div>
+      </div>
+      <div class="panel-total">
+        <span><i class="fas fa-calculator"></i> Jumlah Potongan</span>
+        <strong id="totalPotongan">RM 0.00</strong>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ============ EXTRA ============ -->
+  <div class="extra-grid">
+
+    <section class="extra-card">
+      <h4><i class="fas fa-shield-alt"></i><span>Gaji Untuk Caruman</span></h4>
+      <div class="line-item">
+        <label for="salaryEpf">EPF (KWSP)</label>
+        <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="salaryEpf" value="0"></div>
+      </div>
+      <div class="line-item">
+        <label for="salarySocso">SOCSO (PERKESO)</label>
+        <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="salarySocso" value="0"></div>
+      </div>
+      <div class="line-item">
+        <label for="salaryEis">EIS</label>
+        <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="salaryEis" value="0"></div>
+      </div>
+      <div class="line-item">
+        <label for="salary24jam">24 JAM</label>
+        <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="salary24jam" value="0"></div>
+      </div>
+    </section>
+
+    <section class="extra-card">
+      <h4>
+        <i class="fas fa-building"></i><span>Caruman Statutori</span>
+        <button type="button" class="mini-btn" id="autoCalcBtn" title="Kira anggaran caruman berdasarkan Gaji Asas">
+          <i class="fas fa-magic"></i> Auto
+        </button>
+      </h4>
+      <div class="line-item">
+        <label for="epfEmployee">EPF (Pekerja)</label>
+        <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="epfEmployee" value="0"></div>
+      </div>
+      <div class="line-item">
+        <label for="epfEmployer">EPF (Majikan)</label>
+        <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="epfEmployer" value="0"></div>
+      </div>
+      <div class="line-item">
+        <label for="socsoEmployee">SOCSO (Pekerja)</label>
+        <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="socsoEmployee" value="0"></div>
+      </div>
+      <div class="line-item">
+        <label for="socsoEmployer">SOCSO (Majikan)</label>
+        <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="socsoEmployer" value="0"></div>
+      </div>
+      <div class="line-item">
+        <label for="eisEmployee">EIS (Pekerja)</label>
+        <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="eisEmployee" value="0"></div>
+      </div>
+      <div class="line-item">
+        <label for="eisEmployer">EIS (Majikan)</label>
+        <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="eisEmployer" value="0"></div>
+      </div>
+      <div class="line-item">
+        <label for="lindung24jam">24 JAM (Pekerja)</label>
+        <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="lindung24jam" value="0"></div>
+      </div>
+    </section>
+
+    <section class="extra-card">
+      <h4><i class="fas fa-university"></i><span>Bank &amp; Pendaftaran</span></h4>
+      <div class="line-item">
+        <label for="bankNama">Nama Bank</label>
+        <div class="amount text"><input type="text" class="text" id="bankNama" value="—"></div>
+      </div>
+      <div class="line-item">
+        <label for="bankAcc">No. Akaun</label>
+        <div class="amount text"><input type="text" class="text" id="bankAcc" value="—"></div>
+      </div>
+      <div class="line-item">
+        <label for="epfNo">No. EPF</label>
+        <div class="amount text"><input type="text" class="text" id="epfNo" value="—"></div>
+      </div>
+      <div class="line-item">
+        <label for="socsoNo">No. PERKESO</label>
+        <div class="amount text"><input type="text" class="text" id="socsoNo" value="—"></div>
+      </div>
+      <div class="line-item">
+        <label for="eisNo">No. EIS</label>
+        <div class="amount text"><input type="text" class="text" id="eisNo" value="—"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ============ SUMMARY ============ -->
+  <div class="summary">
+    <div class="sum-card sum-gross">
+      <span class="sum-label"><i class="fas fa-money-bill-wave"></i> Gaji Kasar</span>
+      <span class="sum-value" id="gajiKasarDisplay">RM 0.00</span>
     </div>
-
-    <div class="extra-grid">
-      <div class="extra-card">
-        <h4><i class="fas fa-shield-alt"></i> GAJI UNTUK CARUMAN</h4>
-        <div class="row-item"><span class="row-label">EPF (KWSP)</span><span class="row-value"><input type="number" step="0.01" id="salaryEpf" value="0"></span></div>
-        <div class="row-item"><span class="row-label">SOCSO (PERKESO)</span><span class="row-value"><input type="number" step="0.01" id="salarySocso" value="0"></span></div>
-        <div class="row-item"><span class="row-label">EIS</span><span class="row-value"><input type="number" step="0.01" id="salaryEis" value="0"></span></div>
-        <div class="row-item"><span class="row-label">24JAM</span><span class="row-value"><input type="number" step="0.01" id="salary24jam" value="0"></span></div>
-      </div>
-
-      <div class="extra-card">
-        <h4><i class="fas fa-building"></i> CARUMAN STATUTORI</h4>
-        <div class="row-item"><span class="row-label">EPF (Pekerja)</span><span class="row-value"><input type="number" step="0.01" id="epfEmployee" value="0"></span></div>
-        <div class="row-item"><span class="row-label">EPF (Majikan)</span><span class="row-value"><input type="number" step="0.01" id="epfEmployer" value="0"></span></div>
-        <div class="row-item"><span class="row-label">SOCSO (Pekerja)</span><span class="row-value"><input type="number" step="0.01" id="socsoEmployee" value="0"></span></div>
-        <div class="row-item"><span class="row-label">SOCSO (Majikan)</span><span class="row-value"><input type="number" step="0.01" id="socsoEmployer" value="0"></span></div>
-        <div class="row-item"><span class="row-label">EIS (Pekerja)</span><span class="row-value"><input type="number" step="0.01" id="eisEmployee" value="0"></span></div>
-        <div class="row-item"><span class="row-label">EIS (Majikan)</span><span class="row-value"><input type="number" step="0.01" id="eisEmployer" value="0"></span></div>
-        <div class="row-item"><span class="row-label">24JAM (Pekerja)</span><span class="row-value"><input type="number" step="0.01" id="lindung24jam" value="0"></span></div>
-      </div>
-
-      <div class="extra-card">
-        <h4><i class="fas fa-university"></i> BANK & LOGIN (U-Y)</h4>
-        <div class="row-item"><span class="row-label">Bank Nama (U)</span><span class="row-value"><input type="text" class="text" id="bankNama" value="—"></span></div>
-        <div class="row-item"><span class="row-label">Bank Acc (V)</span><span class="row-value"><input type="text" class="text" id="bankAcc" value="—"></span></div>
-        <div class="row-item"><span class="row-label">EPF (W)</span><span class="row-value"><input type="text" class="text" id="epfNo" value="—"></span></div>
-        <div class="row-item"><span class="row-label">SOCSO (X)</span><span class="row-value"><input type="text" class="text" id="socsoNo" value="—"></span></div>
-        <div class="row-item"><span class="row-label">EIS (Y)</span><span class="row-value"><input type="text" class="text" id="eisNo" value="—"></span></div>
-      </div>
+    <div class="sum-card sum-ded">
+      <span class="sum-label"><i class="fas fa-minus-circle"></i> Total Potongan</span>
+      <span class="sum-value" id="totalPotonganDisplay">RM 0.00</span>
     </div>
-
-    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 10px;">
-      <div class="total-row" style="background: #1e3a5f;">
-        <span class="label"><i class="fas fa-money-bill-wave"></i> Gaji Kasar</span>
-        <span class="value" id="gajiKasarDisplay">RM 0.00</span>
-      </div>
-      <div class="total-row" style="background: #8b1e1e;">
-        <span class="label"><i class="fas fa-minus-circle"></i> Total Potongan</span>
-        <span class="value" id="totalPotonganDisplay">RM 0.00</span>
-      </div>
-      <div class="total-row" style="background: #1e7b4c;">
-        <span class="label"><i class="fas fa-hand-holding-usd"></i> Gaji Bersih</span>
-        <span class="value" id="gajiBersihDisplay">RM 0.00</span>
-      </div>
-    </div>
-
-    <div class="action-bar">
-      <div class="btn-group">
-        <button class="btn btn-outline" onclick="window.close()"><i class="fas fa-arrow-left"></i> Kembali</button>
-        <button class="btn btn-primary" id="saveBtn"><i class="fas fa-save"></i> Simpan & Sync</button>
-        <button class="btn btn-success" id="reloadBtn"><i class="fas fa-cloud-download-alt"></i> Muat semula</button>
-      </div>
-      <div style="font-size: 0.85rem; color: #5a6f88;">
-        <i class="fas fa-info-circle"></i> Perubahan akan disimpan dan disegerakkan ke salary.html
-        <span id="syncStatus" class="sync-status" style="margin-left: 12px;">Sedia</span>
-      </div>
-    </div>
-
-    <div class="signature-area">
-      <div class="signature-line"><span>APPROVED BY :</span><div class="line"></div></div>
-      <div class="signature-line"><span>RECEIVED BY :</span><div class="line"></div></div>
+    <div class="sum-card sum-net">
+      <span class="sum-label"><i class="fas fa-hand-holding-usd"></i> Gaji Bersih</span>
+      <span class="sum-value" id="gajiBersihDisplay">RM 0.00</span>
     </div>
   </div>
 
-  <script>
-    (function () {
-      /* ===== 常量 ===== */
-      const STORAGE_KEY = 'payrollEmployees';
-      const SELECTED_CODE_KEY = 'payrollSelectedCode';
-      const SELECTED_EMP_KEY = 'payrollSelectedEmployee';
+  <!-- ============ ACTIONS ============ -->
+  <div class="action-bar">
+    <div class="btn-group">
+      <button class="btn btn-outline" onclick="window.close()"><i class="fas fa-arrow-left"></i> Kembali</button>
+      <button class="btn btn-primary" id="saveBtn"><i class="fas fa-save"></i> Simpan &amp; Sync</button>
+      <button class="btn btn-success" id="reloadBtn"><i class="fas fa-cloud-download-alt"></i> Muat Semula</button>
+      <button class="btn btn-ghost" id="printBtn"><i class="fas fa-print"></i> Cetak</button>
+    </div>
+    <div class="action-hint">
+      <i class="fas fa-info-circle"></i>
+      <span>Perubahan akan disimpan dan disegerakkan ke <strong>salary.html</strong>. Tekan <kbd>Ctrl</kbd> + <kbd>S</kbd> untuk simpan pantas.</span>
+    </div>
+  </div>
 
-      /* ===== 字段映射：detail element id -> salary.html 字段名 ===== */
-      const FIELD_MAP = {
-        otBiasa: 'NormalOT',
-        otRehat: 'RestOT',
-        otAwam: 'PublicOT',
-        otLain: 'OtherOT',
-        allowance: 'Allowance2',
-        commision: 'Commission',
-        incentives: 'Incentives',
-        annualLeave: 'AnnualLeave',
-        unpaidLeave: 'UnpaidLeave',
-        sickLeave: 'SickLeave',
-        halfDaysLeave: 'HalfDays',
-        pinjaman: 'Pinjaman',
-        salaryEpf: 'EPFSalary',
-        salarySocso: 'SOCSOSalary',
-        salaryEis: 'EISSalary',
-        salary24jam: 'LindungSalary',
-        epfEmployee: 'EPF_Employee',
-        epfEmployer: 'EPF_Employer',
-        socsoEmployee: 'SOCSO_Employee',
-        socsoEmployer: 'SOCSO_Employer',
-        eisEmployee: 'EIS_Employee',
-        eisEmployer: 'EIS_Employer',
-        lindung24jam: 'Lindung24Jam',
-        bankNama: 'SLRBankNama',
-        bankAcc: 'SLRBankAccountNo',
-        epfNo: 'SLREPF',
-        socsoNo: 'SLRPERKESO',
-        eisNo: 'SLREIS'
-      };
-      const TEXT_FIELDS = new Set(['bankNama','bankAcc','epfNo','socsoNo','eisNo']);
+  <!-- ============ SIGNATURE ============ -->
+  <div class="signature-area">
+    <div class="signature-line">
+      <span>Approved By</span>
+      <div class="line"></div>
+      <span class="line-sub">Tarikh: ____ / ____ / ______</span>
+    </div>
+    <div class="signature-line">
+      <span>Received By</span>
+      <div class="line"></div>
+      <span class="line-sub">Tarikh: ____ / ____ / ______</span>
+    </div>
+  </div>
 
-      /* ===== DOM helpers ===== */
-      const el = id => document.getElementById(id);
-      const inputs = {};
-      Object.keys(FIELD_MAP).forEach(id => { inputs[id] = el(id); });
+</div>
 
-      let currentRaw = null;         // 当前员工的 salary.html 格式对象
-      let allEmployees = [];         // 全部员工数组
+<script>
+(function () {
+  'use strict';
 
-      function num(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
-      function fmtRM(v) { return 'RM ' + num(v).toFixed(2); }
-      function setSyncStatus(msg, type) {
-        const s = el('syncStatus');
-        s.textContent = msg;
-        s.className = 'sync-status ' + (type || '');
+  /* ===== 常量 ===== */
+  const STORAGE_KEY        = 'payrollEmployees';
+  const SELECTED_CODE_KEY  = 'payrollSelectedCode';
+  const SELECTED_EMP_KEY   = 'payrollSelectedEmployee';
+
+  /* ===== 字段映射：detail element id -> salary.html 字段名 ===== */
+  const FIELD_MAP = {
+    otBiasa:       'NormalOT',
+    otRehat:       'RestOT',
+    otAwam:        'PublicOT',
+    otLain:        'OtherOT',
+    allowance:     'Allowance2',
+    commision:     'Commission',
+    incentives:    'Incentives',
+    annualLeave:   'AnnualLeave',
+    unpaidLeave:   'UnpaidLeave',
+    sickLeave:     'SickLeave',
+    halfDaysLeave: 'HalfDays',
+    pinjaman:      'Pinjaman',
+    salaryEpf:     'EPFSalary',
+    salarySocso:   'SOCSOSalary',
+    salaryEis:     'EISSalary',
+    salary24jam:   'LindungSalary',
+    epfEmployee:   'EPF_Employee',
+    epfEmployer:   'EPF_Employer',
+    socsoEmployee: 'SOCSO_Employee',
+    socsoEmployer: 'SOCSO_Employer',
+    eisEmployee:   'EIS_Employee',
+    eisEmployer:   'EIS_Employer',
+    lindung24jam:  'Lindung24Jam',
+    bankNama:      'SLRBankNama',
+    bankAcc:       'SLRBankAccountNo',
+    epfNo:         'SLREPF',
+    socsoNo:       'SLRPERKESO',
+    eisNo:         'SLREIS'
+  };
+  const TEXT_FIELDS = new Set(['bankNama', 'bankAcc', 'epfNo', 'socsoNo', 'eisNo']);
+
+  /* ===== DOM helpers ===== */
+  const el = id => document.getElementById(id);
+  const inputs = {};
+  Object.keys(FIELD_MAP).forEach(id => { inputs[id] = el(id); });
+
+  let currentRaw = null;
+  let allEmployees = [];
+
+  const RM_FMT = new Intl.NumberFormat('ms-MY', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+
+  function num(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
+  function round2(v) { return Math.round((v + Number.EPSILON) * 100) / 100; }
+  function ceilRM(v) { return Math.ceil(v - 1e-9); }
+  function fmtRM(v) { return 'RM ' + RM_FMT.format(num(v)); }
+
+  function setSyncStatus(msg, type) {
+    const s = el('syncStatus');
+    if (!s) return;
+    s.textContent = msg;
+    s.className = 'sync-status ' + (type || '');
+  }
+
+  function setPeriod() {
+    const now = new Date();
+    const label = now.toLocaleDateString('ms-MY', { month: 'long', year: 'numeric' });
+    el('periodBadge').innerText = label.toUpperCase();
+  }
+
+  /* ===== 计算 ===== */
+  function updateCalc() {
+    const basic = num(el('inputGajiAsas').value);
+
+    const income = basic
+      + num(inputs.otBiasa.value) + num(inputs.otRehat.value)
+      + num(inputs.otAwam.value)  + num(inputs.otLain.value)
+      + num(inputs.allowance.value) + num(inputs.commision.value)
+      + num(inputs.incentives.value);
+
+    const ded = num(inputs.annualLeave.value) + num(inputs.unpaidLeave.value)
+      + num(inputs.sickLeave.value) + num(inputs.halfDaysLeave.value)
+      + num(inputs.pinjaman.value);
+
+    el('infoGajiAsas').innerText       = fmtRM(basic);
+    el('firstCalcTotal').innerText     = fmtRM(income);
+    el('totalPotongan').innerText      = fmtRM(ded);
+    el('gajiKasarDisplay').innerText   = fmtRM(income);
+    el('totalPotonganDisplay').innerText = fmtRM(ded);
+    el('gajiBersihDisplay').innerText  = fmtRM(income - ded);
+  }
+
+  /* ===== 自动估算法定缴款 ===== */
+  function autoCalcStatutory() {
+    const basic = num(el('inputGajiAsas').value);
+    if (basic <= 0) {
+      alert('Sila masukkan Gaji Asas terlebih dahulu sebelum mengira caruman.');
+      return;
+    }
+
+    // 基数：若已填写「Gaji Untuk Caruman」则优先使用，否则使用底薪
+    const epfBase   = num(inputs.salaryEpf.value)   > 0 ? num(inputs.salaryEpf.value)   : basic;
+    const socsoBase = num(inputs.salarySocso.value) > 0 ? num(inputs.salarySocso.value) : basic;
+    const eisBase   = num(inputs.salaryEis.value)   > 0 ? num(inputs.salaryEis.value)   : basic;
+
+    // EPF：雇员 11%，雇主 13%（≤RM5000）或 12%（>RM5000），进位至整数令吉
+    inputs.epfEmployee.value = ceilRM(epfBase * 0.11);
+    inputs.epfEmployer.value = ceilRM(epfBase * (epfBase <= 5000 ? 0.13 : 0.12));
+
+    // SOCSO：雇员 0.5%，雇主 1.75%（顶限 RM6000）
+    const socsoCap = Math.min(socsoBase, 6000);
+    inputs.socsoEmployee.value = round2(socsoCap * 0.005);
+    inputs.socsoEmployer.value = round2(socsoCap * 0.0175);
+
+    // EIS：双方 0.2%（顶限 RM6000）
+    const eisCap = Math.min(eisBase, 6000);
+    inputs.eisEmployee.value = round2(eisCap * 0.002);
+    inputs.eisEmployer.value = round2(eisCap * 0.002);
+
+    updateCalc();
+    setSyncStatus('Caruman dikira (anggaran)', 'success');
+  }
+
+  /* ===== 填充表单 ===== */
+  function fillForm(raw) {
+    if (!raw) return;
+    currentRaw = raw;
+
+    el('infoSituation').innerText = raw.Situation || 'Aktif';
+    el('infoKod').value           = raw.Code  || '';
+    el('infoNama').value          = raw.Name  || '';
+    el('infoKumpulan').value      = raw.GroupName || '';
+    el('inputGajiAsas').value     = (raw.Basic != null) ? raw.Basic : 0;
+
+    setPeriod();
+
+    Object.entries(FIELD_MAP).forEach(([id, key]) => {
+      const inp = inputs[id];
+      if (!inp) return;
+      const v = raw[key];
+      if (TEXT_FIELDS.has(id)) {
+        inp.value = (v === undefined || v === null || v === '') ? '—' : String(v);
+      } else {
+        inp.value = (v === undefined || v === null || v === '') ? 0 : num(v);
       }
+    });
 
-      /* ===== 计算 ===== */
-      function updateCalc() {
-        const basic = num(el('inputGajiAsas').value);
-        const income = basic
-          + num(inputs.otBiasa.value) + num(inputs.otRehat.value)
-          + num(inputs.otAwam.value) + num(inputs.otLain.value)
-          + num(inputs.allowance.value) + num(inputs.commision.value)
-          + num(inputs.incentives.value);
-        el('firstCalcTotal').innerText = fmtRM(income);
-        el('infoGajiAsas').innerText = fmtRM(basic);
+    updateCalc();
+    setSyncStatus('Data dimuat', 'success');
+  }
 
-        const ded = num(inputs.annualLeave.value) + num(inputs.unpaidLeave.value)
-          + num(inputs.sickLeave.value) + num(inputs.halfDaysLeave.value)
-          + num(inputs.pinjaman.value);
-        el('totalPotongan').innerText = fmtRM(ded);
+  /* ===== 从 localStorage 加载 ===== */
+  function loadFromStorage() {
+    let code = '';
+    try { code = localStorage.getItem(SELECTED_CODE_KEY) || ''; } catch (e) {}
 
-        el('gajiKasarDisplay').innerText = fmtRM(income);
-        el('totalPotonganDisplay').innerText = fmtRM(ded);
-        el('gajiBersihDisplay').innerText = fmtRM(income - ded);
-      }
-
-      /* ===== 填充表单 ===== */
-      function fillForm(raw) {
-        if (!raw) return;
-        currentRaw = raw;
-
-        el('infoSituation').innerText = raw.Situation || 'Aktif';
-        el('infoKod').value = raw.Code || '';
-        el('infoNama').value = raw.Name || '';
-        el('infoKumpulan').value = raw.GroupName || '';
-        el('inputGajiAsas').value = raw.Basic != null ? raw.Basic : 0;
-
-        // 自动生成期间
-        const now = new Date();
-        const m = now.toLocaleDateString('ms-MY', { month: 'long', year: 'numeric' });
-        el('periodBadge').innerText = m.toUpperCase();
-
-        // 数值 / 文本字段
-        Object.entries(FIELD_MAP).forEach(([id, key]) => {
-          const inp = inputs[id];
-          if (!inp) return;
-          const v = raw[key];
-          if (TEXT_FIELDS.has(id)) {
-            inp.value = (v === undefined || v === null || v === '') ? '—' : String(v);
-          } else {
-            inp.value = (v === undefined || v === null || v === '') ? 0 : num(v);
-          }
-        });
-
-        updateCalc();
-        setSyncStatus('Data dimuat', 'success');
-      }
-
-      /* ===== 从 localStorage 加载 ===== */
-      function loadFromStorage() {
-        let code = '';
-        try { code = localStorage.getItem(SELECTED_CODE_KEY) || ''; } catch (e) {}
-
-        // 优先：直接读取当前选中员工
-        try {
-          const selJson = localStorage.getItem(SELECTED_EMP_KEY);
-          if (selJson) {
-            const sel = JSON.parse(selJson);
-            if (sel && sel.Code) {
-              // 如果主数组有，用主数组里最新的覆盖
-              try {
-                const allJson = localStorage.getItem(STORAGE_KEY);
-                if (allJson) {
-                  allEmployees = JSON.parse(allJson) || [];
-                  const found = allEmployees.find(e => e.Code === sel.Code);
-                  if (found) { fillForm(found); return true; }
-                }
-              } catch (e) {}
-              fillForm(sel);
-              return true;
+    // 优先：当前选中员工
+    try {
+      const selJson = localStorage.getItem(SELECTED_EMP_KEY);
+      if (selJson) {
+        const sel = JSON.parse(selJson);
+        if (sel && sel.Code) {
+          // 主数组里有更新版本则覆盖
+          try {
+            const allJson = localStorage.getItem(STORAGE_KEY);
+            if (allJson) {
+              allEmployees = JSON.parse(allJson) || [];
+              const found = allEmployees.find(e => e.Code === sel.Code);
+              if (found) { fillForm(found); return true; }
             }
-          }
-        } catch (e) {}
-
-        // 次选：从主数组里按 code 找
-        try {
-          const allJson = localStorage.getItem(STORAGE_KEY);
-          if (allJson) {
-            allEmployees = JSON.parse(allJson) || [];
-            if (Array.isArray(allEmployees) && allEmployees.length > 0) {
-              let picked = allEmployees[0];
-              if (code) {
-                const found = allEmployees.find(e => e.Code === code);
-                if (found) picked = found;
-              }
-              fillForm(picked);
-              return true;
-            }
-          }
-        } catch (e) {}
-
-        return false;
-      }
-
-      /* ===== 收集表单到 salary.html 格式对象 ===== */
-      function collectUpdates() {
-        if (!currentRaw) return null;
-        const updated = { ...currentRaw };
-        updated.Basic = num(el('inputGajiAsas').value);
-        updated.GroupName = el('infoKumpulan').value || updated.GroupName || '';
-        Object.entries(FIELD_MAP).forEach(([id, key]) => {
-          const inp = inputs[id];
-          if (!inp) return;
-          if (TEXT_FIELDS.has(id)) updated[key] = inp.value;
-          else updated[key] = num(inp.value);
-        });
-        // 用户在 detail 修改过缴款额 → 标记为手动，避免 salary.html 自动重算
-        if (updated.EPF_Employee !== currentRaw.EPF_Employee ||
-            updated.EPF_Employer !== currentRaw.EPF_Employer) updated.manualEPF = true;
-        if (updated.SOCSO_Employee !== currentRaw.SOCSO_Employee ||
-            updated.SOCSO_Employer !== currentRaw.SOCSO_Employer) updated.manualSOCSO = true;
-        if (updated.EIS_Employee !== currentRaw.EIS_Employee ||
-            updated.EIS_Employer !== currentRaw.EIS_Employer) updated.manualEIS = true;
-        if (updated.Lindung24Jam !== currentRaw.Lindung24Jam) updated.manual24JAM = true;
-        return updated;
-      }
-
-      /* ===== 保存 + 同步 ===== */
-      function saveAndSync() {
-        const updated = collectUpdates();
-        if (!updated) { alert('Tiada pekerja untuk disimpan'); return; }
-
-        // 更新主数组
-        let all = [];
-        try {
-          const allJson = localStorage.getItem(STORAGE_KEY);
-          if (allJson) all = JSON.parse(allJson) || [];
-        } catch (e) {}
-        if (!Array.isArray(all)) all = [];
-
-        const i = all.findIndex(e => e.Code === updated.Code);
-        if (i !== -1) all[i] = { ...all[i], ...updated };
-        else all.push(updated);
-
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-          localStorage.setItem(SELECTED_EMP_KEY, JSON.stringify(updated));
-          localStorage.setItem(SELECTED_CODE_KEY, updated.Code || '');
-        } catch (e) { console.error(e); }
-
-        currentRaw = updated;
-        allEmployees = all;
-
-        // 通知 opener
-        try {
-          if (window.opener && !window.opener.closed) {
-            window.opener.postMessage({ type: 'PAYROLL_UPDATE', employees: all }, '*');
-          }
-        } catch (e) {}
-
-        setSyncStatus('已保存 · ' + new Date().toLocaleTimeString('zh-CN'), 'success');
-        alert('✅ 已保存并同步到薪资页面\n' + (updated.Name || updated.Code));
-      }
-
-      /* ===== 事件绑定 ===== */
-      Object.values(inputs).forEach(inp => {
-        if (!inp) return;
-        inp.addEventListener('input', updateCalc);
-        inp.addEventListener('change', updateCalc);
-      });
-      el('inputGajiAsas').addEventListener('input', updateCalc);
-
-      el('saveBtn').addEventListener('click', saveAndSync);
-      el('reloadBtn').addEventListener('click', function () {
-        if (loadFromStorage()) setSyncStatus('已重新载入', 'success');
-        else setSyncStatus('没有可载入的数据', 'error');
-      });
-
-      /* ===== Init ===== */
-      if (!loadFromStorage()) {
-        setSyncStatus('未找到数据', 'error');
-        // 友好提示，不阻塞用户
-        setTimeout(() => {
-          alert('未找到员工数据。\n请从 salary.html 点击员工名字进入本页面。');
-        }, 200);
-      }
-
-      // 也监听 storage，方便在别的地方修改后自动刷新
-      window.addEventListener('storage', (ev) => {
-        if (ev.key === SELECTED_CODE_KEY && ev.newValue) {
-          loadFromStorage();
+          } catch (e) {}
+          fillForm(sel);
+          return true;
         }
-      });
-    })();
-  </script>
+      }
+    } catch (e) {}
+
+    // 次选：从主数组按 code 查找
+    try {
+      const allJson = localStorage.getItem(STORAGE_KEY);
+      if (allJson) {
+        allEmployees = JSON.parse(allJson) || [];
+        if (Array.isArray(allEmployees) && allEmployees.length > 0) {
+          let picked = allEmployees[0];
+          if (code) {
+            const found = allEmployees.find(e => e.Code === code);
+            if (found) picked = found;
+          }
+          fillForm(picked);
+          return true;
+        }
+      }
+    } catch (e) {}
+
+    return false;
+  }
+
+  /* ===== 收集表单 → salary.html 格式对象 ===== */
+  function collectUpdates() {
+    if (!currentRaw) return null;
+    const updated = { ...currentRaw };
+
+    updated.Basic     = num(el('inputGajiAsas').value);
+    updated.GroupName = el('infoKumpulan').value || updated.GroupName || '';
+
+    Object.entries(FIELD_MAP).forEach(([id, key]) => {
+      const inp = inputs[id];
+      if (!inp) return;
+      if (TEXT_FIELDS.has(id)) updated[key] = inp.value;
+      else updated[key] = num(inp.value);
+    });
+
+    // 用户在 detail 页手动改过缴款额 → 打标记，避免 salary.html 自动重算覆盖
+    if (updated.EPF_Employee   !== currentRaw.EPF_Employee   ||
+        updated.EPF_Employer   !== currentRaw.EPF_Employer)   updated.manualEPF   = true;
+    if (updated.SOCSO_Employee !== currentRaw.SOCSO_Employee ||
+        updated.SOCSO_Employer !== currentRaw.SOCSO_Employer) updated.manualSOCSO = true;
+    if (updated.EIS_Employee   !== currentRaw.EIS_Employee   ||
+        updated.EIS_Employer   !== currentRaw.EIS_Employer)   updated.manualEIS   = true;
+    if (updated.Lindung24Jam   !== currentRaw.Lindung24Jam)   updated.manual24JAM = true;
+
+    return updated;
+  }
+
+  /* ===== 保存 + 同步 ===== */
+  function saveAndSync() {
+    const updated = collectUpdates();
+    if (!updated) { alert('Tiada pekerja untuk disimpan.'); return; }
+
+    let all = [];
+    try {
+      const allJson = localStorage.getItem(STORAGE_KEY);
+      if (allJson) all = JSON.parse(allJson) || [];
+    } catch (e) {}
+    if (!Array.isArray(all)) all = [];
+
+    const i = all.findIndex(e => e.Code === updated.Code);
+    if (i !== -1) all[i] = { ...all[i], ...updated };
+    else all.push(updated);
+
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+      localStorage.setItem(SELECTED_EMP_KEY, JSON.stringify(updated));
+      localStorage.setItem(SELECTED_CODE_KEY, updated.Code || '');
+    } catch (e) { console.error(e); }
+
+    currentRaw = updated;
+    allEmployees = all;
+
+    // 通知 opener 页面刷新
+    try {
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage({ type: 'PAYROLL_UPDATE', employees: all }, '*');
+      }
+    } catch (e) {}
+
+    const time = new Date().toLocaleTimeString('ms-MY', { hour12: false });
+    setSyncStatus('Disimpan · ' + time, 'success');
+    alert('Data berjaya disimpan & disegerakkan.\n' + (updated.Name || updated.Code || ''));
+  }
+
+  /* ===== 事件绑定 ===== */
+  Object.values(inputs).forEach(inp => {
+    if (!inp) return;
+    inp.addEventListener('input', updateCalc);
+    inp.addEventListener('change', updateCalc);
+  });
+  el('inputGajiAsas').addEventListener('input', updateCalc);
+
+  el('saveBtn').addEventListener('click', saveAndSync);
+
+  el('reloadBtn').addEventListener('click', function () {
+    if (loadFromStorage()) setSyncStatus('Dimuat semula', 'success');
+    else setSyncStatus('Tiada data untuk dimuat', 'error');
+  });
+
+  el('printBtn').addEventListener('click', function () { window.print(); });
+  el('autoCalcBtn').addEventListener('click', autoCalcStatutory);
+
+  // Ctrl/Cmd + S 快速保存
+  document.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === 's') {
+      e.preventDefault();
+      saveAndSync();
+    }
+  });
+
+  /* ===== Init ===== */
+  setPeriod();
+  if (!loadFromStorage()) {
+    setSyncStatus('Tiada data', 'error');
+    setTimeout(function () {
+      alert('Tiada data pekerja ditemui.\nSila klik nama pekerja dari salary.html untuk membuka halaman ini.');
+    }, 220);
+  }
+
+  // 其他标签页修改后自动刷新
+  window.addEventListener('storage', function (ev) {
+    if (ev.key === SELECTED_CODE_KEY && ev.newValue) loadFromStorage();
+  });
+})();
+</script>
 </body>
 </html>
