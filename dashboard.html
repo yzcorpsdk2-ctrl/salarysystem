@@ -106,8 +106,24 @@
     display: flex; align-items: center; justify-content: center;
     color: #fff; font-size: 0.95rem; font-weight: 800;
   }
+  
+  /* URL 输入框样式 */
+  .url-config {
+    display: flex; align-items: center; gap: 6px;
+    background: #f8fafc; border: 1px solid var(--epf-border);
+    border-radius: 6px; padding: 4px 10px;
+    margin-left: 10px;
+  }
+  .url-config i { color: var(--epf-muted); font-size: 0.8rem; }
+  .url-config input {
+    border: none; background: transparent; outline: none;
+    font-size: 0.75rem; font-family: inherit; color: var(--epf-text);
+    width: 320px; transition: width 0.2s;
+  }
+  .url-config input:focus { width: 450px; }
+
   .search-box {
-    flex: 1; max-width: 320px; position: relative;
+    flex: 1; max-width: 300px; position: relative; margin-left: 10px;
   }
   .search-box input {
     width: 100%; padding: 0.5rem 0.85rem 0.5rem 2.2rem;
@@ -242,6 +258,10 @@
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
   /* ==================== 响应式 ==================== */
+  @media (max-width: 992px) {
+    .url-config input { width: 200px; }
+    .url-config input:focus { width: 260px; }
+  }
   @media (max-width: 768px) {
     .navbar { padding: 0 0.5rem; }
     .navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
@@ -253,6 +273,9 @@
     .page-header { padding: 1.2rem; }
     .page-header h1 { font-size: 1.2rem; }
     .employee-grid { grid-template-columns: 1fr; }
+    .url-config { margin-left: 0; flex: 1 1 100%; order: 10; }
+    .url-config input { width: 100%; }
+    .url-config input:focus { width: 100%; }
   }
 </style>
 </head>
@@ -276,8 +299,13 @@
 <!-- ==================== 工具栏 ==================== -->
 <div class="topbar">
   <div class="brand"><div class="logo">P</div> Payroll Dashboard</div>
-  <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
   
+  <!-- 新增：DEPLOY URL 配置 -->
+  <div class="url-config" title="在此粘贴最新的 Google Apps Script Deploy URL，按回车键生效">
+    <i class="fas fa-link"></i>
+    <input type="text" id="deployUrlInput" placeholder="Paste Deploy URL di sini...">
+  </div>
+
   <div class="search-box">
     <i class="fas fa-search"></i>
     <input type="text" id="searchInput" placeholder="Cari Nama / Kod / Kumpulan..." oninput="filterCards()">
@@ -318,9 +346,11 @@
 
 <script>
 /* ============================================================
-   核心常量
+   核心常量与 URL 配置
    ============================================================ */
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMvU6u4HEWNoULZedWPs3XvjJMY8fb-J3UDCRbNeRnijj7DDbqPXnb07RlL2st0xsmHQ/exec';
+const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwznz6RtRHxH4YT7MS0KWmpDfCNBKXC69eV1DLZ8OFYNq__oy2zdjcRyZoP5_0CYZ_6/exec';
+let SCRIPT_URL = localStorage.getItem('payroll_script_url') || DEFAULT_SCRIPT_URL;
+
 const DETAIL_URL = 'detail.html';
 const STORAGE_KEY = 'payrollEmployees';
 const SELECTED_CODE_KEY = 'payrollSelectedCode';
@@ -540,9 +570,29 @@ function openDetail(code) {
 }
 
 /* ============================================================
-   初始化
+   初始化与 URL 监听
    ============================================================ */
 window.addEventListener('DOMContentLoaded', () => {
+  // 初始化 URL 输入框
+  const urlInput = document.getElementById('deployUrlInput');
+  if (urlInput) {
+    urlInput.value = SCRIPT_URL;
+    urlInput.addEventListener('change', (e) => {
+      const newUrl = e.target.value.trim();
+      if (newUrl && newUrl !== SCRIPT_URL) {
+        SCRIPT_URL = newUrl;
+        localStorage.setItem('payroll_script_url', newUrl);
+        loadData(); // 重新加载数据
+      }
+    });
+    // 支持按回车键立即生效
+    urlInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.target.blur();
+      }
+    });
+  }
+
   loadData();
 });
 
