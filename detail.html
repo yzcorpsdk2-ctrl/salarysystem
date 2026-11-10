@@ -72,6 +72,26 @@
   .sync-status.success{ background:var(--green-light); color:#116b43; border-color:#bfe3cd; }
   .sync-status.error{ background:var(--red-light); color:#95201f; border-color:#f0c4c4; }
 
+  /* ============ URL 栏 ============ */
+  .url-bar {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+    background: #f8fafc; border: 1px solid var(--line); border-radius: 10px;
+    padding: 8px 14px; font-size: 0.8rem;
+  }
+  .url-bar label { font-weight: 600; color: var(--ink-2); white-space: nowrap; }
+  .url-bar input {
+    flex: 1; border: 1px solid var(--line); border-radius: 6px;
+    padding: 6px 10px; font-size: 0.78rem; color: var(--ink-3);
+    background: #fff; outline: none; cursor: default;
+  }
+  .url-bar input:focus { border-color: var(--navy); }
+  .url-bar .status-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1;
+    flex-shrink: 0;
+  }
+  .url-bar .status-dot.ok { background: #22c55e; }
+  .url-bar .status-dot.err { background: #ef4444; }
+
   /* ============ Meta cards ============ */
   .meta-grid{ display:grid; grid-template-columns:minmax(0,1.7fr) minmax(0,1fr); gap:16px; margin-bottom:22px; }
   .meta-card{
@@ -216,7 +236,7 @@
     body{ background:#fff; padding:0; display:block; font-size:12px; }
     .payslip-container{ box-shadow:none; border:none; border-radius:0; max-width:none; padding:0; }
     .payslip-container::before{ display:none; }
-    .action-bar, .mini-btn, .no-print{ display:none !important; }
+    .action-bar, .mini-btn, .no-print, .url-bar{ display:none !important; }
     .sum-card, .meta-card.basic-card{ box-shadow:none; }
     .panel, .extra-card, .meta-card, .sum-card{ break-inside:avoid; page-break-inside:avoid; }
     .amount{ background:transparent !important; border-color:#dde5ee !important; box-shadow:none !important; }
@@ -243,6 +263,14 @@
       <span class="sync-status" id="syncStatus">Sedia</span>
     </div>
   </header>
+
+  <!-- ============ URL 栏 ============ -->
+  <div class="url-bar no-print">
+    <div class="status-dot" id="urlStatusDot"></div>
+    <label for="deployUrlDisplay">🔗 Deploy URL:</label>
+    <input type="text" id="deployUrlDisplay" readonly placeholder="Menunggu URL dari Dashboard..." title="URL ini diselaraskan secara automatik dari Dashboard">
+    <span style="font-size:0.7rem; color:var(--ink-3);">(Auto-sync dari Dashboard)</span>
+  </div>
 
   <!-- ============ META ============ -->
   <div class="meta-grid">
@@ -389,7 +417,7 @@
 
   /* ===== 常量 ===== */
   const STORAGE_KEY = 'payrollEmployees';
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMvU6u4HEWNoULZedWPs3XvjJMY8fb-J3UDCRbNeRnijj7DDbqPXnb07RlL2st0xsmHQ/exec';
+  const URL_KEY = 'payrollScriptUrl';
 
   /* ===== 字段映射 ===== */
   const FIELD_MAP = {
@@ -433,6 +461,7 @@
   let currentRaw = null;
   let allEmployees = [];
   let activeStaffList = [];
+  let SCRIPT_URL = '';
 
   const RM_FMT = new Intl.NumberFormat('ms-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   function num(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
@@ -449,6 +478,26 @@
     const now = new Date();
     const label = now.toLocaleDateString('ms-MY', { month: 'long', year: 'numeric' });
     el('periodBadge').innerText = label.toUpperCase();
+  }
+
+  /* ===== URL 管理 ===== */
+  function loadSavedUrl() {
+    try {
+      const saved = localStorage.getItem(URL_KEY);
+      if (saved) {
+        SCRIPT_URL = saved;
+        el('deployUrlDisplay').value = saved;
+        el('urlStatusDot').className = 'status-dot ok';
+      } else {
+        SCRIPT_URL = '';
+        el('deployUrlDisplay').value = '';
+        el('deployUrlDisplay').placeholder = 'Menunggu URL dari Dashboard...';
+        el('urlStatusDot').className = 'status-dot err';
+      }
+    } catch (e) {
+      SCRIPT_URL = '';
+      el('urlStatusDot').className = 'status-dot err';
+    }
   }
 
   /* ===== 计算 ===== */
@@ -500,6 +549,10 @@
 
   /* ===== 获取员工数据 ===== */
   async function fetchStaffBasics() {
+    if (!SCRIPT_URL) {
+      setSyncStatus('URL belum ditetapkan. Sila tetapkan di Dashboard.', 'error');
+      return;
+    }
     setSyncStatus('Memuatkan data staf...', '');
     try {
       const res = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
@@ -756,9 +809,25 @@
     }
   });
 
+  /* ===== 监听 storage 变化（自动同步 URL） ===== */
+  window.addEventListener('storage', (e) => {
+    if (e.key === URL_KEY && e.newValue) {
+      SCRIPT_URL = e.newValue;
+      el('deployUrlDisplay').value = e.newValue;
+      el('urlStatusDot').className = 'status-dot ok';
+      setSyncStatus('URL dikemas kini, memuat semula...', 'success');
+      fetchStaffBasics();
+    }
+  });
+
   /* ===== Init ===== */
   setPeriod();
-  fetchStaffBasics();
+  loadSavedUrl();
+  if (SCRIPT_URL) {
+    fetchStaffBasics();
+  } else {
+    setSyncStatus('Sila tetapkan URL di Dashboard terlebih dahulu.', 'error');
+  }
 
 })();
 </script>
