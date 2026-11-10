@@ -306,6 +306,11 @@
     <button onclick="applyUrl()">🔗 Apply</button>
   </div>
 
+  <!-- ✅ 补齐了：触发建立 Sheet 的按钮 -->
+  <button class="btn" onclick="createEmployeeSheets()" id="btnCreateSheets" title="Buat sheet individu untuk setiap pekerja aktif">
+    📄 Buat Sheet
+  </button>
+
   <span class="sync-badge" id="syncBadge">
     <span class="dot"></span><span id="syncBadgeText">Sedia</span>
   </span>
@@ -339,17 +344,55 @@
 
 <script>
 /* ============================================================
-   核心常量
+   ✅ 补齐了：核心变量声明
    ============================================================ */
-const DETAIL_URL = 'detail.html';
+const URL_KEY = 'payrollScriptUrl';
 const STORAGE_KEY = 'payrollEmployees';
 const SELECTED_CODE_KEY = 'payrollSelectedCode';
 const SELECTED_EMP_KEY = 'payrollSelectedEmployee';
-const URL_KEY = 'payrollScriptUrl';
+const DETAIL_URL = 'detail.html';
 
+let SCRIPT_URL = '';
 let allEmployees = [];
 let filteredEmployees = [];
-let SCRIPT_URL = '';
+
+/* ============================================================
+   创建员工独立 Sheet
+   ============================================================ */
+async function createEmployeeSheets() {
+  if (!SCRIPT_URL) {
+    alert('Sila tetapkan URL Deploy terlebih dahulu.');
+    return;
+  }
+
+  const btn = document.getElementById('btnCreateSheets');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Mencipta...';
+  setSyncBadge('busy', 'Mencipta sheet...');
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'createStaffSheets' })
+    });
+    const result = await res.json();
+
+    if (result.status === 'success') {
+      setSyncBadge('ok', 'Sheet dicipta');
+      alert(`✅ ${result.message}\n\nDicipta: ${result.created.length}\nDilangkau: ${result.skipped.length}`);
+    } else {
+      throw new Error(result.message || 'Gagal mencipta sheet');
+    }
+  } catch (err) {
+    console.error('Create sheets error:', err);
+    setSyncBadge('err', 'Gagal cipta sheet');
+    alert('❌ Gagal: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '📄 Buat Sheet';
+  }
+}
 
 /* ============================================================
    工具函数
