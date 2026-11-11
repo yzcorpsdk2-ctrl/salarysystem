@@ -143,15 +143,12 @@
   .line-item:last-child{ border-bottom:none; }
   .line-item label{ display:flex; align-items:center; gap:6px; min-width:0; font-size:.82rem; font-weight:600; color:var(--ink-2); cursor:pointer; }
   .line-item label i{ width:14px; text-align:center; font-size:.72rem; color:#7d93ad; flex-shrink:0; }
-  
   .amount{ display:flex; align-items:center; gap:4px; flex:0 0 auto; width:110px; background:#f6f9fd; border:1px solid var(--line); border-radius:8px; padding:4px 8px; transition:border-color .15s, box-shadow .15s, background .15s; }
   .amount:focus-within{ border-color:var(--navy); background:#fff; box-shadow:0 0 0 3px rgba(30,58,95,.10); }
   .amount .cur{ font-size:.62rem; font-weight:800; letter-spacing:.05em; color:var(--ink-3); flex-shrink:0; }
   .amount input{ width:100%; min-width:0; border:none; background:transparent; outline:none; text-align:right; font-family:inherit; font-size:.85rem; font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums; padding:3px 0; }
-  
   .amount input::-webkit-outer-spin-button, .amount input::-webkit-inner-spin-button, .basic-input-wrap input::-webkit-outer-spin-button, .basic-input-wrap input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
   .amount input[type=number], .basic-input-wrap input[type=number]{ -moz-appearance:textfield; }
-  
   .panel-total{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 16px; font-size:.8rem; font-weight:800; letter-spacing:.02em; }
   .panel-income .panel-total{ background:var(--green-light); color:#0d6240; border-top:1px solid #c9e6d6; }
   .panel-deduction .panel-total{ background:var(--red-light); color:#8f1e1e; border-top:1px solid #f0cfcf; }
@@ -167,23 +164,34 @@
   .extra-card h4 span{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .mini-btn{ margin-left:auto; flex-shrink:0; display:inline-flex; align-items:center; gap:5px; font-size:.6rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; font-family:inherit; padding:4px 9px; border-radius:6px; cursor:pointer; border:1px solid #b9cfe4; background:#fff; color:var(--navy); transition:.15s; }
   .mini-btn:hover{ background:var(--navy); color:#fff; border-color:var(--navy); }
-  
-  .extra-card .line-item{ padding:6px 0; gap:8px; border-bottom:1px dotted var(--line-soft); align-items:center; }
-  .extra-card .line-item label{ flex:1 1 auto; font-size:.8rem; font-weight:500; line-height:1.35; white-space:nowrap; }
+  .extra-card .line-item{ padding:6px 0; gap:8px; border-bottom:1px dotted var(--line-soft); flex-wrap: nowrap; }
+  .extra-card .line-item label{ flex:1 1 auto; font-size:.8rem; font-weight:500; line-height:1.35; }
   .extra-card .line-item label i{ display:none; }
-  
-  /* 修改 text 类型输入框，配合按钮使用 */
-  .input-edit-group { display: flex; gap: 4px; align-items: center; flex: 0 0 auto; width: 160px; }
-  .input-edit-group .amount.text { width: 100%; padding: 3px 8px; flex: 1; }
-  .input-edit-group .amount.text input { text-align: left; font-size: .82rem; font-weight: 600; }
-  .input-edit-group .btn-edit {
-    flex-shrink: 0; width: 26px; height: 26px; border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    border: 1px solid var(--line); background: var(--navy-soft); color: var(--navy);
-    cursor: pointer; transition: 0.15s; font-size: 0.7rem;
+  .extra-card .amount{ width:108px; padding:3px 8px; }
+  .extra-card .amount .cur{ font-size:.62rem; }
+  .extra-card .amount input{ font-size:.85rem; }
+  .extra-card .amount.text{ width:100%; max-width:118px; }
+  .extra-card .amount.text input{ text-align:left; font-size:.82rem; font-weight:600; }
+  .extra-card .amount.text input[readonly]{ color: var(--ink-2); }
+
+  /* ✅ 迷你编辑按钮样式 */
+  .mini-edit-btn {
+    width: 26px; height: 26px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid var(--line);
+    background: var(--navy-soft);
+    color: var(--navy);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.62rem;
+    transition: 0.15s;
+    padding: 0;
+    flex-shrink: 0;
+    font-family: inherit;
   }
-  .input-edit-group .btn-edit:hover { background: #d0dce8; }
-  .input-edit-group .btn-edit.active { background: var(--green); color: #fff; border-color: var(--green); }
+  .mini-edit-btn:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .mini-edit-btn.editing { background: #0f7a4d; color: #fff; border-color: #0f7a4d; }
+  .mini-edit-btn.editing:hover { background: #0b5c3a; border-color: #0b5c3a; }
 
   .summary{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:16px; margin-bottom:26px; }
   .sum-card{ position:relative; overflow:hidden; display:flex; flex-direction:column; gap:6px; padding:16px 20px; border-radius:var(--radius); color:#fff; box-shadow:var(--shadow-md); }
@@ -220,14 +228,14 @@
   @media (max-width: 1100px){ .columns{ grid-template-columns:1fr 1fr; } .panel-cuti{ grid-column: 1 / -1; } }
   @media (max-width: 980px){ .meta-grid{ grid-template-columns:1fr; } .extra-grid{ grid-template-columns:1fr 1fr; } }
   @media (max-width: 760px){ .columns{ grid-template-columns:1fr; } .summary{ grid-template-columns:1fr; } .extra-grid{ grid-template-columns:1fr; } .payslip-container{ padding:24px 20px 28px; } .brand h1{ font-size:1.2rem; } }
-  @media (max-width: 540px){ body{ padding:14px 10px 40px; } .payslip-container{ padding:20px 14px 24px; border-radius:14px; } .field-grid{ grid-template-columns:1fr; } .payslip-header{ flex-direction:column; } .header-badges{ justify-content:flex-start; } .btn-group{ width:100%; } .btn{ flex:1 1 auto; } .line-item{ flex-wrap:wrap; } .input-edit-group { width: 100%; } .amount{ width:100%; } }
+  @media (max-width: 540px){ body{ padding:14px 10px 40px; } .payslip-container{ padding:20px 14px 24px; border-radius:14px; } .field-grid{ grid-template-columns:1fr; } .payslip-header{ flex-direction:column; } .header-badges{ justify-content:flex-start; } .btn-group{ width:100%; } .btn{ flex:1 1 auto; } .line-item{ flex-wrap:wrap; } .amount{ width:100%; } .extra-card .amount{ width:100%; } }
 
   @media print{
     *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
     body{ background:#fff; padding:0; display:block; font-size:12px; }
     .payslip-container{ box-shadow:none; border:none; border-radius:0; max-width:none; padding:0; }
     .payslip-container::before{ display:none; }
-    .action-bar, .mini-btn, .no-print, .url-bar, .btn-edit{ display:none !important; }
+    .action-bar, .mini-btn, .mini-edit-btn, .no-print, .url-bar{ display:none !important; }
     .sum-card, .meta-card.basic-card{ box-shadow:none; }
     .panel, .extra-card, .meta-card, .sum-card{ break-inside:avoid; page-break-inside:avoid; }
     .amount{ background:transparent !important; border-color:#dde5ee !important; box-shadow:none !important; }
@@ -263,7 +271,7 @@
 
   <div class="meta-grid">
     <section class="meta-card">
-      <div class="card-head"><i class="fas fa-id-card"></i> Maklumat Pekerja (Dari StaffInfo)</div>
+      <div class="card-head"><i class="fas fa-id-card"></i> Maklumat Pekerja (Dari StaffInfo - Tidak Boleh Edit)</div>
       <div class="field-grid">
         <div class="field">
           <span class="field-label">Situation</span>
@@ -356,50 +364,43 @@
       <div class="line-item"><label for="lindung24jam">24 JAM (Pekerja)</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="lindung24jam" value="0"></div></div>
     </section>
 
-    <!-- ✅ Bank & Pendaftaran 修改为支持独立手动编辑 -->
     <section class="extra-card">
       <h4><i class="fas fa-university"></i><span>Bank &amp; Pendaftaran</span></h4>
-      
       <div class="line-item">
         <label for="bankNama">Nama Bank</label>
-        <div class="input-edit-group">
+        <div style="display:flex; gap:4px; align-items:center;">
           <div class="amount text"><input type="text" class="text" id="bankNama" value="—" readonly></div>
-          <button type="button" class="btn-edit" id="btnEditBankNama" title="Edit"><i class="fas fa-pen"></i></button>
+          <button type="button" class="mini-edit-btn" id="btnEditBankNama" title="Edit manual"><i class="fas fa-pen"></i></button>
         </div>
       </div>
-      
       <div class="line-item">
         <label for="bankAcc">No. Akaun</label>
-        <div class="input-edit-group">
+        <div style="display:flex; gap:4px; align-items:center;">
           <div class="amount text"><input type="text" class="text" id="bankAcc" value="—" readonly></div>
-          <button type="button" class="btn-edit" id="btnEditBankAcc" title="Edit"><i class="fas fa-pen"></i></button>
+          <button type="button" class="mini-edit-btn" id="btnEditBankAcc" title="Edit manual"><i class="fas fa-pen"></i></button>
         </div>
       </div>
-      
       <div class="line-item">
         <label for="epfNo">No. EPF</label>
-        <div class="input-edit-group">
+        <div style="display:flex; gap:4px; align-items:center;">
           <div class="amount text"><input type="text" class="text" id="epfNo" value="—" readonly></div>
-          <button type="button" class="btn-edit" id="btnEditEpfNo" title="Edit"><i class="fas fa-pen"></i></button>
+          <button type="button" class="mini-edit-btn" id="btnEditEpfNo" title="Edit manual"><i class="fas fa-pen"></i></button>
         </div>
       </div>
-      
       <div class="line-item">
         <label for="socsoNo">No. PERKESO</label>
-        <div class="input-edit-group">
+        <div style="display:flex; gap:4px; align-items:center;">
           <div class="amount text"><input type="text" class="text" id="socsoNo" value="—" readonly></div>
-          <button type="button" class="btn-edit" id="btnEditSocsoNo" title="Edit"><i class="fas fa-pen"></i></button>
+          <button type="button" class="mini-edit-btn" id="btnEditSocsoNo" title="Edit manual"><i class="fas fa-pen"></i></button>
         </div>
       </div>
-      
       <div class="line-item">
         <label for="eisNo">No. EIS</label>
-        <div class="input-edit-group">
+        <div style="display:flex; gap:4px; align-items:center;">
           <div class="amount text"><input type="text" class="text" id="eisNo" value="—" readonly></div>
-          <button type="button" class="btn-edit" id="btnEditEisNo" title="Edit"><i class="fas fa-pen"></i></button>
+          <button type="button" class="mini-edit-btn" id="btnEditEisNo" title="Edit manual"><i class="fas fa-pen"></i></button>
         </div>
       </div>
-      
     </section>
   </div>
 
@@ -458,14 +459,15 @@
   let activeStaffList = [];
   let SCRIPT_URL = '';
 
-  // 5 个字段的独立编辑状态
-  const editStates = {
-    bankNama: false,
-    bankAcc: false,
-    epfNo: false,
-    socsoNo: false,
-    eisNo: false
-  };
+  // ✅ 5 个手动编辑字段的统一配置
+  const MANUAL_FIELDS = [
+    { inputId: 'bankNama', btnId: 'btnEditBankNama', rawKey: 'SLRBankNama', staffKey: 'BankNama' },
+    { inputId: 'bankAcc',  btnId: 'btnEditBankAcc',  rawKey: 'SLRBankAccountNo', staffKey: 'BankAccountNo' },
+    { inputId: 'epfNo',    btnId: 'btnEditEpfNo',    rawKey: 'SLREPF', staffKey: 'EPF' },
+    { inputId: 'socsoNo',  btnId: 'btnEditSocsoNo',  rawKey: 'SLRPERKESO', staffKey: 'PERKESO' },
+    { inputId: 'eisNo',    btnId: 'btnEditEisNo',    rawKey: 'SLREIS', staffKey: 'EIS' }
+  ];
+  const editStates = {};  // 每个字段的编辑状态
 
   const RM_FMT = new Intl.NumberFormat('ms-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   function num(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
@@ -567,14 +569,12 @@
         const group = String(row.GroupName || '').trim();
         const situation = String(row.Situation || 'ACTIVE').toUpperCase();
         const salary = parseFloat(row.Salary) || 0;
-        
-        // 获取基础信息中的 Bank 和 EPF 等
+        // ✅ 增加 EPF / PERKESO / EIS 字段读取
         const bankNama = String(row.BankNama || '').trim();
         const bankAccount = String(row.BankAccountNo || '').trim();
         const epf = String(row.EPF || '').trim();
         const perkeso = String(row.PERKESO || '').trim();
         const eis = String(row.EIS || '').trim();
-        
         return {
           Code: code, Name: name, GroupName: group, Situation: situation, Salary: salary,
           BankNama: bankNama, BankAccountNo: bankAccount,
@@ -662,8 +662,7 @@
     el('infoNama').value = emp.Name || '';
     el('infoSituation').innerText = emp.Situation || 'ACTIVE';
     switchEmployee(emp);
-
-    // ✅ 从 Google Sheet 自动拉取最新数据
+    // 自动从 Sheet 读取最新数据
     await syncFromSheet(true);
   }
 
@@ -685,6 +684,7 @@
         updateCalc();
       }
     } else {
+      // 新建对象：Bank/EPF/PERKESO/EIS 默认使用 staffinfo
       const newObj = {
         Code: code, Name: staffObj.Name, GroupName: staffObj.GroupName, Situation: staffObj.Situation,
         Basic: staffObj.Salary,
@@ -695,7 +695,6 @@
         EPFSalary: 0, SOCSOSalary: 0, EISSalary: 0, LindungSalary: 0,
         EPF_Employee: 0, EPF_Employer: 0, SOCSO_Employee: 0, SOCSO_Employer: 0,
         EIS_Employee: 0, EIS_Employer: 0, Lindung24Jam: 0,
-        // 默认从 staffinfo 取值
         SLRBankNama: staffObj.BankNama || '',
         SLRBankAccountNo: staffObj.BankAccountNo || '',
         SLREPF: staffObj.EPF || '',
@@ -710,26 +709,25 @@
 
   function fillForm(raw) {
     if (!raw) return;
-    currentRaw = raw;
 
-    // ✅ 基础信息强制从 staffinfo 取（不变）
+    // ✅ 基础信息强制从 staffinfo
     const staff = activeStaffList.find(s => s.Code === raw.Code);
     if (staff) {
       raw.Name = staff.Name;
       raw.GroupName = staff.GroupName;
       raw.Situation = staff.Situation;
       raw.Basic = staff.Salary;
+      // 若 raw 中这些字段未定义 → 填充 staffinfo 默认值
+      if (raw.SLRBankNama === undefined || raw.SLRBankNama === null) raw.SLRBankNama = staff.BankNama || '';
+      if (raw.SLRBankAccountNo === undefined || raw.SLRBankAccountNo === null) raw.SLRBankAccountNo = staff.BankAccountNo || '';
+      if (raw.SLREPF === undefined || raw.SLREPF === null) raw.SLREPF = staff.EPF || '';
+      if (raw.SLRPERKESO === undefined || raw.SLRPERKESO === null) raw.SLRPERKESO = staff.PERKESO || '';
+      if (raw.SLREIS === undefined || raw.SLREIS === null) raw.SLREIS = staff.EIS || '';
     }
 
+    currentRaw = raw;
     el('infoSituation').innerText = raw.Situation || 'ACTIVE';
     el('inputGajiAsas').value = (raw.Basic != null) ? raw.Basic : 0;
-
-    // ✅ 填充 5 个字段，兜底逻辑
-    if (!raw.SLRBankNama && staff) raw.SLRBankNama = staff.BankNama || '—';
-    if (!raw.SLRBankAccountNo && staff) raw.SLRBankAccountNo = staff.BankAccountNo || '—';
-    if (!raw.SLREPF && staff) raw.SLREPF = staff.EPF || '—';
-    if (!raw.SLRPERKESO && staff) raw.SLRPERKESO = staff.PERKESO || '—';
-    if (!raw.SLREIS && staff) raw.SLREIS = staff.EIS || '—';
 
     Object.entries(FIELD_MAP).forEach(([id, key]) => {
       const inp = inputs[id];
@@ -742,41 +740,39 @@
       }
     });
 
-    // ✅ 重置所有编辑状态
-    Object.keys(editStates).forEach(k => {
-      editStates[k] = false;
-      const inp = inputs[k];
+    // ✅ 重置所有手动编辑按钮为锁定状态
+    MANUAL_FIELDS.forEach(f => {
+      const inp = el(f.inputId);
+      const btn = el(f.btnId);
+      editStates[f.inputId] = false;
       if (inp) inp.readOnly = true;
-      const btn = el('btnEdit' + k.charAt(0).toUpperCase() + k.slice(1));
       if (btn) {
+        btn.classList.remove('editing');
         btn.innerHTML = '<i class="fas fa-pen"></i>';
-        btn.classList.remove('active');
       }
     });
 
     updateCalc();
   }
 
-  /* ===== 通用手动编辑切换 ===== */
-  function toggleEdit(fieldId) {
-    editStates[fieldId] = !editStates[fieldId];
-    const inp = inputs[fieldId];
-    const btn = el('btnEdit' + fieldId.charAt(0).toUpperCase() + fieldId.slice(1));
-    
+  /* ✅ 通用切换编辑函数 */
+  function toggleEditField(field) {
+    const inp = el(field.inputId);
+    const btn = el(field.btnId);
     if (!inp || !btn) return;
-
-    inp.readOnly = !editStates[fieldId];
-
-    if (editStates[fieldId]) {
+    editStates[field.inputId] = !editStates[field.inputId];
+    const editing = editStates[field.inputId];
+    inp.readOnly = !editing;
+    if (editing) {
       inp.focus();
+      inp.select && inp.select();
+      btn.classList.add('editing');
       btn.innerHTML = '<i class="fas fa-check"></i>';
-      btn.classList.add('active');
     } else {
+      btn.classList.remove('editing');
       btn.innerHTML = '<i class="fas fa-pen"></i>';
-      btn.classList.remove('active');
-      // 更新 currentRaw 数据
       if (currentRaw) {
-        currentRaw[FIELD_MAP[fieldId]] = inp.value;
+        currentRaw[field.rawKey] = inp.value;
       }
     }
   }
@@ -871,7 +867,7 @@
     }
   }
 
-  /* ===== ✅ 从 Sheet 读取最新一行数据 ===== */
+  /* ===== 从 Sheet 读取最新一行数据 ===== */
   async function syncFromSheet(silent = false) {
     if (!currentRaw || !currentRaw.Code) {
       if (!silent) alert('Sila pilih pekerja dahulu.');
@@ -883,8 +879,10 @@
     }
     const btn = el('syncSheetBtn');
     const originalText = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menarik...';
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menarik...';
+    }
 
     try {
       const res = await fetch(SCRIPT_URL, {
@@ -895,41 +893,51 @@
       const result = await res.json();
       if (result.status === 'success' && result.data) {
         const sheetData = result.data;
-        
-        // ✅ 合并：基础信息始终来自 staffinfo，其他字段用 Sheet 数据覆盖
+        // 基础信息始终来自 staffinfo
         const staff = activeStaffList.find(s => s.Code === currentRaw.Code);
         const merged = { ...currentRaw, ...sheetData };
         if (staff) {
           merged.Name = staff.Name;
           merged.GroupName = staff.GroupName;
           merged.Situation = staff.Situation;
-          merged.Basic = staff.Salary; // Gaji 强制从 staffinfo
+          merged.Basic = staff.Salary;
         }
         if (merged.Basic !== undefined) merged.Basic = num(merged.Basic);
         fillForm(merged);
-        
+
         // 同步到 localStorage 缓存
         const idx = allEmployees.findIndex(e => e.Code === currentRaw.Code);
         if (idx !== -1) allEmployees[idx] = merged;
         else allEmployees.push(merged);
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees)); } catch(e) {}
-        
+
         const lastUpdated = sheetData.LastUpdated || '—';
         setSyncStatus('Data dari Sheet dimuat · ' + lastUpdated, 'success');
         if (!silent) {
           alert('✅ Data berjaya dimuat dari Google Sheet.\n\nTerakhir dikemas kini: ' + lastUpdated);
         }
       } else {
-        if (!silent) alert('Tiada data di Sheet untuk pekerja ini: ' + (result.message || ''));
-        setSyncStatus('Tiada data Sheet untuk ' + currentRaw.Code, '');
+        // Sheet 无数据 → 用 staffinfo 默认值填充
+        if (staff) {
+          if (currentRaw.SLRBankNama === undefined || currentRaw.SLRBankNama === null || currentRaw.SLRBankNama === '') currentRaw.SLRBankNama = staff.BankNama || '';
+          if (currentRaw.SLRBankAccountNo === undefined || currentRaw.SLRBankAccountNo === null || currentRaw.SLRBankAccountNo === '') currentRaw.SLRBankAccountNo = staff.BankAccountNo || '';
+          if (currentRaw.SLREPF === undefined || currentRaw.SLREPF === null || currentRaw.SLREPF === '') currentRaw.SLREPF = staff.EPF || '';
+          if (currentRaw.SLRPERKESO === undefined || currentRaw.SLRPERKESO === null || currentRaw.SLRPERKESO === '') currentRaw.SLRPERKESO = staff.PERKESO || '';
+          if (currentRaw.SLREIS === undefined || currentRaw.SLREIS === null || currentRaw.SLREIS === '') currentRaw.SLREIS = staff.EIS || '';
+        }
+        fillForm(currentRaw);
+        setSyncStatus('Tiada data Sheet · Guna default StaffInfo', '');
+        if (!silent) alert('Tiada data di Sheet untuk pekerja ini. Menggunakan data default dari StaffInfo.');
       }
     } catch (err) {
       console.error('Sync from sheet error:', err);
       setSyncStatus('Gagal sync dari Sheet', 'error');
       if (!silent) alert('❌ Gagal sync dari Sheet: ' + err.message);
     } finally {
-      btn.disabled = false;
-      btn.innerHTML = originalText;
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
     }
   }
 
@@ -978,12 +986,19 @@
   el('printBtn').addEventListener('click', () => window.print());
   el('autoCalcBtn').addEventListener('click', autoCalcStatutory);
 
-  // ✅ 绑定 5 个字段的编辑按钮
-  el('btnEditBankNama').addEventListener('click', () => toggleEdit('bankNama'));
-  el('btnEditBankAcc').addEventListener('click', () => toggleEdit('bankAcc'));
-  el('btnEditEpfNo').addEventListener('click', () => toggleEdit('epfNo'));
-  el('btnEditSocsoNo').addEventListener('click', () => toggleEdit('socsoNo'));
-  el('btnEditEisNo').addEventListener('click', () => toggleEdit('eisNo'));
+  // ✅ 5 个字段各自的手动编辑按钮与双向绑定
+  MANUAL_FIELDS.forEach(field => {
+    const inp = el(field.inputId);
+    const btn = el(field.btnId);
+    if (btn) {
+      btn.addEventListener('click', () => toggleEditField(field));
+    }
+    if (inp) {
+      inp.addEventListener('input', (e) => {
+        if (currentRaw) currentRaw[field.rawKey] = e.target.value;
+      });
+    }
+  });
 
   document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === 's') {
