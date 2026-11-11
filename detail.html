@@ -6,7 +6,6 @@
 <title>Slip Gaji Pekerja · Sistem Penggajian</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-  /* ============ Design tokens ============ */
   :root{
     --navy:#1e3a5f; --navy-dark:#152c48; --navy-soft:#eaf0f7;
     --green:#0f7a4d; --green-dark:#0b5c3a; --green-light:#e6f4ec;
@@ -17,18 +16,14 @@
     --shadow-sm:0 1px 2px rgba(16,32,56,.05), 0 2px 10px rgba(16,32,56,.05);
     --shadow-md:0 8px 24px rgba(16,32,56,.10);
   }
-
   *,*::before,*::after{ margin:0; padding:0; box-sizing:border-box; }
   html{ -webkit-text-size-adjust:100%; }
-
   body{
     font-family:'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
     background:radial-gradient(1200px 600px at 50% -10%, #e2eaf6 0%, #eef2f7 55%, #e9eef5 100%);
     color:var(--ink); font-size:15px; line-height:1.5;
     padding:26px 18px 60px; display:flex; justify-content:center; align-items:flex-start; min-height:100vh;
   }
-
-  /* ============ Container ============ */
   .payslip-container{
     width:100%; max-width:1280px; background:var(--card); border:1px solid #e2e9f1;
     border-radius:18px; box-shadow:0 1px 2px rgba(16,32,56,.06), 0 18px 48px rgba(16,32,56,.12);
@@ -38,8 +33,6 @@
     content:''; position:absolute; inset:0 0 auto 0; height:4px;
     background:linear-gradient(90deg, var(--navy) 0%, var(--navy) 58%, var(--green) 58%, var(--green) 100%);
   }
-
-  /* ============ Header ============ */
   .payslip-header{
     display:flex; justify-content:space-between; align-items:flex-start; gap:18px; flex-wrap:wrap;
     padding-bottom:16px; margin-bottom:22px; border-bottom:1px solid var(--line); position:relative;
@@ -72,7 +65,6 @@
   .sync-status.success{ background:var(--green-light); color:#116b43; border-color:#bfe3cd; }
   .sync-status.error{ background:var(--red-light); color:#95201f; border-color:#f0c4c4; }
 
-  /* ============ URL 栏 ============ */
   .url-bar {
     display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
     background: #f8fafc; border: 1px solid var(--line); border-radius: 10px;
@@ -84,15 +76,10 @@
     padding: 6px 10px; font-size: 0.78rem; color: var(--ink-3);
     background: #fff; outline: none; cursor: default;
   }
-  .url-bar input:focus { border-color: var(--navy); }
-  .url-bar .status-dot {
-    width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1;
-    flex-shrink: 0;
-  }
+  .url-bar .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; flex-shrink: 0; }
   .url-bar .status-dot.ok { background: #22c55e; }
   .url-bar .status-dot.err { background: #ef4444; }
 
-  /* ============ Meta cards ============ */
   .meta-grid{ display:grid; grid-template-columns:minmax(0,1.7fr) minmax(0,1fr); gap:16px; margin-bottom:22px; }
   .meta-card{
     background:linear-gradient(180deg, #f9fbfe, #f2f7fc); border:1px solid #dae4f0;
@@ -103,12 +90,10 @@
     letter-spacing:.09em; text-transform:uppercase; color:#4a6484; margin-bottom:14px;
   }
   .card-head i{ font-size:.8rem; color:var(--navy); opacity:.8; }
-
   .field-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px 18px; }
   .field{ display:flex; flex-direction:column; gap:4px; min-width:0; }
   .field-label{ font-size:.66rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); }
   .field-static{ font-size:.95rem; font-weight:600; color:var(--ink); padding:7px 2px; word-break:break-word; }
-  
   .field-input, select.field-input {
     width:100%; padding:7px 10px; border:1px solid transparent; background:rgba(255,255,255,.7);
     border-radius:8px; font-size:.92rem; font-weight:600; color:var(--ink);
@@ -123,7 +108,6 @@
   .field-input:focus, select.field-input:focus{ border-color:var(--navy); background:#fff; box-shadow:0 0 0 3px rgba(30,58,95,.12); }
   .field-input[readonly]{ background:transparent; cursor:default; }
 
-  /* basic salary card */
   .meta-card.basic-card{
     background:linear-gradient(160deg, #1e3a5f 0%, #2b5580 55%, #1d4468 100%);
     border-color:#1a3355; display:flex; flex-direction:column; justify-content:space-between;
@@ -142,7 +126,6 @@
     font-size:1rem; font-weight:700; text-align:right; font-family:inherit; font-variant-numeric:tabular-nums;
   }
 
-  /* ============ Columns (三列布局) ============ */
   .columns{ display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:20px; }
   .panel{ display:flex; flex-direction:column; border:1px solid var(--line); border-radius:var(--radius); background:#fff; overflow:hidden; box-shadow:var(--shadow-sm); }
   .panel-head{ display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid var(--line); background:#f7fafd; }
@@ -154,21 +137,17 @@
   .panel-income .panel-head h2{ color:#0e6b45; }
   .panel-deduction .panel-head h2{ color:#8f1e1e; }
   .panel-cuti .panel-head h2{ color:var(--navy); }
-  
   .panel-body{ padding:4px 16px 12px; flex:1; }
   .line-item{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px dashed var(--line-soft); }
   .line-item:last-child{ border-bottom:none; }
   .line-item label{ display:flex; align-items:center; gap:6px; min-width:0; font-size:.82rem; font-weight:600; color:var(--ink-2); cursor:pointer; }
   .line-item label i{ width:14px; text-align:center; font-size:.72rem; color:#7d93ad; flex-shrink:0; }
-  
   .amount{ display:flex; align-items:center; gap:4px; flex:0 0 auto; width:110px; background:#f6f9fd; border:1px solid var(--line); border-radius:8px; padding:4px 8px; transition:border-color .15s, box-shadow .15s, background .15s; }
   .amount:focus-within{ border-color:var(--navy); background:#fff; box-shadow:0 0 0 3px rgba(30,58,95,.10); }
   .amount .cur{ font-size:.62rem; font-weight:800; letter-spacing:.05em; color:var(--ink-3); flex-shrink:0; }
   .amount input{ width:100%; min-width:0; border:none; background:transparent; outline:none; text-align:right; font-family:inherit; font-size:.85rem; font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums; padding:3px 0; }
-  
   .amount input::-webkit-outer-spin-button, .amount input::-webkit-inner-spin-button, .basic-input-wrap input::-webkit-outer-spin-button, .basic-input-wrap input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
   .amount input[type=number], .basic-input-wrap input[type=number]{ -moz-appearance:textfield; }
-  
   .panel-total{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 16px; font-size:.8rem; font-weight:800; letter-spacing:.02em; }
   .panel-income .panel-total{ background:var(--green-light); color:#0d6240; border-top:1px solid #c9e6d6; }
   .panel-deduction .panel-total{ background:var(--red-light); color:#8f1e1e; border-top:1px solid #f0cfcf; }
@@ -176,7 +155,6 @@
   .panel-total i{ margin-right:4px; opacity:.75; }
   .panel-total strong{ font-size:.95rem; font-variant-numeric:tabular-nums; }
 
-  /* ============ Extra & Summary ============ */
   .extra-grid{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:16px; margin-bottom:22px; }
   .extra-card{ background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px 8px; box-shadow:var(--shadow-sm); min-width:0; transition:border-color .18s, box-shadow .18s; }
   .extra-card:hover{ border-color:#c2d4e6; box-shadow:var(--shadow-md); }
@@ -249,7 +227,6 @@
 
 <div class="payslip-container" id="payslipContainer">
 
-  <!-- ============ HEADER ============ -->
   <header class="payslip-header">
     <div class="brand">
       <div class="brand-mark"><i class="fas fa-file-invoice-dollar"></i></div>
@@ -264,7 +241,6 @@
     </div>
   </header>
 
-  <!-- ============ URL 栏 ============ -->
   <div class="url-bar no-print">
     <div class="status-dot" id="urlStatusDot"></div>
     <label for="deployUrlDisplay">🔗 Deploy URL:</label>
@@ -272,7 +248,6 @@
     <span style="font-size:0.7rem; color:var(--ink-3);">(Auto-sync dari Dashboard)</span>
   </div>
 
-  <!-- ============ META ============ -->
   <div class="meta-grid">
     <section class="meta-card">
       <div class="card-head"><i class="fas fa-id-card"></i> Maklumat Pekerja</div>
@@ -299,6 +274,15 @@
             <option value="">Pilih Nama</option>
           </select>
         </div>
+        <!-- 新增：Bank & Bank Account 显示 -->
+        <div class="field">
+          <span class="field-label">Bank</span>
+          <input type="text" class="field-input" id="infoBank" readonly>
+        </div>
+        <div class="field">
+          <span class="field-label">Bank Account</span>
+          <input type="text" class="field-input" id="infoBankAcc" readonly>
+        </div>
       </div>
     </section>
 
@@ -312,10 +296,7 @@
     </section>
   </div>
 
-  <!-- ============ 三列：Pendapatan / Potongan / Hari Cuti ============ -->
   <div class="columns">
-    
-    <!-- 1. PENDAPATAN -->
     <section class="panel panel-income">
       <div class="panel-head"><span class="panel-icon"><i class="fas fa-plus"></i></span><h2>Pendapatan / Earnings</h2></div>
       <div class="panel-body">
@@ -330,7 +311,6 @@
       <div class="panel-total"><span><i class="fas fa-calculator"></i> Jumlah Pendapatan</span><strong id="firstCalcTotal">RM 0.00</strong></div>
     </section>
 
-    <!-- 2. POTONGAN (金额) -->
     <section class="panel panel-deduction">
       <div class="panel-head"><span class="panel-icon"><i class="fas fa-minus"></i></span><h2>Potongan / Deductions</h2></div>
       <div class="panel-body">
@@ -342,7 +322,6 @@
       <div class="panel-total"><span><i class="fas fa-calculator"></i> Jumlah Potongan</span><strong id="totalPotongan">RM 0.00</strong></div>
     </section>
 
-    <!-- 3. HARI CUTI (天数记录) -->
     <section class="panel panel-cuti">
       <div class="panel-head"><span class="panel-icon"><i class="fas fa-calendar-alt"></i></span><h2>Hari Cuti / Leave Days</h2></div>
       <div class="panel-body">
@@ -351,10 +330,8 @@
       </div>
       <div class="panel-total"><span><i class="fas fa-info-circle"></i> Jumlah Hari</span><strong id="totalHariCuti">0 Hari</strong></div>
     </section>
-
   </div>
 
-  <!-- ============ EXTRA ============ -->
   <div class="extra-grid">
     <section class="extra-card">
       <h4><i class="fas fa-shield-alt"></i><span>Gaji Untuk Caruman</span></h4>
@@ -385,22 +362,21 @@
     </section>
   </div>
 
-  <!-- ============ SUMMARY ============ -->
   <div class="summary">
     <div class="sum-card sum-gross"><span class="sum-label"><i class="fas fa-money-bill-wave"></i> Gaji Kasar</span><span class="sum-value" id="gajiKasarDisplay">RM 0.00</span></div>
     <div class="sum-card sum-ded"><span class="sum-label"><i class="fas fa-minus-circle"></i> Total Potongan</span><span class="sum-value" id="totalPotonganDisplay">RM 0.00</span></div>
     <div class="sum-card sum-net"><span class="sum-label"><i class="fas fa-hand-holding-usd"></i> Gaji Bersih</span><span class="sum-value" id="gajiBersihDisplay">RM 0.00</span></div>
   </div>
 
-  <!-- ============ ACTIONS ============ -->
   <div class="action-bar">
     <div class="btn-group">
       <button class="btn btn-outline" onclick="window.close()"><i class="fas fa-arrow-left"></i> Kembali</button>
       <button class="btn btn-primary" id="saveBtn"><i class="fas fa-save"></i> Simpan &amp; Sync</button>
-      <button class="btn btn-success" id="reloadBtn"><i class="fas fa-cloud-download-alt"></i> Muat Semula</button>
+      <button class="btn btn-ghost" id="syncSheetBtn"><i class="fas fa-cloud-download-alt"></i> Sync dari Sheet</button>
+      <button class="btn btn-success" id="reloadBtn"><i class="fas fa-sync-alt"></i> Muat Semula</button>
       <button class="btn btn-ghost" id="printBtn"><i class="fas fa-print"></i> Cetak</button>
     </div>
-    <div class="action-hint"><i class="fas fa-info-circle"></i><span>Perubahan akan disimpan ke <strong>payrollEmployees</strong> dan di-sync ke Google Sheet. Tekan <kbd>Ctrl</kbd> + <kbd>S</kbd> untuk simpan pantas.</span></div>
+    <div class="action-hint"><i class="fas fa-info-circle"></i><span>Perubahan akan disimpan ke <strong>payrollEmployees</strong> dan disegerakkan ke Google Sheet. Tekan <kbd>Ctrl</kbd> + <kbd>S</kbd> untuk simpan pantas.</span></div>
   </div>
 
   <div class="signature-area">
@@ -414,45 +390,24 @@
 (function () {
   'use strict';
 
-  /* ===== 常量 ===== */
   const STORAGE_KEY = 'payrollEmployees';
   const URL_KEY = 'payrollScriptUrl';
 
-  /* ===== 字段映射 ===== */
   const FIELD_MAP = {
-    otBiasa:       'NormalOT',
-    otRehat:       'RestOT',
-    otAwam:        'PublicOT',
-    otLain:        'OtherOT',
-    allowance:     'Allowance2',
-    commision:     'Commission',
-    incentives:    'Incentives',
-    unpaidLeave:   'UnpaidLeave',
-    pinjaman:      'Pinjaman',
-    deductionLain: 'Deduction',
-    halfDaysLeave: 'HalfDays',
-    annualLeaveDays: 'AnnualLeaveDays',
-    sickLeaveDays:   'SickLeaveDays',
-    salaryEpf:     'EPFSalary',
-    salarySocso:   'SOCSOSalary',
-    salaryEis:     'EISSalary',
-    salary24jam:   'LindungSalary',
-    epfEmployee:   'EPF_Employee',
-    epfEmployer:   'EPF_Employer',
-    socsoEmployee: 'SOCSO_Employee',
-    socsoEmployer: 'SOCSO_Employer',
-    eisEmployee:   'EIS_Employee',
-    eisEmployer:   'EIS_Employer',
-    lindung24jam:  'Lindung24Jam',
-    bankNama:      'SLRBankNama',
-    bankAcc:       'SLRBankAccountNo',
-    epfNo:         'SLREPF',
-    socsoNo:       'SLRPERKESO',
-    eisNo:         'SLREIS'
+    otBiasa: 'NormalOT', otRehat: 'RestOT', otAwam: 'PublicOT', otLain: 'OtherOT',
+    allowance: 'Allowance2', commision: 'Commission', incentives: 'Incentives',
+    unpaidLeave: 'UnpaidLeave', pinjaman: 'Pinjaman', deductionLain: 'Deduction',
+    halfDaysLeave: 'HalfDays', annualLeaveDays: 'AnnualLeaveDays', sickLeaveDays: 'SickLeaveDays',
+    salaryEpf: 'EPFSalary', salarySocso: 'SOCSOSalary', salaryEis: 'EISSalary', salary24jam: 'LindungSalary',
+    epfEmployee: 'EPF_Employee', epfEmployer: 'EPF_Employer',
+    socsoEmployee: 'SOCSO_Employee', socsoEmployer: 'SOCSO_Employer',
+    eisEmployee: 'EIS_Employee', eisEmployer: 'EIS_Employer',
+    lindung24jam: 'Lindung24Jam',
+    bankNama: 'SLRBankNama', bankAcc: 'SLRBankAccountNo',
+    epfNo: 'SLREPF', socsoNo: 'SLRPERKESO', eisNo: 'SLREIS'
   };
   const TEXT_FIELDS = new Set(['bankNama', 'bankAcc', 'epfNo', 'socsoNo', 'eisNo']);
 
-  /* ===== DOM helpers ===== */
   const el = id => document.getElementById(id);
   const inputs = {};
   Object.keys(FIELD_MAP).forEach(id => { inputs[id] = el(id); });
@@ -479,7 +434,6 @@
     el('periodBadge').innerText = label.toUpperCase();
   }
 
-  /* ===== URL 管理 ===== */
   function loadSavedUrl() {
     try {
       const saved = localStorage.getItem(URL_KEY);
@@ -499,33 +453,26 @@
     }
   }
 
-  /* ===== 计算 ===== */
   function updateCalc() {
     const basic = num(el('inputGajiAsas').value);
     const income = basic
       + num(inputs.otBiasa.value) + num(inputs.otRehat.value)
-      + num(inputs.otAwam.value)  + num(inputs.otLain.value)
+      + num(inputs.otAwam.value) + num(inputs.otLain.value)
       + num(inputs.allowance.value) + num(inputs.commision.value)
       + num(inputs.incentives.value);
-
-    // Potongan 面板加总
     const ded = num(inputs.unpaidLeave.value) + num(inputs.pinjaman.value)
       + num(inputs.deductionLain.value) + num(inputs.halfDaysLeave.value);
-
-    // Hari Cuti 面板加总
     const totalDays = num(inputs.annualLeaveDays.value) + num(inputs.sickLeaveDays.value);
 
     el('infoGajiAsas').innerText = fmtRM(basic);
     el('firstCalcTotal').innerText = fmtRM(income);
     el('totalPotongan').innerText = fmtRM(ded);
     el('totalHariCuti').innerText = totalDays + ' Hari';
-    
     el('gajiKasarDisplay').innerText = fmtRM(income);
     el('totalPotonganDisplay').innerText = fmtRM(ded);
     el('gajiBersihDisplay').innerText = fmtRM(income - ded);
   }
 
-  /* ===== 自动估算法定缴款 ===== */
   function autoCalcStatutory() {
     const basic = num(el('inputGajiAsas').value);
     if (basic <= 0) { alert('Sila masukkan Gaji Asas terlebih dahulu.'); return; }
@@ -546,7 +493,6 @@
     setSyncStatus('Caruman dikira (anggaran)', 'success');
   }
 
-  /* ===== 获取员工数据 ===== */
   async function fetchStaffBasics() {
     if (!SCRIPT_URL) {
       setSyncStatus('URL belum ditetapkan. Sila tetapkan di Dashboard.', 'error');
@@ -556,7 +502,6 @@
     try {
       const res = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
       const data = await res.json();
-      
       let staffRaw = [];
       if (data && data.result === 'success' && Array.isArray(data.data)) {
         staffRaw = data.data;
@@ -572,10 +517,14 @@
         const group = String(row.GroupName || '').trim();
         const situation = String(row.Situation || 'ACTIVE').toUpperCase();
         const salary = parseFloat(row.Salary) || 0;
-        return { Code: code, Name: name, GroupName: group, Situation: situation, Salary: salary };
+        const bankNama = String(row.BankNama || '').trim();
+        const bankAccount = String(row.BankAccountNo || '').trim();
+        return {
+          Code: code, Name: name, GroupName: group, Situation: situation, Salary: salary,
+          BankNama: bankNama, BankAccountNo: bankAccount
+        };
       }).filter(s => s.Code && s.Name && s.Situation === 'ACTIVE');
 
-      console.log('[Staff] Active employees loaded:', activeStaffList.length);
       buildDropdowns();
       setSyncStatus('Data staf dimuat', 'success');
     } catch (err) {
@@ -585,7 +534,6 @@
     }
   }
 
-  /* ===== 构建筛选下拉框 ===== */
   function buildDropdowns() {
     const selGroup = el('infoKumpulan');
     const selKod = el('infoKod');
@@ -593,7 +541,6 @@
 
     const groups = [...new Set(activeStaffList.map(s => s.GroupName))].sort();
     selGroup.innerHTML = '<option value="">Semua Kumpulan</option>' + groups.map(g => `<option value="${g}">${g}</option>`).join('');
-
     populateKodAndNama('', '');
 
     selGroup.addEventListener('change', () => {
@@ -624,25 +571,19 @@
         switchEmployee(emp);
       }
     });
+
+    autoSelectFromStorage();
   }
 
-  /* ===== 填充 Kod 和 Nama 的选项 ===== */
   function populateKodAndNama(groupFilter, keepCode) {
     const selKod = el('infoKod');
     const selNama = el('infoNama');
-
     let filtered = activeStaffList;
-    if (groupFilter) {
-      filtered = filtered.filter(s => s.GroupName === groupFilter);
-    }
-
+    if (groupFilter) filtered = filtered.filter(s => s.GroupName === groupFilter);
     filtered.sort((a, b) => a.Code.localeCompare(b.Code));
 
-    const kodOptions = filtered.map(s => `<option value="${s.Code}">${s.Code}</option>`).join('');
-    const namaOptions = filtered.map(s => `<option value="${s.Name}">${s.Name}</option>`).join('');
-
-    selKod.innerHTML = '<option value="">Pilih Kod</option>' + kodOptions;
-    selNama.innerHTML = '<option value="">Pilih Nama</option>' + namaOptions;
+    selKod.innerHTML = '<option value="">Pilih Kod</option>' + filtered.map(s => `<option value="${s.Code}">${s.Code}</option>`).join('');
+    selNama.innerHTML = '<option value="">Pilih Nama</option>' + filtered.map(s => `<option value="${s.Name}">${s.Name}</option>`).join('');
 
     if (keepCode && filtered.some(s => s.Code === keepCode)) {
       selKod.value = keepCode;
@@ -654,10 +595,20 @@
     }
   }
 
-  /* ===== 切换员工 ===== */
+  function autoSelectFromStorage() {
+    const code = localStorage.getItem('payrollSelectedCode');
+    if (!code) return;
+    const emp = activeStaffList.find(s => s.Code === code);
+    if (!emp) return;
+    el('infoKumpulan').value = emp.GroupName || '';
+    el('infoKod').value = emp.Code || '';
+    el('infoNama').value = emp.Name || '';
+    el('infoSituation').innerText = emp.Situation || 'ACTIVE';
+    switchEmployee(emp);
+  }
+
   function switchEmployee(staffObj) {
     const code = staffObj.Code;
-    
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       allEmployees = stored ? JSON.parse(stored) : [];
@@ -673,6 +624,16 @@
         el('inputGajiAsas').value = staffObj.Salary;
         updateCalc();
       }
+      if (!existing.SLRBankNama && staffObj.BankNama) {
+        existing.SLRBankNama = staffObj.BankNama;
+        inputs.bankNama.value = staffObj.BankNama;
+        el('infoBank').value = staffObj.BankNama;
+      }
+      if (!existing.SLRBankAccountNo && staffObj.BankAccountNo) {
+        existing.SLRBankAccountNo = staffObj.BankAccountNo;
+        inputs.bankAcc.value = staffObj.BankAccountNo;
+        el('infoBankAcc').value = staffObj.BankAccountNo;
+      }
     } else {
       const newObj = {
         Code: code, Name: staffObj.Name, GroupName: staffObj.GroupName, Situation: staffObj.Situation,
@@ -684,7 +645,9 @@
         EPFSalary: 0, SOCSOSalary: 0, EISSalary: 0, LindungSalary: 0,
         EPF_Employee: 0, EPF_Employer: 0, SOCSO_Employee: 0, SOCSO_Employer: 0,
         EIS_Employee: 0, EIS_Employer: 0, Lindung24Jam: 0,
-        SLRBankNama: '', SLRBankAccountNo: '', SLREPF: '', SLRPERKESO: '', SLREIS: ''
+        SLRBankNama: staffObj.BankNama || '',
+        SLRBankAccountNo: staffObj.BankAccountNo || '',
+        SLREPF: '', SLRPERKESO: '', SLREIS: ''
       };
       fillForm(newObj);
     }
@@ -692,7 +655,6 @@
     setSyncStatus('Data dimuat untuk ' + code, 'success');
   }
 
-  /* ===== 填充表单 ===== */
   function fillForm(raw) {
     if (!raw) return;
     currentRaw = raw;
@@ -711,10 +673,13 @@
       }
     });
 
+    // 更新基础信息栏的 Bank 显示
+    el('infoBank').value = raw.SLRBankNama || '—';
+    el('infoBankAcc').value = raw.SLRBankAccountNo || '—';
+
     updateCalc();
   }
 
-  /* ===== 保存 + 同步 ===== */
   async function saveAndSync() {
     if (!currentRaw || !currentRaw.Code) {
       alert('Tiada pekerja dipilih. Sila pilih KOD terlebih dahulu.');
@@ -726,7 +691,6 @@
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
 
-    // 收集最新表单数据到 updated
     const updated = { ...currentRaw };
     updated.Basic = num(el('inputGajiAsas').value);
 
@@ -737,19 +701,16 @@
       else updated[key] = num(inp.value);
     });
 
-    // 1. 先推送到 Google Sheet
     let sheetSuccess = false;
     if (SCRIPT_URL) {
       try {
         const payload = { ...updated, action: 'saveEmployeeDetail' };
-        
         const res = await fetch(SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
         });
         const result = await res.json();
-        
         if (result.status === 'success') {
           sheetSuccess = true;
         } else {
@@ -762,12 +723,11 @@
           btn.disabled = false;
           btn.innerHTML = originalText;
           setSyncStatus('Batal simpan', 'error');
-          return; // 用户取消
+          return;
         }
       }
     }
 
-    // 2. 更新主数组 (LocalStorage)
     let all = [];
     try {
       const allJson = localStorage.getItem(STORAGE_KEY);
@@ -779,21 +739,16 @@
     if (idx !== -1) all[idx] = { ...all[idx], ...updated };
     else all.push(updated);
 
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-    } catch (e) { console.error(e); }
-
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); } catch (e) { console.error(e); }
     allEmployees = all;
     currentRaw = updated;
 
-    // 通知 opener（如果是通过 window.open 打开的）
     try {
       if (window.opener && !window.opener.closed) {
         window.opener.postMessage({ type: 'PAYROLL_UPDATE', employees: all }, '*');
       }
     } catch (e) {}
 
-    // 3. 更新 UI
     btn.disabled = false;
     btn.innerHTML = originalText;
 
@@ -807,7 +762,49 @@
     }
   }
 
-  /* ===== 备选方案 ===== */
+  /* ===== Sync dari Sheet ===== */
+  async function syncFromSheet() {
+    if (!currentRaw || !currentRaw.Code) {
+      alert('Sila pilih pekerja dahulu.');
+      return;
+    }
+    if (!SCRIPT_URL) {
+      alert('Sila tetapkan URL Deploy terlebih dahulu di Dashboard.');
+      return;
+    }
+    const btn = el('syncSheetBtn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menarik...';
+
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'getEmployeeDetail', Code: currentRaw.Code })
+      });
+      const result = await res.json();
+      if (result.status === 'success' && result.data) {
+        const merged = { ...currentRaw, ...result.data };
+        // 确保 Basic / 相关字段是数字
+        if (merged.Basic !== undefined) merged.Basic = num(merged.Basic);
+        fillForm(merged);
+        const lastUpdated = result.data.LastUpdated || '—';
+        setSyncStatus('Data dari Sheet dimuat · ' + lastUpdated, 'success');
+        alert('✅ Data berjaya dimuat dari Google Sheet.\n\nTerakhir dikemas kini: ' + lastUpdated);
+      } else {
+        alert('Tiada data di Sheet untuk pekerja ini: ' + (result.message || ''));
+      }
+    } catch (err) {
+      console.error('Sync from sheet error:', err);
+      alert('❌ Gagal sync dari Sheet: ' + err.message);
+      setSyncStatus('Gagal sync dari Sheet', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
+  }
+
   function loadFallbackFromStorage() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
@@ -816,7 +813,8 @@
         if (Array.isArray(allEmployees) && allEmployees.length > 0) {
           activeStaffList = allEmployees.map(e => ({
             Code: e.Code, Name: e.Name, GroupName: e.GroupName || 'Tidak Diketahui',
-            Situation: 'ACTIVE', Salary: e.Basic || 0
+            Situation: 'ACTIVE', Salary: e.Basic || 0,
+            BankNama: e.SLRBankNama || '', BankAccountNo: e.SLRBankAccountNo || ''
           }));
           buildDropdowns();
           setSyncStatus('Data fallback dimuat', 'success');
@@ -827,7 +825,6 @@
     setSyncStatus('Tiada data', 'error');
   }
 
-  /* ===== 事件绑定 ===== */
   Object.values(inputs).forEach(inp => {
     if (!inp) return;
     inp.addEventListener('input', updateCalc);
@@ -836,6 +833,7 @@
   el('inputGajiAsas').addEventListener('input', updateCalc);
 
   el('saveBtn').addEventListener('click', saveAndSync);
+  el('syncSheetBtn').addEventListener('click', syncFromSheet);
   el('reloadBtn').addEventListener('click', () => {
     const code = el('infoKod').value;
     if (code) {
@@ -855,7 +853,6 @@
     }
   });
 
-  /* ===== 监听 storage 变化（自动同步 URL） ===== */
   window.addEventListener('storage', (e) => {
     if (e.key === URL_KEY && e.newValue) {
       SCRIPT_URL = e.newValue;
@@ -866,7 +863,6 @@
     }
   });
 
-  /* ===== Init ===== */
   setPeriod();
   loadSavedUrl();
   if (SCRIPT_URL) {
