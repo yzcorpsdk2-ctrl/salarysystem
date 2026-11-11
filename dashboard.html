@@ -6,7 +6,6 @@
 <title>Dashboard · 员工薪资仪表盘</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-  /* ==================== 全局变量 ==================== */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --epf-blue: #1a4f8a; --epf-blue-light: #e8f0fa; --epf-blue-soft: #f4f8fd;
@@ -24,8 +23,6 @@
     min-height: 100vh; line-height: 1.5; font-size: 14px;
     -webkit-font-smoothing: antialiased;
   }
-
-  /* ==================== 顶部导航栏 ==================== */
   .navbar {
     position: sticky; top: 0; z-index: 200;
     display: flex; align-items: stretch; flex-wrap: wrap;
@@ -88,8 +85,6 @@
     70% { box-shadow: 0 0 0 7px rgba(110,240,168,0); }
     100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); }
   }
-
-  /* ==================== 工具栏 ==================== */
   .topbar {
     position: sticky; top: var(--nav-h); z-index: 100; background: #ffffff;
     border-bottom: 1px solid var(--epf-border); padding: 0.65rem 1.75rem;
@@ -106,9 +101,7 @@
     display: flex; align-items: center; justify-content: center;
     color: #fff; font-size: 0.95rem; font-weight: 800;
   }
-  .search-box {
-    flex: 1; max-width: 320px; position: relative;
-  }
+  .search-box { flex: 1; max-width: 320px; position: relative; }
   .search-box input {
     width: 100%; padding: 0.5rem 0.85rem 0.5rem 2.2rem;
     border: 1px solid var(--epf-border); border-radius: 6px;
@@ -163,8 +156,6 @@
     cursor: pointer; transition: 0.15s; white-space: nowrap;
   }
   .url-box button:hover { background: #15406f; }
-
-  /* ==================== 容器 ==================== */
   .container { max-width: 1400px; margin: 0 auto; padding: 1.5rem 1.75rem 3rem; }
   .page-header {
     background: #ffffff; border: 1px solid var(--epf-border); border-radius: 8px;
@@ -175,8 +166,6 @@
   .page-header .info { flex: 1; min-width: 240px; }
   .page-header h1 { font-size: 1.45rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--epf-blue); letter-spacing: -0.015em; }
   .page-header p { font-size: 0.85rem; color: var(--epf-muted); line-height: 1.6; }
-
-  /* ==================== 员工卡片网格 ==================== */
   .employee-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -201,30 +190,18 @@
     opacity: 0; transition: opacity 0.2s;
   }
   .employee-card:hover::before { opacity: 1; }
-
-  .card-header {
-    display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
-  }
-  .card-name {
-    font-size: 1.05rem; font-weight: 700; color: var(--epf-blue);
-    word-break: break-word; line-height: 1.3;
-  }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .card-name { font-size: 1.05rem; font-weight: 700; color: var(--epf-blue); word-break: break-word; line-height: 1.3; }
   .card-code {
     font-size: 0.72rem; font-weight: 700; color: var(--epf-muted);
     background: var(--epf-blue-soft); padding: 2px 8px; border-radius: 4px;
     white-space: nowrap;
   }
   .card-body { display: flex; flex-direction: column; gap: 8px; }
-  .card-row {
-    display: flex; justify-content: space-between; align-items: center;
-    font-size: 0.8rem; color: var(--epf-text);
-  }
+  .card-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--epf-text); }
   .card-row .label { color: var(--epf-muted); font-weight: 500; }
   .card-row .value { font-weight: 600; text-align: right; }
-  .card-row .value.salary {
-    font-size: 1.1rem; font-weight: 800; color: #0f7a54;
-    font-variant-numeric: tabular-nums;
-  }
+  .card-row .value.salary { font-size: 1.1rem; font-weight: 800; color: #0f7a54; font-variant-numeric: tabular-nums; }
   .card-footer {
     display: flex; align-items: center; justify-content: space-between;
     padding-top: 12px; border-top: 1px solid var(--epf-border-soft);
@@ -239,15 +216,8 @@
   .status-badge.inactive { background: #fed7d7; color: #9b2c2c; }
   .card-footer .arrow { font-size: 1rem; color: var(--epf-muted); transition: transform 0.15s; }
   .employee-card:hover .arrow { transform: translateX(3px); color: var(--epf-blue); }
-
-  /* ==================== 空状态 / 加载 ==================== */
-  .empty-state {
-    grid-column: 1 / -1; text-align: center; padding: 3rem 1rem;
-    color: #a7b7c9; font-size: 0.85rem;
-  }
+  .empty-state { grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: #a7b7c9; font-size: 0.85rem; }
   .empty-state .icon { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; }
-
-  /* ==================== Loading Spinner ==================== */
   .spinner {
     display: inline-block; width: 16px; height: 16px;
     border: 2px solid rgba(26,79,138,0.2); border-top: 2px solid var(--epf-blue);
@@ -255,8 +225,6 @@
     margin-right: 6px; vertical-align: middle;
   }
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-  /* ==================== 响应式 ==================== */
   @media (max-width: 768px) {
     .navbar { padding: 0 0.5rem; }
     .navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
@@ -274,7 +242,6 @@
 </head>
 <body>
 
-<!-- ==================== 顶部导航栏 ==================== -->
 <nav class="navbar">
   <div class="nav-brand">
     <span class="logo">Y</span>
@@ -289,7 +256,6 @@
   </button>
 </nav>
 
-<!-- ==================== 工具栏 ==================== -->
 <div class="topbar">
   <div class="brand"><div class="logo">P</div> Payroll Dashboard</div>
   <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
@@ -319,7 +285,6 @@
   </button>
 </div>
 
-<!-- ==================== 页面内容 ==================== -->
 <div class="container">
   <div class="page-header">
     <div class="info">
@@ -342,9 +307,6 @@
 </div>
 
 <script>
-/* ============================================================
-   全局变量
-   ============================================================ */
 const URL_KEY = 'payrollScriptUrl';
 const STORAGE_KEY = 'payrollEmployees';
 const SELECTED_CODE_KEY = 'payrollSelectedCode';
@@ -355,20 +317,12 @@ let SCRIPT_URL = '';
 let allEmployees = [];
 let filteredEmployees = [];
 
-/* ============================================================
-   创建员工独立 Sheet
-   ============================================================ */
 async function createEmployeeSheets() {
-  if (!SCRIPT_URL) {
-    alert('Sila tetapkan URL Deploy terlebih dahulu.');
-    return;
-  }
-
+  if (!SCRIPT_URL) { alert('Sila tetapkan URL Deploy terlebih dahulu.'); return; }
   const btn = document.getElementById('btnCreateSheets');
   btn.disabled = true;
   btn.innerHTML = '⏳ Mencipta...';
   setSyncBadge('busy', 'Mencipta sheet...');
-
   try {
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
@@ -376,7 +330,6 @@ async function createEmployeeSheets() {
       body: JSON.stringify({ action: 'createStaffSheets' })
     });
     const result = await res.json();
-
     if (result.status === 'success') {
       setSyncBadge('ok', 'Sheet dicipta');
       alert(`✅ ${result.message}\n\nDicipta: ${result.created.length}\nDilangkau: ${result.skipped.length}`);
@@ -393,9 +346,6 @@ async function createEmployeeSheets() {
   }
 }
 
-/* ============================================================
-   工具函数
-   ============================================================ */
 function num(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
 function fmtRM(v) { return 'RM ' + Number(v || 0).toFixed(2); }
 function escapeHtml(s) {
@@ -410,9 +360,6 @@ function setSyncBadge(state, text) {
   txt.textContent = text;
 }
 
-/* ============================================================
-   URL 管理
-   ============================================================ */
 function loadSavedUrl() {
   try {
     const saved = localStorage.getItem(URL_KEY);
@@ -423,31 +370,21 @@ function loadSavedUrl() {
       SCRIPT_URL = '';
       document.getElementById('deployUrlInput').value = '';
     }
-  } catch (e) {
-    SCRIPT_URL = '';
-  }
+  } catch (e) { SCRIPT_URL = ''; }
 }
 
 function applyUrl() {
   const input = document.getElementById('deployUrlInput');
   const url = input.value.trim();
-  if (!url) {
-    alert('Sila masukkan URL terlebih dahulu.');
-    return;
-  }
+  if (!url) { alert('Sila masukkan URL terlebih dahulu.'); return; }
   try {
     localStorage.setItem(URL_KEY, url);
     SCRIPT_URL = url;
     setSyncBadge('ok', 'URL disimpan');
     loadData();
-  } catch (e) {
-    alert('Gagal menyimpan URL.');
-  }
+  } catch (e) { alert('Gagal menyimpan URL.'); }
 }
 
-/* ============================================================
-   加载数据（API + localStorage 合并）
-   ============================================================ */
 async function loadData() {
   if (!SCRIPT_URL) {
     document.getElementById('employeeGrid').innerHTML = `
@@ -459,23 +396,17 @@ async function loadData() {
     document.getElementById('countText').textContent = '0 pekerja';
     return;
   }
-
   setSyncBadge('busy', 'Memuatkan data...');
   document.getElementById('employeeGrid').innerHTML = `
     <div class="empty-state">
       <span class="spinner"></span> Memuatkan data pekerja...
     </div>`;
-
   try {
     const res = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
     const data = await res.json();
-    
     let staffRaw = [];
-    if (data && data.result === 'success' && Array.isArray(data.data)) {
-      staffRaw = data.data;
-    } else if (Array.isArray(data)) {
-      staffRaw = data;
-    }
+    if (data && data.result === 'success' && Array.isArray(data.data)) staffRaw = data.data;
+    else if (Array.isArray(data)) staffRaw = data;
 
     const activeStaff = staffRaw.map(row => {
       return {
@@ -507,29 +438,22 @@ async function loadData() {
     allEmployees = activeStaff.map(staff => {
       const payroll = localPayroll.find(p => p.Code === staff.Code) || {};
       return {
-        ...staff,
-        ...payroll,
-        Name: staff.Name,
-        GroupName: staff.GroupName,
-        Situation: staff.Situation,
+        ...staff, ...payroll,
+        Name: staff.Name, GroupName: staff.GroupName, Situation: staff.Situation,
         Basic: payroll.Basic || staff.Salary || 0,
         Salary: staff.Salary || 0
       };
     });
 
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees));
-    } catch (e) {}
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees)); } catch (e) {}
 
     filteredEmployees = [...allEmployees];
     renderCards();
     setSyncBadge('ok', 'Data dimuat (' + allEmployees.length + ' pekerja)');
     document.getElementById('countText').textContent = allEmployees.length + ' pekerja aktif';
-
   } catch (err) {
     console.error('Load error:', err);
     setSyncBadge('err', 'Gagal muat data');
-    
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
@@ -542,7 +466,6 @@ async function loadData() {
         return;
       }
     } catch (e) {}
-
     document.getElementById('employeeGrid').innerHTML = `
       <div class="empty-state">
         <span class="icon">⚠️</span>
@@ -553,30 +476,19 @@ async function loadData() {
   }
 }
 
-/* ============================================================
-   渲染卡片
-   ============================================================ */
 function renderCards() {
   const grid = document.getElementById('employeeGrid');
-  
   if (filteredEmployees.length === 0) {
-    grid.innerHTML = `
-      <div class="empty-state">
-        <span class="icon">📭</span>
-        Tiada pekerja ditemui.
-      </div>`;
+    grid.innerHTML = `<div class="empty-state"><span class="icon">📭</span> Tiada pekerja ditemui.</div>`;
     return;
   }
-
   let html = '';
   filteredEmployees.forEach(emp => {
     const sitLower = String(emp.Situation || '').toLowerCase();
     let badgeClass = 'active';
     if (sitLower === 'pending') badgeClass = 'pending';
     else if (sitLower === 'inactive') badgeClass = 'inactive';
-
     const displaySalary = num(emp.Basic || emp.Salary);
-
     html += `
       <div class="employee-card" onclick="openDetail('${escapeHtml(emp.Code)}')">
         <div class="card-header">
@@ -584,14 +496,8 @@ function renderCards() {
           <div class="card-code">${escapeHtml(emp.Code || '-')}</div>
         </div>
         <div class="card-body">
-          <div class="card-row">
-            <span class="label">Kumpulan</span>
-            <span class="value">${escapeHtml(emp.GroupName || '-')}</span>
-          </div>
-          <div class="card-row">
-            <span class="label">Gaji Asas</span>
-            <span class="value salary">${fmtRM(displaySalary)}</span>
-          </div>
+          <div class="card-row"><span class="label">Kumpulan</span><span class="value">${escapeHtml(emp.GroupName || '-')}</span></div>
+          <div class="card-row"><span class="label">Gaji Asas</span><span class="value salary">${fmtRM(displaySalary)}</span></div>
         </div>
         <div class="card-footer">
           <span class="status-badge ${badgeClass}">${escapeHtml(emp.Situation || 'ACTIVE')}</span>
@@ -602,9 +508,6 @@ function renderCards() {
   grid.innerHTML = html;
 }
 
-/* ============================================================
-   搜索筛选
-   ============================================================ */
 function filterCards() {
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
   if (!q) {
@@ -621,28 +524,17 @@ function filterCards() {
   renderCards();
 }
 
-/* ============================================================
-   打开详情页 (带 Code 参数)
-   ============================================================ */
 function openDetail(code) {
   const emp = allEmployees.find(e => e.Code === code);
   if (!emp) return;
-
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees));
     localStorage.setItem(SELECTED_CODE_KEY, emp.Code || '');
     localStorage.setItem(SELECTED_EMP_KEY, JSON.stringify(emp));
-  } catch (err) {
-    console.error('localStorage save failed:', err);
-  }
-
-  // 带 code 参数打开详情页
-  window.open(DETAIL_URL + '?code=' + encodeURIComponent(emp.Code), '_blank');
+  } catch (err) { console.error('localStorage save failed:', err); }
+  window.open(DETAIL_URL, '_blank');
 }
 
-/* ============================================================
-   初始化
-   ============================================================ */
 window.addEventListener('DOMContentLoaded', () => {
   loadSavedUrl();
   if (SCRIPT_URL) {
@@ -658,7 +550,6 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// 支持 Ctrl/Cmd + K 聚焦搜索
 document.addEventListener('keydown', (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
     e.preventDefault();
@@ -666,7 +557,6 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// 监听 storage 变化，如果其他标签页修改了 URL
 window.addEventListener('storage', (e) => {
   if (e.key === URL_KEY && e.newValue) {
     SCRIPT_URL = e.newValue;
