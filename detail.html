@@ -299,16 +299,6 @@
             <option value="">Pilih Nama</option>
           </select>
         </div>
-        <!-- 新增 Bank Nama -->
-        <div class="field">
-          <span class="field-label">Bank Nama</span>
-          <input type="text" class="field-input" id="topBankNama" readonly style="background:transparent;" value="—">
-        </div>
-        <!-- 新增 Bank Account -->
-        <div class="field">
-          <span class="field-label">Bank Account</span>
-          <input type="text" class="field-input" id="topBankAccount" readonly style="background:transparent;" value="—">
-        </div>
       </div>
     </section>
 
@@ -489,10 +479,6 @@
     el('periodBadge').innerText = label.toUpperCase();
   }
 
-  function getQueryParam(name) {
-    return new URLSearchParams(window.location.search).get(name);
-  }
-
   /* ===== URL 管理 ===== */
   function loadSavedUrl() {
     try {
@@ -522,9 +508,11 @@
       + num(inputs.allowance.value) + num(inputs.commision.value)
       + num(inputs.incentives.value);
 
+    // Potongan 面板加总
     const ded = num(inputs.unpaidLeave.value) + num(inputs.pinjaman.value)
       + num(inputs.deductionLain.value) + num(inputs.halfDaysLeave.value);
 
+    // Hari Cuti 面板加总
     const totalDays = num(inputs.annualLeaveDays.value) + num(inputs.sickLeaveDays.value);
 
     el('infoGajiAsas').innerText = fmtRM(basic);
@@ -584,20 +572,10 @@
         const group = String(row.GroupName || '').trim();
         const situation = String(row.Situation || 'ACTIVE').toUpperCase();
         const salary = parseFloat(row.Salary) || 0;
-        return { 
-          Code: code, 
-          Name: name, 
-          GroupName: group, 
-          Situation: situation, 
-          Salary: salary,
-          BankNama: row.BankNama || '',
-          BankAccountNo: row.BankAccountNo || '',
-          EPF: row.EPF || '',
-          PERKESO: row.PERKESO || '',
-          EIS: row.EIS || ''
-        };
+        return { Code: code, Name: name, GroupName: group, Situation: situation, Salary: salary };
       }).filter(s => s.Code && s.Name && s.Situation === 'ACTIVE');
 
+      console.log('[Staff] Active employees loaded:', activeStaffList.length);
       buildDropdowns();
       setSyncStatus('Data staf dimuat', 'success');
     } catch (err) {
@@ -616,39 +594,40 @@
     const groups = [...new Set(activeStaffList.map(s => s.GroupName))].sort();
     selGroup.innerHTML = '<option value="">Semua Kumpulan</option>' + groups.map(g => `<option value="${g}">${g}</option>`).join('');
 
-    populateKodAndNama('');
+    populateKodAndNama('', '');
 
     selGroup.addEventListener('change', () => {
-      populateKodAndNama(selGroup.value);
-      el('infoKod').value = '';
-      el('infoNama').value = '';
+      const selectedGroup = selGroup.value;
+      populateKodAndNama(selectedGroup, '');
     });
 
     selKod.addEventListener('change', () => {
-      if (selKod.value) {
-        const emp = activeStaffList.find(s => s.Code === selKod.value);
-        if (emp) {
-          el('infoNama').value = emp.Name;
-          el('infoKumpulan').value = emp.GroupName;
-          loadEmployeeData(emp.Code);
-        }
+      const selectedCode = selKod.value;
+      if (!selectedCode) return;
+      const emp = activeStaffList.find(s => s.Code === selectedCode);
+      if (emp) {
+        selNama.value = emp.Name;
+        selGroup.value = emp.GroupName;
+        el('infoSituation').innerText = emp.Situation;
+        switchEmployee(emp);
       }
     });
 
     selNama.addEventListener('change', () => {
-      if (selNama.value) {
-        const emp = activeStaffList.find(s => s.Name === selNama.value);
-        if (emp) {
-          el('infoKod').value = emp.Code;
-          el('infoKumpulan').value = emp.GroupName;
-          loadEmployeeData(emp.Code);
-        }
+      const selectedName = selNama.value;
+      if (!selectedName) return;
+      const emp = activeStaffList.find(s => s.Name === selectedName);
+      if (emp) {
+        selKod.value = emp.Code;
+        selGroup.value = emp.GroupName;
+        el('infoSituation').innerText = emp.Situation;
+        switchEmployee(emp);
       }
     });
   }
 
   /* ===== 填充 Kod 和 Nama 的选项 ===== */
-  function populateKodAndNama(groupFilter) {
+  function populateKodAndNama(groupFilter, keepCode) {
     const selKod = el('infoKod');
     const selNama = el('infoNama');
 
@@ -664,70 +643,53 @@
 
     selKod.innerHTML = '<option value="">Pilih Kod</option>' + kodOptions;
     selNama.innerHTML = '<option value="">Pilih Nama</option>' + namaOptions;
+
+    if (keepCode && filtered.some(s => s.Code === keepCode)) {
+      selKod.value = keepCode;
+      const emp = filtered.find(s => s.Code === keepCode);
+      if (emp) {
+        selNama.value = emp.Name;
+        el('infoSituation').innerText = emp.Situation;
+      }
+    }
   }
 
-  /* ===== 加载特定员工数据（优先从 Sheet 获取最新详情） ===== */
-  async function loadEmployeeData(code) {
-    const emp = activeStaffList.find(s => s.Code === code);
-    if (!emp) return;
+  /* ===== 切换员工 ===== */
+  function switchEmployee(staffObj) {
+    const code = staffObj.Code;
+    
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      allEmployees = stored ? JSON.parse(stored) : [];
+      if (!Array.isArray(allEmployees)) allEmployees = [];
+    } catch (e) { allEmployees = []; }
 
-    el('infoKumpulan').value = emp.GroupName;
-    el('infoKod').value = emp.Code;
-    el('infoNama').value = emp.Name;
-    el('infoSituation').innerText = emp.Situation;
+    const existing = allEmployees.find(e => e.Code === code);
 
-    let detailData = null;
-    if (SCRIPT_URL) {
-      try {
-        const res = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'getEmployeeDetail', Code: emp.Code, Name: emp.Name })
-        });
-        const result = await res.json();
-        if (result.status === 'success' && result.data) {
-          detailData = result.data;
-        }
-      } catch (err) {
-        console.error('Failed to fetch detail:', err);
-      }
-    }
-
-    // 基础数据（来自 STAFF LOGIN RECORD）
-    const baseData = {
-      Code: emp.Code,
-      Name: emp.Name,
-      GroupName: emp.GroupName,
-      Situation: emp.Situation,
-      Basic: emp.Salary,
-      SLRBankNama: emp.BankNama || '',
-      SLRBankAccountNo: emp.BankAccountNo || '',
-      SLREPF: emp.EPF || '',
-      SLRPERKESO: emp.PERKESO || '',
-      SLREIS: emp.EIS || '',
-    };
-
-    let finalData;
-    if (detailData) {
-      finalData = { ...baseData, ...detailData };
-      // 确保基础资料以 STAFF LOGIN RECORD 为最高优先级
-      finalData.Name = emp.Name;
-      finalData.GroupName = emp.GroupName;
-      finalData.Situation = emp.Situation;
-      finalData.SLRBankNama = emp.BankNama || finalData.SLRBankNama || '';
-      finalData.SLRBankAccountNo = emp.BankAccountNo || finalData.SLRBankAccountNo || '';
-      finalData.SLREPF = emp.EPF || finalData.SLREPF || '';
-      finalData.SLRPERKESO = emp.PERKESO || finalData.SLRPERKESO || '';
-      finalData.SLREIS = emp.EIS || finalData.SLREIS || '';
-      if (!finalData.Basic || finalData.Basic === 0) {
-        finalData.Basic = emp.Salary;
+    if (existing) {
+      fillForm(existing);
+      if (!existing.Basic || existing.Basic === 0) {
+        existing.Basic = staffObj.Salary;
+        el('inputGajiAsas').value = staffObj.Salary;
+        updateCalc();
       }
     } else {
-      finalData = baseData;
+      const newObj = {
+        Code: code, Name: staffObj.Name, GroupName: staffObj.GroupName, Situation: staffObj.Situation,
+        Basic: staffObj.Salary,
+        NormalOT: 0, RestOT: 0, PublicOT: 0, OtherOT: 0,
+        Allowance2: 0, Commission: 0, Incentives: 0,
+        UnpaidLeave: 0, Pinjaman: 0, Deduction: 0, HalfDays: 0,
+        AnnualLeaveDays: 0, SickLeaveDays: 0,
+        EPFSalary: 0, SOCSOSalary: 0, EISSalary: 0, LindungSalary: 0,
+        EPF_Employee: 0, EPF_Employer: 0, SOCSO_Employee: 0, SOCSO_Employer: 0,
+        EIS_Employee: 0, EIS_Employer: 0, Lindung24Jam: 0,
+        SLRBankNama: '', SLRBankAccountNo: '', SLREPF: '', SLRPERKESO: '', SLREIS: ''
+      };
+      fillForm(newObj);
     }
 
-    fillForm(finalData);
-    setSyncStatus('Data dimuat untuk ' + emp.Code, 'success');
+    setSyncStatus('Data dimuat untuk ' + code, 'success');
   }
 
   /* ===== 填充表单 ===== */
@@ -749,10 +711,6 @@
       }
     });
 
-    // 更新顶部的 Bank 信息
-    el('topBankNama').value = raw.SLRBankNama || '—';
-    el('topBankAccount').value = raw.SLRBankAccountNo || '—';
-
     updateCalc();
   }
 
@@ -768,6 +726,7 @@
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
 
+    // 收集最新表单数据到 updated
     const updated = { ...currentRaw };
     updated.Basic = num(el('inputGajiAsas').value);
 
@@ -778,6 +737,7 @@
       else updated[key] = num(inp.value);
     });
 
+    // 1. 先推送到 Google Sheet
     let sheetSuccess = false;
     if (SCRIPT_URL) {
       try {
@@ -802,11 +762,12 @@
           btn.disabled = false;
           btn.innerHTML = originalText;
           setSyncStatus('Batal simpan', 'error');
-          return;
+          return; // 用户取消
         }
       }
     }
 
+    // 2. 更新主数组 (LocalStorage)
     let all = [];
     try {
       const allJson = localStorage.getItem(STORAGE_KEY);
@@ -825,6 +786,96 @@
     allEmployees = all;
     currentRaw = updated;
 
+    // 通知 opener（如果是通过 window.open 打开的）
     try {
       if (window.opener && !window.opener.closed) {
-        window.opener.postMessage({ type: 'PAY
+        window.opener.postMessage({ type: 'PAYROLL_UPDATE', employees: all }, '*');
+      }
+    } catch (e) {}
+
+    // 3. 更新 UI
+    btn.disabled = false;
+    btn.innerHTML = originalText;
+
+    const time = new Date().toLocaleTimeString('ms-MY', { hour12: false });
+    if (sheetSuccess) {
+      setSyncStatus('Disimpan & Sync ke Sheet · ' + time, 'success');
+      alert('✅ Data berjaya disimpan & disegerakkan ke Google Sheet untuk ' + (updated.Name || updated.Code));
+    } else {
+      setSyncStatus('Disimpan (Local sahaja) · ' + time, 'success');
+      alert('✅ Data disimpan di LocalStorage. (Gagal sync ke Sheet)');
+    }
+  }
+
+  /* ===== 备选方案 ===== */
+  function loadFallbackFromStorage() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        allEmployees = JSON.parse(stored) || [];
+        if (Array.isArray(allEmployees) && allEmployees.length > 0) {
+          activeStaffList = allEmployees.map(e => ({
+            Code: e.Code, Name: e.Name, GroupName: e.GroupName || 'Tidak Diketahui',
+            Situation: 'ACTIVE', Salary: e.Basic || 0
+          }));
+          buildDropdowns();
+          setSyncStatus('Data fallback dimuat', 'success');
+          return;
+        }
+      }
+    } catch (e) {}
+    setSyncStatus('Tiada data', 'error');
+  }
+
+  /* ===== 事件绑定 ===== */
+  Object.values(inputs).forEach(inp => {
+    if (!inp) return;
+    inp.addEventListener('input', updateCalc);
+    inp.addEventListener('change', updateCalc);
+  });
+  el('inputGajiAsas').addEventListener('input', updateCalc);
+
+  el('saveBtn').addEventListener('click', saveAndSync);
+  el('reloadBtn').addEventListener('click', () => {
+    const code = el('infoKod').value;
+    if (code) {
+      const emp = activeStaffList.find(s => s.Code === code);
+      if (emp) switchEmployee(emp);
+    } else {
+      fetchStaffBasics();
+    }
+  });
+  el('printBtn').addEventListener('click', () => window.print());
+  el('autoCalcBtn').addEventListener('click', autoCalcStatutory);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === 's') {
+      e.preventDefault();
+      saveAndSync();
+    }
+  });
+
+  /* ===== 监听 storage 变化（自动同步 URL） ===== */
+  window.addEventListener('storage', (e) => {
+    if (e.key === URL_KEY && e.newValue) {
+      SCRIPT_URL = e.newValue;
+      el('deployUrlDisplay').value = e.newValue;
+      el('urlStatusDot').className = 'status-dot ok';
+      setSyncStatus('URL dikemas kini, memuat semula...', 'success');
+      fetchStaffBasics();
+    }
+  });
+
+  /* ===== Init ===== */
+  setPeriod();
+  loadSavedUrl();
+  if (SCRIPT_URL) {
+    fetchStaffBasics();
+  } else {
+    setSyncStatus('Sila tetapkan URL di Dashboard terlebih dahulu.', 'error');
+  }
+
+})();
+</script>
+</body>
+</html>
