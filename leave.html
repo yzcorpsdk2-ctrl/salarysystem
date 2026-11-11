@@ -1,1 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payroll · Timesheet Calculation</title>
+    <!-- SheetJS 用于导入 Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <style>
+        /* ===== 整体风格参考您提供的URL ===== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            background: #f0f2f5;
+            color: #1e293b;
+            padding: 24px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            padding: 24px 28px 32px;
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        h1 small {
+            font-size: 13px;
+            font-weight: 400;
+            color: #64748b;
+            background: #f1f5f9;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .toolbar button,
+        .toolbar label.file-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            border: 1px solid #d1d9e6;
+            background: #ffffff;
+            color: #1e293b;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .toolbar button:hover,
+        .toolbar label.file-label:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+        .toolbar button.primary {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #ffffff;
+        }
+        .toolbar button.primary:hover {
+            background: #1d4ed8;
+        }
+        .toolbar button.danger {
+            border-color: #fca5a5;
+            color: #dc2626;
+        }
+        .toolbar button.danger:hover {
+            background: #fef2f2;
+            border-color: #f87171;
+        }
+        .toolbar .spacer {
+            flex: 1;
+        }
+        .toolbar .summary-badge {
+            font-size: 13px;
+            color: #475569;
+            background: #f1f5f9;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        input[type="file"] {
+            display: none;
+        }
 
+        /* ===== 表格样式 ===== */
+        .table-wrap {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 1200px;
+        }
+        thead {
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        thead th {
+            padding: 10px 8px;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #475569;
+            text-align: center;
+            white-space: nowrap;
+            border-right: 1px solid #e9eef4;
+            position: sticky;
+            top: 0;
+            background: #f8fafc;
+            z-index: 2;
+        }
+        thead th:first-child { text-align: left; padding-left: 14px; }
+        thead th:last-child { border-right: none; }
+        thead th .sub {
+            display: block;
+            font-weight: 400;
+            font-size: 10px;
+            color: #94a3b8;
+            text-transform: none;
+            letter-spacing: 0;
+            margin-top: 2px;
+        }
+
+        tbody td {
+            padding: 8px 8px;
+            border-bottom: 1px solid #f1f5f9;
+            border-right: 1px solid #f1f5f9;
+            text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+        tbody td:first-child {
+            text-align: left;
+            padding-left: 14px;
+            font-weight: 500;
+        }
+        tbody td:last-child { border-right: none; }
+        tbody tr:hover { background: #fafbfc; }
+
+        /* 日期列较窄 */
+        td.date-cell { min-width: 100px; font-size: 12px; }
+        td.name-cell { min-width: 130px; }
+
+        /* 打卡时间输入框 */
+        .time-input {
+            width: 64px;
+            padding: 5px 4px;
+            font-size: 12px;
+            text-align: center;
+            border: 1px solid transparent;
+            border-radius: 5px;
+            background: transparent;
+            font-family: 'Inter', monospace;
+            transition: all 0.15s;
+        }
+        .time-input:hover { border-color: #cbd5e1; background: #fff; }
+        .time-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+        .time-input::placeholder { color: #cbd5e1; font-size: 11px; }
+
+        /* 状态选择器 */
+        .status-select {
+            padding: 5px 6px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 6px;
+            border: 1px solid #d1d9e6;
+            background: #ffffff;
+            color: #1e293b;
+            cursor: pointer;
+            transition: all 0.15s;
+            width: 68px;
+        }
+        .status-select:hover { border-color: #94a3b8; }
+        .status-select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+        /* 不同状态的颜色 */
+        .status-select[data-status="AL"] { background: #fef9c3; border-color: #fde047; color: #854d0e; }
+        .status-select[data-status="SL"] { background: #ffedd5; border-color: #fdba74; color: #9a3412; }
+        .status-select[data-status="UL"] { background: #fecaca; border-color: #f87171; color: #991b1b; }
+        .status-select[data-status="HAL"] { background: #e0f2fe; border-color: #7dd3fc; color: #075985; }
+        .status-select[data-status="L"] { background: #f3e8ff; border-color: #d8b4fe; color: #6b21a8; }
+        .status-select[data-status="OFF"] { background: #f1f5f9; border-color: #cbd5e1; color: #64748b; }
+
+        /* 计算结果列 */
+        td.calc-cell {
+            font-weight: 600;
+            color: #0f172a;
+            font-size: 13px;
+            min-width: 70px;
+        }
+        td.calc-cell.ot { color: #d97706; }
+        td.calc-cell.absent { color: #dc2626; }
+
+        /* 行高亮 */
+        tbody tr.row-overtime { background: #fffbeb; }
+        tbody tr.row-absent { background: #fef2f2; }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+        .empty-state p { margin-top: 8px; font-size: 14px; }
+
+        /* 底部合计 */
+        tfoot {
+            background: #f8fafc;
+            font-weight: 600;
+            border-top: 2px solid #e2e8f0;
+        }
+        tfoot td {
+            padding: 12px 8px;
+            font-size: 13px;
+            color: #0f172a;
+            text-align: center;
+            border-right: 1px solid #e9eef4;
+        }
+        tfoot td:first-child {
+            text-align: left;
+            padding-left: 14px;
+            font-weight: 600;
+        }
+        tfoot td:last-child { border-right: none; }
+        tfoot .total-label { color: #475569; font-weight: 500; font-size: 12px; }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .container { padding: 16px; }
+            h1 { font-size: 18px; flex-wrap: wrap; }
+            .toolbar { gap: 8px; }
+            .toolbar button, .toolbar label.file-label { font-size: 12px; padding: 7px 12px; }
+        }
+
+        /* 滚动条美化 */
+        .table-wrap::-webkit-scrollbar { height: 8px; }
+        .table-wrap::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .table-wrap::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .table-wrap::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>
+        Payroll · Timesheet Calculation
+        <small id="recordCount">0 rows</small>
+    </h1>
+
+    <!-- ===== 工具栏 ===== -->
+    <div class="toolbar">
+        <label class="file-label" for="fileInput">
+            📂 Import Timesheet
+        </label>
+        <input type="file" id="fileInput" accept=".xlsx, .xls, .csv">
+
+        <button class="primary" id="addRowBtn">+ Add Row</button>
+        <button class="danger" id="clearBtn">🗑 Clear All</button>
+
+        <div class="spacer"></div>
+
+        <span class="summary-badge" id="summaryBadge">Total Work: 0.00h</span>
+        <button id="exportBtn">📥 Export CSV</button>
+    </div>
+
+    <!-- ===== 表格 ===== -->
+    <div class="table-wrap">
+        <table id="timesheetTable">
+            <thead>
+                <tr>
+                    <th style="width:40px;">#</th>
+                    <th>Person ID</th>
+                    <th>Name</th>
+                    <th>Date</th>
+                    <th>Clock In<span class="sub">AM</span></th>
+                    <th>Clock Out<span class="sub">AM</span></th>
+                    <th>Clock In<span class="sub">PM</span></th>
+                    <th>Clock Out<span class="sub">PM</span></th>
+                    <th>Clock In<span class="sub">OT</span></th>
+                    <th>Clock Out<span class="sub">OT</span></th>
+                    <th>Status<span class="sub">AL/L/HAL/SL/UL/OFF</span></th>
+                    <th>Work Hrs</th>
+                    <th>OT Hrs</th>
+                    <th>Late/Early</th>
+                    <th>Remark</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- 动态填充 -->
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="11" style="text-align:right;font-weight:500;color:#475569;">TOTAL</td>
+                    <td id="totalWork">0.00</td>
+                    <td id="totalOT">0.00</td>
+                    <td id="totalLate">0.00</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    //  DATA LAYER
+    // ============================================================
+    let rows = []; // { id, personId, name, date, clockInAM, clockOutAM, clockInPM, clockOutPM, clockInOT, clockOutOT, status, remark }
+
+    // ============================================================
+    //  DOM REFS
+    // ============================================================
+    const tbody = document.getElementById('tableBody');
+    const recordCount = document.getElementById('recordCount');
+    const summaryBadge = document.getElementById('summaryBadge');
+    const totalWorkEl = document.getElementById('totalWork');
+    const totalOTEl = document.getElementById('totalOT');
+    const totalLateEl = document.getElementById('totalLate');
+    const fileInput = document.getElementById('fileInput');
+
+    // ============================================================
+    //  HELPERS
+    // ============================================================
+    function generateId() {
+        return 'r_' + Math.random().toString(36).slice(2, 9);
+    }
+
+    /** 将 "HH:MM" 转为分钟数，无效返回 null */
+    function timeToMinutes(str) {
+        if (!str) return null;
+        const s = str.trim();
+        const m = s.match(/^(\d{1,2}):(\d{2})$/);
+        if (!m) return null;
+        const h = parseInt(m[1], 10);
+        const min = parseInt(m[2], 10);
+        if (h > 23 || min > 59) return null;
+        return h * 60 + min;
+    }
+
+    /** 分钟数转 "X.XX" 小时字符串 */
+    function minutesToHoursStr(minutes) {
+        if (minutes === null || minutes < 0) return '0.00';
+        return (minutes / 60).toFixed(2);
+    }
+
+    /** 计算单个时段的工作分钟数（处理跨日） */
+    function calcDuration(inMin, outMin) {
+        if (inMin === null || outMin === null) return 0;
+        let d = outMin - inMin;
+        if (d < 0) d += 24 * 60; // 跨日
+        return d;
+    }
+
+    // ============================================================
+    //  CORE CALCULATION
+    // ============================================================
+    /**
+     * 根据当前行数据计算：
+     *   workMinutes  — 总工作分钟（扣除午休）
+     *   otMinutes    — 加班分钟
+     *   lateMinutes  — 迟到/早退分钟
+     *   absentFlag   — 是否缺勤
+     *
+     * 规则（基于您CALCULATION的常见逻辑）：
+     *   - 标准工作日 8 小时 = 480 分钟
+     *   - 午休 1 小时（12:00–13:00），从 AM+PM 总跨度中扣除
+     *   - OT 仅当有 OT 打卡时计算
+     *   - 状态为 AL/SL/UL 等时，Work 按 0 处理（或按您需要可调整）
+     */
+    function computeRow(row) {
+        const inAM = timeToMinutes(row.clockInAM);
+        const outAM = timeToMinutes(row.clockOutAM);
+        const inPM = timeToMinutes(row.clockInPM);
+        const outPM = timeToMinutes(row.clockOutPM);
+        const inOT = timeToMinutes(row.clockInOT);
+        const outOT = timeToMinutes(row.clockOutOT);
+
+        const status = (row.status || '').toUpperCase();
+
+        let workMin = 0;
+        let otMin = 0;
+        let lateMin = 0;
+        let absent = false;
+
+        // --- 缺勤类状态 ---
+        if (['AL', 'SL', 'UL', 'OFF'].includes(status)) {
+            // 这些状态当天不计实际工作工时
+            // 如果状态是 AL / SL / UL，您可以根据需要把 workMin 设为 0
+            workMin = 0;
+            otMin = 0;
+            lateMin = 0;
+            absent = (status === 'UL'); // UL 视为缺勤标记
+        } else {
+            // --- 正常出勤 / 半天 ---
+            // AM 段
+            const amDur = calcDuration(inAM, outAM);
+            // PM 段
+            const pmDur = calcDuration(inPM, outPM);
+            // OT 段
+            const otDur = calcDuration(inOT, outOT);
+
+            // 总跨度（AM + PM）
+            let totalSpan = amDur + pmDur;
+
+            // 扣除午休（如果 AM 和 PM 都有打卡，且总跨度 > 60 分钟，扣 60 分钟午休）
+            // 简化逻辑：只要 AM 和 PM 都存在，扣 60 分钟午休
+            if (inAM !== null && outAM !== null && inPM !== null && outPM !== null) {
+                totalSpan = Math.max(0, totalSpan - 60);
+            }
+
+            // HAL 半天：如果状态是 HAL，只取一半（或按实际打卡）
+            if (status === 'HAL') {
+                // 半天：取 AM 或 PM 中较长的一段，不扣午休
+                totalSpan = Math.max(amDur, pmDur);
+            }
+
+            workMin = totalSpan;
+            otMin = otDur;
+
+            // 迟到/早退：标准 8:00–17:00（可根据需要调整）
+            // 简化：如果 AM 打卡晚于 8:30 或 PM 打卡晚于 13:00，记录迟到分钟
+            const STD_START = 8 * 60;      // 8:00
+            const STD_END = 17 * 60;       // 17:00
+            if (inAM !== null && inAM > STD_START + 30) { // 8:30 后算迟到
+                lateMin += inAM - (STD_START + 30);
+            }
+            if (inPM !== null && inPM > 13 * 60) { // 13:00 后算迟到
+                lateMin += inPM - 13 * 60;
+            }
+            // 早退：PM 下班早于 17:00
+            if (outPM !== null && outPM < STD_END) {
+                lateMin += STD_END - outPM;
+            }
+        }
+
+        return {
+            workMinutes: workMin,
+            otMinutes: otMin,
+            lateMinutes: lateMin,
+            absent: absent
+        };
+    }
+
+    // ============================================================
+    //  RENDER
+    // ============================================================
+    function render() {
+        tbody.innerHTML = '';
+
+        if (rows.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="15">
+                        <div class="empty-state">
+                            <div style="font-size:36px;margin-bottom:8px;">📋</div>
+                            <p>No timesheet data yet. Import an Excel file or click <strong>+ Add Row</strong>.</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            recordCount.textContent = '0 rows';
+            summaryBadge.textContent = 'Total Work: 0.00h';
+            totalWorkEl.textContent = '0.00';
+            totalOTEl.textContent = '0.00';
+            totalLateEl.textContent = '0.00';
+            return;
+        }
+
+        let totalWorkMin = 0;
+        let totalOTMin = 0;
+        let totalLateMin = 0;
+
+        rows.forEach((row, index) => {
+            const calc = computeRow(row);
+            totalWorkMin += calc.workMinutes;
+            totalOTMin += calc.otMinutes;
+            totalLateMin += calc.lateMinutes;
+
+            const tr = document.createElement('tr');
+            if (calc.otMinutes > 0) tr.classList.add('row-overtime');
+            if (calc.absent) tr.classList.add('row-absent');
+
+            // 状态 data 属性用于颜色
+            const statusVal = (row.status || '').toUpperCase();
+
+            tr.innerHTML = `
+                <td style="color:#94a3b8;font-size:12px;">${index + 1}</td>
+                <td>${escapeHtml(row.personId || '')}</td>
+                <td class="name-cell">${escapeHtml(row.name || '')}</td>
+                <td class="date-cell">${escapeHtml(row.date || '')}</td>
+                <td><input class="time-input" data-field="clockInAM" value="${escapeHtml(row.clockInAM || '')}" placeholder="08:00"></td>
+                <td><input class="time-input" data-field="clockOutAM" value="${escapeHtml(row.clockOutAM || '')}" placeholder="12:00"></td>
+                <td><input class="time-input" data-field="clockInPM" value="${escapeHtml(row.clockInPM || '')}" placeholder="13:00"></td>
+                <td><input class="time-input" data-field="clockOutPM" value="${escapeHtml(row.clockOutPM || '')}" placeholder="17:00"></td>
+                <td><input class="time-input" data-field="clockInOT" value="${escapeHtml(row.clockInOT || '')}" placeholder="--"></td>
+                <td><input class="time-input" data-field="clockOutOT" value="${escapeHtml(row.clockOutOT || '')}" placeholder="--"></td>
+                <td>
+                    <select class="status-select" data-field="status" data-status="${statusVal}">
+                        <option value="" ${!statusVal ? 'selected' : ''}>—</option>
+                        <option value="AL" ${statusVal === 'AL' ? 'selected' : ''}>AL</option>
+                        <option value="L" ${statusVal === 'L' ? 'selected' : ''}>L</option>
+                        <option value="HAL" ${statusVal === 'HAL' ? 'selected' : ''}>HAL</option>
+                        <option value="SL" ${statusVal === 'SL' ? 'selected' : ''}>SL</option>
+                        <option value="UL" ${statusVal === 'UL' ? 'selected' : ''}>UL</option>
+                        <option value="OFF" ${statusVal === 'OFF' ? 'selected' : ''}>OFF</option>
+                    </select>
+                </td>
+                <td class="calc-cell ${calc.workMinutes === 0 ? 'absent' : ''}">${minutesToHoursStr(calc.workMinutes)}</td>
+                <td class="calc-cell ${calc.otMinutes > 0 ? 'ot' : ''}">${minutesToHoursStr(calc.otMinutes)}</td>
+                <td class="calc-cell ${calc.lateMinutes > 0 ? 'absent' : ''}">${minutesToHoursStr(calc.lateMinutes)}</td>
+                <td><input class="time-input" style="width:90px;text-align:left;" data-field="remark" value="${escapeHtml(row.remark || '')}" placeholder="—"></td>
+            `;
+
+            // 绑定输入事件
+            tr.querySelectorAll('.time-input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const field = e.target.dataset.field;
+                    row[field] = e.target.value.trim();
+                    render(); // 重新计算并刷新
+                });
+                input.addEventListener('blur', (e) => {
+                    const field = e.target.dataset.field;
+                    if (row[field] !== e.target.value.trim()) {
+                        row[field] = e.target.value.trim();
+                        render();
+                    }
+                });
+            });
+
+            // 绑定状态下拉
+            tr.querySelector('.status-select').addEventListener('change', (e) => {
+                row.status = e.target.value;
+                render();
+            });
+
+            tbody.appendChild(tr);
+        });
+
+        // 更新合计
+        recordCount.textContent = rows.length + ' rows';
+        summaryBadge.textContent = `Total Work: ${minutesToHoursStr(totalWorkMin)}h`;
+        totalWorkEl.textContent = minutesToHoursStr(totalWorkMin);
+        totalOTEl.textContent = minutesToHoursStr(totalOTMin);
+        totalLateEl.textContent = minutesToHoursStr(totalLateMin);
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>"]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            if (m === '"') return '&quot;';
+            return m;
+        });
+    }
+
+    // ============================================================
+    //  IMPORT EXCEL
+    // ============================================================
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            try {
+                const data = new Uint8Array(evt.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
+
+                if (jsonData.length < 2) {
+                    alert('File is empty or has no data rows.');
+                    return;
+                }
+
+                // 检测表头行：跳过可能的标题行，找到包含 "Person" 或 "ID" 的行
+                let headerRowIndex = 0;
+                for (let i = 0; i < Math.min(jsonData.length, 5); i++) {
+                    const rowStr = jsonData[i].join(' ').toLowerCase();
+                    if (rowStr.includes('person') || rowStr.includes('id') || rowStr.includes('name')) {
+                        headerRowIndex = i;
+                        break;
+                    }
+                }
+
+                const headers = jsonData[headerRowIndex].map(h => String(h).trim().toLowerCase());
+
+                // 映射列索引
+                const colMap = {
+                    personId: findCol(headers, ['person id', 'id', 'personid']),
+                    name: findCol(headers, ['name', 'first name', 'employee name']),
+                    date: findCol(headers, ['date']),
+                    clockInAM: findCol(headers, ['clock in', 'clockin', 'in', 'clock in 1']),
+                    clockOutAM: findCol(headers, ['clock out', 'clockout', 'out', 'clock out 1']),
+                    clockInPM: findCol(headers, ['clock in 2', 'clockin2', 'in2']),
+                    clockOutPM: findCol(headers, ['clock out 2', 'clockout2', 'out2']),
+                    clockInOT: findCol(headers, ['clock in 3', 'clockin3', 'in3']),
+                    clockOutOT: findCol(headers, ['clock out 3', 'clockout3', 'out3']),
+                    status: findCol(headers, ['status', 'abnormal situation', 'abnormal']),
+                    remark: findCol(headers, ['remark', 'remarks', 'note', 'notes'])
+                };
+
+                // 如果找不到 AM/PM 分开的列，尝试合并列
+                if (colMap.clockInAM === -1 && colMap.clockInPM === -1) {
+                    // 可能只有一组 Clock In/Clock Out
+                    const inIdx = findCol(headers, ['clock in', 'clockin', 'in']);
+                    const outIdx = findCol(headers, ['clock out', 'clockout', 'out']);
+                    if (inIdx !== -1 && outIdx !== -1) {
+                        colMap.clockInAM = inIdx;
+                        colMap.clockOutAM = outIdx;
+                    }
+                }
+
+                // 构建数据行
+                const newRows = [];
+                for (let i = headerRowIndex + 1; i < jsonData.length; i++) {
+                    const r = jsonData[i];
+                    if (!r || r.length === 0) continue;
+                    // 跳过全空行
+                    if (r.every(c => String(c).trim() === '')) continue;
+
+                    const personId = colMap.personId !== -1 ? String(r[colMap.personId] || '').trim() : '';
+                    const name = colMap.name !== -1 ? String(r[colMap.name] || '').trim() : '';
+                    const date = colMap.date !== -1 ? String(r[colMap.date] || '').trim() : '';
+
+                    // 解析时间：支持 "08:30" 或数字格式
+                    const clockInAM = parseTimeValue(colMap.clockInAM !== -1 ? r[colMap.clockInAM] : '');
+                    const clockOutAM = parseTimeValue(colMap.clockOutAM !== -1 ? r[colMap.clockOutAM] : '');
+                    const clockInPM = parseTimeValue(colMap.clockInPM !== -1 ? r[colMap.clockInPM] : '');
+                    const clockOutPM = parseTimeValue(colMap.clockOutPM !== -1 ? r[colMap.clockOutPM] : '');
+                    const clockInOT = parseTimeValue(colMap.clockInOT !== -1 ? r[colMap.clockInOT] : '');
+                    const clockOutOT = parseTimeValue(colMap.clockOutOT !== -1 ? r[colMap.clockOutOT] : '');
+
+                    // 状态：如果 Excel 中有 abnormal situation，尝试映射
+                    let status = '';
+                    const rawStatus = colMap.status !== -1 ? String(r[colMap.status] || '').trim().toUpperCase() : '';
+                    // 映射常见值
+                    if (rawStatus.includes('AL') || rawStatus === 'AL') status = 'AL';
+                    else if (rawStatus.includes('SL') || rawStatus === 'SL') status = 'SL';
+                    else if (rawStatus.includes('UL') || rawStatus === 'UL') status = 'UL';
+                    else if (rawStatus.includes('HAL') || rawStatus === 'HAL') status = 'HAL';
+                    else if (rawStatus.includes('OFF') || rawStatus === 'OFF') status = 'OFF';
+                    else if (rawStatus.includes('LEAVE') || rawStatus === 'L') status = 'L';
+                    else if (rawStatus === 'ABSENT') status = 'UL';
+
+                    const remark = colMap.remark !== -1 ? String(r[colMap.remark] || '').trim() : '';
+
+                    // 只添加有意义的行（有名字或 ID）
+                    if (personId || name) {
+                        newRows.push({
+                            id: generateId(),
+                            personId,
+                            name,
+                            date,
+                            clockInAM: clockInAM || '',
+                            clockOutAM: clockOutAM || '',
+                            clockInPM: clockInPM || '',
+                            clockOutPM: clockOutPM || '',
+                            clockInOT: clockInOT || '',
+                            clockOutOT: clockOutOT || '',
+                            status,
+                            remark
+                        });
+                    }
+                }
+
+                if (newRows.length === 0) {
+                    alert('No valid rows found. Please check the file format.');
+                    return;
+                }
+
+                rows = newRows;
+                render();
+                alert(`✅ Imported ${rows.length} rows successfully.`);
+
+            } catch (err) {
+                console.error(err);
+                alert('Error reading file: ' + err.message);
+            }
+        };
+        reader.readAsArrayBuffer(file);
+        fileInput.value = ''; // 允许重复导入同一文件
+    });
+
+    function findCol(headers, candidates) {
+        for (const c of candidates) {
+            const idx = headers.findIndex(h => h.includes(c));
+            if (idx !== -1) return idx;
+        }
+        return -1;
+    }
+
+    function parseTimeValue(val) {
+        if (val === null || val === undefined || val === '') return '';
+        const s = String(val).trim();
+        // 如果已经是 HH:MM
+        if (/^\d{1,2}:\d{2}$/.test(s)) return s;
+        // 如果是数字（Excel 时间序列号，如 0.354166 = 8:30）
+        const num = parseFloat(s);
+        if (!isNaN(num) && num >= 0 && num < 1) {
+            const totalMinutes = Math.round(num * 24 * 60);
+            const h = Math.floor(totalMinutes / 60);
+            const m = totalMinutes % 60;
+            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        }
+        // 尝试匹配 "8:30 AM" 之类
+        const match12 = s.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+        if (match12) {
+            let h = parseInt(match12[1], 10);
+            const m = parseInt(match12[2], 10);
+            const ampm = match12[3].toUpperCase();
+            if (ampm === 'PM' && h < 12) h += 12;
+            if (ampm === 'AM' && h === 12) h = 0;
+            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        }
+        return s; // 原样返回
+    }
+
+    // ============================================================
+    //  ADD ROW
+    // ============================================================
+    document.getElementById('addRowBtn').addEventListener('click', function() {
+        rows.push({
+            id: generateId(),
+            personId: '',
+            name: '',
+            date: new Date().toISOString().slice(0, 10),
+            clockInAM: '',
+            clockOutAM: '',
+            clockInPM: '',
+            clockOutPM: '',
+            clockInOT: '',
+            clockOutOT: '',
+            status: '',
+            remark: ''
+        });
+        render();
+        // 滚动到新行
+        setTimeout(() => {
+            const lastRow = tbody.lastElementChild;
+            if (lastRow) lastRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 50);
+    });
+
+    // ============================================================
+    //  CLEAR
+    // ============================================================
+    document.getElementById('clearBtn').addEventListener('click', function() {
+        if (rows.length === 0) return;
+        if (confirm('Clear all data? This cannot be undone.')) {
+            rows = [];
+            render();
+        }
+    });
+
+    // ============================================================
+    //  EXPORT CSV
+    // ============================================================
+    document.getElementById('exportBtn').addEventListener('click', function() {
+        if (rows.length === 0) {
+            alert('No data to export.');
+            return;
+        }
+
+        const headers = ['Person ID', 'Name', 'Date', 'Clock In (AM)', 'Clock Out (AM)', 'Clock In (PM)', 'Clock Out (PM)', 'Clock In (OT)', 'Clock Out (OT)', 'Status', 'Work Hrs', 'OT Hrs', 'Late/Early', 'Remark'];
+        const csvRows = [headers.join(',')];
+
+        rows.forEach(row => {
+            const calc = computeRow(row);
+            const vals = [
+                csvEscape(row.personId),
+                csvEscape(row.name),
+                csvEscape(row.date),
+                csvEscape(row.clockInAM),
+                csvEscape(row.clockOutAM),
+                csvEscape(row.clockInPM),
+                csvEscape(row.clockOutPM),
+                csvEscape(row.clockInOT),
+                csvEscape(row.clockOutOT),
+                csvEscape(row.status),
+                minutesToHoursStr(calc.workMinutes),
+                minutesToHoursStr(calc.otMinutes),
+                minutesToHoursStr(calc.lateMinutes),
+                csvEscape(row.remark)
+            ];
+            csvRows.push(vals.join(','));
+        });
+
+        const blob = new Blob(['\uFEFF' + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'timesheet_calculation_' + new Date().toISOString().slice(0, 10) + '.csv';
+        link.click();
+        URL.revokeObjectURL(link.href);
+    });
+
+    function csvEscape(val) {
+        if (val === null || val === undefined) return '';
+        const s = String(val);
+        if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+            return '"' + s.replace(/"/g, '""') + '"';
+        }
+        return s;
+    }
+
+    // ============================================================
+    //  INIT
+    // ============================================================
+    render();
+</script>
+</body>
+</html>
