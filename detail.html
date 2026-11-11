@@ -337,7 +337,6 @@
         <div class="line-item"><label for="unpaidLeave"><i class="fas fa-calendar-times"></i> Cuti Tanpa Gaji</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="unpaidLeave" value="0"></div></div>
         <div class="line-item"><label for="pinjaman"><i class="fas fa-hand-holding-usd"></i> Pinjaman</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="pinjaman" value="0"></div></div>
         <div class="line-item"><label for="deductionLain"><i class="fas fa-ellipsis-h"></i> Potongan Lain</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="deductionLain" value="0"></div></div>
-        <!-- 保留半天假金额输入（可选） -->
         <div class="line-item"><label for="halfDaysLeave"><i class="fas fa-hourglass-half"></i> Cuti Setengah Hari (RM)</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="halfDaysLeave" value="0"></div></div>
       </div>
       <div class="panel-total"><span><i class="fas fa-calculator"></i> Jumlah Potongan</span><strong id="totalPotongan">RM 0.00</strong></div>
@@ -401,7 +400,7 @@
       <button class="btn btn-success" id="reloadBtn"><i class="fas fa-cloud-download-alt"></i> Muat Semula</button>
       <button class="btn btn-ghost" id="printBtn"><i class="fas fa-print"></i> Cetak</button>
     </div>
-    <div class="action-hint"><i class="fas fa-info-circle"></i><span>Perubahan akan disimpan ke <strong>payrollEmployees</strong>. Tekan <kbd>Ctrl</kbd> + <kbd>S</kbd> untuk simpan pantas.</span></div>
+    <div class="action-hint"><i class="fas fa-info-circle"></i><span>Perubahan akan disimpan ke <strong>payrollEmployees</strong> dan di-sync ke Google Sheet. Tekan <kbd>Ctrl</kbd> + <kbd>S</kbd> untuk simpan pantas.</span></div>
   </div>
 
   <div class="signature-area">
@@ -716,12 +715,18 @@
   }
 
   /* ===== 保存 + 同步 ===== */
-  function saveAndSync() {
+  async function saveAndSync() {
     if (!currentRaw || !currentRaw.Code) {
       alert('Tiada pekerja dipilih. Sila pilih KOD terlebih dahulu.');
       return;
     }
 
+    const btn = el('saveBtn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+    // 收集最新表单数据到 updated
     const updated = { ...currentRaw };
     updated.Basic = num(el('inputGajiAsas').value);
 
@@ -732,6 +737,37 @@
       else updated[key] = num(inp.value);
     });
 
+    // 1. 先推送到 Google Sheet
+    let sheetSuccess = false;
+    if (SCRIPT_URL) {
+      try {
+        const payload = { ...updated, action: 'saveEmployeeDetail' };
+        
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        
+        if (result.status === 'success') {
+          sheetSuccess = true;
+        } else {
+          throw new Error(result.message || 'Gagal sync ke Sheet');
+        }
+      } catch (err) {
+        console.error('Sync to sheet error:', err);
+        const proceed = confirm(`⚠️ Gagal sync ke Google Sheet: ${err.message}\n\nAdakah anda mahu tetap simpan di LocalStorage sahaja?`);
+        if (!proceed) {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+          setSyncStatus('Batal simpan', 'error');
+          return; // 用户取消
+        }
+      }
+    }
+
+    // 2. 更新主数组 (LocalStorage)
     let all = [];
     try {
       const allJson = localStorage.getItem(STORAGE_KEY);
@@ -750,15 +786,25 @@
     allEmployees = all;
     currentRaw = updated;
 
+    // 通知 opener（如果是通过 window.open 打开的）
     try {
       if (window.opener && !window.opener.closed) {
         window.opener.postMessage({ type: 'PAYROLL_UPDATE', employees: all }, '*');
       }
     } catch (e) {}
 
+    // 3. 更新 UI
+    btn.disabled = false;
+    btn.innerHTML = originalText;
+
     const time = new Date().toLocaleTimeString('ms-MY', { hour12: false });
-    setSyncStatus('Disimpan · ' + time, 'success');
-    alert('✅ Data berjaya disimpan untuk ' + (updated.Name || updated.Code));
+    if (sheetSuccess) {
+      setSyncStatus('Disimpan & Sync ke Sheet · ' + time, 'success');
+      alert('✅ Data berjaya disimpan & disegerakkan ke Google Sheet untuk ' + (updated.Name || updated.Code));
+    } else {
+      setSyncStatus('Disimpan (Local sahaja) · ' + time, 'success');
+      alert('✅ Data disimpan di LocalStorage. (Gagal sync ke Sheet)');
+    }
   }
 
   /* ===== 备选方案 ===== */
