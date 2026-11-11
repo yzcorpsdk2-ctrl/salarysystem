@@ -306,7 +306,6 @@
     <button onclick="applyUrl()">🔗 Apply</button>
   </div>
 
-  <!-- 触发建立 Sheet 的按钮 -->
   <button class="btn" onclick="createEmployeeSheets()" id="btnCreateSheets" title="Buat sheet individu untuk setiap pekerja aktif">
     📄 Buat Sheet
   </button>
@@ -623,7 +622,7 @@ function filterCards() {
 }
 
 /* ============================================================
-   打开详情页
+   打开详情页 (带 Code 参数)
    ============================================================ */
 function openDetail(code) {
   const emp = allEmployees.find(e => e.Code === code);
@@ -637,7 +636,8 @@ function openDetail(code) {
     console.error('localStorage save failed:', err);
   }
 
-  window.open(DETAIL_URL, '_blank');
+  // 带 code 参数打开详情页
+  window.open(DETAIL_URL + '?code=' + encodeURIComponent(emp.Code), '_blank');
 }
 
 /* ============================================================
