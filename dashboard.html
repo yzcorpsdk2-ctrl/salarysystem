@@ -306,7 +306,7 @@
     <button onclick="applyUrl()">🔗 Apply</button>
   </div>
 
-  <!-- ✅ 补齐了：触发建立 Sheet 的按钮 -->
+  <!-- 触发建立 Sheet 的按钮 -->
   <button class="btn" onclick="createEmployeeSheets()" id="btnCreateSheets" title="Buat sheet individu untuk setiap pekerja aktif">
     📄 Buat Sheet
   </button>
@@ -344,7 +344,7 @@
 
 <script>
 /* ============================================================
-   ✅ 补齐了：核心变量声明
+   全局变量
    ============================================================ */
 const URL_KEY = 'payrollScriptUrl';
 const STORAGE_KEY = 'payrollEmployees';
@@ -468,7 +468,6 @@ async function loadData() {
     </div>`;
 
   try {
-    // 1. 从 API 获取基础数据
     const res = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
     const data = await res.json();
     
@@ -479,7 +478,6 @@ async function loadData() {
       staffRaw = data;
     }
 
-    // 2. 过滤 ACTIVE 员工，并映射字段
     const activeStaff = staffRaw.map(row => {
       return {
         Code: String(row.Code || '').trim(),
@@ -487,7 +485,6 @@ async function loadData() {
         GroupName: String(row.GroupName || '').trim(),
         Situation: String(row.Situation || 'ACTIVE').toUpperCase(),
         Salary: parseFloat(row.Salary) || 0,
-        // 补充基础字段（为 detail.html 准备）
         Jantina: row.Jantina || '',
         TarikhLahir: row.TarikhLahir || '',
         IC: row.IC || '',
@@ -501,7 +498,6 @@ async function loadData() {
       };
     }).filter(s => s.Code && s.Name && s.Situation === 'ACTIVE');
 
-    // 3. 从 localStorage 获取已有薪资数据
     let localPayroll = [];
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
@@ -509,13 +505,11 @@ async function loadData() {
     } catch (e) { localPayroll = []; }
     if (!Array.isArray(localPayroll)) localPayroll = [];
 
-    // 4. 合并：优先保留 localStorage 中的薪资字段，基础资料以 API 为准
     allEmployees = activeStaff.map(staff => {
       const payroll = localPayroll.find(p => p.Code === staff.Code) || {};
       return {
         ...staff,
         ...payroll,
-        // 确保基础字段以 staffinfo 为准
         Name: staff.Name,
         GroupName: staff.GroupName,
         Situation: staff.Situation,
@@ -524,7 +518,6 @@ async function loadData() {
       };
     });
 
-    // 5. 保存合并后的数据回 localStorage
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees));
     } catch (e) {}
@@ -538,7 +531,6 @@ async function loadData() {
     console.error('Load error:', err);
     setSyncBadge('err', 'Gagal muat data');
     
-    // Fallback: 从 localStorage 读取
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
@@ -584,7 +576,6 @@ function renderCards() {
     if (sitLower === 'pending') badgeClass = 'pending';
     else if (sitLower === 'inactive') badgeClass = 'inactive';
 
-    // 使用 Basic 或 Salary 作为展示薪资
     const displaySalary = num(emp.Basic || emp.Salary);
 
     html += `
@@ -639,7 +630,6 @@ function openDetail(code) {
   if (!emp) return;
 
   try {
-    // 确保 localStorage 中有完整数据
     localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees));
     localStorage.setItem(SELECTED_CODE_KEY, emp.Code || '');
     localStorage.setItem(SELECTED_EMP_KEY, JSON.stringify(emp));
@@ -658,7 +648,6 @@ window.addEventListener('DOMContentLoaded', () => {
   if (SCRIPT_URL) {
     loadData();
   } else {
-    // 显示提示
     document.getElementById('employeeGrid').innerHTML = `
       <div class="empty-state">
         <span class="icon">🔗</span>
