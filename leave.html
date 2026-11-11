@@ -7,212 +7,48 @@
     <!-- SheetJS 用于导入/导出 Excel -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-            background: #f0f2f5;
-            color: #1e293b;
-            padding: 24px;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-            padding: 24px 28px 32px;
-        }
-        h1 {
-            font-size: 24px;
-            font-weight: 600;
-            letter-spacing: -0.3px;
-            color: #0f172a;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        h1 small {
-            font-size: 13px;
-            font-weight: 400;
-            color: #64748b;
-            background: #f1f5f9;
-            padding: 4px 12px;
-            border-radius: 20px;
-        }
-        .toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 12px;
-            margin: 20px 0 24px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .toolbar button,
-        .toolbar label.file-label {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 9px 18px;
-            font-size: 14px;
-            font-weight: 500;
-            border-radius: 8px;
-            border: 1px solid #d1d9e6;
-            background: #ffffff;
-            color: #1e293b;
-            cursor: pointer;
-            transition: all 0.15s;
-            white-space: nowrap;
-        }
-        .toolbar button:hover,
-        .toolbar label.file-label:hover {
-            background: #f8fafc;
-            border-color: #94a3b8;
-        }
-        .toolbar button.primary {
-            background: #2563eb;
-            border-color: #2563eb;
-            color: #ffffff;
-        }
-        .toolbar button.primary:hover {
-            background: #1d4ed8;
-        }
-        .toolbar button.template {
-            background: #10b981;
-            border-color: #10b981;
-            color: #ffffff;
-        }
-        .toolbar button.template:hover {
-            background: #059669;
-        }
-        .toolbar button.danger {
-            border-color: #fca5a5;
-            color: #dc2626;
-        }
-        .toolbar button.danger:hover {
-            background: #fef2f2;
-            border-color: #f87171;
-        }
-        .toolbar .spacer {
-            flex: 1;
-        }
-        .toolbar .summary-badge {
-            font-size: 13px;
-            color: #475569;
-            background: #f1f5f9;
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1px solid #e2e8f0;
-        }
-        input[type="file"] {
-            display: none;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #1e293b; padding: 24px; }
+        .container { max-width: 1500px; margin: 0 auto; background: #ffffff; border-radius: 16px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08); padding: 24px 28px 32px; }
+        h1 { font-size: 24px; font-weight: 600; letter-spacing: -0.3px; color: #0f172a; display: flex; align-items: center; gap: 12px; }
+        h1 small { font-size: 13px; font-weight: 400; color: #64748b; background: #f1f5f9; padding: 4px 12px; border-radius: 20px; }
+        .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 20px 0 24px; padding-bottom: 20px; border-bottom: 1px solid #e2e8f0; }
+        .toolbar button, .toolbar label.file-label { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; font-size: 14px; font-weight: 500; border-radius: 8px; border: 1px solid #d1d9e6; background: #ffffff; color: #1e293b; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+        .toolbar button:hover, .toolbar label.file-label:hover { background: #f8fafc; border-color: #94a3b8; }
+        .toolbar button.primary { background: #2563eb; border-color: #2563eb; color: #ffffff; }
+        .toolbar button.primary:hover { background: #1d4ed8; }
+        .toolbar button.template { background: #10b981; border-color: #10b981; color: #ffffff; }
+        .toolbar button.template:hover { background: #059669; }
+        .toolbar button.danger { border-color: #fca5a5; color: #dc2626; }
+        .toolbar button.danger:hover { background: #fef2f2; border-color: #f87171; }
+        .toolbar .spacer { flex: 1; }
+        .toolbar .summary-badge { font-size: 13px; color: #475569; background: #f1f5f9; padding: 6px 14px; border-radius: 20px; border: 1px solid #e2e8f0; }
+        input[type="file"] { display: none; }
 
-        .table-wrap {
-            overflow-x: auto;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            background: #ffffff;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            min-width: 1400px;
-        }
-        thead {
-            background: #f8fafc;
-            border-bottom: 2px solid #e2e8f0;
-        }
-        thead th {
-            padding: 10px 8px;
-            font-weight: 600;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            color: #475569;
-            text-align: center;
-            white-space: nowrap;
-            border-right: 1px solid #e9eef4;
-            position: sticky;
-            top: 0;
-            background: #f8fafc;
-            z-index: 2;
-        }
+        .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid #e2e8f0; background: #ffffff; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1400px; }
+        thead { background: #f8fafc; border-bottom: 2px solid #e2e8f0; }
+        thead th { padding: 10px 8px; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; color: #475569; text-align: center; white-space: nowrap; border-right: 1px solid #e9eef4; position: sticky; top: 0; background: #f8fafc; z-index: 2; }
         thead th:first-child { text-align: left; padding-left: 14px; }
         thead th:last-child { border-right: none; }
-        thead th .sub {
-            display: block;
-            font-weight: 400;
-            font-size: 10px;
-            color: #94a3b8;
-            text-transform: none;
-            letter-spacing: 0;
-            margin-top: 2px;
-        }
+        thead th .sub { display: block; font-weight: 400; font-size: 10px; color: #94a3b8; text-transform: none; letter-spacing: 0; margin-top: 2px; }
 
-        tbody td {
-            padding: 8px 8px;
-            border-bottom: 1px solid #f1f5f9;
-            border-right: 1px solid #f1f5f9;
-            text-align: center;
-            vertical-align: middle;
-            white-space: nowrap;
-        }
-        tbody td:first-child {
-            text-align: left;
-            padding-left: 14px;
-            font-weight: 500;
-        }
+        tbody td { padding: 8px 8px; border-bottom: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; text-align: center; vertical-align: middle; white-space: nowrap; }
+        tbody td:first-child { text-align: left; padding-left: 14px; font-weight: 500; }
         tbody td:last-child { border-right: none; }
         tbody tr:hover { background: #fafbfc; }
 
         td.date-cell { min-width: 100px; font-size: 12px; }
-        td.name-cell { min-width: 130px; }
+        td.name-cell { min-width: 140px; }
 
-        .time-input {
-            width: 64px;
-            padding: 5px 4px;
-            font-size: 12px;
-            text-align: center;
-            border: 1px solid transparent;
-            border-radius: 5px;
-            background: transparent;
-            font-family: 'Inter', monospace;
-            transition: all 0.15s;
-        }
+        .time-input { width: 64px; padding: 5px 4px; font-size: 12px; text-align: center; border: 1px solid transparent; border-radius: 5px; background: transparent; font-family: 'Inter', monospace; transition: all 0.15s; }
         .time-input:hover { border-color: #cbd5e1; background: #fff; }
-        .time-input:focus {
-            outline: none;
-            border-color: #2563eb;
-            background: #fff;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-        }
+        .time-input:focus { outline: none; border-color: #2563eb; background: #fff; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
         .time-input::placeholder { color: #cbd5e1; font-size: 11px; }
 
-        /* 状态选择器 —— 加宽以容纳完整描述 */
-        .status-select {
-            padding: 5px 6px;
-            font-size: 12px;
-            font-weight: 500;
-            border-radius: 6px;
-            border: 1px solid #d1d9e6;
-            background: #ffffff;
-            color: #1e293b;
-            cursor: pointer;
-            transition: all 0.15s;
-            width: 170px;
-        }
+        .status-select { padding: 5px 6px; font-size: 12px; font-weight: 500; border-radius: 6px; border: 1px solid #d1d9e6; background: #ffffff; color: #1e293b; cursor: pointer; transition: all 0.15s; width: 150px; }
         .status-select:hover { border-color: #94a3b8; }
-        .status-select:focus {
-            outline: none;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-        }
+        .status-select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
         .status-select[data-status="AL"] { background: #fef9c3; border-color: #fde047; color: #854d0e; }
         .status-select[data-status="SL"] { background: #ffedd5; border-color: #fdba74; color: #9a3412; }
         .status-select[data-status="UL"] { background: #fecaca; border-color: #f87171; color: #991b1b; }
@@ -220,42 +56,19 @@
         .status-select[data-status="L"] { background: #f3e8ff; border-color: #d8b4fe; color: #6b21a8; }
         .status-select[data-status="OFF"] { background: #f1f5f9; border-color: #cbd5e1; color: #64748b; }
 
-        td.calc-cell {
-            font-weight: 600;
-            color: #0f172a;
-            font-size: 13px;
-            min-width: 70px;
-        }
+        td.calc-cell { font-weight: 600; color: #0f172a; font-size: 13px; min-width: 70px; }
         td.calc-cell.ot { color: #d97706; }
         td.calc-cell.absent { color: #dc2626; }
 
         tbody tr.row-overtime { background: #fffbeb; }
         tbody tr.row-absent { background: #fef2f2; }
 
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #94a3b8;
-        }
+        .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
         .empty-state p { margin-top: 8px; font-size: 14px; }
 
-        tfoot {
-            background: #f8fafc;
-            font-weight: 600;
-            border-top: 2px solid #e2e8f0;
-        }
-        tfoot td {
-            padding: 12px 8px;
-            font-size: 13px;
-            color: #0f172a;
-            text-align: center;
-            border-right: 1px solid #e9eef4;
-        }
-        tfoot td:first-child {
-            text-align: left;
-            padding-left: 14px;
-            font-weight: 600;
-        }
+        tfoot { background: #f8fafc; font-weight: 600; border-top: 2px solid #e2e8f0; }
+        tfoot td { padding: 12px 8px; font-size: 13px; color: #0f172a; text-align: center; border-right: 1px solid #e9eef4; }
+        tfoot td:first-child { text-align: left; padding-left: 14px; font-weight: 600; }
         tfoot td:last-child { border-right: none; }
         tfoot .total-label { color: #475569; font-weight: 500; font-size: 12px; }
 
@@ -339,7 +152,7 @@
     // ============================================================
     //  DATA LAYER
     // ============================================================
-    let rows = []; // { id, personId, name, date, clockInAM, clockOutAM, clockInPM, clockOutPM, clockInOT, clockOutOT, status, remark }
+    let rows = []; // 内部数据结构
 
     // ============================================================
     //  DOM REFS
@@ -361,7 +174,7 @@
 
     function timeToMinutes(str) {
         if (!str) return null;
-        const s = str.trim();
+        const s = String(str).trim();
         const m = s.match(/^(\d{1,2}):(\d{2})$/);
         if (!m) return null;
         const h = parseInt(m[1], 10);
@@ -382,7 +195,6 @@
         return d;
     }
 
-    // 状态缩写列表（用于展示和映射）
     const STATUS_OPTIONS = [
         { value: 'AL',  label: 'AL - Annual Leave' },
         { value: 'L',   label: 'L - Leave' },
@@ -423,11 +235,11 @@
             let totalSpan = amDur + pmDur;
 
             if (inAM !== null && outAM !== null && inPM !== null && outPM !== null) {
-                totalSpan = Math.max(0, totalSpan - 60);
+                totalSpan = Math.max(0, totalSpan - 60); // 扣除1小时午休
             }
 
             if (status === 'HAL') {
-                totalSpan = Math.max(amDur, pmDur);
+                totalSpan = Math.max(amDur, pmDur); // 半天取较长的一段
             }
 
             workMin = totalSpan;
@@ -446,12 +258,7 @@
             }
         }
 
-        return {
-            workMinutes: workMin,
-            otMinutes: otMin,
-            lateMinutes: lateMin,
-            absent: absent
-        };
+        return { workMinutes: workMin, otMinutes: otMin, lateMinutes: lateMin, absent: absent };
     }
 
     // ============================================================
@@ -466,7 +273,7 @@
                     <td colspan="15">
                         <div class="empty-state">
                             <div style="font-size:36px;margin-bottom:8px;">📋</div>
-                            <p>No timesheet data yet. Import an Excel file or click <strong>+ Add Row</strong>.</p>
+                            <p>No data yet. Import a Timesheet or click <strong>+ Add Row</strong>.</p>
                         </div>
                     </td>
                 </tr>
@@ -495,17 +302,19 @@
 
             const statusVal = (row.status || '').toUpperCase();
 
-            // 生成状态下拉选项
             let statusOptionsHtml = `<option value="" ${!statusVal ? 'selected' : ''}>— Select —</option>`;
             STATUS_OPTIONS.forEach(opt => {
                 const sel = (opt.value === statusVal) ? 'selected' : '';
                 statusOptionsHtml += `<option value="${opt.value}" ${sel}>${opt.label}</option>`;
             });
 
+            // 合并 First Name 和 Last Name
+            const fullName = [row.firstName, row.lastName].filter(Boolean).join(' ');
+
             tr.innerHTML = `
                 <td style="color:#94a3b8;font-size:12px;">${index + 1}</td>
                 <td>${escapeHtml(row.personId || '')}</td>
-                <td class="name-cell">${escapeHtml(row.name || '')}</td>
+                <td class="name-cell">${escapeHtml(fullName)}</td>
                 <td class="date-cell">${escapeHtml(row.date || '')}</td>
                 <td><input class="time-input" data-field="clockInAM" value="${escapeHtml(row.clockInAM || '')}" placeholder="08:00"></td>
                 <td><input class="time-input" data-field="clockOutAM" value="${escapeHtml(row.clockOutAM || '')}" placeholder="12:00"></td>
@@ -529,13 +338,6 @@
                     const field = e.target.dataset.field;
                     row[field] = e.target.value.trim();
                     render();
-                });
-                input.addEventListener('blur', (e) => {
-                    const field = e.target.dataset.field;
-                    if (row[field] !== e.target.value.trim()) {
-                        row[field] = e.target.value.trim();
-                        render();
-                    }
                 });
             });
 
@@ -566,45 +368,48 @@
     }
 
     // ============================================================
-    //  DOWNLOAD TEMPLATE
+    //  DOWNLOAD TEMPLATE (完全匹配 Timesheet Report 列名)
     // ============================================================
     document.getElementById('downloadTemplateBtn').addEventListener('click', function() {
         const headers = [
-            'Person ID', 'Name', 'Date',
-            'Clock In (AM)', 'Clock Out (AM)',
-            'Clock In (PM)', 'Clock Out (PM)',
-            'Clock In (OT)', 'Clock Out (OT)',
-            'Status', 'Remark'
+            'Person ID', 'First Name', 'Last Name', 'Date', 'Timesheet',
+            'Clock In', 'Clock Out', 'Clock Time(h)',
+            'Clock In', 'Clock Out', 'Clock Time(h)',
+            'Clock In', 'Clock Out', 'Clock Time(h)',
+            'Total Break Time(h)', 'Total Work Time(h)', 'Total Overtime Time(h)',
+            'Statistic Rule Mode', 'Abnormal Situation'
         ];
 
-        // 三行示例：正常出勤、有加班、半天假
+        // 示例数据：正常、加班、缺勤
         const sampleRows = [
-            ['0001', 'YANG PING',      '2025-10-01', '08:00', '12:00', '13:00', '17:00', '',      '',      '',                          ''],
-            ['0002', 'TAN XIAO MING',  '2025-10-01', '08:30', '12:00', '13:00', '17:00', '18:00', '20:00', '',                          'OT 2h'],
-            ['0003', 'SITI NURHALIZA', '2025-10-01', '08:00', '12:00', '13:00', '17:00', '',      '',      'HAL - Half Day Leave',      'PM off'],
+            ['0001', 'YANG', 'PING', '2025-10-01', '8', '08:00', '12:00', '4.00', '13:00', '17:00', '4.00', '', '', '', '1.00', '8.00', '0.00', 'Even and Odd', ''],
+            ['0002', 'TAN', 'XIAO MING', '2025-10-01', '9', '08:30', '12:00', '3.50', '13:00', '17:00', '4.00', '18:00', '20:00', '2.00', '0.50', '9.50', '2.00', 'Even and Odd', 'Missed Punch'],
+            ['0003', 'SITI', 'NURHALIZA', '2025-10-01', '8', '08:00', '12:00', '4.00', '13:00', '17:00', '4.00', '', '', '', '1.00', '8.00', '0.00', 'Even and Odd', 'Absent']
         ];
 
         const wsData = [headers, ...sampleRows];
         const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-        // 设置列宽
         ws['!cols'] = [
-            { wch: 12 }, { wch: 20 }, { wch: 12 },
-            { wch: 14 }, { wch: 15 },
-            { wch: 14 }, { wch: 15 },
-            { wch: 14 }, { wch: 15 },
-            { wch: 24 }, { wch: 22 }
+            { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 10 },
+            { wch: 12 }, { wch: 12 }, { wch: 12 },
+            { wch: 12 }, { wch: 12 }, { wch: 12 },
+            { wch: 12 }, { wch: 12 }, { wch: 12 },
+            { wch: 18 }, { wch: 18 }, { wch: 20 },
+            { wch: 18 }, { wch: 18 }
         ];
 
-        // 加一个 Instructions 页
         const instructions = [
             ['Timesheet Template — Instructions'],
             [''],
             ['1. Fill in one row per employee per day.'],
             ['2. Date format: YYYY-MM-DD (e.g. 2025-10-01).'],
             ['3. Time format: HH:MM (e.g. 08:00, 17:30). Use 24-hour format.'],
-            ['4. Leave time cells blank if no clock-in/out.'],
-            ['5. Status column accepts:'],
+            ['4. Columns "Clock In", "Clock Out" appear 3 times:'],
+            ['   - 1st group: AM session (e.g. 08:00 - 12:00)'],
+            ['   - 2nd group: PM session (e.g. 13:00 - 17:00)'],
+            ['   - 3rd group: Overtime (OT) session (if applicable)'],
+            ['5. "Abnormal Situation" column accepts:'],
             ['   AL  - Annual Leave'],
             ['   L   - Leave'],
             ['   HAL - Half Day Leave'],
@@ -620,11 +425,11 @@
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Timesheet');
         XLSX.utils.book_append_sheet(wb, ws2, 'Instructions');
-        XLSX.writeFile(wb, 'Timesheet_Template.xlsx');
+        XLSX.writeFile(wb, 'Timesheet_Report_Template.xlsx');
     });
 
     // ============================================================
-    //  IMPORT EXCEL
+    //  IMPORT EXCEL (按列索引提取，适配重复列名)
     // ============================================================
     fileInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
@@ -634,11 +439,9 @@
             try {
                 const data = new Uint8Array(evt.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
-                // 优先选 "Timesheet" 页；否则取第一页
-                const sheetName = workbook.SheetNames.includes('Timesheet')
-                    ? 'Timesheet'
-                    : workbook.SheetNames[0];
-                const firstSheet = workbook.Sheets[sheetName];
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                
+                // 按行读取，避免列名重复导致解析问题
                 const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
 
                 if (jsonData.length < 2) {
@@ -646,6 +449,7 @@
                     return;
                 }
 
+                // 寻找表头行
                 let headerRowIndex = 0;
                 for (let i = 0; i < Math.min(jsonData.length, 5); i++) {
                     const rowStr = jsonData[i].join(' ').toLowerCase();
@@ -655,60 +459,50 @@
                     }
                 }
 
-                const headers = jsonData[headerRowIndex].map(h => String(h).trim().toLowerCase());
-
-                const colMap = {
-                    personId: findCol(headers, ['person id', 'id', 'personid']),
-                    name: findCol(headers, ['name', 'first name', 'employee name']),
-                    date: findCol(headers, ['date']),
-                    clockInAM: findCol(headers, ['clock in (am)', 'clock in 1', 'clockin', 'clock in']),
-                    clockOutAM: findCol(headers, ['clock out (am)', 'clock out 1', 'clockout', 'clock out']),
-                    clockInPM: findCol(headers, ['clock in (pm)', 'clock in 2', 'clockin2']),
-                    clockOutPM: findCol(headers, ['clock out (pm)', 'clock out 2', 'clockout2']),
-                    clockInOT: findCol(headers, ['clock in (ot)', 'clock in 3', 'clockin3']),
-                    clockOutOT: findCol(headers, ['clock out (ot)', 'clock out 3', 'clockout3']),
-                    status: findCol(headers, ['status', 'abnormal situation', 'abnormal']),
-                    remark: findCol(headers, ['remark', 'remarks', 'note', 'notes'])
-                };
-
-                if (colMap.clockInAM === -1 && colMap.clockInPM === -1) {
-                    const inIdx = findCol(headers, ['clock in', 'clockin', 'in']);
-                    const outIdx = findCol(headers, ['clock out', 'clockout', 'out']);
-                    if (inIdx !== -1 && outIdx !== -1) {
-                        colMap.clockInAM = inIdx;
-                        colMap.clockOutAM = outIdx;
-                    }
-                }
-
                 const newRows = [];
+                // 遍历数据行
                 for (let i = headerRowIndex + 1; i < jsonData.length; i++) {
                     const r = jsonData[i];
                     if (!r || r.length === 0) continue;
+                    // 跳过全空行
                     if (r.every(c => String(c).trim() === '')) continue;
 
-                    const personId = colMap.personId !== -1 ? String(r[colMap.personId] || '').trim() : '';
-                    const name = colMap.name !== -1 ? String(r[colMap.name] || '').trim() : '';
-                    const date = colMap.date !== -1 ? String(r[colMap.date] || '').trim() : '';
+                    // 基于你提供的截图，列索引是固定的
+                    // 0: Person ID, 1: First Name, 2: Last Name, 3: Date, 4: Timesheet
+                    // 5: Clock In, 6: Clock Out, 7: Clock Time(h)
+                    // 8: Clock In, 9: Clock Out, 10: Clock Time(h)
+                    // 11: Clock In, 12: Clock Out, 13: Clock Time(h)
+                    // 14: Total Break, 15: Total Work, 16: Total OT
+                    // 17: Statistic Rule, 18: Abnormal Situation
 
-                    const clockInAM = parseTimeValue(colMap.clockInAM !== -1 ? r[colMap.clockInAM] : '');
-                    const clockOutAM = parseTimeValue(colMap.clockOutAM !== -1 ? r[colMap.clockOutAM] : '');
-                    const clockInPM = parseTimeValue(colMap.clockInPM !== -1 ? r[colMap.clockInPM] : '');
-                    const clockOutPM = parseTimeValue(colMap.clockOutPM !== -1 ? r[colMap.clockOutPM] : '');
-                    const clockInOT = parseTimeValue(colMap.clockInOT !== -1 ? r[colMap.clockInOT] : '');
-                    const clockOutOT = parseTimeValue(colMap.clockOutOT !== -1 ? r[colMap.clockOutOT] : '');
+                    const personId = String(r[0] || '').trim();
+                    const firstName = String(r[1] || '').trim();
+                    const lastName = String(r[2] || '').trim();
+                    const date = String(r[3] || '').trim();
+                    
+                    // 第一组打卡 (AM)
+                    const clockInAM = parseTimeValue(r[5]);
+                    const clockOutAM = parseTimeValue(r[6]);
+                    
+                    // 第二组打卡 (PM)
+                    const clockInPM = parseTimeValue(r[8]);
+                    const clockOutPM = parseTimeValue(r[9]);
+                    
+                    // 第三组打卡 (OT)
+                    const clockInOT = parseTimeValue(r[11]);
+                    const clockOutOT = parseTimeValue(r[12]);
 
-                    // --- 状态映射（兼容完整标签 + 缩写） ---
+                    // Abnormal Situation 映射为状态
                     let status = '';
-                    const rawStatus = colMap.status !== -1 ? String(r[colMap.status] || '').trim().toUpperCase() : '';
+                    const rawStatus = String(r[18] || '').trim().toUpperCase();
                     status = mapStatus(rawStatus);
 
-                    const remark = colMap.remark !== -1 ? String(r[colMap.remark] || '').trim() : '';
-
-                    if (personId || name) {
+                    if (personId || firstName || lastName) {
                         newRows.push({
                             id: generateId(),
                             personId,
-                            name,
+                            firstName,
+                            lastName,
                             date,
                             clockInAM: clockInAM || '',
                             clockOutAM: clockOutAM || '',
@@ -717,7 +511,7 @@
                             clockInOT: clockInOT || '',
                             clockOutOT: clockOutOT || '',
                             status,
-                            remark
+                            remark: ''
                         });
                     }
                 }
@@ -727,9 +521,19 @@
                     return;
                 }
 
-                rows = newRows;
+                // 可以追加或替换数据
+                if (rows.length > 0) {
+                    if (confirm('Do you want to replace the current data or append?')) {
+                        rows = newRows;
+                    } else {
+                        rows = rows.concat(newRows);
+                    }
+                } else {
+                    rows = newRows;
+                }
+                
                 render();
-                alert(`✅ Imported ${rows.length} rows successfully.`);
+                alert(`✅ Imported ${newRows.length} rows successfully.`);
 
             } catch (err) {
                 console.error(err);
@@ -740,11 +544,10 @@
         fileInput.value = '';
     });
 
-    /** 将任意状态文本映射为缩写，兼容 "AL - Annual Leave" 等 */
     function mapStatus(raw) {
         if (!raw) return '';
         const s = raw.toUpperCase();
-        // 注意顺序：先匹配更长/更具体的缩写
+        if (s.includes('ABSENT') || s.includes('MISSED PUNCH')) return 'UL'; // 将缺卡/缺勤映射为 UL
         if (s.startsWith('HAL')) return 'HAL';
         if (s.startsWith('AL'))  return 'AL';
         if (s.startsWith('SL'))  return 'SL';
@@ -756,21 +559,7 @@
         if (s.includes('UNPAID'))  return 'UL';
         if (s.includes('HALF'))    return 'HAL';
         if (s.includes('OFF'))     return 'OFF';
-        if (s.includes('ABSENT'))  return 'UL';
         return '';
-    }
-
-    function findCol(headers, candidates) {
-        // 先精确匹配，再模糊匹配
-        for (const c of candidates) {
-            const idx = headers.indexOf(c);
-            if (idx !== -1) return idx;
-        }
-        for (const c of candidates) {
-            const idx = headers.findIndex(h => h.includes(c));
-            if (idx !== -1) return idx;
-        }
-        return -1;
     }
 
     function parseTimeValue(val) {
@@ -803,7 +592,8 @@
         rows.push({
             id: generateId(),
             personId: '',
-            name: '',
+            firstName: '',
+            lastName: '',
             date: new Date().toISOString().slice(0, 10),
             clockInAM: '',
             clockOutAM: '',
@@ -846,11 +636,11 @@
 
         rows.forEach(row => {
             const calc = computeRow(row);
-            // 导出时把缩写翻译成完整标签，方便交接
             const statusLabel = STATUS_OPTIONS.find(o => o.value === row.status)?.label || row.status || '';
+            const fullName = [row.firstName, row.lastName].filter(Boolean).join(' ');
             const vals = [
                 csvEscape(row.personId),
-                csvEscape(row.name),
+                csvEscape(fullName),
                 csvEscape(row.date),
                 csvEscape(row.clockInAM),
                 csvEscape(row.clockOutAM),
