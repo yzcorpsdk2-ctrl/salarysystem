@@ -1,689 +1,227 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timecard Report · 演算SHEET</title>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #1e293b; padding: 24px; }
-        .container { max-width: 1800px; margin: 0 auto; background: #ffffff; border-radius: 16px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08); padding: 24px 28px 32px; }
-        h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; color: #0f172a; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        h1 small { font-size: 13px; font-weight: 400; color: #64748b; background: #f1f5f9; padding: 4px 12px; border-radius: 20px; }
-        .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 20px 0 24px; padding-bottom: 20px; border-bottom: 1px solid #e2e8f0; }
-        .toolbar button, .toolbar label.file-label { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; font-size: 14px; font-weight: 500; border-radius: 8px; border: 1px solid #d1d9e6; background: #ffffff; color: #1e293b; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
-        .toolbar button:hover, .toolbar label.file-label:hover { background: #f8fafc; border-color: #94a3b8; }
-        .toolbar button.primary { background: #2563eb; border-color: #2563eb; color: #ffffff; }
-        .toolbar button.primary:hover { background: #1d4ed8; }
-        .toolbar button.template { background: #10b981; border-color: #10b981; color: #ffffff; }
-        .toolbar button.template:hover { background: #059669; }
-        .toolbar button.danger { border-color: #fca5a5; color: #dc2626; }
-        .toolbar button.danger:hover { background: #fef2f2; border-color: #f87171; }
-        .toolbar .spacer { flex: 1; }
-        .toolbar .summary-badge { font-size: 13px; color: #475569; background: #f1f5f9; padding: 6px 14px; border-radius: 20px; border: 1px solid #e2e8f0; }
-        input[type="file"] { display: none; }
-
-        .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid #e2e8f0; background: #ffffff; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1900px; }
-        thead { background: #f8fafc; border-bottom: 2px solid #e2e8f0; }
-        thead th { padding: 8px 6px; font-weight: 600; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.3px; color: #475569; text-align: center; white-space: nowrap; border-right: 1px solid #e9eef4; position: sticky; top: 0; background: #f8fafc; z-index: 2; }
-        thead th:first-child { text-align: left; padding-left: 12px; }
-        thead th:last-child { border-right: none; }
-        thead th .sub { display: block; font-weight: 400; font-size: 9.5px; color: #94a3b8; text-transform: none; letter-spacing: 0; margin-top: 2px; }
-        thead th.col-code { font-size: 9px; color: #cbd5e1; font-weight: 500; }
-
-        tbody td { padding: 6px 4px; border-bottom: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; text-align: center; vertical-align: middle; white-space: nowrap; }
-        tbody td:first-child { text-align: left; padding-left: 12px; font-weight: 500; }
-        tbody td:last-child { border-right: none; }
-        tbody tr:hover { background: #fafbfc; }
-
-        .time-input { width: 62px; padding: 5px 3px; font-size: 12px; text-align: center; border: 1px solid transparent; border-radius: 5px; background: transparent; font-family: 'Inter', monospace; transition: all 0.15s; }
-        .time-input:hover { border-color: #cbd5e1; background: #fff; }
-        .time-input:focus { outline: none; border-color: #2563eb; background: #fff; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
-        .time-input::placeholder { color: #cbd5e1; font-size: 11px; }
-        .text-input { width: 90px; padding: 5px 6px; font-size: 12px; text-align: left; border: 1px solid transparent; border-radius: 5px; background: transparent; transition: all 0.15s; }
-        .text-input:hover { border-color: #cbd5e1; background: #fff; }
-        .text-input:focus { outline: none; border-color: #2563eb; background: #fff; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
-        .text-input.wide { width: 130px; }
-        .text-input.id { width: 80px; }
-
-        .status-select { padding: 5px 6px; font-size: 12px; font-weight: 500; border-radius: 6px; border: 1px solid #d1d9e6; background: #ffffff; color: #1e293b; cursor: pointer; transition: all 0.15s; width: 150px; }
-        .status-select:hover { border-color: #94a3b8; }
-        .status-select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
-        .status-select[data-status="AL"] { background: #fef9c3; border-color: #fde047; color: #854d0e; }
-        .status-select[data-status="SL"] { background: #ffedd5; border-color: #fdba74; color: #9a3412; }
-        .status-select[data-status="UL"] { background: #fecaca; border-color: #f87171; color: #991b1b; }
-        .status-select[data-status="HAL"] { background: #e0f2fe; border-color: #7dd3fc; color: #075985; }
-        .status-select[data-status="L"] { background: #f3e8ff; border-color: #d8b4fe; color: #6b21a8; }
-        .status-select[data-status="OFF"] { background: #f1f5f9; border-color: #cbd5e1; color: #64748b; }
-
-        td.calc-cell { font-weight: 600; color: #0f172a; font-size: 12.5px; background: #f8fafc; }
-        td.calc-cell.seg { font-weight: 500; color: #475569; font-size: 12px; background: #fbfcfe; }
-        td.calc-cell.ot { color: #d97706; }
-        td.calc-cell.absent { color: #dc2626; }
-        td.calc-cell.break { color: #0369a1; }
-
-        tbody tr.row-overtime { background: #fffbeb; }
-        tbody tr.row-absent { background: #fef2f2; }
-
-        .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
-        .empty-state p { margin-top: 8px; font-size: 14px; }
-
-        tfoot { background: #f8fafc; font-weight: 600; border-top: 2px solid #e2e8f0; }
-        tfoot td { padding: 11px 4px; font-size: 12.5px; color: #0f172a; text-align: center; border-right: 1px solid #e9eef4; }
-        tfoot td:first-child { text-align: left; padding-left: 12px; font-weight: 600; }
-        tfoot td:last-child { border-right: none; }
-        tfoot .total-label { color: #475569; font-weight: 500; font-size: 12px; }
-
-        @media (max-width: 768px) {
-            body { padding: 12px; }
-            .container { padding: 16px; }
-            h1 { font-size: 18px; }
-            .toolbar { gap: 8px; }
-            .toolbar button, .toolbar label.file-label { font-size: 12px; padding: 7px 12px; }
-        }
-
-        .table-wrap::-webkit-scrollbar { height: 8px; }
-        .table-wrap::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
-        .table-wrap::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .table-wrap::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    </style>
-</head>
-<body>
-<div class="container">
-    <h1>
-        Timecard Report · 演算SHEET
-        <small id="recordCount">0 rows</small>
-    </h1>
-
-    <!-- ===== 工具栏 ===== -->
-    <div class="toolbar">
-        <label class="file-label" for="fileInput">📂 Import Timesheet</label>
-        <input type="file" id="fileInput" accept=".xlsx, .xls, .csv">
-
-        <button class="template" id="downloadTemplateBtn">📄 Download Template</button>
-        <button class="primary" id="addRowBtn">+ Add Row</button>
-        <button class="danger" id="clearBtn">🗑 Clear All</button>
-
-        <div class="spacer"></div>
-
-        <span class="summary-badge" id="summaryBadge">Total Work: 0.00h · OT: 0.00h</span>
-        <button id="exportBtn">📥 Export Excel</button>
-    </div>
-
-    <!-- ===== 表格（严格对齐 Excel A–S 19 列） ===== -->
-    <div class="table-wrap">
-        <table id="timesheetTable">
-            <thead>
-                <tr>
-                    <th style="width:34px;">#</th>
-                    <th style="min-width:80px;">Person ID<span class="sub">A</span></th>
-                    <th style="min-width:90px;">First Name<span class="sub">B</span></th>
-                    <th style="min-width:110px;">Last Name<span class="sub">C</span></th>
-                    <th style="min-width:100px;">Date<span class="sub">D</span></th>
-                    <th style="min-width:70px;">Timesheet<span class="sub">E</span></th>
-                    <th style="min-width:78px;">Clock In<span class="sub">F · AM</span></th>
-                    <th style="min-width:78px;">Clock Out<span class="sub">G · AM</span></th>
-                    <th style="min-width:80px;">Clock Time(h)<span class="sub">H · AM</span></th>
-                    <th style="min-width:78px;">Clock In<span class="sub">I · PM</span></th>
-                    <th style="min-width:78px;">Clock Out<span class="sub">J · PM</span></th>
-                    <th style="min-width:80px;">Clock Time(h)<span class="sub">K · PM</span></th>
-                    <th style="min-width:78px;">Clock In<span class="sub">L · OT</span></th>
-                    <th style="min-width:78px;">Clock Out<span class="sub">M · OT</span></th>
-                    <th style="min-width:80px;">Clock Time(h)<span class="sub">N · OT</span></th>
-                    <th style="min-width:95px;">Total Break Time(h)<span class="sub">O</span></th>
-                    <th style="min-width:95px;">Total Work Time(h)<span class="sub">P</span></th>
-                    <th style="min-width:105px;">Total Overtime Time(h)<span class="sub">Q</span></th>
-                    <th style="min-width:130px;">Statistic Rule Mode<span class="sub">R</span></th>
-                    <th style="min-width:150px;">Abnormal Situation<span class="sub">S</span></th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="15" style="text-align:right;font-weight:500;color:#475569;">TOTAL</td>
-                    <td id="totalBreak">0.00</td>
-                    <td id="totalWork">0.00</td>
-                    <td id="totalOT">0.00</td>
-                    <td colspan="2"></td>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
-</div>
-
-<script>
-    // ============================================================
-    //  DATA
-    // ============================================================
-    let rows = [];
-
-    // ============================================================
-    //  DOM
-    // ============================================================
-    const tbody = document.getElementById('tableBody');
-    const recordCount = document.getElementById('recordCount');
-    const summaryBadge = document.getElementById('summaryBadge');
-    const totalBreakEl = document.getElementById('totalBreak');
-    const totalWorkEl = document.getElementById('totalWork');
-    const totalOTEl = document.getElementById('totalOT');
-    const fileInput = document.getElementById('fileInput');
-
-    // ============================================================
-    //  HELPERS
-    // ============================================================
-    function generateId() {
-        return 'r_' + Math.random().toString(36).slice(2, 9);
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+        background: linear-gradient(160deg, #eef2f7 0%, #e6ecf5 40%, #f3f6fb 100%);
+        color: #1e293b;
+        padding: 28px 20px;
+        min-height: 100vh;
+    }
+    .container {
+        max-width: 1800px; margin: 0 auto;
+        background: rgba(255,255,255,0.85);
+        backdrop-filter: blur(8px);
+        border-radius: 22px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.10), 0 2px 8px rgba(15,23,42,0.04);
+        border: 1px solid rgba(255,255,255,0.7);
+        padding: 0 0 28px;
+        overflow: hidden;
     }
 
-    function timeToMinutes(str) {
-        if (!str) return null;
-        const s = String(str).trim();
-        const m = s.match(/^(\d{1,2}):(\d{2})$/);
-        if (!m) return null;
-        const h = parseInt(m[1], 10);
-        const min = parseInt(m[2], 10);
-        if (h > 23 || min > 59) return null;
-        return h * 60 + min;
+    /* ===== 品牌栏 ===== */
+    .brandbar {
+        display: flex; align-items: center; gap: 14px;
+        padding: 22px 30px;
+        background: linear-gradient(120deg, #1e3a8a 0%, #2563eb 55%, #3b82f6 100%);
+        color: #fff;
+    }
+    .brandbar .logo {
+        width: 46px; height: 46px; border-radius: 14px;
+        background: rgba(255,255,255,0.18);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 22px; font-weight: 700;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);
+    }
+    .brandbar .titles { display: flex; flex-direction: column; gap: 2px; }
+    .brandbar .titles .kicker {
+        font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase;
+        color: rgba(255,255,255,0.72); font-weight: 600;
+    }
+    .brandbar .titles h1 {
+        font-size: 21px; font-weight: 700; letter-spacing: -0.3px;
+        display: flex; align-items: center; gap: 10px;
+    }
+    .brandbar .titles h1 small {
+        font-size: 11.5px; font-weight: 500;
+        background: rgba(255,255,255,0.18);
+        color: #fff; padding: 4px 11px; border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.25);
+    }
+    .brandbar .spacer { flex: 1; }
+    .brandbar .stat-pill {
+        display: inline-flex; align-items: center; gap: 7px;
+        background: rgba(255,255,255,0.16);
+        border: 1px solid rgba(255,255,255,0.25);
+        padding: 7px 14px; border-radius: 30px;
+        font-size: 12.5px; font-weight: 500;
+        color: #f8fafc;
+        white-space: nowrap;
+    }
+    .brandbar .stat-pill b { font-weight: 700; color: #fff; }
+    .brandbar .stat-pill .dot {
+        width: 7px; height: 7px; border-radius: 50%;
+        background: #34d399; box-shadow: 0 0 0 3px rgba(52,211,153,0.25);
     }
 
-    function minutesToHoursStr(minutes) {
-        if (minutes === null || minutes < 0) return '0.00';
-        return (minutes / 60).toFixed(2);
+    /* ===== 工具栏 ===== */
+    .toolbar {
+        display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+        margin: 22px 30px 6px;
+        padding: 14px 18px;
+        background: #ffffff;
+        border: 1px solid #e6ebf3;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(15,23,42,0.05);
+    }
+    .toolbar button, .toolbar label.file-label {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 9px 16px; font-size: 13px; font-weight: 600;
+        border-radius: 10px; border: 1px solid #dbe2ee;
+        background: #ffffff; color: #1e293b;
+        cursor: pointer; transition: all 0.18s; white-space: nowrap;
+    }
+    .toolbar button:hover, .toolbar label.file-label:hover {
+        background: #f6f9ff; border-color: #93b4f5; transform: translateY(-1px);
+    }
+    .toolbar button.primary {
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
+        border-color: transparent; color: #ffffff;
+        box-shadow: 0 4px 12px rgba(37,99,235,0.28);
+    }
+    .toolbar button.primary:hover { filter: brightness(1.06); }
+    .toolbar button.template {
+        background: linear-gradient(135deg, #059669, #10b981);
+        border-color: transparent; color: #ffffff;
+        box-shadow: 0 4px 12px rgba(16,185,129,0.25);
+    }
+    .toolbar button.template:hover { filter: brightness(1.06); }
+    .toolbar button.danger { border-color: #fecaca; color: #dc2626; background:#fff; }
+    .toolbar button.danger:hover { background: #fef2f2; border-color: #f87171; }
+    .toolbar .spacer { flex: 1; }
+    input[type="file"] { display: none; }
+
+    /* ===== 表格容器 ===== */
+    .table-wrap {
+        margin: 18px 30px 0;
+        overflow-x: auto;
+        border-radius: 16px;
+        border: 1px solid #e6ebf3;
+        background: #ffffff;
+        box-shadow: 0 6px 22px rgba(15,23,42,0.05);
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1900px; }
+
+    thead { background: linear-gradient(180deg, #f8fafc, #f1f5fb); }
+    thead th {
+        padding: 10px 6px; font-weight: 600; font-size: 10.5px;
+        text-transform: uppercase; letter-spacing: 0.4px;
+        color: #475569; text-align: center; white-space: nowrap;
+        border-right: 1px solid #e9eef4; border-bottom: 2px solid #e2e8f0;
+        position: sticky; top: 0; background: #f8fafc; z-index: 2;
+    }
+    thead th:first-child { text-align: left; padding-left: 14px; }
+    thead th:last-child { border-right: none; }
+    thead th .sub {
+        display: block; font-weight: 500; font-size: 9.5px;
+        color: #94a3b8; text-transform: none; letter-spacing: 0;
+        margin-top: 2px;
     }
 
-    function calcDuration(inMin, outMin) {
-        if (inMin === null || outMin === null) return 0;
-        let d = outMin - inMin;
-        if (d < 0) d += 24 * 60;
-        return d;
+    tbody td {
+        padding: 6px 4px; border-bottom: 1px solid #f1f5f9;
+        border-right: 1px solid #f4f7fb; text-align: center;
+        vertical-align: middle; white-space: nowrap;
+    }
+    tbody td:first-child {
+        text-align: left; padding-left: 14px; font-weight: 600;
+        color: #94a3b8; font-size: 12px;
+    }
+    tbody td:last-child { border-right: none; }
+    tbody tr:nth-child(even) { background: #fbfcfe; }
+    tbody tr:hover { background: #eef4ff; }
+
+    /* ===== 输入控件 ===== */
+    .time-input {
+        width: 62px; padding: 6px 3px; font-size: 12px; text-align: center;
+        border: 1px solid transparent; border-radius: 7px;
+        background: transparent; font-family: 'Inter', monospace;
+        transition: all 0.15s; color: #0f172a;
+    }
+    .time-input:hover { border-color: #cbd5e1; background: #fff; }
+    .time-input:focus {
+        outline: none; border-color: #2563eb; background: #fff;
+        box-shadow: 0 0 0 3px rgba(37,99,235,0.14);
+    }
+    .time-input::placeholder { color: #cbd5e1; font-size: 11px; }
+
+    .text-input {
+        width: 90px; padding: 6px; font-size: 12px; text-align: left;
+        border: 1px solid transparent; border-radius: 7px;
+        background: transparent; transition: all 0.15s; color: #0f172a;
+    }
+    .text-input:hover { border-color: #cbd5e1; background: #fff; }
+    .text-input:focus {
+        outline: none; border-color: #2563eb; background: #fff;
+        box-shadow: 0 0 0 3px rgba(37,99,235,0.14);
+    }
+    .text-input.wide { width: 130px; }
+    .text-input.id { width: 80px; font-weight: 600; }
+
+    .status-select {
+        padding: 6px 8px; font-size: 12px; font-weight: 600;
+        border-radius: 8px; border: 1px solid #dbe2ee;
+        background: #ffffff; color: #1e293b; cursor: pointer;
+        transition: all 0.15s; width: 150px;
+    }
+    .status-select:hover { border-color: #93b4f5; }
+    .status-select:focus {
+        outline: none; border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37,99,235,0.14);
+    }
+    .status-select[data-status="AL"]  { background:#fef9c3; border-color:#fde047; color:#854d0e; }
+    .status-select[data-status="SL"]  { background:#ffedd5; border-color:#fdba74; color:#9a3412; }
+    .status-select[data-status="UL"]  { background:#fecaca; border-color:#f87171; color:#991b1b; }
+    .status-select[data-status="HAL"] { background:#e0f2fe; border-color:#7dd3fc; color:#075985; }
+    .status-select[data-status="L"]   { background:#f3e8ff; border-color:#d8b4fe; color:#6b21a8; }
+    .status-select[data-status="OFF"] { background:#f1f5f9; border-color:#cbd5e1; color:#64748b; }
+
+    /* ===== 计算列 ===== */
+    td.calc-cell {
+        font-weight: 700; color: #0f172a; font-size: 12.5px;
+        background: #f6f9ff;
+    }
+    td.calc-cell.seg { font-weight: 600; color: #2563eb; background: #f3f7ff; font-size: 12px; }
+    td.calc-cell.break { color: #0369a1; background: #f0f7ff; }
+    td.calc-cell.ot { color: #d97706; }
+    td.calc-cell.absent { color: #dc2626; }
+
+    tbody tr.row-overtime { background: #fffbeb !important; }
+    tbody tr.row-absent { background: #fef2f2 !important; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+    .empty-state p { margin-top: 8px; font-size: 14px; }
+
+    /* ===== 表尾合计 ===== */
+    tfoot { background: linear-gradient(180deg,#f8fafc,#eef2f8); border-top: 2px solid #e2e8f0; }
+    tfoot td {
+        padding: 13px 4px; font-size: 12.5px; color: #0f172a;
+        text-align: center; border-right: 1px solid #e9eef4; font-weight: 700;
+    }
+    tfoot td:first-child { text-align: right; padding-right: 10px; }
+    tfoot td:last-child { border-right: none; }
+    tfoot .total-label { color: #475569; font-weight: 600; font-size: 12px; letter-spacing: 0.4px; }
+
+    @media (max-width: 768px) {
+        body { padding: 12px; }
+        .brandbar { padding: 16px 18px; flex-wrap: wrap; }
+        .brandbar .titles h1 { font-size: 17px; }
+        .toolbar { margin: 14px 16px 6px; gap: 8px; }
+        .toolbar button, .toolbar label.file-label { font-size: 12px; padding: 7px 12px; }
+        .table-wrap { margin: 14px 16px 0; }
     }
 
-    const STATUS_OPTIONS = [
-        { value: 'AL',  label: 'AL - Annual Leave' },
-        { value: 'L',   label: 'L - Leave' },
-        { value: 'HAL', label: 'HAL - Half Day Leave' },
-        { value: 'SL',  label: 'SL - Sick Leave' },
-        { value: 'UL',  label: 'UL - Unpaid Leave' },
-        { value: 'OFF', label: 'OFF - Off Day' },
-    ];
-
-    // ============================================================
-    //  CORE CALCULATION
-    //  输出 AM/PM/OT 各段分钟数 + break/work/ot/late
-    //  计算口径沿用原版：AM+PM 都有打卡则扣 60min 午休；
-    //  状态 AL/SL/UL/OFF 时 work=ot=late=0；
-    //  HAL 取 AM/PM 较长段。
-    // ============================================================
-    function computeRow(row) {
-        const inAM = timeToMinutes(row.clockInAM);
-        const outAM = timeToMinutes(row.clockOutAM);
-        const inPM = timeToMinutes(row.clockInPM);
-        const outPM = timeToMinutes(row.clockOutPM);
-        const inOT = timeToMinutes(row.clockInOT);
-        const outOT = timeToMinutes(row.clockOutOT);
-
-        const status = (row.status || '').toUpperCase();
-
-        const amMin = calcDuration(inAM, outAM);
-        const pmMin = calcDuration(inPM, outPM);
-        const otMin = calcDuration(inOT, outOT);
-
-        let workMin = 0;
-        let breakMin = 0;
-        let lateMin = 0;
-        let absent = false;
-
-        if (['AL', 'SL', 'UL', 'OFF'].includes(status)) {
-            workMin = 0;
-            breakMin = 0;
-            lateMin = 0;
-            absent = (status === 'UL');
-        } else {
-            let span = amMin + pmMin;
-            let brk = 0;
-
-            if (inAM !== null && outAM !== null && inPM !== null && outPM !== null) {
-                brk = 60;
-                span = Math.max(0, span - brk);
-            }
-
-            if (status === 'HAL') {
-                span = Math.max(amMin, pmMin);
-            }
-
-            workMin = span;
-            breakMin = brk;
-
-            const STD_START = 8 * 60;
-            const STD_END = 17 * 60;
-            if (inAM !== null && inAM > STD_START + 30) lateMin += inAM - (STD_START + 30);
-            if (inPM !== null && inPM > 13 * 60) lateMin += inPM - 13 * 60;
-            if (outPM !== null && outPM < STD_END) lateMin += STD_END - outPM;
-        }
-
-        return {
-            amMinutes: amMin,
-            pmMinutes: pmMin,
-            otMinutes: otMin,
-            breakMinutes: breakMin,
-            workMinutes: workMin,
-            lateMinutes: lateMin,
-            absent: absent
-        };
-    }
-
-    // ============================================================
-    //  RENDER
-    // ============================================================
-    function render() {
-        tbody.innerHTML = '';
-
-        if (rows.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="20">
-                        <div class="empty-state">
-                            <div style="font-size:36px;margin-bottom:8px;">📋</div>
-                            <p>No data yet. Import a Timesheet or click <strong>+ Add Row</strong>.</p>
-                        </div>
-                    </td>
-                </tr>
-            `;
-            recordCount.textContent = '0 rows';
-            summaryBadge.textContent = 'Total Work: 0.00h · OT: 0.00h';
-            totalBreakEl.textContent = '0.00';
-            totalWorkEl.textContent = '0.00';
-            totalOTEl.textContent = '0.00';
-            return;
-        }
-
-        let totalBreakMin = 0, totalWorkMin = 0, totalOTMin = 0;
-
-        rows.forEach((row, index) => {
-            const calc = computeRow(row);
-            totalBreakMin += calc.breakMinutes;
-            totalWorkMin += calc.workMinutes;
-            totalOTMin += calc.otMinutes;
-
-            const tr = document.createElement('tr');
-            if (calc.otMinutes > 0) tr.classList.add('row-overtime');
-            if (calc.absent) tr.classList.add('row-absent');
-
-            const statusVal = (row.status || '').toUpperCase();
-
-            let statusOptionsHtml = `<option value="" ${!statusVal ? 'selected' : ''}>— Select —</option>`;
-            STATUS_OPTIONS.forEach(opt => {
-                const sel = (opt.value === statusVal) ? 'selected' : '';
-                statusOptionsHtml += `<option value="${opt.value}" ${sel}>${opt.label}</option>`;
-            });
-
-            tr.innerHTML = `
-                <td style="color:#94a3b8;font-size:12px;">${index + 1}</td>
-                <td><input class="text-input id" data-field="personId" value="${escapeHtml(row.personId || '')}" placeholder="0001"></td>
-                <td><input class="text-input" data-field="firstName" value="${escapeHtml(row.firstName || '')}" placeholder="First"></td>
-                <td><input class="text-input wide" data-field="lastName" value="${escapeHtml(row.lastName || '')}" placeholder="Last"></td>
-                <td><input class="text-input" style="width:92px;" data-field="date" value="${escapeHtml(row.date || '')}" placeholder="YYYY-MM-DD"></td>
-                <td><input class="text-input" style="width:56px;text-align:center;" data-field="timesheet" value="${escapeHtml(row.timesheet || '')}" placeholder="8"></td>
-                <td><input class="time-input" data-field="clockInAM"  value="${escapeHtml(row.clockInAM  || '')}" placeholder="08:00"></td>
-                <td><input class="time-input" data-field="clockOutAM" value="${escapeHtml(row.clockOutAM || '')}" placeholder="12:00"></td>
-                <td class="calc-cell seg">${minutesToHoursStr(calc.amMinutes)}</td>
-                <td><input class="time-input" data-field="clockInPM"  value="${escapeHtml(row.clockInPM  || '')}" placeholder="13:00"></td>
-                <td><input class="time-input" data-field="clockOutPM" value="${escapeHtml(row.clockOutPM || '')}" placeholder="17:00"></td>
-                <td class="calc-cell seg">${minutesToHoursStr(calc.pmMinutes)}</td>
-                <td><input class="time-input" data-field="clockInOT"  value="${escapeHtml(row.clockInOT  || '')}" placeholder="18:00"></td>
-                <td><input class="time-input" data-field="clockOutOT" value="${escapeHtml(row.clockOutOT || '')}" placeholder="20:00"></td>
-                <td class="calc-cell seg">${minutesToHoursStr(calc.otMinutes)}</td>
-                <td class="calc-cell break">${minutesToHoursStr(calc.breakMinutes)}</td>
-                <td class="calc-cell ${calc.workMinutes === 0 ? 'absent' : ''}">${minutesToHoursStr(calc.workMinutes)}</td>
-                <td class="calc-cell ${calc.otMinutes > 0 ? 'ot' : ''}">${minutesToHoursStr(calc.otMinutes)}</td>
-                <td><input class="text-input wide" data-field="statisticRuleMode" value="${escapeHtml(row.statisticRuleMode || '')}" placeholder="Even and Odd"></td>
-                <td>
-                    <select class="status-select" data-field="status" data-status="${statusVal}">
-                        ${statusOptionsHtml}
-                    </select>
-                </td>
-            `;
-
-            // 文本/时间输入统一处理
-            tr.querySelectorAll('input[data-field]').forEach(input => {
-                input.addEventListener('change', (e) => {
-                    const field = e.target.dataset.field;
-                    row[field] = e.target.value.trim();
-                    render();
-                });
-            });
-
-            tr.querySelector('.status-select').addEventListener('change', (e) => {
-                row.status = e.target.value;
-                render();
-            });
-
-            tbody.appendChild(tr);
-        });
-
-        recordCount.textContent = rows.length + ' rows';
-        summaryBadge.textContent = `Total Work: ${minutesToHoursStr(totalWorkMin)}h · OT: ${minutesToHoursStr(totalOTMin)}h`;
-        totalBreakEl.textContent = minutesToHoursStr(totalBreakMin);
-        totalWorkEl.textContent = minutesToHoursStr(totalWorkMin);
-        totalOTEl.textContent = minutesToHoursStr(totalOTMin);
-    }
-
-    function escapeHtml(str) {
-        if (str === null || str === undefined) return '';
-        return String(str).replace(/[&<>"]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            if (m === '"') return '&quot;';
-            return m;
-        });
-    }
-
-    // ============================================================
-    //  DOWNLOAD TEMPLATE (19 列，和导入格式一致)
-    // ============================================================
-    document.getElementById('downloadTemplateBtn').addEventListener('click', function() {
-        const headers = [
-            'Person ID', 'First Name', 'Last Name', 'Date', 'Timesheet',
-            'Clock In', 'Clock Out', 'Clock Time(h)',
-            'Clock In', 'Clock Out', 'Clock Time(h)',
-            'Clock In', 'Clock Out', 'Clock Time(h)',
-            'Total Break Time(h)', 'Total Work Time(h)', 'Total Overtime Time(h)',
-            'Statistic Rule Mode', 'Abnormal Situation'
-        ];
-
-        const sampleRows = [
-            ['0001', 'YANG', 'PING', '2025-10-01', '8', '08:00', '12:00', '4.00', '13:00', '17:00', '4.00', '', '', '', '1.00', '8.00', '0.00', 'Even and Odd', ''],
-            ['0002', 'TAN', 'XIAO MING', '2025-10-01', '9', '08:30', '12:00', '3.50', '13:00', '17:00', '4.00', '18:00', '20:00', '2.00', '0.50', '9.50', '2.00', 'Even and Odd', 'Missed Punch'],
-            ['0003', 'SITI', 'NURHALIZA', '2025-10-01', '8', '08:00', '12:00', '4.00', '13:00', '17:00', '4.00', '', '', '', '1.00', '8.00', '0.00', 'Even and Odd', 'Absent']
-        ];
-
-        const wsData = [headers, ...sampleRows];
-        const ws = XLSX.utils.aoa_to_sheet(wsData);
-        ws['!cols'] = [
-            { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 10 },
-            { wch: 12 }, { wch: 12 }, { wch: 12 },
-            { wch: 12 }, { wch: 12 }, { wch: 12 },
-            { wch: 12 }, { wch: 12 }, { wch: 12 },
-            { wch: 18 }, { wch: 18 }, { wch: 20 },
-            { wch: 18 }, { wch: 18 }
-        ];
-
-        const instructions = [
-            ['Timesheet Template — Instructions'],
-            [''],
-            ['1. Fill in one row per employee per day.'],
-            ['2. Date format: YYYY-MM-DD (e.g. 2025-10-01).'],
-            ['3. Time format: HH:MM (e.g. 08:00, 17:30). Use 24-hour format.'],
-            ['4. Columns "Clock In", "Clock Out" appear 3 times:'],
-            ['   - 1st group: AM session (e.g. 08:00 - 12:00)'],
-            ['   - 2nd group: PM session (e.g. 13:00 - 17:00)'],
-            ['   - 3rd group: Overtime (OT) session (if applicable)'],
-            ['5. "Abnormal Situation" column accepts:'],
-            ['   AL  - Annual Leave'],
-            ['   L   - Leave'],
-            ['   HAL - Half Day Leave'],
-            ['   SL  - Sick Leave'],
-            ['   UL  - Unpaid Leave'],
-            ['   OFF - Off Day'],
-            ['6. You may also write the full label (e.g. "AL - Annual Leave").'],
-            ['7. Import this file via "Import Timesheet" once filled.'],
-        ];
-        const ws2 = XLSX.utils.aoa_to_sheet(instructions);
-        ws2['!cols'] = [{ wch: 70 }];
-
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Timesheet');
-        XLSX.utils.book_append_sheet(wb, ws2, 'Instructions');
-        XLSX.writeFile(wb, 'Timesheet_Report_Template.xlsx');
-    });
-
-    // ============================================================
-    //  IMPORT EXCEL（按 0–18 列索引读取）
-    // ============================================================
-    fileInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-            try {
-                const data = new Uint8Array(evt.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
-
-                if (jsonData.length < 2) {
-                    alert('File is empty or has no data rows.');
-                    return;
-                }
-
-                // 找表头行
-                let headerRowIndex = 0;
-                for (let i = 0; i < Math.min(jsonData.length, 5); i++) {
-                    const rowStr = jsonData[i].join(' ').toLowerCase();
-                    if (rowStr.includes('person') || rowStr.includes('id') || rowStr.includes('name')) {
-                        headerRowIndex = i;
-                        break;
-                    }
-                }
-
-                const newRows = [];
-                for (let i = headerRowIndex + 1; i < jsonData.length; i++) {
-                    const r = jsonData[i];
-                    if (!r || r.length === 0) continue;
-                    if (r.every(c => String(c).trim() === '')) continue;
-
-                    // A–S 列索引：0 PersonID, 1 First, 2 Last, 3 Date, 4 Timesheet,
-                    // 5-6 AM in/out, 7 AM time, 8-9 PM in/out, 10 PM time,
-                    // 11-12 OT in/out, 13 OT time, 14 Break, 15 Work, 16 OT,
-                    // 17 StatisticRule, 18 Abnormal
-                    const personId = String(r[0] || '').trim();
-                    const firstName = String(r[1] || '').trim();
-                    const lastName = String(r[2] || '').trim();
-                    const date = String(r[3] || '').trim();
-                    const timesheet = String(r[4] || '').trim();
-
-                    const clockInAM  = parseTimeValue(r[5]);
-                    const clockOutAM = parseTimeValue(r[6]);
-                    const clockInPM  = parseTimeValue(r[8]);
-                    const clockOutPM = parseTimeValue(r[9]);
-                    const clockInOT  = parseTimeValue(r[11]);
-                    const clockOutOT = parseTimeValue(r[12]);
-
-                    const statisticRuleMode = String(r[17] || '').trim();
-                    const rawStatus = String(r[18] || '').trim();
-                    const status = mapStatus(rawStatus);
-
-                    if (personId || firstName || lastName) {
-                        newRows.push({
-                            id: generateId(),
-                            personId, firstName, lastName, date, timesheet,
-                            clockInAM: clockInAM || '',
-                            clockOutAM: clockOutAM || '',
-                            clockInPM: clockInPM || '',
-                            clockOutPM: clockOutPM || '',
-                            clockInOT: clockInOT || '',
-                            clockOutOT: clockOutOT || '',
-                            statisticRuleMode,
-                            status,
-                            // 原始 abnormal 文本保留，导出时可回写
-                            abnormalRaw: rawStatus
-                        });
-                    }
-                }
-
-                if (newRows.length === 0) {
-                    alert('No valid rows found. Please check the file format.');
-                    return;
-                }
-
-                if (rows.length > 0) {
-                    if (confirm('Replace current data? OK = Replace, Cancel = Append.')) {
-                        rows = newRows;
-                    } else {
-                        rows = rows.concat(newRows);
-                    }
-                } else {
-                    rows = newRows;
-                }
-
-                render();
-                alert(`✅ Imported ${newRows.length} rows successfully.`);
-
-            } catch (err) {
-                console.error(err);
-                alert('Error reading file: ' + err.message);
-            }
-        };
-        reader.readAsArrayBuffer(file);
-        fileInput.value = '';
-    });
-
-    function mapStatus(raw) {
-        if (!raw) return '';
-        const s = raw.toUpperCase();
-        if (s.includes('ABSENT') || s.includes('MISSED PUNCH')) return 'UL';
-        if (s.startsWith('HAL')) return 'HAL';
-        if (s.startsWith('AL'))  return 'AL';
-        if (s.startsWith('SL'))  return 'SL';
-        if (s.startsWith('UL'))  return 'UL';
-        if (s.startsWith('OFF')) return 'OFF';
-        if (s.startsWith('L'))   return 'L';
-        if (s.includes('ANNUAL'))  return 'AL';
-        if (s.includes('SICK'))    return 'SL';
-        if (s.includes('UNPAID'))  return 'UL';
-        if (s.includes('HALF'))    return 'HAL';
-        if (s.includes('OFF'))     return 'OFF';
-        return '';
-    }
-
-    function parseTimeValue(val) {
-        if (val === null || val === undefined || val === '') return '';
-        const s = String(val).trim();
-        if (/^\d{1,2}:\d{2}$/.test(s)) return s;
-        const num = parseFloat(s);
-        if (!isNaN(num) && num >= 0 && num < 1) {
-            const totalMinutes = Math.round(num * 24 * 60);
-            const h = Math.floor(totalMinutes / 60);
-            const m = totalMinutes % 60;
-            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-        }
-        const match12 = s.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-        if (match12) {
-            let h = parseInt(match12[1], 10);
-            const m = parseInt(match12[2], 10);
-            const ampm = match12[3].toUpperCase();
-            if (ampm === 'PM' && h < 12) h += 12;
-            if (ampm === 'AM' && h === 12) h = 0;
-            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-        }
-        return s;
-    }
-
-    // ============================================================
-    //  ADD ROW
-    // ============================================================
-    document.getElementById('addRowBtn').addEventListener('click', function() {
-        rows.push({
-            id: generateId(),
-            personId: '',
-            firstName: '',
-            lastName: '',
-            date: new Date().toISOString().slice(0, 10),
-            timesheet: '',
-            clockInAM: '', clockOutAM: '',
-            clockInPM: '', clockOutPM: '',
-            clockInOT: '', clockOutOT: '',
-            statisticRuleMode: 'Even and Odd',
-            status: '',
-            abnormalRaw: ''
-        });
-        render();
-        setTimeout(() => {
-            const lastRow = tbody.lastElementChild;
-            if (lastRow) lastRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 50);
-    });
-
-    // ============================================================
-    //  CLEAR
-    // ============================================================
-    document.getElementById('clearBtn').addEventListener('click', function() {
-        if (rows.length === 0) return;
-        if (confirm('Clear all data? This cannot be undone.')) {
-            rows = [];
-            render();
-        }
-    });
-
-    // ============================================================
-    //  EXPORT EXCEL（19 列，和导入模板完全一致）
-    // ============================================================
-    document.getElementById('exportBtn').addEventListener('click', function() {
-        if (rows.length === 0) {
-            alert('No data to export.');
-            return;
-        }
-
-        const headers = [
-            'Person ID', 'First Name', 'Last Name', 'Date', 'Timesheet',
-            'Clock In', 'Clock Out', 'Clock Time(h)',
-            'Clock In', 'Clock Out', 'Clock Time(h)',
-            'Clock In', 'Clock Out', 'Clock Time(h)',
-            'Total Break Time(h)', 'Total Work Time(h)', 'Total Overtime Time(h)',
-            'Statistic Rule Mode', 'Abnormal Situation'
-        ];
-
-        const data = rows.map(row => {
-            const calc = computeRow(row);
-            // 回写 Abnormal 原文（若导入时有），否则用 status 标签
-            const abnormal = row.abnormalRaw
-                ? row.abnormalRaw
-                : (STATUS_OPTIONS.find(o => o.value === row.status)?.label || '');
-            return [
-                row.personId || '',
-                row.firstName || '',
-                row.lastName || '',
-                row.date || '',
-                row.timesheet || '',
-                row.clockInAM || '',
-                row.clockOutAM || '',
-                minutesToHoursStr(calc.amMinutes),
-                row.clockInPM || '',
-                row.clockOutPM || '',
-                minutesToHoursStr(calc.pmMinutes),
-                row.clockInOT || '',
-                row.clockOutOT || '',
-                minutesToHoursStr(calc.otMinutes),
-                minutesToHoursStr(calc.breakMinutes),
-                minutesToHoursStr(calc.workMinutes),
-                minutesToHoursStr(calc.otMinutes),
-                row.statisticRuleMode || '',
-                abnormal
-            ];
-        });
-
-        const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
-        ws['!cols'] = [
-            { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 10 },
-            { wch: 12 }, { wch: 12 }, { wch: 12 },
-            { wch: 12 }, { wch: 12 }, { wch: 12 },
-            { wch: 12 }, { wch: 12 }, { wch: 12 },
-            { wch: 18 }, { wch: 18 }, { wch: 20 },
-            { wch: 18 }, { wch: 18 }
-        ];
-
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Timesheet');
-        XLSX.writeFile(wb, 'Timecard_Report_' + new Date().toISOString().slice(0, 10) + '.xlsx');
-    });
-
-    // ============================================================
-    //  INIT
-    // ============================================================
-    render();
-</script>
-</body>
-</html>
+    .table-wrap::-webkit-scrollbar { height: 9px; }
+    .table-wrap::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+    .table-wrap::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .table-wrap::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+</style>
