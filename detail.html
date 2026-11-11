@@ -274,7 +274,8 @@
             <option value="">Pilih Nama</option>
           </select>
         </div>
-        <!-- ✅ 新增：Bank Nama & 手动编辑按钮 -->
+        
+        <!-- ✅ 手动编辑：Bank Nama -->
         <div class="field">
           <span class="field-label">Bank Nama</span>
           <div style="display:flex; gap:6px; align-items:center;">
@@ -284,10 +285,18 @@
             </button>
           </div>
         </div>
+        
+        <!-- ✅ 手动编辑：Bank Account -->
         <div class="field">
           <span class="field-label">Bank Account</span>
-          <input type="text" class="field-input" id="infoBankAcc" readonly>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <input type="text" class="field-input" id="infoBankAcc" readonly>
+            <button type="button" class="btn btn-sm" id="btnEditBankAcc" title="Klik untuk edit manual" style="padding:6px 10px; min-height:32px; background:var(--navy-soft); color:var(--navy); border:1px solid var(--line);">
+              <i class="fas fa-pen"></i>
+            </button>
+          </div>
         </div>
+        
       </div>
     </section>
 
@@ -421,7 +430,9 @@
   let allEmployees = [];
   let activeStaffList = [];
   let SCRIPT_URL = '';
+  
   let isEditingBank = false;
+  let isEditingBankAcc = false;
 
   const RM_FMT = new Intl.NumberFormat('ms-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   function num(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
@@ -661,11 +672,9 @@
     const staff = activeStaffList.find(s => s.Code === raw.Code);
     if (staff && raw.manualBank !== true) {
       raw.SLRBankNama = staff.BankNama || '';
-      if (inputs.bankNama) inputs.bankNama.value = raw.SLRBankNama;
     }
     if (staff && raw.manualBankAcc !== true) {
       raw.SLRBankAccountNo = staff.BankAccountNo || '';
-      if (inputs.bankAcc) inputs.bankAcc.value = raw.SLRBankAccountNo;
     }
 
     el('infoSituation').innerText = raw.Situation || 'ACTIVE';
@@ -682,8 +691,31 @@
       }
     });
 
+    // ✅ 强制 UI 与底层数据同步
     el('infoBank').value = raw.SLRBankNama || '—';
+    inputs.bankNama.value = raw.SLRBankNama || '—';
+    
     el('infoBankAcc').value = raw.SLRBankAccountNo || '—';
+    inputs.bankAcc.value = raw.SLRBankAccountNo || '—';
+
+    // ✅ 重置手动编辑状态
+    isEditingBank = false;
+    el('infoBank').readOnly = true;
+    const btnEditBank = el('btnEditBank');
+    if(btnEditBank) {
+      btnEditBank.innerHTML = '<i class="fas fa-pen"></i>';
+      btnEditBank.style.background = 'var(--navy-soft)';
+      btnEditBank.style.color = 'var(--navy)';
+    }
+
+    isEditingBankAcc = false;
+    el('infoBankAcc').readOnly = true;
+    const btnEditBankAcc = el('btnEditBankAcc');
+    if(btnEditBankAcc) {
+      btnEditBankAcc.innerHTML = '<i class="fas fa-pen"></i>';
+      btnEditBankAcc.style.background = 'var(--navy-soft)';
+      btnEditBankAcc.style.color = 'var(--navy)';
+    }
 
     updateCalc();
   }
@@ -703,11 +735,32 @@
       btn.innerHTML = '<i class="fas fa-pen"></i>';
       btn.style.background = 'var(--navy-soft)';
       btn.style.color = 'var(--navy)';
-      // 失去焦点时保存
       if (currentRaw) {
         currentRaw.SLRBankNama = inp.value;
         currentRaw.manualBank = true;
         inputs.bankNama.value = inp.value;
+      }
+    }
+  }
+
+  function toggleBankAccEdit() {
+    isEditingBankAcc = !isEditingBankAcc;
+    const inp = el('infoBankAcc');
+    const btn = el('btnEditBankAcc');
+    inp.readOnly = !isEditingBankAcc;
+    if (isEditingBankAcc) {
+      inp.focus();
+      btn.innerHTML = '<i class="fas fa-check"></i>';
+      btn.style.background = '#0f7a4d';
+      btn.style.color = '#fff';
+    } else {
+      btn.innerHTML = '<i class="fas fa-pen"></i>';
+      btn.style.background = 'var(--navy-soft)';
+      btn.style.color = 'var(--navy)';
+      if (currentRaw) {
+        currentRaw.SLRBankAccountNo = inp.value;
+        currentRaw.manualBankAcc = true;
+        inputs.bankAcc.value = inp.value;
       }
     }
   }
@@ -824,7 +877,7 @@
       if (result.status === 'success' && result.data) {
         const merged = { ...currentRaw, ...result.data };
         if (merged.Basic !== undefined) merged.Basic = num(merged.Basic);
-        // 重置手动标记，强制使用 staffinfo 的值
+        // 重置手动标记，强制使用 staffinfo 的值（如果有）
         merged.manualBank = false;
         merged.manualBankAcc = false;
         fillForm(merged);
@@ -886,10 +939,11 @@
   el('printBtn').addEventListener('click', () => window.print());
   el('autoCalcBtn').addEventListener('click', autoCalcStatutory);
 
-  // ✅ 手动编辑 Bank 按钮绑定
+  // ✅ 手动编辑 Bank 与 Bank Account 按钮绑定
   el('btnEditBank').addEventListener('click', toggleBankEdit);
+  el('btnEditBankAcc').addEventListener('click', toggleBankAccEdit);
 
-  // ✅ Bank Nama (上方 infoBank 与下方 bankNama 双向绑定)
+  // ✅ Bank Nama 双向绑定（infoBank <-> bankNama）
   el('infoBank').addEventListener('input', (e) => {
     if (currentRaw) {
       currentRaw.SLRBankNama = e.target.value;
@@ -905,7 +959,14 @@
     el('infoBank').value = e.target.value;
   });
 
-  // ✅ Bank Account 双向绑定（infoBankAcc 为只读，仅反映底层值）
+  // ✅ Bank Account 双向绑定（infoBankAcc <-> bankAcc）
+  el('infoBankAcc').addEventListener('input', (e) => {
+    if (currentRaw) {
+      currentRaw.SLRBankAccountNo = e.target.value;
+      currentRaw.manualBankAcc = true;
+      inputs.bankAcc.value = e.target.value;
+    }
+  });
   inputs.bankAcc.addEventListener('input', (e) => {
     if (currentRaw) {
       currentRaw.SLRBankAccountNo = e.target.value;
