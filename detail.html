@@ -80,7 +80,8 @@
   .url-bar .status-dot.ok { background: #22c55e; }
   .url-bar .status-dot.err { background: #ef4444; }
 
-  .meta-grid{ display:grid; grid-template-columns:minmax(0,1.7fr) minmax(0,1fr); gap:16px; margin-bottom:22px; }
+  /* Meta cards */
+  .meta-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:22px; }
   .meta-card{
     background:linear-gradient(180deg, #f9fbfe, #f2f7fc); border:1px solid #dae4f0;
     border-radius:var(--radius); padding:16px 18px 18px; box-shadow:0 1px 2px rgba(16,32,56,.03); min-width:0;
@@ -93,7 +94,6 @@
   .field-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px 18px; }
   .field{ display:flex; flex-direction:column; gap:4px; min-width:0; }
   .field-label{ font-size:.66rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); }
-  .field-static{ font-size:.95rem; font-weight:600; color:var(--ink); padding:7px 2px; word-break:break-word; }
   .field-input, select.field-input {
     width:100%; padding:7px 10px; border:1px solid transparent; background:rgba(255,255,255,.7);
     border-radius:8px; font-size:.92rem; font-weight:600; color:var(--ink);
@@ -108,6 +108,7 @@
   .field-input:focus, select.field-input:focus{ border-color:var(--navy); background:#fff; box-shadow:0 0 0 3px rgba(30,58,95,.12); }
   .field-input[readonly]{ background:transparent; cursor:default; }
 
+  /* Basic salary card */
   .meta-card.basic-card{
     background:linear-gradient(160deg, #1e3a5f 0%, #2b5580 55%, #1d4468 100%);
     border-color:#1a3355; display:flex; flex-direction:column; justify-content:space-between;
@@ -126,6 +127,19 @@
     font-size:1rem; font-weight:700; text-align:right; font-family:inherit; font-variant-numeric:tabular-nums;
   }
 
+  /* Bank Edit UI */
+  .bank-input-group {
+    display: flex; gap: 6px; align-items: center;
+  }
+  .btn-edit-bank {
+    background: var(--navy-soft); color: var(--navy);
+    border: 1px solid var(--line); padding: 7px 10px; border-radius: 8px;
+    cursor: pointer; transition: 0.15s;
+  }
+  .btn-edit-bank:hover { background: #e2eaf6; }
+  .btn-edit-bank.editing { background: var(--green); color: #fff; border-color: var(--green-dark); }
+
+  /* Columns */
   .columns{ display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:20px; }
   .panel{ display:flex; flex-direction:column; border:1px solid var(--line); border-radius:var(--radius); background:#fff; overflow:hidden; box-shadow:var(--shadow-sm); }
   .panel-head{ display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid var(--line); background:#f7fafd; }
@@ -155,6 +169,7 @@
   .panel-total i{ margin-right:4px; opacity:.75; }
   .panel-total strong{ font-size:.95rem; font-variant-numeric:tabular-nums; }
 
+  /* Extra & Summary */
   .extra-grid{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:16px; margin-bottom:22px; }
   .extra-card{ background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px 8px; box-shadow:var(--shadow-sm); min-width:0; transition:border-color .18s, box-shadow .18s; }
   .extra-card:hover{ border-color:#c2d4e6; box-shadow:var(--shadow-md); }
@@ -248,9 +263,11 @@
     <span style="font-size:0.7rem; color:var(--ink-3);">(Auto-sync dari Dashboard)</span>
   </div>
 
+  <!-- 基础信息与银行信息的分工 -->
   <div class="meta-grid">
+    <!-- KIRI: 固定的基础资料 (Nama, Kod, Kumpulan, Situation) -->
     <section class="meta-card">
-      <div class="card-head"><i class="fas fa-id-card"></i> Maklumat Pekerja</div>
+      <div class="card-head"><i class="fas fa-id-card"></i> Maklumat Asas Pekerja</div>
       <div class="field-grid">
         <div class="field">
           <span class="field-label">Situation</span>
@@ -274,38 +291,34 @@
             <option value="">Pilih Nama</option>
           </select>
         </div>
-        
-        <!-- ✅ 手动编辑：Bank Nama -->
-        <div class="field">
-          <span class="field-label">Bank Nama</span>
-          <div style="display:flex; gap:6px; align-items:center;">
-            <input type="text" class="field-input" id="infoBank" readonly>
-            <button type="button" class="btn btn-sm" id="btnEditBank" title="Klik untuk edit manual" style="padding:6px 10px; min-height:32px; background:var(--navy-soft); color:var(--navy); border:1px solid var(--line);">
-              <i class="fas fa-pen"></i>
-            </button>
-          </div>
-        </div>
-        
-        <!-- ✅ 手动编辑：Bank Account -->
-        <div class="field">
-          <span class="field-label">Bank Account</span>
-          <div style="display:flex; gap:6px; align-items:center;">
-            <input type="text" class="field-input" id="infoBankAcc" readonly>
-            <button type="button" class="btn btn-sm" id="btnEditBankAcc" title="Klik untuk edit manual" style="padding:6px 10px; min-height:32px; background:var(--navy-soft); color:var(--navy); border:1px solid var(--line);">
-              <i class="fas fa-pen"></i>
-            </button>
-          </div>
-        </div>
-        
       </div>
     </section>
 
+    <!-- KANAN: Gaji Asas (Boleh edit terus tanpa lock) -->
     <section class="meta-card basic-card">
       <div class="card-head"><i class="fas fa-wallet"></i> Gaji Asas Bulanan</div>
       <div class="basic-display" id="infoGajiAsas">RM 0.00</div>
       <div class="basic-input-wrap">
         <span class="cur">RM</span>
         <input type="number" step="0.01" id="inputGajiAsas" value="0" inputmode="decimal">
+      </div>
+    </section>
+  </div>
+
+  <!-- Bank 专区和按钮 -->
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:22px;">
+    <section class="meta-card" style="padding:14px 18px;">
+      <div class="card-head" style="margin-bottom:10px;"><i class="fas fa-university"></i> Bank Nama</div>
+      <div class="bank-input-group">
+        <input type="text" class="field-input" id="infoBank" readonly style="background:#fff; border:1px solid var(--line);">
+        <button type="button" class="btn-edit-bank" id="btnEditBank" title="Klik untuk edit manual"><i class="fas fa-pen"></i></button>
+      </div>
+    </section>
+    <section class="meta-card" style="padding:14px 18px;">
+      <div class="card-head" style="margin-bottom:10px;"><i class="fas fa-credit-card"></i> Bank Account No.</div>
+      <div class="bank-input-group">
+        <input type="text" class="field-input" id="infoBankAcc" readonly style="background:#fff; border:1px solid var(--line);">
+        <button type="button" class="btn-edit-bank" id="btnEditBankAcc" title="Klik untuk edit manual"><i class="fas fa-pen"></i></button>
       </div>
     </section>
   </div>
@@ -367,7 +380,7 @@
     </section>
 
     <section class="extra-card">
-      <h4><i class="fas fa-university"></i><span>Bank &amp; Pendaftaran</span></h4>
+      <h4><i class="fas fa-university"></i><span>Bank &amp; Pendaftaran (Bawah)</span></h4>
       <div class="line-item"><label for="bankNama">Nama Bank</label><div class="amount text"><input type="text" class="text" id="bankNama" value="—"></div></div>
       <div class="line-item"><label for="bankAcc">No. Akaun</label><div class="amount text"><input type="text" class="text" id="bankAcc" value="—"></div></div>
       <div class="line-item"><label for="epfNo">No. EPF</label><div class="amount text"><input type="text" class="text" id="epfNo" value="—"></div></div>
@@ -386,11 +399,10 @@
     <div class="btn-group">
       <button class="btn btn-outline" onclick="window.close()"><i class="fas fa-arrow-left"></i> Kembali</button>
       <button class="btn btn-primary" id="saveBtn"><i class="fas fa-save"></i> Simpan &amp; Sync</button>
-      <button class="btn btn-ghost" id="syncSheetBtn"><i class="fas fa-cloud-download-alt"></i> Sync dari Sheet</button>
-      <button class="btn btn-success" id="reloadBtn"><i class="fas fa-sync-alt"></i> Muat Semula</button>
+      <button class="btn btn-ghost" id="syncSheetBtn"><i class="fas fa-cloud-download-alt"></i> Muat Data dari Sheet</button>
       <button class="btn btn-ghost" id="printBtn"><i class="fas fa-print"></i> Cetak</button>
     </div>
-    <div class="action-hint"><i class="fas fa-info-circle"></i><span>Perubahan akan disimpan ke <strong>payrollEmployees</strong> dan disegerakkan ke Google Sheet. Tekan <kbd>Ctrl</kbd> + <kbd>S</kbd> untuk simpan pantas.</span></div>
+    <div class="action-hint"><i class="fas fa-info-circle"></i><span>Data Bank dan Gaji akan disimpan ke <strong>Google Sheet</strong>. Tekan <kbd>Ctrl</kbd> + <kbd>S</kbd> untuk simpan pantas.</span></div>
   </div>
 
   <div class="signature-area">
@@ -634,13 +646,9 @@
 
     const existing = allEmployees.find(e => e.Code === code);
 
+    // 1. 先用本地缓存或基础数据进行首次填充（保证不空白）
     if (existing) {
       fillForm(existing);
-      if (!existing.Basic || existing.Basic === 0) {
-        existing.Basic = staffObj.Salary;
-        el('inputGajiAsas').value = staffObj.Salary;
-        updateCalc();
-      }
     } else {
       const newObj = {
         Code: code, Name: staffObj.Name, GroupName: staffObj.GroupName, Situation: staffObj.Situation,
@@ -654,28 +662,19 @@
         EIS_Employee: 0, EIS_Employer: 0, Lindung24Jam: 0,
         SLRBankNama: staffObj.BankNama || '',
         SLRBankAccountNo: staffObj.BankAccountNo || '',
-        SLREPF: '', SLRPERKESO: '', SLREIS: '',
-        manualBank: false,
-        manualBankAcc: false
+        SLREPF: '', SLRPERKESO: '', SLREIS: ''
       };
       fillForm(newObj);
     }
 
-    setSyncStatus('Data dimuat untuk ' + code, 'success');
+    // 2. ✅ 核心修改：无论是新员工还是老员工，强制向 Google Sheet 拉取最新数据
+    // 这样无论你在 Google Sheet 里手动改了什么，只要刷新页面就能拿到最新值。
+    syncFromSheet(true); 
   }
 
   function fillForm(raw) {
     if (!raw) return;
     currentRaw = raw;
-
-    // ✅ 自动从 activeStaffList 同步 Bank 信息，除非用户手动修改过
-    const staff = activeStaffList.find(s => s.Code === raw.Code);
-    if (staff && raw.manualBank !== true) {
-      raw.SLRBankNama = staff.BankNama || '';
-    }
-    if (staff && raw.manualBankAcc !== true) {
-      raw.SLRBankAccountNo = staff.BankAccountNo || '';
-    }
 
     el('infoSituation').innerText = raw.Situation || 'ACTIVE';
     el('inputGajiAsas').value = (raw.Basic != null) ? raw.Basic : 0;
@@ -691,81 +690,72 @@
       }
     });
 
-    // ✅ 强制 UI 与底层数据同步
+    // UI 同步
     el('infoBank').value = raw.SLRBankNama || '—';
     inputs.bankNama.value = raw.SLRBankNama || '—';
     
     el('infoBankAcc').value = raw.SLRBankAccountNo || '—';
     inputs.bankAcc.value = raw.SLRBankAccountNo || '—';
 
-    // ✅ 重置手动编辑状态
-    isEditingBank = false;
-    el('infoBank').readOnly = true;
-    const btnEditBank = el('btnEditBank');
-    if(btnEditBank) {
-      btnEditBank.innerHTML = '<i class="fas fa-pen"></i>';
-      btnEditBank.style.background = 'var(--navy-soft)';
-      btnEditBank.style.color = 'var(--navy)';
-    }
-
-    isEditingBankAcc = false;
-    el('infoBankAcc').readOnly = true;
-    const btnEditBankAcc = el('btnEditBankAcc');
-    if(btnEditBankAcc) {
-      btnEditBankAcc.innerHTML = '<i class="fas fa-pen"></i>';
-      btnEditBankAcc.style.background = 'var(--navy-soft)';
-      btnEditBankAcc.style.color = 'var(--navy)';
-    }
+    // 重置编辑状态
+    resetEditState('bank');
+    resetEditState('bankAcc');
 
     updateCalc();
   }
 
-  /* ===== 手动编辑 Bank 功能 ===== */
-  function toggleBankEdit() {
-    isEditingBank = !isEditingBank;
-    const inp = el('infoBank');
-    const btn = el('btnEditBank');
-    inp.readOnly = !isEditingBank;
-    if (isEditingBank) {
-      inp.focus();
-      btn.innerHTML = '<i class="fas fa-check"></i>';
-      btn.style.background = '#0f7a4d';
-      btn.style.color = '#fff';
-    } else {
+  function resetEditState(type) {
+    if (type === 'bank') {
+      isEditingBank = false;
+      el('infoBank').readOnly = true;
+      const btn = el('btnEditBank');
       btn.innerHTML = '<i class="fas fa-pen"></i>';
-      btn.style.background = 'var(--navy-soft)';
-      btn.style.color = 'var(--navy)';
-      if (currentRaw) {
-        currentRaw.SLRBankNama = inp.value;
-        currentRaw.manualBank = true;
-        inputs.bankNama.value = inp.value;
+      btn.classList.remove('editing');
+    } else {
+      isEditingBankAcc = false;
+      el('infoBankAcc').readOnly = true;
+      const btn = el('btnEditBankAcc');
+      btn.innerHTML = '<i class="fas fa-pen"></i>';
+      btn.classList.remove('editing');
+    }
+  }
+
+  function toggleEdit(type) {
+    if (type === 'bank') {
+      isEditingBank = !isEditingBank;
+      el('infoBank').readOnly = !isEditingBank;
+      const btn = el('btnEditBank');
+      if (isEditingBank) {
+        el('infoBank').focus();
+        btn.innerHTML = '<i class="fas fa-check"></i>';
+        btn.classList.add('editing');
+      } else {
+        btn.innerHTML = '<i class="fas fa-pen"></i>';
+        btn.classList.remove('editing');
+        if (currentRaw) {
+          currentRaw.SLRBankNama = el('infoBank').value;
+          inputs.bankNama.value = el('infoBank').value;
+        }
+      }
+    } else {
+      isEditingBankAcc = !isEditingBankAcc;
+      el('infoBankAcc').readOnly = !isEditingBankAcc;
+      const btn = el('btnEditBankAcc');
+      if (isEditingBankAcc) {
+        el('infoBankAcc').focus();
+        btn.innerHTML = '<i class="fas fa-check"></i>';
+        btn.classList.add('editing');
+      } else {
+        btn.innerHTML = '<i class="fas fa-pen"></i>';
+        btn.classList.remove('editing');
+        if (currentRaw) {
+          currentRaw.SLRBankAccountNo = el('infoBankAcc').value;
+          inputs.bankAcc.value = el('infoBankAcc').value;
+        }
       }
     }
   }
 
-  function toggleBankAccEdit() {
-    isEditingBankAcc = !isEditingBankAcc;
-    const inp = el('infoBankAcc');
-    const btn = el('btnEditBankAcc');
-    inp.readOnly = !isEditingBankAcc;
-    if (isEditingBankAcc) {
-      inp.focus();
-      btn.innerHTML = '<i class="fas fa-check"></i>';
-      btn.style.background = '#0f7a4d';
-      btn.style.color = '#fff';
-    } else {
-      btn.innerHTML = '<i class="fas fa-pen"></i>';
-      btn.style.background = 'var(--navy-soft)';
-      btn.style.color = 'var(--navy)';
-      if (currentRaw) {
-        currentRaw.SLRBankAccountNo = inp.value;
-        currentRaw.manualBankAcc = true;
-        inputs.bankAcc.value = inp.value;
-      }
-    }
-  }
-
-  /* ===== 保存 + 同步 ===== */
   async function saveAndSync() {
     if (!currentRaw || !currentRaw.Code) {
       alert('Tiada pekerja dipilih. Sila pilih KOD terlebih dahulu.');
@@ -780,16 +770,19 @@
     const updated = { ...currentRaw };
     updated.Basic = num(el('inputGajiAsas').value);
 
+    // 强制同步 UI 上最新的 Bank 文本到数据对象
+    updated.SLRBankNama = el('infoBank').value;
+    updated.SLRBankAccountNo = el('infoBankAcc').value;
+
     Object.entries(FIELD_MAP).forEach(([id, key]) => {
       const inp = inputs[id];
       if (!inp) return;
+      // 跳过已经被上面的 updated.SLRBank 赋值的字段，防止被下拉框覆盖
+      if (key === 'SLRBankNama' || key === 'SLRBankAccountNo') return; 
+      
       if (TEXT_FIELDS.has(id)) updated[key] = inp.value;
       else updated[key] = num(inp.value);
     });
-
-    // 同步 Bank 字段如果被手动修改
-    if (updated.SLRBankNama !== currentRaw.SLRBankNama) updated.manualBank = true;
-    if (updated.SLRBankAccountNo !== currentRaw.SLRBankAccountNo) updated.manualBankAcc = true;
 
     let sheetSuccess = false;
     if (SCRIPT_URL) {
@@ -852,20 +845,25 @@
     }
   }
 
-  /* ===== Sync dari Sheet ===== */
-  async function syncFromSheet() {
+  // ✅ syncFromSheet 增加 silent 模式 (用于页面加载时静默拉取)
+  async function syncFromSheet(silent = false) {
     if (!currentRaw || !currentRaw.Code) {
-      alert('Sila pilih pekerja dahulu.');
+      if(!silent) alert('Sila pilih pekerja dahulu.');
       return;
     }
     if (!SCRIPT_URL) {
-      alert('Sila tetapkan URL Deploy terlebih dahulu di Dashboard.');
+      if(!silent) alert('Sila tetapkan URL Deploy terlebih dahulu di Dashboard.');
       return;
     }
+    
     const btn = el('syncSheetBtn');
     const originalText = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menarik...';
+    if (!silent) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menarik...';
+    } else {
+      setSyncStatus('Mendapatkan data terkini dari Sheet...', '');
+    }
 
     try {
       const res = await fetch(SCRIPT_URL, {
@@ -874,26 +872,41 @@
         body: JSON.stringify({ action: 'getEmployeeDetail', Code: currentRaw.Code })
       });
       const result = await res.json();
+      
       if (result.status === 'success' && result.data) {
         const merged = { ...currentRaw, ...result.data };
         if (merged.Basic !== undefined) merged.Basic = num(merged.Basic);
-        // 重置手动标记，强制使用 staffinfo 的值（如果有）
-        merged.manualBank = false;
-        merged.manualBankAcc = false;
+        
         fillForm(merged);
+        
+        // 同步更新 localStorage 缓存为最新
+        let all = [];
+        try {
+          const allJson = localStorage.getItem(STORAGE_KEY);
+          if (allJson) all = JSON.parse(allJson) || [];
+        } catch (e) {}
+        if (!Array.isArray(all)) all = [];
+        const idx = all.findIndex(e => e.Code === merged.Code);
+        if (idx !== -1) all[idx] = { ...all[idx], ...merged };
+        else all.push(merged);
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); } catch(e){}
+
         const lastUpdated = result.data.LastUpdated || '—';
-        setSyncStatus('Data dari Sheet dimuat · ' + lastUpdated, 'success');
-        alert('✅ Data berjaya dimuat dari Google Sheet.\n\nTerakhir dikemas kini: ' + lastUpdated);
+        setSyncStatus('Data Sheet dimuat · ' + lastUpdated, 'success');
+        if (!silent) alert('✅ Data berjaya dimuat dari Google Sheet.\n\nTerakhir dikemas kini: ' + lastUpdated);
       } else {
-        alert('Tiada data di Sheet untuk pekerja ini: ' + (result.message || ''));
+        if (!silent) alert('Tiada data di Sheet untuk pekerja ini: ' + (result.message || ''));
+        setSyncStatus('Tiada data di Sheet', '');
       }
     } catch (err) {
       console.error('Sync from sheet error:', err);
-      alert('❌ Gagal sync dari Sheet: ' + err.message);
+      if (!silent) alert('❌ Gagal sync dari Sheet: ' + err.message);
       setSyncStatus('Gagal sync dari Sheet', 'error');
     } finally {
-      btn.disabled = false;
-      btn.innerHTML = originalText;
+      if (!silent) {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
     }
   }
 
@@ -917,7 +930,7 @@
     setSyncStatus('Tiada data', 'error');
   }
 
-  /* ===== 事件绑定 ===== */
+  // 事件绑定
   Object.values(inputs).forEach(inp => {
     if (!inp) return;
     inp.addEventListener('input', updateCalc);
@@ -925,53 +938,32 @@
   });
   el('inputGajiAsas').addEventListener('input', updateCalc);
 
-  el('saveBtn').addEventListener('click', saveAndSync);
-  el('syncSheetBtn').addEventListener('click', syncFromSheet);
-  el('reloadBtn').addEventListener('click', () => {
-    const code = el('infoKod').value;
-    if (code) {
-      const emp = activeStaffList.find(s => s.Code === code);
-      if (emp) switchEmployee(emp);
-    } else {
-      fetchStaffBasics();
-    }
-  });
+  el('saveBtn').addEventListener('click', () => saveAndSync());
+  el('syncSheetBtn').addEventListener('click', () => syncFromSheet(false)); // 手动点击拉取
   el('printBtn').addEventListener('click', () => window.print());
   el('autoCalcBtn').addEventListener('click', autoCalcStatutory);
 
-  // ✅ 手动编辑 Bank 与 Bank Account 按钮绑定
-  el('btnEditBank').addEventListener('click', toggleBankEdit);
-  el('btnEditBankAcc').addEventListener('click', toggleBankAccEdit);
+  // ✅ 绑定编辑按钮
+  el('btnEditBank').addEventListener('click', () => toggleEdit('bank'));
+  el('btnEditBankAcc').addEventListener('click', () => toggleEdit('bankAcc'));
 
-  // ✅ Bank Nama 双向绑定（infoBank <-> bankNama）
+  // ✅ 双向绑定 Bank Nama (上方输入框与下方 Extra 区域联动)
   el('infoBank').addEventListener('input', (e) => {
-    if (currentRaw) {
-      currentRaw.SLRBankNama = e.target.value;
-      currentRaw.manualBank = true;
-      inputs.bankNama.value = e.target.value;
-    }
+    if (currentRaw) currentRaw.SLRBankNama = e.target.value;
+    inputs.bankNama.value = e.target.value;
   });
   inputs.bankNama.addEventListener('input', (e) => {
-    if (currentRaw) {
-      currentRaw.SLRBankNama = e.target.value;
-      currentRaw.manualBank = true;
-    }
+    if (currentRaw) currentRaw.SLRBankNama = e.target.value;
     el('infoBank').value = e.target.value;
   });
 
-  // ✅ Bank Account 双向绑定（infoBankAcc <-> bankAcc）
+  // ✅ 双向绑定 Bank Account
   el('infoBankAcc').addEventListener('input', (e) => {
-    if (currentRaw) {
-      currentRaw.SLRBankAccountNo = e.target.value;
-      currentRaw.manualBankAcc = true;
-      inputs.bankAcc.value = e.target.value;
-    }
+    if (currentRaw) currentRaw.SLRBankAccountNo = e.target.value;
+    inputs.bankAcc.value = e.target.value;
   });
   inputs.bankAcc.addEventListener('input', (e) => {
-    if (currentRaw) {
-      currentRaw.SLRBankAccountNo = e.target.value;
-      currentRaw.manualBankAcc = true;
-    }
+    if (currentRaw) currentRaw.SLRBankAccountNo = e.target.value;
     el('infoBankAcc').value = e.target.value;
   });
 
