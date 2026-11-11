@@ -274,10 +274,15 @@
             <option value="">Pilih Nama</option>
           </select>
         </div>
-        <!-- 新增：Bank & Bank Account 显示 -->
+        <!-- ✅ 新增：Bank Nama & 手动编辑按钮 -->
         <div class="field">
-          <span class="field-label">Bank</span>
-          <input type="text" class="field-input" id="infoBank" readonly>
+          <span class="field-label">Bank Nama</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <input type="text" class="field-input" id="infoBank" readonly>
+            <button type="button" class="btn btn-sm" id="btnEditBank" title="Klik untuk edit manual" style="padding:6px 10px; min-height:32px; background:var(--navy-soft); color:var(--navy); border:1px solid var(--line);">
+              <i class="fas fa-pen"></i>
+            </button>
+          </div>
         </div>
         <div class="field">
           <span class="field-label">Bank Account</span>
@@ -416,6 +421,7 @@
   let allEmployees = [];
   let activeStaffList = [];
   let SCRIPT_URL = '';
+  let isEditingBank = false;
 
   const RM_FMT = new Intl.NumberFormat('ms-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   function num(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
@@ -624,16 +630,6 @@
         el('inputGajiAsas').value = staffObj.Salary;
         updateCalc();
       }
-      if (!existing.SLRBankNama && staffObj.BankNama) {
-        existing.SLRBankNama = staffObj.BankNama;
-        inputs.bankNama.value = staffObj.BankNama;
-        el('infoBank').value = staffObj.BankNama;
-      }
-      if (!existing.SLRBankAccountNo && staffObj.BankAccountNo) {
-        existing.SLRBankAccountNo = staffObj.BankAccountNo;
-        inputs.bankAcc.value = staffObj.BankAccountNo;
-        el('infoBankAcc').value = staffObj.BankAccountNo;
-      }
     } else {
       const newObj = {
         Code: code, Name: staffObj.Name, GroupName: staffObj.GroupName, Situation: staffObj.Situation,
@@ -647,7 +643,9 @@
         EIS_Employee: 0, EIS_Employer: 0, Lindung24Jam: 0,
         SLRBankNama: staffObj.BankNama || '',
         SLRBankAccountNo: staffObj.BankAccountNo || '',
-        SLREPF: '', SLRPERKESO: '', SLREIS: ''
+        SLREPF: '', SLRPERKESO: '', SLREIS: '',
+        manualBank: false,
+        manualBankAcc: false
       };
       fillForm(newObj);
     }
@@ -658,6 +656,17 @@
   function fillForm(raw) {
     if (!raw) return;
     currentRaw = raw;
+
+    // ✅ 自动从 activeStaffList 同步 Bank 信息，除非用户手动修改过
+    const staff = activeStaffList.find(s => s.Code === raw.Code);
+    if (staff && raw.manualBank !== true) {
+      raw.SLRBankNama = staff.BankNama || '';
+      if (inputs.bankNama) inputs.bankNama.value = raw.SLRBankNama;
+    }
+    if (staff && raw.manualBankAcc !== true) {
+      raw.SLRBankAccountNo = staff.BankAccountNo || '';
+      if (inputs.bankAcc) inputs.bankAcc.value = raw.SLRBankAccountNo;
+    }
 
     el('infoSituation').innerText = raw.Situation || 'ACTIVE';
     el('inputGajiAsas').value = (raw.Basic != null) ? raw.Basic : 0;
@@ -673,13 +682,37 @@
       }
     });
 
-    // 更新基础信息栏的 Bank 显示
     el('infoBank').value = raw.SLRBankNama || '—';
     el('infoBankAcc').value = raw.SLRBankAccountNo || '—';
 
     updateCalc();
   }
 
+  /* ===== 手动编辑 Bank 功能 ===== */
+  function toggleBankEdit() {
+    isEditingBank = !isEditingBank;
+    const inp = el('infoBank');
+    const btn = el('btnEditBank');
+    inp.readOnly = !isEditingBank;
+    if (isEditingBank) {
+      inp.focus();
+      btn.innerHTML = '<i class="fas fa-check"></i>';
+      btn.style.background = '#0f7a4d';
+      btn.style.color = '#fff';
+    } else {
+      btn.innerHTML = '<i class="fas fa-pen"></i>';
+      btn.style.background = 'var(--navy-soft)';
+      btn.style.color = 'var(--navy)';
+      // 失去焦点时保存
+      if (currentRaw) {
+        currentRaw.SLRBankNama = inp.value;
+        currentRaw.manualBank = true;
+        inputs.bankNama.value = inp.value;
+      }
+    }
+  }
+
+  /* ===== 保存 + 同步 ===== */
   async function saveAndSync() {
     if (!currentRaw || !currentRaw.Code) {
       alert('Tiada pekerja dipilih. Sila pilih KOD terlebih dahulu.');
@@ -700,6 +733,10 @@
       if (TEXT_FIELDS.has(id)) updated[key] = inp.value;
       else updated[key] = num(inp.value);
     });
+
+    // 同步 Bank 字段如果被手动修改
+    if (updated.SLRBankNama !== currentRaw.SLRBankNama) updated.manualBank = true;
+    if (updated.SLRBankAccountNo !== currentRaw.SLRBankAccountNo) updated.manualBankAcc = true;
 
     let sheetSuccess = false;
     if (SCRIPT_URL) {
@@ -786,8 +823,10 @@
       const result = await res.json();
       if (result.status === 'success' && result.data) {
         const merged = { ...currentRaw, ...result.data };
-        // 确保 Basic / 相关字段是数字
         if (merged.Basic !== undefined) merged.Basic = num(merged.Basic);
+        // 重置手动标记，强制使用 staffinfo 的值
+        merged.manualBank = false;
+        merged.manualBankAcc = false;
         fillForm(merged);
         const lastUpdated = result.data.LastUpdated || '—';
         setSyncStatus('Data dari Sheet dimuat · ' + lastUpdated, 'success');
@@ -825,6 +864,7 @@
     setSyncStatus('Tiada data', 'error');
   }
 
+  /* ===== 事件绑定 ===== */
   Object.values(inputs).forEach(inp => {
     if (!inp) return;
     inp.addEventListener('input', updateCalc);
@@ -845,6 +885,34 @@
   });
   el('printBtn').addEventListener('click', () => window.print());
   el('autoCalcBtn').addEventListener('click', autoCalcStatutory);
+
+  // ✅ 手动编辑 Bank 按钮绑定
+  el('btnEditBank').addEventListener('click', toggleBankEdit);
+
+  // ✅ Bank Nama (上方 infoBank 与下方 bankNama 双向绑定)
+  el('infoBank').addEventListener('input', (e) => {
+    if (currentRaw) {
+      currentRaw.SLRBankNama = e.target.value;
+      currentRaw.manualBank = true;
+      inputs.bankNama.value = e.target.value;
+    }
+  });
+  inputs.bankNama.addEventListener('input', (e) => {
+    if (currentRaw) {
+      currentRaw.SLRBankNama = e.target.value;
+      currentRaw.manualBank = true;
+    }
+    el('infoBank').value = e.target.value;
+  });
+
+  // ✅ Bank Account 双向绑定（infoBankAcc 为只读，仅反映底层值）
+  inputs.bankAcc.addEventListener('input', (e) => {
+    if (currentRaw) {
+      currentRaw.SLRBankAccountNo = e.target.value;
+      currentRaw.manualBankAcc = true;
+    }
+    el('infoBankAcc').value = e.target.value;
+  });
 
   document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === 's') {
