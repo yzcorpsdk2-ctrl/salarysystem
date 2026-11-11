@@ -125,6 +125,7 @@
     flex:1; min-width:0; background:transparent; border:none; outline:none; color:#fff;
     font-size:1rem; font-weight:700; text-align:right; font-family:inherit; font-variant-numeric:tabular-nums;
   }
+  .basic-input-wrap input[readonly]{ cursor: default; }
 
   .columns{ display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:20px; }
   .panel{ display:flex; flex-direction:column; border:1px solid var(--line); border-radius:var(--radius); background:#fff; overflow:hidden; box-shadow:var(--shadow-sm); }
@@ -250,7 +251,7 @@
 
   <div class="meta-grid">
     <section class="meta-card">
-      <div class="card-head"><i class="fas fa-id-card"></i> Maklumat Pekerja</div>
+      <div class="card-head"><i class="fas fa-id-card"></i> Maklumat Pekerja (Dari StaffInfo - Tidak Boleh Edit)</div>
       <div class="field-grid">
         <div class="field">
           <span class="field-label">Situation</span>
@@ -275,7 +276,7 @@
           </select>
         </div>
         
-        <!-- ✅ 手动编辑：Bank Nama -->
+        <!-- Bank Nama - 可手动编辑 -->
         <div class="field">
           <span class="field-label">Bank Nama</span>
           <div style="display:flex; gap:6px; align-items:center;">
@@ -286,7 +287,7 @@
           </div>
         </div>
         
-        <!-- ✅ 手动编辑：Bank Account -->
+        <!-- Bank Account - 可手动编辑 -->
         <div class="field">
           <span class="field-label">Bank Account</span>
           <div style="display:flex; gap:6px; align-items:center;">
@@ -301,11 +302,11 @@
     </section>
 
     <section class="meta-card basic-card">
-      <div class="card-head"><i class="fas fa-wallet"></i> Gaji Asas Bulanan</div>
+      <div class="card-head"><i class="fas fa-wallet"></i> Gaji Asas Bulanan (Dari StaffInfo)</div>
       <div class="basic-display" id="infoGajiAsas">RM 0.00</div>
       <div class="basic-input-wrap">
         <span class="cur">RM</span>
-        <input type="number" step="0.01" id="inputGajiAsas" value="0" inputmode="decimal">
+        <input type="number" step="0.01" id="inputGajiAsas" value="0" inputmode="decimal" readonly>
       </div>
     </section>
   </div>
@@ -412,7 +413,7 @@
     allowance: 'Allowance2', commision: 'Commission', incentives: 'Incentives',
     unpaidLeave: 'UnpaidLeave', pinjaman: 'Pinjaman', deductionLain: 'Deduction',
     halfDaysLeave: 'HalfDays', annualLeaveDays: 'AnnualLeaveDays', sickLeaveDays: 'SickLeaveDays',
-    salaryEpf: 'EPFSalary', salarySocso: 'SOCSOSalary', salaryEis: 'EISSalary', salary24jam: 'LindungSalary',
+    salaryEpf: 'EPFSalary', salarySocso: 'SOSOSalary_Unused', salaryEis: 'EISSalary', salary24jam: 'LindungSalary',
     epfEmployee: 'EPF_Employee', epfEmployer: 'EPF_Employer',
     socsoEmployee: 'SOCSO_Employee', socsoEmployer: 'SOCSO_Employer',
     eisEmployee: 'EIS_Employee', eisEmployer: 'EIS_Employer',
@@ -420,6 +421,9 @@
     bankNama: 'SLRBankNama', bankAcc: 'SLRBankAccountNo',
     epfNo: 'SLREPF', socsoNo: 'SLRPERKESO', eisNo: 'SLREIS'
   };
+  // 修正：salarySocso 正确的映射字段是 SOCSOSalary
+  FIELD_MAP.salarySocso = 'SOCSOSalary';
+
   const TEXT_FIELDS = new Set(['bankNama', 'bankAcc', 'epfNo', 'socsoNo', 'eisNo']);
 
   const el = id => document.getElementById(id);
@@ -612,7 +616,7 @@
     }
   }
 
-  function autoSelectFromStorage() {
+  async function autoSelectFromStorage() {
     const code = localStorage.getItem('payrollSelectedCode');
     if (!code) return;
     const emp = activeStaffList.find(s => s.Code === code);
@@ -622,6 +626,9 @@
     el('infoNama').value = emp.Name || '';
     el('infoSituation').innerText = emp.Situation || 'ACTIVE';
     switchEmployee(emp);
+
+    // ✅ 从 Google Sheet 自动拉取最新数据
+    await syncFromSheet(true);
   }
 
   function switchEmployee(staffObj) {
@@ -654,9 +661,7 @@
         EIS_Employee: 0, EIS_Employer: 0, Lindung24Jam: 0,
         SLRBankNama: staffObj.BankNama || '',
         SLRBankAccountNo: staffObj.BankAccountNo || '',
-        SLREPF: '', SLRPERKESO: '', SLREIS: '',
-        manualBank: false,
-        manualBankAcc: false
+        SLREPF: '', SLRPERKESO: '', SLREIS: ''
       };
       fillForm(newObj);
     }
@@ -668,18 +673,19 @@
     if (!raw) return;
     currentRaw = raw;
 
-    // ✅ 自动从 activeStaffList 同步 Bank 信息，除非用户手动修改过
+    // ✅ 基础信息强制从 staffinfo 取（不变）
     const staff = activeStaffList.find(s => s.Code === raw.Code);
-    if (staff && raw.manualBank !== true) {
-      raw.SLRBankNama = staff.BankNama || '';
-    }
-    if (staff && raw.manualBankAcc !== true) {
-      raw.SLRBankAccountNo = staff.BankAccountNo || '';
+    if (staff) {
+      raw.Name = staff.Name;
+      raw.GroupName = staff.GroupName;
+      raw.Situation = staff.Situation;
+      raw.Basic = staff.Salary;  // Gaji 不变
     }
 
     el('infoSituation').innerText = raw.Situation || 'ACTIVE';
     el('inputGajiAsas').value = (raw.Basic != null) ? raw.Basic : 0;
 
+    // ✅ Bank Nama/Bank Acc 优先使用 raw 内已有的值（来自 Sheet），否则保留
     Object.entries(FIELD_MAP).forEach(([id, key]) => {
       const inp = inputs[id];
       if (!inp) return;
@@ -691,7 +697,7 @@
       }
     });
 
-    // ✅ 强制 UI 与底层数据同步
+    // 上下两块 Bank 字段保持同步
     el('infoBank').value = raw.SLRBankNama || '—';
     inputs.bankNama.value = raw.SLRBankNama || '—';
     
@@ -720,7 +726,7 @@
     updateCalc();
   }
 
-  /* ===== 手动编辑 Bank 功能 ===== */
+  /* ===== 手动编辑 Bank ===== */
   function toggleBankEdit() {
     isEditingBank = !isEditingBank;
     const inp = el('infoBank');
@@ -737,7 +743,6 @@
       btn.style.color = 'var(--navy)';
       if (currentRaw) {
         currentRaw.SLRBankNama = inp.value;
-        currentRaw.manualBank = true;
         inputs.bankNama.value = inp.value;
       }
     }
@@ -759,7 +764,6 @@
       btn.style.color = 'var(--navy)';
       if (currentRaw) {
         currentRaw.SLRBankAccountNo = inp.value;
-        currentRaw.manualBankAcc = true;
         inputs.bankAcc.value = inp.value;
       }
     }
@@ -778,7 +782,14 @@
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
 
     const updated = { ...currentRaw };
-    updated.Basic = num(el('inputGajiAsas').value);
+    // 基础信息强制从 staffinfo
+    const staff = activeStaffList.find(s => s.Code === updated.Code);
+    if (staff) {
+      updated.Name = staff.Name;
+      updated.GroupName = staff.GroupName;
+      updated.Situation = staff.Situation;
+      updated.Basic = staff.Salary;
+    }
 
     Object.entries(FIELD_MAP).forEach(([id, key]) => {
       const inp = inputs[id];
@@ -786,10 +797,6 @@
       if (TEXT_FIELDS.has(id)) updated[key] = inp.value;
       else updated[key] = num(inp.value);
     });
-
-    // 同步 Bank 字段如果被手动修改
-    if (updated.SLRBankNama !== currentRaw.SLRBankNama) updated.manualBank = true;
-    if (updated.SLRBankAccountNo !== currentRaw.SLRBankAccountNo) updated.manualBankAcc = true;
 
     let sheetSuccess = false;
     if (SCRIPT_URL) {
@@ -852,14 +859,14 @@
     }
   }
 
-  /* ===== Sync dari Sheet ===== */
-  async function syncFromSheet() {
+  /* ===== ✅ 从 Sheet 读取最新一行数据 ===== */
+  async function syncFromSheet(silent = false) {
     if (!currentRaw || !currentRaw.Code) {
-      alert('Sila pilih pekerja dahulu.');
+      if (!silent) alert('Sila pilih pekerja dahulu.');
       return;
     }
     if (!SCRIPT_URL) {
-      alert('Sila tetapkan URL Deploy terlebih dahulu di Dashboard.');
+      if (!silent) alert('Sila tetapkan URL Deploy terlebih dahulu di Dashboard.');
       return;
     }
     const btn = el('syncSheetBtn');
@@ -875,22 +882,39 @@
       });
       const result = await res.json();
       if (result.status === 'success' && result.data) {
-        const merged = { ...currentRaw, ...result.data };
+        const sheetData = result.data;
+        
+        // ✅ 合并：基础信息始终来自 staffinfo，其他字段用 Sheet 数据覆盖
+        const staff = activeStaffList.find(s => s.Code === currentRaw.Code);
+        const merged = { ...currentRaw, ...sheetData };
+        if (staff) {
+          merged.Name = staff.Name;
+          merged.GroupName = staff.GroupName;
+          merged.Situation = staff.Situation;
+          merged.Basic = staff.Salary; // Gaji 强制从 staffinfo
+        }
         if (merged.Basic !== undefined) merged.Basic = num(merged.Basic);
-        // 重置手动标记，强制使用 staffinfo 的值（如果有）
-        merged.manualBank = false;
-        merged.manualBankAcc = false;
         fillForm(merged);
-        const lastUpdated = result.data.LastUpdated || '—';
+        
+        // 同步到 localStorage 缓存
+        const idx = allEmployees.findIndex(e => e.Code === currentRaw.Code);
+        if (idx !== -1) allEmployees[idx] = merged;
+        else allEmployees.push(merged);
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees)); } catch(e) {}
+        
+        const lastUpdated = sheetData.LastUpdated || '—';
         setSyncStatus('Data dari Sheet dimuat · ' + lastUpdated, 'success');
-        alert('✅ Data berjaya dimuat dari Google Sheet.\n\nTerakhir dikemas kini: ' + lastUpdated);
+        if (!silent) {
+          alert('✅ Data berjaya dimuat dari Google Sheet.\n\nTerakhir dikemas kini: ' + lastUpdated);
+        }
       } else {
-        alert('Tiada data di Sheet untuk pekerja ini: ' + (result.message || ''));
+        if (!silent) alert('Tiada data di Sheet untuk pekerja ini: ' + (result.message || ''));
+        setSyncStatus('Tiada data Sheet untuk ' + currentRaw.Code, '');
       }
     } catch (err) {
       console.error('Sync from sheet error:', err);
-      alert('❌ Gagal sync dari Sheet: ' + err.message);
       setSyncStatus('Gagal sync dari Sheet', 'error');
+      if (!silent) alert('❌ Gagal sync dari Sheet: ' + err.message);
     } finally {
       btn.disabled = false;
       btn.innerHTML = originalText;
@@ -923,15 +947,17 @@
     inp.addEventListener('input', updateCalc);
     inp.addEventListener('change', updateCalc);
   });
-  el('inputGajiAsas').addEventListener('input', updateCalc);
 
   el('saveBtn').addEventListener('click', saveAndSync);
-  el('syncSheetBtn').addEventListener('click', syncFromSheet);
+  el('syncSheetBtn').addEventListener('click', () => syncFromSheet(false));
   el('reloadBtn').addEventListener('click', () => {
     const code = el('infoKod').value;
     if (code) {
       const emp = activeStaffList.find(s => s.Code === code);
-      if (emp) switchEmployee(emp);
+      if (emp) {
+        switchEmployee(emp);
+        syncFromSheet(true);
+      }
     } else {
       fetchStaffBasics();
     }
@@ -939,39 +965,30 @@
   el('printBtn').addEventListener('click', () => window.print());
   el('autoCalcBtn').addEventListener('click', autoCalcStatutory);
 
-  // ✅ 手动编辑 Bank 与 Bank Account 按钮绑定
+  // 手动编辑 Bank / Bank Account 按钮
   el('btnEditBank').addEventListener('click', toggleBankEdit);
   el('btnEditBankAcc').addEventListener('click', toggleBankAccEdit);
 
-  // ✅ Bank Nama 双向绑定（infoBank <-> bankNama）
+  // 双向绑定 Bank 上下两块
   el('infoBank').addEventListener('input', (e) => {
     if (currentRaw) {
       currentRaw.SLRBankNama = e.target.value;
-      currentRaw.manualBank = true;
       inputs.bankNama.value = e.target.value;
     }
   });
   inputs.bankNama.addEventListener('input', (e) => {
-    if (currentRaw) {
-      currentRaw.SLRBankNama = e.target.value;
-      currentRaw.manualBank = true;
-    }
+    if (currentRaw) currentRaw.SLRBankNama = e.target.value;
     el('infoBank').value = e.target.value;
   });
 
-  // ✅ Bank Account 双向绑定（infoBankAcc <-> bankAcc）
   el('infoBankAcc').addEventListener('input', (e) => {
     if (currentRaw) {
       currentRaw.SLRBankAccountNo = e.target.value;
-      currentRaw.manualBankAcc = true;
       inputs.bankAcc.value = e.target.value;
     }
   });
   inputs.bankAcc.addEventListener('input', (e) => {
-    if (currentRaw) {
-      currentRaw.SLRBankAccountNo = e.target.value;
-      currentRaw.manualBankAcc = true;
-    }
+    if (currentRaw) currentRaw.SLRBankAccountNo = e.target.value;
     el('infoBankAcc').value = e.target.value;
   });
 
