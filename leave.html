@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payroll · Timesheet Calculation</title>
-    <!-- SheetJS 用于导入 Excel -->
+    <!-- SheetJS 用于导入/导出 Excel -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <style>
-        /* ===== 整体风格参考您提供的URL ===== */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -82,6 +81,14 @@
         .toolbar button.primary:hover {
             background: #1d4ed8;
         }
+        .toolbar button.template {
+            background: #10b981;
+            border-color: #10b981;
+            color: #ffffff;
+        }
+        .toolbar button.template:hover {
+            background: #059669;
+        }
         .toolbar button.danger {
             border-color: #fca5a5;
             color: #dc2626;
@@ -105,7 +112,6 @@
             display: none;
         }
 
-        /* ===== 表格样式 ===== */
         .table-wrap {
             overflow-x: auto;
             border-radius: 12px;
@@ -116,7 +122,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 13px;
-            min-width: 1200px;
+            min-width: 1400px;
         }
         thead {
             background: #f8fafc;
@@ -165,11 +171,9 @@
         tbody td:last-child { border-right: none; }
         tbody tr:hover { background: #fafbfc; }
 
-        /* 日期列较窄 */
         td.date-cell { min-width: 100px; font-size: 12px; }
         td.name-cell { min-width: 130px; }
 
-        /* 打卡时间输入框 */
         .time-input {
             width: 64px;
             padding: 5px 4px;
@@ -190,7 +194,7 @@
         }
         .time-input::placeholder { color: #cbd5e1; font-size: 11px; }
 
-        /* 状态选择器 */
+        /* 状态选择器 —— 加宽以容纳完整描述 */
         .status-select {
             padding: 5px 6px;
             font-size: 12px;
@@ -201,7 +205,7 @@
             color: #1e293b;
             cursor: pointer;
             transition: all 0.15s;
-            width: 68px;
+            width: 170px;
         }
         .status-select:hover { border-color: #94a3b8; }
         .status-select:focus {
@@ -209,7 +213,6 @@
             border-color: #2563eb;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
         }
-        /* 不同状态的颜色 */
         .status-select[data-status="AL"] { background: #fef9c3; border-color: #fde047; color: #854d0e; }
         .status-select[data-status="SL"] { background: #ffedd5; border-color: #fdba74; color: #9a3412; }
         .status-select[data-status="UL"] { background: #fecaca; border-color: #f87171; color: #991b1b; }
@@ -217,7 +220,6 @@
         .status-select[data-status="L"] { background: #f3e8ff; border-color: #d8b4fe; color: #6b21a8; }
         .status-select[data-status="OFF"] { background: #f1f5f9; border-color: #cbd5e1; color: #64748b; }
 
-        /* 计算结果列 */
         td.calc-cell {
             font-weight: 600;
             color: #0f172a;
@@ -227,11 +229,9 @@
         td.calc-cell.ot { color: #d97706; }
         td.calc-cell.absent { color: #dc2626; }
 
-        /* 行高亮 */
         tbody tr.row-overtime { background: #fffbeb; }
         tbody tr.row-absent { background: #fef2f2; }
 
-        /* 空状态 */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -239,7 +239,6 @@
         }
         .empty-state p { margin-top: 8px; font-size: 14px; }
 
-        /* 底部合计 */
         tfoot {
             background: #f8fafc;
             font-weight: 600;
@@ -260,7 +259,6 @@
         tfoot td:last-child { border-right: none; }
         tfoot .total-label { color: #475569; font-weight: 500; font-size: 12px; }
 
-        /* 响应式 */
         @media (max-width: 768px) {
             body { padding: 12px; }
             .container { padding: 16px; }
@@ -269,7 +267,6 @@
             .toolbar button, .toolbar label.file-label { font-size: 12px; padding: 7px 12px; }
         }
 
-        /* 滚动条美化 */
         .table-wrap::-webkit-scrollbar { height: 8px; }
         .table-wrap::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
         .table-wrap::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -290,6 +287,7 @@
         </label>
         <input type="file" id="fileInput" accept=".xlsx, .xls, .csv">
 
+        <button class="template" id="downloadTemplateBtn">📄 Download Template</button>
         <button class="primary" id="addRowBtn">+ Add Row</button>
         <button class="danger" id="clearBtn">🗑 Clear All</button>
 
@@ -361,7 +359,6 @@
         return 'r_' + Math.random().toString(36).slice(2, 9);
     }
 
-    /** 将 "HH:MM" 转为分钟数，无效返回 null */
     function timeToMinutes(str) {
         if (!str) return null;
         const s = str.trim();
@@ -373,36 +370,31 @@
         return h * 60 + min;
     }
 
-    /** 分钟数转 "X.XX" 小时字符串 */
     function minutesToHoursStr(minutes) {
         if (minutes === null || minutes < 0) return '0.00';
         return (minutes / 60).toFixed(2);
     }
 
-    /** 计算单个时段的工作分钟数（处理跨日） */
     function calcDuration(inMin, outMin) {
         if (inMin === null || outMin === null) return 0;
         let d = outMin - inMin;
-        if (d < 0) d += 24 * 60; // 跨日
+        if (d < 0) d += 24 * 60;
         return d;
     }
+
+    // 状态缩写列表（用于展示和映射）
+    const STATUS_OPTIONS = [
+        { value: 'AL',  label: 'AL - Annual Leave' },
+        { value: 'L',   label: 'L - Leave' },
+        { value: 'HAL', label: 'HAL - Half Day Leave' },
+        { value: 'SL',  label: 'SL - Sick Leave' },
+        { value: 'UL',  label: 'UL - Unpaid Leave' },
+        { value: 'OFF', label: 'OFF - Off Day' },
+    ];
 
     // ============================================================
     //  CORE CALCULATION
     // ============================================================
-    /**
-     * 根据当前行数据计算：
-     *   workMinutes  — 总工作分钟（扣除午休）
-     *   otMinutes    — 加班分钟
-     *   lateMinutes  — 迟到/早退分钟
-     *   absentFlag   — 是否缺勤
-     *
-     * 规则（基于您CALCULATION的常见逻辑）：
-     *   - 标准工作日 8 小时 = 480 分钟
-     *   - 午休 1 小时（12:00–13:00），从 AM+PM 总跨度中扣除
-     *   - OT 仅当有 OT 打卡时计算
-     *   - 状态为 AL/SL/UL 等时，Work 按 0 处理（或按您需要可调整）
-     */
     function computeRow(row) {
         const inAM = timeToMinutes(row.clockInAM);
         const outAM = timeToMinutes(row.clockOutAM);
@@ -418,52 +410,37 @@
         let lateMin = 0;
         let absent = false;
 
-        // --- 缺勤类状态 ---
         if (['AL', 'SL', 'UL', 'OFF'].includes(status)) {
-            // 这些状态当天不计实际工作工时
-            // 如果状态是 AL / SL / UL，您可以根据需要把 workMin 设为 0
             workMin = 0;
             otMin = 0;
             lateMin = 0;
-            absent = (status === 'UL'); // UL 视为缺勤标记
+            absent = (status === 'UL');
         } else {
-            // --- 正常出勤 / 半天 ---
-            // AM 段
             const amDur = calcDuration(inAM, outAM);
-            // PM 段
             const pmDur = calcDuration(inPM, outPM);
-            // OT 段
             const otDur = calcDuration(inOT, outOT);
 
-            // 总跨度（AM + PM）
             let totalSpan = amDur + pmDur;
 
-            // 扣除午休（如果 AM 和 PM 都有打卡，且总跨度 > 60 分钟，扣 60 分钟午休）
-            // 简化逻辑：只要 AM 和 PM 都存在，扣 60 分钟午休
             if (inAM !== null && outAM !== null && inPM !== null && outPM !== null) {
                 totalSpan = Math.max(0, totalSpan - 60);
             }
 
-            // HAL 半天：如果状态是 HAL，只取一半（或按实际打卡）
             if (status === 'HAL') {
-                // 半天：取 AM 或 PM 中较长的一段，不扣午休
                 totalSpan = Math.max(amDur, pmDur);
             }
 
             workMin = totalSpan;
             otMin = otDur;
 
-            // 迟到/早退：标准 8:00–17:00（可根据需要调整）
-            // 简化：如果 AM 打卡晚于 8:30 或 PM 打卡晚于 13:00，记录迟到分钟
-            const STD_START = 8 * 60;      // 8:00
-            const STD_END = 17 * 60;       // 17:00
-            if (inAM !== null && inAM > STD_START + 30) { // 8:30 后算迟到
+            const STD_START = 8 * 60;
+            const STD_END = 17 * 60;
+            if (inAM !== null && inAM > STD_START + 30) {
                 lateMin += inAM - (STD_START + 30);
             }
-            if (inPM !== null && inPM > 13 * 60) { // 13:00 后算迟到
+            if (inPM !== null && inPM > 13 * 60) {
                 lateMin += inPM - 13 * 60;
             }
-            // 早退：PM 下班早于 17:00
             if (outPM !== null && outPM < STD_END) {
                 lateMin += STD_END - outPM;
             }
@@ -516,8 +493,14 @@
             if (calc.otMinutes > 0) tr.classList.add('row-overtime');
             if (calc.absent) tr.classList.add('row-absent');
 
-            // 状态 data 属性用于颜色
             const statusVal = (row.status || '').toUpperCase();
+
+            // 生成状态下拉选项
+            let statusOptionsHtml = `<option value="" ${!statusVal ? 'selected' : ''}>— Select —</option>`;
+            STATUS_OPTIONS.forEach(opt => {
+                const sel = (opt.value === statusVal) ? 'selected' : '';
+                statusOptionsHtml += `<option value="${opt.value}" ${sel}>${opt.label}</option>`;
+            });
 
             tr.innerHTML = `
                 <td style="color:#94a3b8;font-size:12px;">${index + 1}</td>
@@ -532,27 +515,20 @@
                 <td><input class="time-input" data-field="clockOutOT" value="${escapeHtml(row.clockOutOT || '')}" placeholder="--"></td>
                 <td>
                     <select class="status-select" data-field="status" data-status="${statusVal}">
-                        <option value="" ${!statusVal ? 'selected' : ''}>—</option>
-                        <option value="AL" ${statusVal === 'AL' ? 'selected' : ''}>AL</option>
-                        <option value="L" ${statusVal === 'L' ? 'selected' : ''}>L</option>
-                        <option value="HAL" ${statusVal === 'HAL' ? 'selected' : ''}>HAL</option>
-                        <option value="SL" ${statusVal === 'SL' ? 'selected' : ''}>SL</option>
-                        <option value="UL" ${statusVal === 'UL' ? 'selected' : ''}>UL</option>
-                        <option value="OFF" ${statusVal === 'OFF' ? 'selected' : ''}>OFF</option>
+                        ${statusOptionsHtml}
                     </select>
                 </td>
                 <td class="calc-cell ${calc.workMinutes === 0 ? 'absent' : ''}">${minutesToHoursStr(calc.workMinutes)}</td>
                 <td class="calc-cell ${calc.otMinutes > 0 ? 'ot' : ''}">${minutesToHoursStr(calc.otMinutes)}</td>
                 <td class="calc-cell ${calc.lateMinutes > 0 ? 'absent' : ''}">${minutesToHoursStr(calc.lateMinutes)}</td>
-                <td><input class="time-input" style="width:90px;text-align:left;" data-field="remark" value="${escapeHtml(row.remark || '')}" placeholder="—"></td>
+                <td><input class="time-input" style="width:100px;text-align:left;" data-field="remark" value="${escapeHtml(row.remark || '')}" placeholder="—"></td>
             `;
 
-            // 绑定输入事件
             tr.querySelectorAll('.time-input').forEach(input => {
                 input.addEventListener('change', (e) => {
                     const field = e.target.dataset.field;
                     row[field] = e.target.value.trim();
-                    render(); // 重新计算并刷新
+                    render();
                 });
                 input.addEventListener('blur', (e) => {
                     const field = e.target.dataset.field;
@@ -563,7 +539,6 @@
                 });
             });
 
-            // 绑定状态下拉
             tr.querySelector('.status-select').addEventListener('change', (e) => {
                 row.status = e.target.value;
                 render();
@@ -572,7 +547,6 @@
             tbody.appendChild(tr);
         });
 
-        // 更新合计
         recordCount.textContent = rows.length + ' rows';
         summaryBadge.textContent = `Total Work: ${minutesToHoursStr(totalWorkMin)}h`;
         totalWorkEl.textContent = minutesToHoursStr(totalWorkMin);
@@ -592,6 +566,64 @@
     }
 
     // ============================================================
+    //  DOWNLOAD TEMPLATE
+    // ============================================================
+    document.getElementById('downloadTemplateBtn').addEventListener('click', function() {
+        const headers = [
+            'Person ID', 'Name', 'Date',
+            'Clock In (AM)', 'Clock Out (AM)',
+            'Clock In (PM)', 'Clock Out (PM)',
+            'Clock In (OT)', 'Clock Out (OT)',
+            'Status', 'Remark'
+        ];
+
+        // 三行示例：正常出勤、有加班、半天假
+        const sampleRows = [
+            ['0001', 'YANG PING',      '2025-10-01', '08:00', '12:00', '13:00', '17:00', '',      '',      '',                          ''],
+            ['0002', 'TAN XIAO MING',  '2025-10-01', '08:30', '12:00', '13:00', '17:00', '18:00', '20:00', '',                          'OT 2h'],
+            ['0003', 'SITI NURHALIZA', '2025-10-01', '08:00', '12:00', '13:00', '17:00', '',      '',      'HAL - Half Day Leave',      'PM off'],
+        ];
+
+        const wsData = [headers, ...sampleRows];
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+        // 设置列宽
+        ws['!cols'] = [
+            { wch: 12 }, { wch: 20 }, { wch: 12 },
+            { wch: 14 }, { wch: 15 },
+            { wch: 14 }, { wch: 15 },
+            { wch: 14 }, { wch: 15 },
+            { wch: 24 }, { wch: 22 }
+        ];
+
+        // 加一个 Instructions 页
+        const instructions = [
+            ['Timesheet Template — Instructions'],
+            [''],
+            ['1. Fill in one row per employee per day.'],
+            ['2. Date format: YYYY-MM-DD (e.g. 2025-10-01).'],
+            ['3. Time format: HH:MM (e.g. 08:00, 17:30). Use 24-hour format.'],
+            ['4. Leave time cells blank if no clock-in/out.'],
+            ['5. Status column accepts:'],
+            ['   AL  - Annual Leave'],
+            ['   L   - Leave'],
+            ['   HAL - Half Day Leave'],
+            ['   SL  - Sick Leave'],
+            ['   UL  - Unpaid Leave'],
+            ['   OFF - Off Day'],
+            ['6. You may also write the full label (e.g. "AL - Annual Leave").'],
+            ['7. Import this file via "Import Timesheet" once filled.'],
+        ];
+        const ws2 = XLSX.utils.aoa_to_sheet(instructions);
+        ws2['!cols'] = [{ wch: 70 }];
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Timesheet');
+        XLSX.utils.book_append_sheet(wb, ws2, 'Instructions');
+        XLSX.writeFile(wb, 'Timesheet_Template.xlsx');
+    });
+
+    // ============================================================
     //  IMPORT EXCEL
     // ============================================================
     fileInput.addEventListener('change', function(e) {
@@ -602,7 +634,11 @@
             try {
                 const data = new Uint8Array(evt.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                // 优先选 "Timesheet" 页；否则取第一页
+                const sheetName = workbook.SheetNames.includes('Timesheet')
+                    ? 'Timesheet'
+                    : workbook.SheetNames[0];
+                const firstSheet = workbook.Sheets[sheetName];
                 const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
 
                 if (jsonData.length < 2) {
@@ -610,7 +646,6 @@
                     return;
                 }
 
-                // 检测表头行：跳过可能的标题行，找到包含 "Person" 或 "ID" 的行
                 let headerRowIndex = 0;
                 for (let i = 0; i < Math.min(jsonData.length, 5); i++) {
                     const rowStr = jsonData[i].join(' ').toLowerCase();
@@ -622,24 +657,21 @@
 
                 const headers = jsonData[headerRowIndex].map(h => String(h).trim().toLowerCase());
 
-                // 映射列索引
                 const colMap = {
                     personId: findCol(headers, ['person id', 'id', 'personid']),
                     name: findCol(headers, ['name', 'first name', 'employee name']),
                     date: findCol(headers, ['date']),
-                    clockInAM: findCol(headers, ['clock in', 'clockin', 'in', 'clock in 1']),
-                    clockOutAM: findCol(headers, ['clock out', 'clockout', 'out', 'clock out 1']),
-                    clockInPM: findCol(headers, ['clock in 2', 'clockin2', 'in2']),
-                    clockOutPM: findCol(headers, ['clock out 2', 'clockout2', 'out2']),
-                    clockInOT: findCol(headers, ['clock in 3', 'clockin3', 'in3']),
-                    clockOutOT: findCol(headers, ['clock out 3', 'clockout3', 'out3']),
+                    clockInAM: findCol(headers, ['clock in (am)', 'clock in 1', 'clockin', 'clock in']),
+                    clockOutAM: findCol(headers, ['clock out (am)', 'clock out 1', 'clockout', 'clock out']),
+                    clockInPM: findCol(headers, ['clock in (pm)', 'clock in 2', 'clockin2']),
+                    clockOutPM: findCol(headers, ['clock out (pm)', 'clock out 2', 'clockout2']),
+                    clockInOT: findCol(headers, ['clock in (ot)', 'clock in 3', 'clockin3']),
+                    clockOutOT: findCol(headers, ['clock out (ot)', 'clock out 3', 'clockout3']),
                     status: findCol(headers, ['status', 'abnormal situation', 'abnormal']),
                     remark: findCol(headers, ['remark', 'remarks', 'note', 'notes'])
                 };
 
-                // 如果找不到 AM/PM 分开的列，尝试合并列
                 if (colMap.clockInAM === -1 && colMap.clockInPM === -1) {
-                    // 可能只有一组 Clock In/Clock Out
                     const inIdx = findCol(headers, ['clock in', 'clockin', 'in']);
                     const outIdx = findCol(headers, ['clock out', 'clockout', 'out']);
                     if (inIdx !== -1 && outIdx !== -1) {
@@ -648,19 +680,16 @@
                     }
                 }
 
-                // 构建数据行
                 const newRows = [];
                 for (let i = headerRowIndex + 1; i < jsonData.length; i++) {
                     const r = jsonData[i];
                     if (!r || r.length === 0) continue;
-                    // 跳过全空行
                     if (r.every(c => String(c).trim() === '')) continue;
 
                     const personId = colMap.personId !== -1 ? String(r[colMap.personId] || '').trim() : '';
                     const name = colMap.name !== -1 ? String(r[colMap.name] || '').trim() : '';
                     const date = colMap.date !== -1 ? String(r[colMap.date] || '').trim() : '';
 
-                    // 解析时间：支持 "08:30" 或数字格式
                     const clockInAM = parseTimeValue(colMap.clockInAM !== -1 ? r[colMap.clockInAM] : '');
                     const clockOutAM = parseTimeValue(colMap.clockOutAM !== -1 ? r[colMap.clockOutAM] : '');
                     const clockInPM = parseTimeValue(colMap.clockInPM !== -1 ? r[colMap.clockInPM] : '');
@@ -668,21 +697,13 @@
                     const clockInOT = parseTimeValue(colMap.clockInOT !== -1 ? r[colMap.clockInOT] : '');
                     const clockOutOT = parseTimeValue(colMap.clockOutOT !== -1 ? r[colMap.clockOutOT] : '');
 
-                    // 状态：如果 Excel 中有 abnormal situation，尝试映射
+                    // --- 状态映射（兼容完整标签 + 缩写） ---
                     let status = '';
                     const rawStatus = colMap.status !== -1 ? String(r[colMap.status] || '').trim().toUpperCase() : '';
-                    // 映射常见值
-                    if (rawStatus.includes('AL') || rawStatus === 'AL') status = 'AL';
-                    else if (rawStatus.includes('SL') || rawStatus === 'SL') status = 'SL';
-                    else if (rawStatus.includes('UL') || rawStatus === 'UL') status = 'UL';
-                    else if (rawStatus.includes('HAL') || rawStatus === 'HAL') status = 'HAL';
-                    else if (rawStatus.includes('OFF') || rawStatus === 'OFF') status = 'OFF';
-                    else if (rawStatus.includes('LEAVE') || rawStatus === 'L') status = 'L';
-                    else if (rawStatus === 'ABSENT') status = 'UL';
+                    status = mapStatus(rawStatus);
 
                     const remark = colMap.remark !== -1 ? String(r[colMap.remark] || '').trim() : '';
 
-                    // 只添加有意义的行（有名字或 ID）
                     if (personId || name) {
                         newRows.push({
                             id: generateId(),
@@ -716,10 +737,35 @@
             }
         };
         reader.readAsArrayBuffer(file);
-        fileInput.value = ''; // 允许重复导入同一文件
+        fileInput.value = '';
     });
 
+    /** 将任意状态文本映射为缩写，兼容 "AL - Annual Leave" 等 */
+    function mapStatus(raw) {
+        if (!raw) return '';
+        const s = raw.toUpperCase();
+        // 注意顺序：先匹配更长/更具体的缩写
+        if (s.startsWith('HAL')) return 'HAL';
+        if (s.startsWith('AL'))  return 'AL';
+        if (s.startsWith('SL'))  return 'SL';
+        if (s.startsWith('UL'))  return 'UL';
+        if (s.startsWith('OFF')) return 'OFF';
+        if (s.startsWith('L'))   return 'L';
+        if (s.includes('ANNUAL'))  return 'AL';
+        if (s.includes('SICK'))    return 'SL';
+        if (s.includes('UNPAID'))  return 'UL';
+        if (s.includes('HALF'))    return 'HAL';
+        if (s.includes('OFF'))     return 'OFF';
+        if (s.includes('ABSENT'))  return 'UL';
+        return '';
+    }
+
     function findCol(headers, candidates) {
+        // 先精确匹配，再模糊匹配
+        for (const c of candidates) {
+            const idx = headers.indexOf(c);
+            if (idx !== -1) return idx;
+        }
         for (const c of candidates) {
             const idx = headers.findIndex(h => h.includes(c));
             if (idx !== -1) return idx;
@@ -730,9 +776,7 @@
     function parseTimeValue(val) {
         if (val === null || val === undefined || val === '') return '';
         const s = String(val).trim();
-        // 如果已经是 HH:MM
         if (/^\d{1,2}:\d{2}$/.test(s)) return s;
-        // 如果是数字（Excel 时间序列号，如 0.354166 = 8:30）
         const num = parseFloat(s);
         if (!isNaN(num) && num >= 0 && num < 1) {
             const totalMinutes = Math.round(num * 24 * 60);
@@ -740,7 +784,6 @@
             const m = totalMinutes % 60;
             return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
         }
-        // 尝试匹配 "8:30 AM" 之类
         const match12 = s.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
         if (match12) {
             let h = parseInt(match12[1], 10);
@@ -750,7 +793,7 @@
             if (ampm === 'AM' && h === 12) h = 0;
             return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
         }
-        return s; // 原样返回
+        return s;
     }
 
     // ============================================================
@@ -772,7 +815,6 @@
             remark: ''
         });
         render();
-        // 滚动到新行
         setTimeout(() => {
             const lastRow = tbody.lastElementChild;
             if (lastRow) lastRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -804,6 +846,8 @@
 
         rows.forEach(row => {
             const calc = computeRow(row);
+            // 导出时把缩写翻译成完整标签，方便交接
+            const statusLabel = STATUS_OPTIONS.find(o => o.value === row.status)?.label || row.status || '';
             const vals = [
                 csvEscape(row.personId),
                 csvEscape(row.name),
@@ -814,7 +858,7 @@
                 csvEscape(row.clockOutPM),
                 csvEscape(row.clockInOT),
                 csvEscape(row.clockOutOT),
-                csvEscape(row.status),
+                csvEscape(statusLabel),
                 minutesToHoursStr(calc.workMinutes),
                 minutesToHoursStr(calc.otMinutes),
                 minutesToHoursStr(calc.lateMinutes),
