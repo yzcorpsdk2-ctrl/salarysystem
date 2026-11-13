@@ -9,25 +9,66 @@
   :root {
     --blue: #1a4f8a; --blue-soft: #f4f8fd; --border: #d4e0ee;
     --text: #1f2d3d; --muted: #64748b; --bg: #f7fafd;
-    --red: #fecaca; --green: #c6f6d5; --yellow: #fefcbf;
+    --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover: #16345c;
+    --nav-text: #cbd9ea; --nav-accent: #4d9fff;
     
-    /* 新增的假期颜色 */
-    --st-al: #fca5a5;      /* ANNUAL LEAVE: 橙红色 */
-    --st-ul: #86efac;      /* UNPAID LEAVE: 青草色 */
-    --st-sl: #fef08a;      /* SICK LEAVE: 奶黄色 */
+    /* 打卡异常默认颜色 (浅色半透明) */
+    --hl-red: rgba(239, 68, 68, 0.15);
+    --hl-yellow: rgba(234, 179, 8, 0.15);
+    --hl-green: rgba(34, 197, 94, 0.15);
+    
+    /* 假期默认颜色 */
+    --st-al: #ff7b72;      /* ANNUAL LEAVE: 橙红 */
+    --st-ul: #a7f3d0;      /* UNPAID LEAVE: 青草 */
+    --st-sl: #fef08a;      /* SICK LEAVE: 奶黄 */
     --st-hal: #bae6fd;     /* HALF DAY LEAVE: 天空蓝 */
-    --st-off: #3b82f6;     /* OFF DAY: 蔚蓝 (深色) */
-    --st-mat: #fbcfe8;     /* MATERNITY LEAVE: 淡粉色 */
-    --st-und: #a78bfa;     /* UNDEDUCTION LEAVE: 紫蓝色 */
+    --st-off: #3b82f6;     /* OFF DAY: 蔚蓝 */
+    --st-mat: #f472b6;     /* MATERNITY LEAVE: 桃粉色 */
+    --st-und: #c084fc;     /* UNDEDUCTION LEAVE: 紫蓝 */
+    
+    --color-columns: 2;    /* 默认只染 ID KOD 和 NAME 两列 */
   }
-  body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); font-size: 13px; min-height: 100vh; }
+  
+  /* ====== 导航栏 (图三风格) ====== */
+  .navbar {
+    position: sticky; top: 0; z-index: 200; display: flex; align-items: stretch;
+    background: linear-gradient(90deg, var(--nav-bg-1) 0%, var(--nav-bg-2) 100%);
+    padding: 0 1rem; min-height: 52px; box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    border-bottom: 1px solid rgba(77,159,255,0.18); font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  .navbar .nav-brand {
+    display: flex; align-items: center; gap: 0.55rem; color: #fff; font-weight: 800; font-size: 0.78rem;
+    letter-spacing: 0.1em; text-transform: uppercase; padding-right: 1.1rem; margin-right: 0.5rem;
+    border-right: 1px solid rgba(255,255,255,0.12); white-space: nowrap;
+  }
+  .navbar .nav-brand .logo {
+    width: 28px; height: 28px; border-radius: 7px; background: linear-gradient(135deg, #4d9fff, #1a4f8a);
+    display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.85rem;
+    font-weight: 800; box-shadow: 0 2px 6px rgba(77,159,255,0.35);
+  }
+  .nav-links { display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px; }
+  .nav-item {
+    display: inline-flex; align-items: center; gap: 0.35rem; padding: 0 1rem;
+    color: var(--nav-text); text-decoration: none; font-size: 0.75rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+    transition: background 0.15s, color 0.15s; position: relative;
+  }
+  .nav-item:hover, .nav-item.active { background: var(--nav-hover); color: #fff; }
+  .nav-item::after {
+    content: ''; position: absolute; left: 1rem; right: 1rem; bottom: 0;
+    height: 2px; background: var(--nav-accent); transform: scaleX(0);
+    transform-origin: left; transition: transform 0.2s;
+  }
+  .nav-item:hover::after, .nav-item.active::after { transform: scaleX(1); }
+
+  /* ====== 次级工具栏 ====== */
   .topbar {
-    position: sticky; top: 0; z-index: 100; background: #fff; border-bottom: 1px solid var(--border);
+    position: sticky; top: 52px; z-index: 100; background: #fff; border-bottom: 1px solid var(--border);
     padding: 10px 18px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
     box-shadow: 0 1px 3px rgba(26,79,138,.06);
   }
-  .topbar .brand { font-weight: 700; color: var(--blue); display: flex; align-items: center; gap: 8px; }
-  .topbar .brand .logo { width: 30px; height: 30px; background: var(--blue); color: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+  .topbar .brand { font-weight: 700; font-size: 0.95rem; color: var(--blue); display: flex; align-items: center; gap: 8px; margin-right: 0.5rem; }
+  .topbar .brand .logo { width: 32px; height: 32px; background: var(--blue); color: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 800; }
   .url-box { display: flex; align-items: center; gap: 4px; flex: 1; max-width: 420px; background: var(--blue-soft); border: 1px solid var(--border); border-radius: 6px; padding: 2px; }
   .url-box input { flex: 1; border: none; background: transparent; padding: 6px 8px; font-size: 12px; outline: none; }
   .url-box button { padding: 5px 12px; border-radius: 4px; border: none; background: var(--blue); color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; }
@@ -39,8 +80,10 @@
   .sync-badge.ok .dot { background: #22c55e; }
   .sync-badge.busy .dot { background: #f59e0b; }
   .sync-badge.err .dot { background: #ef4444; }
+
+  /* ====== 表格 ====== */
   .container { padding: 14px 18px 40px; }
-  .table-wrap { overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: #fff; max-height: calc(100vh - 120px); position: relative; }
+  .table-wrap { overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: #fff; max-height: calc(100vh - 180px); position: relative; }
   table { border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; font-size: 11.5px; }
   thead th {
     position: sticky; top: 0; z-index: 3; background: #eef4fb; color: #334155;
@@ -62,31 +105,25 @@
   input.cell:disabled, select.cell:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
   input.cell.wide { min-width: 120px; text-align: left; }
   
-  /* 高亮状态的整合：覆盖整行 */
-  tr.hl-red td { background: var(--red) !important; }
-  tr.hl-green td { background: var(--green) !important; }
-  tr.hl-yellow td { background: var(--yellow) !important; }
+  /* 状态底色 (由 JS 动态应用) */
+  .row-hl-red { background: var(--hl-red) !important; }
+  .row-hl-yellow { background: var(--hl-yellow) !important; }
+  .row-hl-green { background: var(--hl-green) !important; }
   
-  /* STATUS 颜色联动 (下拉框和名字/KOD) */
-  select.cell[data-status="ANNUAL LEAVE"] { background: var(--st-al) !important; color: #7f1d1d; }
-  select.cell[data-status="UNPAID LEAVE"] { background: var(--st-ul) !important; color: #14532d; }
-  select.cell[data-status="SICK LEAVE"] { background: var(--st-sl) !important; color: #713f12; }
-  select.cell[data-status="HALF DAY LEAVE"] { background: var(--st-hal) !important; color: #0c4a6e; }
-  select.cell[data-status="OFF DAY"] { background: var(--st-off) !important; color: #fff; }
-  select.cell[data-status="MATERNITY LEAVE"] { background: var(--st-mat) !important; color: #831843; }
-  select.cell[data-status="UNDEDUCTION LEAVE"] { background: var(--st-und) !important; color: #3b0764; }
+  /* 名字列染色 (由 JS 动态应用) */
+  .name-color-bg { background: var(--dynamic-color) !important; color: #1e293b !important; font-weight: 700; }
   
-  /* 名字和 KOD 的变色（如果是假期状态，名字变色） */
-  .name-al { background: var(--st-al) !important; color: #7f1d1d; }
-  .name-ul { background: var(--st-ul) !important; color: #14532d; }
-  .name-sl { background: var(--st-sl) !important; color: #713f12; }
-  .name-hal { background: var(--st-hal) !important; color: #0c4a6e; }
-  .name-off { background: var(--st-off) !important; color: #fff; }
-  .name-mat { background: var(--st-mat) !important; color: #831843; }
-  .name-und { background: var(--st-und) !important; color: #3b0764; }
+  /* 调色板面板 */
+  .color-panel { position: fixed; top: 65px; right: 20px; z-index: 1000; background: #fff; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 10px 30px rgba(15,23,42,.15); padding: 15px; width: 280px; display: none; }
+  .color-panel.show { display: block; }
+  .color-panel h4 { font-size: 13px; margin-bottom: 10px; color: var(--blue); border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+  .cp-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 12px; }
+  .cp-row input[type="color"] { width: 40px; height: 25px; border: 1px solid var(--border); border-radius: 4px; cursor: pointer; padding: 0; background: #fff; }
+  .cp-row input[type="number"] { width: 50px; padding: 3px; border: 1px solid var(--border); border-radius: 4px; text-align: center; }
+  .btn-circle { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 1px solid var(--border); color: var(--blue); font-weight: 700; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,.1); margin-left: 10px; transition: 0.2s; }
+  .btn-circle:hover { background: var(--blue-soft); transform: scale(1.05); }
 
-  .col-idx { color: #94a3b8; font-size: 10.5px; font-weight: 600; }
-  
+  /* 筛选面板 */
   .filter-panel { position: fixed; z-index: 1000; background: #fff; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 10px 30px rgba(15,23,42,.15); padding: 10px; width: 220px; max-height: 300px; display: none; flex-direction: column; font-size: 12px; }
   .filter-panel.show { display: flex; }
   .fp-head { margin-bottom: 8px; }
@@ -115,15 +152,73 @@
 </head>
 <body>
 
+<!-- 顶层导航栏 (图三风格) -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <span class="logo">Y</span>
+    <span>YZ PAYROLL</span>
+  </div>
+  <div class="nav-links">
+    <a class="nav-item" href="dashboard.html">📊 DASHBOARD</a>
+    <a class="nav-item" href="staffinfo.html">👥 EMPLOYEES</a>
+    <a class="nav-item active" href="leave.html">⏱ TIMECARD</a>
+  </div>
+</nav>
+
+<!-- 操作栏 -->
 <div class="topbar">
-  <div class="brand"><div class="logo">P</div> Leave · Timecard</div>
+  <div class="brand"><div class="logo">P</div> Timecard</div>
   <div class="url-box">
     <input type="text" id="deployUrlInput" placeholder="Apps Script URL (auto sync dari dashboard)...">
     <button onclick="applyUrl()">🔗 Apply</button>
   </div>
-  <button class="btn" onclick="loadData()"><i>🔄</i> Muat Semula</button>
+  <button class="btn" onclick="loadData()">🔄 Muat Semula</button>
   <button class="btn btn-success" onclick="manualSave()">💾 Simpan</button>
   <span class="sync-badge" id="syncBadge"><span class="dot"></span><span id="syncText">Sedia</span></span>
+  
+  <div style="margin-left: auto; display: flex; align-items: center;">
+    <button class="btn-circle" onclick="toggleColorPanel()" title="Warna & Tetapan">?</button>
+  </div>
+</div>
+
+<!-- 调色盘面板 -->
+<div class="color-panel" id="colorPanel">
+  <h4>🎨 颜色与设置 (Color Settings)</h4>
+  <div class="cp-row">
+    <span>染色列数 (Color Cols)</span>
+    <input type="number" id="cpColumns" min="1" max="10" value="2" onchange="updateColorSettings()">
+  </div>
+  <div class="cp-row">
+    <span>ANNUAL LEAVE</span>
+    <input type="color" id="cpAL" value="#ff7b72" onchange="updateColorSettings()">
+  </div>
+  <div class="cp-row">
+    <span>UNPAID LEAVE</span>
+    <input type="color" id="cpUL" value="#a7f3d0" onchange="updateColorSettings()">
+  </div>
+  <div class="cp-row">
+    <span>SICK LEAVE</span>
+    <input type="color" id="cpSL" value="#fef08a" onchange="updateColorSettings()">
+  </div>
+  <div class="cp-row">
+    <span>HALF DAY LEAVE</span>
+    <input type="color" id="cpHAL" value="#bae6fd" onchange="updateColorSettings()">
+  </div>
+  <div class="cp-row">
+    <span>OFF DAY</span>
+    <input type="color" id="cpOFF" value="#3b82f6" onchange="updateColorSettings()">
+  </div>
+  <div class="cp-row">
+    <span>MATERNITY LEAVE</span>
+    <input type="color" id="cpMAT" value="#f472b6" onchange="updateColorSettings()">
+  </div>
+  <div class="cp-row">
+    <span>UNDEDUCTION LEAVE</span>
+    <input type="color" id="cpUND" value="#c084fc" onchange="updateColorSettings()">
+  </div>
+  <div style="text-align: right; margin-top: 10px;">
+    <button class="btn" style="padding: 2px 8px; font-size: 11px;" onclick="resetColorSettings()">Reset</button>
+  </div>
 </div>
 
 <div class="container">
@@ -161,10 +256,76 @@
 </div>
 
 <script>
+// ====== 颜色配置系统 ======
+const COLOR_CONFIG_KEY = 'timecardColorConfig';
+let colorConfig = {
+  columns: 2,
+  AL: '#ff7b72',
+  UL: '#a7f3d0',
+  SL: '#fef08a',
+  HAL: '#bae6fd',
+  OFF: '#3b82f6',
+  MAT: '#f472b6',
+  UND: '#c084fc'
+};
+
+function loadColorConfig() {
+  try {
+    const saved = localStorage.getItem(COLOR_CONFIG_KEY);
+    if (saved) colorConfig = { ...colorConfig, ...JSON.parse(saved) };
+    document.documentElement.style.setProperty('--st-al', colorConfig.AL);
+    document.documentElement.style.setProperty('--st-ul', colorConfig.UL);
+    document.documentElement.style.setProperty('--st-sl', colorConfig.SL);
+    document.documentElement.style.setProperty('--st-hal', colorConfig.HAL);
+    document.documentElement.style.setProperty('--st-off', colorConfig.OFF);
+    document.documentElement.style.setProperty('--st-mat', colorConfig.MAT);
+    document.documentElement.style.setProperty('--st-und', colorConfig.UND);
+    document.documentElement.style.setProperty('--color-columns', colorConfig.columns);
+    
+    document.getElementById('cpColumns').value = colorConfig.columns;
+    document.getElementById('cpAL').value = colorConfig.AL;
+    document.getElementById('cpUL').value = colorConfig.UL;
+    document.getElementById('cpSL').value = colorConfig.SL;
+    document.getElementById('cpHAL').value = colorConfig.HAL;
+    document.getElementById('cpOFF').value = colorConfig.OFF;
+    document.getElementById('cpMAT').value = colorConfig.MAT;
+    document.getElementById('cpUND').value = colorConfig.UND;
+  } catch(e) {}
+}
+
+function updateColorSettings() {
+  colorConfig.columns = parseInt(document.getElementById('cpColumns').value) || 2;
+  colorConfig.AL = document.getElementById('cpAL').value;
+  colorConfig.UL = document.getElementById('cpUL').value;
+  colorConfig.SL = document.getElementById('cpSL').value;
+  colorConfig.HAL = document.getElementById('cpHAL').value;
+  colorConfig.OFF = document.getElementById('cpOFF').value;
+  colorConfig.MAT = document.getElementById('cpMAT').value;
+  colorConfig.UND = document.getElementById('cpUND').value;
+  
+  localStorage.setItem(COLOR_CONFIG_KEY, JSON.stringify(colorConfig));
+  loadColorConfig(); // 刷新 CSS 变量
+  render(); // 重新渲染表格
+}
+
+function resetColorSettings() {
+  if (confirm('Reset warna kepada asal?')) {
+    localStorage.removeItem(COLOR_CONFIG_KEY);
+    colorConfig = { columns: 2, AL: '#ff7b72', UL: '#a7f3d0', SL: '#fef08a', HAL: '#bae6fd', OFF: '#3b82f6', MAT: '#f472b6', UND: '#c084fc' };
+    loadColorConfig();
+    render();
+  }
+}
+
+function toggleColorPanel() {
+  document.getElementById('colorPanel').classList.toggle('show');
+}
+
+// ====== 核心变量 ======
 const URL_KEY = 'payrollScriptUrl';
 const SHEET_HEADERS = [
   'ID KOD','SITUATION','GROUP','NAME','SHIF','GAJI','Date',
-  'AL REMAIN','SL REMAIN',  // 新增的空白列
+  'AL REMAIN','SL REMAIN',
   'Clock In 01','Clock Out 01','Clock Time(h) 01',
   'Clock In 02','Clock Out 02','Clock Time(h) 02',
   'Clock In 03','Clock Out 03','Clock Time(h) 03',
@@ -191,6 +352,7 @@ let countdownTimer = null;
 let countdownLeft = 10;
 let modalOpen = false;
 
+// ====== 数据加载 ======
 function loadSavedUrl() {
   SCRIPT_URL = localStorage.getItem(URL_KEY) || '';
   document.getElementById('deployUrlInput').value = SCRIPT_URL;
@@ -243,6 +405,7 @@ async function loadData() {
   }
 }
 
+// ====== 工具与计算 ======
 function pad2(n){ return String(n).padStart(2,'0'); }
 function normalizeDate(v) {
   if (!v) return '';
@@ -254,7 +417,6 @@ function normalizeDate(v) {
   if (m) return `${m[3]}-${pad2(m[2])}-${pad2(m[1])}`;
   return s;
 }
-
 function timeToMin(s) {
   if (!s) return null;
   const str = String(s).trim();
@@ -274,7 +436,6 @@ function timeToMin(s) {
   }
   return null;
 }
-
 function formatDuration(totalMinutes) {
   if (!totalMinutes || totalMinutes <= 0) return '00:00:00';
   const totalSeconds = Math.round(totalMinutes * 60);
@@ -283,7 +444,6 @@ function formatDuration(totalMinutes) {
   const s = totalSeconds % 60;
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
-
 function computeRow(r) {
   const segs = [
     [timeToMin(r['Clock In 01']), timeToMin(r['Clock Out 01'])],
@@ -298,28 +458,27 @@ function computeRow(r) {
   const workMin = hasAnyIn ? Math.max(0, totalSegMin - 60) : 0;
   const otMin = Math.max(0, workMin - 7*60-30);
 
-  let swt = '', hl = '';
+  let swt = '', hlClass = '';
   if (!hasAnyIn) { swt = '未存在打卡记录'; }
-  else if (missingOut) { swt = '缺少打卡记录'; hl = 'hl-red'; }
-  else if (workMin > 7*60+30) { swt = '超时工作'; hl = 'hl-green'; }
-  else { swt = '工时不足'; hl = 'hl-yellow'; }
+  else if (missingOut) { swt = '缺少打卡记录'; hlClass = 'row-hl-red'; }
+  else if (workMin > 7*60+30) { swt = '超时工作'; hlClass = 'row-hl-green'; }
+  else { swt = '工时不足'; hlClass = 'row-hl-yellow'; }
 
   const gaji = parseFloat(r['GAJI']) || 0;
   const status = (r['STATUS'] || '').toUpperCase();
   let deduct = 0;
-  if (status === 'UNPAID LEAVE') {
-    deduct = gaji / 30;
-  } else if (status === 'HALF DAY LEAVE') {
+  if (status === 'UNPAID LEAVE') deduct = gaji / 30;
+  else if (status === 'HALF DAY LEAVE') {
     const j = parseFloat(r['HALF TT JAM']) || 0;
     const m = parseFloat(r['HALF TT MIN']) || 0;
     const hrs = j + m/60;
     const hourly = (gaji/30)/7.5;
     deduct = hourly * hrs;
   }
-
-  return { segH, workMin, otMin, swt, hl, deduct };
+  return { segH, workMin, otMin, swt, hlClass, deduct };
 }
 
+// ====== 渲染 ======
 function applyFiltersAndRender() {
   filteredRows = rows.filter(r => {
     for (const col in filters) {
@@ -357,27 +516,31 @@ function buildRow(r, i) {
   const c = computeRow(r);
   const statusVal = (r['STATUS'] || '').toUpperCase();
   
-  let statusClass = '';
-  if (statusVal === 'ANNUAL LEAVE') statusClass = 'name-al';
-  else if (statusVal === 'UNPAID LEAVE') statusClass = 'name-ul';
-  else if (statusVal === 'SICK LEAVE') statusClass = 'name-sl';
-  else if (statusVal === 'HALF DAY LEAVE') statusClass = 'name-hal';
-  else if (statusVal === 'OFF DAY') statusClass = 'name-off';
-  else if (statusVal === 'MATERNITY LEAVE') statusClass = 'name-mat';
-  else if (statusVal === 'UNDEDUCTION LEAVE') statusClass = 'name-und';
+  // 动态获取颜色配置
+  let nameBgColor = '';
+  if (statusVal === 'ANNUAL LEAVE') nameBgColor = colorConfig.AL;
+  else if (statusVal === 'UNPAID LEAVE') nameBgColor = colorConfig.UL;
+  else if (statusVal === 'SICK LEAVE') nameBgColor = colorConfig.SL;
+  else if (statusVal === 'HALF DAY LEAVE') nameBgColor = colorConfig.HAL;
+  else if (statusVal === 'OFF DAY') nameBgColor = colorConfig.OFF;
+  else if (statusVal === 'MATERNITY LEAVE') nameBgColor = colorConfig.MAT;
+  else if (statusVal === 'UNDEDUCTION LEAVE') nameBgColor = colorConfig.UND;
 
   const tr = document.createElement('tr');
-  // 如果打卡异常有警告色，优先展示警告色；否则展示假期底色
-  if (c.hl) {
-    tr.classList.add(c.hl);
-  } else if (statusClass) {
-    tr.classList.add(statusClass); 
-  }
+  if (c.hlClass) tr.classList.add(c.hlClass); 
 
+  // 索引列
   const tdIdx = document.createElement('td'); tdIdx.className = 'col-idx'; tdIdx.textContent = i+1; tr.appendChild(tdIdx);
 
-  SHEET_HEADERS.forEach(h => {
+  SHEET_HEADERS.forEach((h, index) => {
     const td = document.createElement('td');
+    
+    // 检查是否需要给前 N 列染上名字颜色
+    if (nameBgColor && index < colorConfig.columns) {
+      td.style.backgroundColor = nameBgColor;
+      td.style.fontWeight = '700';
+    }
+
     if (h === 'Clock Time(h) 01' || h === 'Clock Time(h) 02' || h === 'Clock Time(h) 03') {
       const k = h.endsWith('01') ? 0 : h.endsWith('02') ? 1 : 2;
       td.className = 'calc'; td.textContent = formatDuration(c.segH[k]);
@@ -394,7 +557,7 @@ function buildRow(r, i) {
     } else if (h === 'STATUS') {
       const sel = document.createElement('select'); 
       sel.className = 'cell';
-      sel.setAttribute('data-status', r[h] || '');
+      // 状态本身的下拉框不再染色，保持透明/白色
       STATUS_OPTIONS.forEach(o => {
         const opt = document.createElement('option'); opt.value = o; opt.textContent = o || '— Pilih —';
         if (statusVal === o) opt.selected = true;
@@ -402,7 +565,6 @@ function buildRow(r, i) {
       });
       sel.addEventListener('change', () => { 
         r[h] = sel.value; 
-        sel.setAttribute('data-status', sel.value);
         markDirty(); 
         if (filters[h]) applyFiltersAndRender();
         else {
@@ -437,6 +599,7 @@ function buildRow(r, i) {
   return tr;
 }
 
+// ====== 其他工具函数 ======
 function openFilter(col, e) {
   e.stopPropagation();
   currentFilterCol = col;
@@ -537,6 +700,7 @@ async function doSave() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+  loadColorConfig();
   loadSavedUrl();
   if (SCRIPT_URL) loadData();
   else setSync('err', 'URL belum ditetapkan');
