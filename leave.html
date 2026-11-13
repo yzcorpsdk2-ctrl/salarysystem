@@ -1,1280 +1,404 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ms">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timecard Report · 演算SHEET</title>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
-            background: linear-gradient(160deg, #eef2f7 0%, #e6ecf5 40%, #f3f6fb 100%);
-            color: #1e293b;
-            padding: 20px 16px;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-            background: rgba(255,255,255,0.9);
-            backdrop-filter: blur(8px);
-            border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.10), 0 2px 8px rgba(15,23,42,0.04);
-            border: 1px solid rgba(255,255,255,0.7);
-            padding: 0 0 18px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 40px);
-        }
-
-        /* ===== 品牌栏 ===== */
-        .brandbar {
-            display: flex; align-items: center; gap: 14px;
-            padding: 16px 24px;
-            background: linear-gradient(120deg, #1e3a8a 0%, #2563eb 55%, #3b82f6 100%);
-            color: #fff;
-            flex-shrink: 0;
-        }
-        .brandbar .logo {
-            width: 40px; height: 40px; border-radius: 12px;
-            background: rgba(255,255,255,0.18);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 19px; font-weight: 700;
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);
-            flex-shrink: 0;
-        }
-        .brandbar .titles { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-        .brandbar .titles .kicker {
-            font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase;
-            color: rgba(255,255,255,0.72); font-weight: 600;
-        }
-        .brandbar .titles h1 {
-            font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
-            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-        }
-        .brandbar .titles h1 small {
-            font-size: 11px; font-weight: 500;
-            background: rgba(255,255,255,0.18);
-            color: #fff; padding: 3px 10px; border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.25);
-        }
-        .brandbar .spacer { flex: 1; }
-        .brandbar .stat-pill {
-            display: inline-flex; align-items: center; gap: 7px;
-            background: rgba(255,255,255,0.16);
-            border: 1px solid rgba(255,255,255,0.25);
-            padding: 6px 13px; border-radius: 30px;
-            font-size: 12px; font-weight: 500;
-            color: #f8fafc;
-            white-space: nowrap;
-        }
-        .brandbar .stat-pill b { font-weight: 700; color: #fff; }
-        .brandbar .stat-pill .dot {
-            width: 7px; height: 7px; border-radius: 50%;
-            background: #34d399; box-shadow: 0 0 0 3px rgba(52,211,153,0.25);
-        }
-
-        /* ===== 工具栏 ===== */
-        .toolbar {
-            display: flex; flex-wrap: wrap; align-items: center; gap: 9px;
-            margin: 14px 24px 0;
-            padding: 11px 14px;
-            background: #ffffff;
-            border: 1px solid #e6ebf3;
-            border-radius: 14px;
-            box-shadow: 0 4px 16px rgba(15,23,42,0.05);
-            flex-shrink: 0;
-        }
-        .toolbar button, .toolbar label.file-label {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 8px 14px; font-size: 12.5px; font-weight: 600;
-            border-radius: 9px; border: 1px solid #dbe2ee;
-            background: #ffffff; color: #1e293b;
-            cursor: pointer; transition: all 0.18s; white-space: nowrap;
-        }
-        .toolbar button:hover, .toolbar label.file-label:hover {
-            background: #f6f9ff; border-color: #93b4f5; transform: translateY(-1px);
-        }
-        .toolbar button.primary {
-            background: linear-gradient(135deg, #2563eb, #3b82f6);
-            border-color: transparent; color: #ffffff;
-            box-shadow: 0 4px 12px rgba(37,99,235,0.28);
-        }
-        .toolbar button.primary:hover { filter: brightness(1.06); }
-        .toolbar button.template {
-            background: linear-gradient(135deg, #059669, #10b981);
-            border-color: transparent; color: #ffffff;
-            box-shadow: 0 4px 12px rgba(16,185,129,0.25);
-        }
-        .toolbar button.template:hover { filter: brightness(1.06); }
-        .toolbar button.danger { border-color: #fecaca; color: #dc2626; background:#fff; }
-        .toolbar button.danger:hover { background: #fef2f2; border-color: #f87171; }
-        .toolbar .spacer { flex: 1; }
-        input[type="file"] { display: none; }
-
-        /* ===== 表格容器：固定高度，内部滚动 ===== */
-        .table-wrap {
-            margin: 14px 24px 0;
-            flex: 1;
-            min-height: 0;
-            overflow: auto;
-            border-radius: 14px;
-            border: 1px solid #e6ebf3;
-            background: #ffffff;
-            box-shadow: 0 6px 22px rgba(15,23,42,0.05);
-            position: relative;
-        }
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            font-size: 12px;
-            table-layout: fixed;
-        }
-
-        thead th {
-            padding: 7px 4px; font-weight: 600; font-size: 10px;
-            text-transform: uppercase; letter-spacing: 0.3px;
-            color: #475569; text-align: center; white-space: nowrap;
-            border-right: 1px solid #e9eef4; border-bottom: 2px solid #e2e8f0;
-            position: sticky; top: 0; background: #f8fafc; z-index: 3;
-            overflow: visible;
-        }
-        thead th:first-child { text-align: left; padding-left: 10px; }
-        thead th:last-child { border-right: none; }
-        thead th .sub {
-            display: block; font-weight: 500; font-size: 8.5px;
-            color: #94a3b8; text-transform: none; letter-spacing: 0;
-            margin-top: 1px;
-        }
-        thead th .th-inner {
-            display: flex; align-items: center; justify-content: center; gap: 3px;
-            position: relative;
-        }
-        thead th:first-child .th-inner { justify-content: flex-start; }
-        .filter-btn {
-            border: none; background: transparent; cursor: pointer;
-            font-size: 9px; color: #94a3b8; padding: 1px 2px;
-            border-radius: 4px; line-height: 1;
-            transition: all 0.15s;
-        }
-        .filter-btn:hover { background: #e2e8f0; color: #2563eb; }
-        .filter-btn.active { color: #2563eb; background: #dbeafe; }
-
-        tbody td {
-            padding: 4px 3px; border-bottom: 1px solid #f1f5f9;
-            border-right: 1px solid #f4f7fb; text-align: center;
-            vertical-align: middle; white-space: nowrap;
-            overflow: hidden; text-overflow: ellipsis;
-            height: 34px;
-        }
-        tbody td:first-child {
-            text-align: left; padding-left: 10px; font-weight: 600;
-            color: #94a3b8; font-size: 11px;
-        }
-        tbody td:last-child { border-right: none; }
-        tbody tr:nth-child(even) { background: #fbfcfe; }
-        tbody tr:hover { background: #eef4ff; }
-
-        /* ===== 输入控件 ===== */
-        .time-input {
-            width: 100%; max-width: 58px; padding: 4px 2px; font-size: 11px;
-            text-align: center; border: 1px solid transparent; border-radius: 6px;
-            background: transparent; font-family: 'Inter', monospace;
-            transition: all 0.15s; color: #0f172a;
-        }
-        .time-input:hover { border-color: #cbd5e1; background: #fff; }
-        .time-input:focus {
-            outline: none; border-color: #2563eb; background: #fff;
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.14);
-        }
-        .time-input::placeholder { color: #cbd5e1; font-size: 10px; }
-
-        .text-input {
-            width: 100%; padding: 4px 5px; font-size: 11px; text-align: left;
-            border: 1px solid transparent; border-radius: 6px;
-            background: transparent; transition: all 0.15s; color: #0f172a;
-        }
-        .text-input:hover { border-color: #cbd5e1; background: #fff; }
-        .text-input:focus {
-            outline: none; border-color: #2563eb; background: #fff;
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.14);
-        }
-        .text-input.id { font-weight: 600; }
-        .text-input.center { text-align: center; }
-
-        .status-select {
-            width: 100%; padding: 4px 4px; font-size: 10.5px; font-weight: 600;
-            border-radius: 6px; border: 1px solid #dbe2ee;
-            background: #ffffff; color: #1e293b; cursor: pointer;
-            transition: all 0.15s;
-        }
-        .status-select:hover { border-color: #93b4f5; }
-        .status-select:focus {
-            outline: none; border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.14);
-        }
-        .status-select[data-status="AL"]  { background:#fef9c3; border-color:#fde047; color:#854d0e; }
-        .status-select[data-status="SL"]  { background:#ffedd5; border-color:#fdba74; color:#9a3412; }
-        .status-select[data-status="UL"]  { background:#fecaca; border-color:#f87171; color:#991b1b; }
-        .status-select[data-status="HAL"] { background:#e0f2fe; border-color:#7dd3fc; color:#075985; }
-        .status-select[data-status="L"]   { background:#f3e8ff; border-color:#d8b4fe; color:#6b21a8; }
-        .status-select[data-status="OFF"] { background:#f1f5f9; border-color:#cbd5e1; color:#64748b; }
-
-        /* ===== 计算列 ===== */
-        td.calc-cell {
-            font-weight: 700; color: #0f172a; font-size: 11.5px;
-            background: #f6f9ff;
-        }
-        td.calc-cell.seg { font-weight: 600; color: #2563eb; background: #f3f7ff; }
-        td.calc-cell.break { color: #0369a1; background: #f0f7ff; }
-        td.calc-cell.ot { color: #d97706; }
-        td.calc-cell.absent { color: #dc2626; }
-
-        tbody tr.row-overtime { background: #fffbeb !important; }
-        tbody tr.row-absent { background: #fef2f2 !important; }
-
-        .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
-        .empty-state p { margin-top: 8px; font-size: 14px; }
-
-        /* ===== 表尾合计 ===== */
-        tfoot {
-            background: linear-gradient(180deg,#f8fafc,#eef2f8);
-            border-top: 2px solid #e2e8f0;
-            position: sticky; bottom: 0; z-index: 3;
-        }
-        tfoot td {
-            padding: 9px 3px; font-size: 11.5px; color: #0f172a;
-            text-align: center; border-right: 1px solid #e9eef4; font-weight: 700;
-            background: #eef2f8;
-        }
-        tfoot td:first-child { text-align: right; padding-right: 8px; background: #eef2f8; }
-        tfoot td:last-child { border-right: none; }
-        tfoot .total-label { color: #475569; font-weight: 600; font-size: 11px; letter-spacing: 0.4px; }
-
-        /* ===== 筛选面板 ===== */
-        .filter-panel {
-            position: fixed;
-            z-index: 1000;
-            background: #fff;
-            border: 1px solid #dbe2ee;
-            border-radius: 12px;
-            box-shadow: 0 12px 40px rgba(15,23,42,0.18);
-            padding: 10px;
-            width: 240px;
-            max-height: 320px;
-            display: flex; flex-direction: column;
-            font-size: 12px;
-        }
-        .filter-panel .fp-head {
-            display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
-        }
-        .filter-panel .fp-head input {
-            flex: 1; padding: 6px 8px; font-size: 12px;
-            border: 1px solid #dbe2ee; border-radius: 7px;
-        }
-        .filter-panel .fp-head input:focus {
-            outline: none; border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
-        }
-        .filter-panel .fp-actions {
-            display: flex; gap: 6px; margin-bottom: 6px;
-        }
-        .filter-panel .fp-actions button {
-            flex: 1; padding: 5px 6px; font-size: 11px; font-weight: 600;
-            border: 1px solid #dbe2ee; border-radius: 6px; background: #f8fafc;
-            cursor: pointer; color: #475569;
-        }
-        .filter-panel .fp-actions button:hover { background: #eef4ff; border-color: #93b4f5; }
-        .filter-panel .fp-list {
-            overflow-y: auto; flex: 1; margin: 0 -4px; padding: 0 4px;
-        }
-        .filter-panel .fp-item {
-            display: flex; align-items: center; gap: 7px;
-            padding: 5px 6px; border-radius: 6px; cursor: pointer;
-        }
-        .filter-panel .fp-item:hover { background: #f1f5f9; }
-        .filter-panel .fp-item input { cursor: pointer; }
-        .filter-panel .fp-item span {
-            flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-        }
-        .filter-panel .fp-item .empty-tag {
-            font-style: italic; color: #94a3b8; font-size: 11px;
-        }
-        .filter-panel .fp-footer {
-            display: flex; justify-content: flex-end; gap: 6px; margin-top: 8px;
-            border-top: 1px solid #eef2f7; padding-top: 8px;
-        }
-        .filter-panel .fp-footer button {
-            padding: 5px 12px; font-size: 11.5px; font-weight: 600;
-            border-radius: 6px; cursor: pointer; border: 1px solid #dbe2ee;
-            background: #fff; color: #475569;
-        }
-        .filter-panel .fp-footer button.apply {
-            background: #2563eb; border-color: #2563eb; color: #fff;
-        }
-        .filter-panel .fp-footer button.apply:hover { background: #1d4ed8; }
-
-        @media (max-width: 1280px) {
-            table { font-size: 11px; }
-            .time-input { max-width: 52px; font-size: 10.5px; }
-            .text-input { font-size: 10.5px; }
-            .status-select { font-size: 10px; }
-        }
-
-        .table-wrap::-webkit-scrollbar { width: 9px; height: 9px; }
-        .table-wrap::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
-        .table-wrap::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .table-wrap::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leave · Timecard Sheet</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue: #1a4f8a; --blue-soft: #f4f8fd; --border: #d4e0ee;
+    --text: #1f2d3d; --muted: #64748b; --bg: #f7fafd;
+    --red: #fecaca; --green: #c6f6d5; --yellow: #fefcbf;
+  }
+  body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); font-size: 13px; min-height: 100vh; }
+  .topbar {
+    position: sticky; top: 0; z-index: 100; background: #fff; border-bottom: 1px solid var(--border);
+    padding: 10px 18px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    box-shadow: 0 1px 3px rgba(26,79,138,.06);
+  }
+  .topbar .brand { font-weight: 700; color: var(--blue); display: flex; align-items: center; gap: 8px; }
+  .topbar .brand .logo { width: 30px; height: 30px; background: var(--blue); color: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+  .url-box { display: flex; align-items: center; gap: 4px; flex: 1; max-width: 420px; background: var(--blue-soft); border: 1px solid var(--border); border-radius: 6px; padding: 2px; }
+  .url-box input { flex: 1; border: none; background: transparent; padding: 6px 8px; font-size: 12px; outline: none; }
+  .url-box button { padding: 5px 12px; border-radius: 4px; border: none; background: var(--blue); color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; }
+  .btn { background: #fff; border: 1px solid var(--border); padding: 6px 12px; border-radius: 5px; font-size: 12px; font-weight: 500; cursor: pointer; color: var(--blue); display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+  .btn:hover { background: var(--blue-soft); }
+  .btn-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .btn-primary:hover { background: #15406f; }
+  .btn-success { background: #0f7a54; color: #fff; border-color: #0f7a54; }
+  .btn-success:hover { background: #0c6a48; }
+  .sync-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--blue-soft); border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; color: var(--muted); }
+  .sync-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: #9db8d2; }
+  .sync-badge.ok .dot { background: #22c55e; }
+  .sync-badge.busy .dot { background: #f59e0b; }
+  .sync-badge.err .dot { background: #ef4444; }
+  .container { padding: 14px 18px 40px; }
+  .table-wrap { overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: #fff; max-height: calc(100vh - 120px); }
+  table { border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; font-size: 11.5px; }
+  thead th {
+    position: sticky; top: 0; z-index: 3; background: #eef4fb; color: #334155;
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px;
+    padding: 8px 5px; border-right: 1px solid #dbe6f2; border-bottom: 2px solid #cbd9ea;
+    white-space: nowrap; text-align: center;
+  }
+  tbody td { padding: 3px 4px; border-bottom: 1px solid #eef3f9; border-right: 1px solid #f2f6fb; text-align: center; white-space: nowrap; height: 34px; }
+  tbody tr:hover { background: #f7fbff; }
+  .ro { color: #334155; font-weight: 600; }
+  .calc { background: #f6f9ff; font-weight: 700; color: #0f172a; }
+  input.cell, select.cell {
+    width: 100%; min-width: 54px; padding: 4px 4px; font-size: 11.5px; text-align: center;
+    border: 1px solid transparent; border-radius: 5px; background: transparent; color: #0f172a;
+  }
+  input.cell:hover, select.cell:hover { border-color: #cbd5e1; background: #fff; }
+  input.cell:focus, select.cell:focus { outline: none; border-color: var(--blue); background: #fff; box-shadow: 0 0 0 2px rgba(26,79,138,.12); }
+  input.cell:disabled, select.cell:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
+  input.cell.wide { min-width: 120px; text-align: left; }
+  tr.hl-red td:nth-child(-n+20) { background: var(--red) !important; }
+  tr.hl-green td:nth-child(-n+20) { background: var(--green) !important; }
+  tr.hl-yellow td:nth-child(-n+20) { background: var(--yellow) !important; }
+  .col-idx { color: #94a3b8; font-size: 10.5px; font-weight: 600; }
+  .modal-mask {
+    position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 9999;
+    display: none; align-items: center; justify-content: center;
+  }
+  .modal-mask.show { display: flex; }
+  .modal {
+    background: #fff; border-radius: 12px; padding: 22px 24px; width: 360px; max-width: 92vw;
+    box-shadow: 0 20px 60px rgba(15,23,42,.35); text-align: center;
+  }
+  .modal h3 { font-size: 15px; color: var(--blue); margin-bottom: 8px; }
+  .modal p { font-size: 12.5px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+  .modal .countdown { font-size: 26px; font-weight: 800; color: #dc2626; margin: 6px 0 12px; }
+  .modal .actions { display: flex; gap: 8px; justify-content: center; }
+  .modal .actions button { padding: 8px 18px; border-radius: 6px; font-size: 12.5px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: #fff; color: var(--text); }
+  .modal .actions button.confirm { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .modal .actions button:hover { filter: brightness(.96); }
+  .empty { text-align: center; padding: 50px 20px; color: #94a3b8; }
+</style>
 </head>
 <body>
+
+<div class="topbar">
+  <div class="brand"><div class="logo">P</div> Leave · Timecard</div>
+  <div class="url-box">
+    <input type="text" id="deployUrlInput" placeholder="Apps Script URL (auto sync dari dashboard)...">
+    <button onclick="applyUrl()">🔗 Apply</button>
+  </div>
+  <button class="btn" onclick="loadData()"><i>🔄</i> Muat Semula</button>
+  <button class="btn btn-success" onclick="manualSave()">💾 Simpan</button>
+  <span class="sync-badge" id="syncBadge"><span class="dot"></span><span id="syncText">Sedia</span></span>
+</div>
+
 <div class="container">
+  <div class="table-wrap">
+    <table id="mainTable">
+      <thead><tr id="headerRow"></tr></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</div>
 
-    <!-- ===== 品牌栏 ===== -->
-    <div class="brandbar">
-        <div class="logo">P</div>
-        <div class="titles">
-            <span class="kicker">Payroll System</span>
-            <h1>📊 Timecard Report · 演算SHEET <small id="recordCount">0 rows</small></h1>
-        </div>
-        <div class="spacer"></div>
-        <span class="stat-pill">
-            <span class="dot"></span>
-            Work <b id="summaryWork">0.00h</b> · OT <b id="summaryOT">0.00h</b>
-        </span>
+<div class="modal-mask" id="autoSaveModal">
+  <div class="modal">
+    <h3>⏰ Autosave</h3>
+    <p>Perubahan akan disimpan secara automatik.</p>
+    <div class="countdown" id="countdownNum">10</div>
+    <div class="actions">
+      <button onclick="autoSaveCancel()">Cancel</button>
+      <button class="confirm" onclick="autoSaveConfirm()">Confirm</button>
     </div>
-
-    <!-- ===== 工具栏 ===== -->
-    <div class="toolbar">
-        <label class="file-label" for="fileInput">📂 Import Timesheet</label>
-        <input type="file" id="fileInput" accept=".xlsx, .xls, .csv">
-
-        <button class="template" id="downloadTemplateBtn">📄 Download Template</button>
-        <button class="primary" id="addRowBtn">+ Add Row</button>
-        <button class="danger" id="clearBtn">🗑 Clear All</button>
-
-        <div class="spacer"></div>
-
-        <button id="clearFiltersBtn" style="display:none;">✖ Clear Filters</button>
-        <button id="exportBtn">📥 Export Excel</button>
-    </div>
-
-    <!-- ===== 表格 ===== -->
-    <div class="table-wrap" id="tableWrap">
-        <table id="timesheetTable">
-            <colgroup id="colgroup"></colgroup>
-            <thead>
-                <tr id="headerRow"></tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="15" class="total-label">TOTAL (filtered)</td>
-                    <td id="totalBreak">0.00</td>
-                    <td id="totalWork">0.00</td>
-                    <td id="totalOT">0.00</td>
-                    <td colspan="2"></td>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
+  </div>
 </div>
 
 <script>
-    // ============================================================
-    //  列定义（与 Excel A–S 19 列完全一致）
-    // ============================================================
-    const COLUMNS = [
-        { key: '_idx',          label: '#',                    sub: '',        type: 'index',    width: 34,  filter: false },
-        { key: 'personId',      label: 'Person ID',            sub: 'A',       type: 'text',     width: 70,  filter: true, cls: 'id' },
-        { key: 'firstName',     label: 'First Name',           sub: 'B',       type: 'text',     width: 80,  filter: true },
-        { key: 'lastName',      label: 'Last Name',            sub: 'C',       type: 'text',     width: 95,  filter: true },
-        { key: 'date',          label: 'Date',                 sub: 'D',       type: 'text',     width: 88,  filter: true },
-        { key: 'timesheet',     label: 'Timesheet',            sub: 'E',       type: 'text',     width: 60,  filter: true, cls: 'center' },
-        { key: 'clockInAM',     label: 'Clock In',             sub: 'F · AM',  type: 'time',     width: 58,  filter: true },
-        { key: 'clockOutAM',    label: 'Clock Out',            sub: 'G · AM',  type: 'time',     width: 58,  filter: true },
-        { key: '_am',           label: 'Clock Time(h)',        sub: 'H · AM',  type: 'calc-seg', width: 58,  filter: true },
-        { key: 'clockInPM',     label: 'Clock In',             sub: 'I · PM',  type: 'time',     width: 58,  filter: true },
-        { key: 'clockOutPM',    label: 'Clock Out',            sub: 'J · PM',  type: 'time',     width: 58,  filter: true },
-        { key: '_pm',           label: 'Clock Time(h)',        sub: 'K · PM',  type: 'calc-seg', width: 58,  filter: true },
-        { key: 'clockInOT',     label: 'Clock In',             sub: 'L · OT',  type: 'time',     width: 58,  filter: true },
-        { key: 'clockOutOT',    label: 'Clock Out',            sub: 'M · OT',  type: 'time',     width: 58,  filter: true },
-        { key: '_otSeg',        label: 'Clock Time(h)',        sub: 'N · OT',  type: 'calc-seg', width: 58,  filter: true },
-        { key: '_break',        label: 'Total Break Time(h)',  sub: 'O',       type: 'calc-break', width: 72, filter: true },
-        { key: '_work',         label: 'Total Work Time(h)',   sub: 'P',       type: 'calc',     width: 72,  filter: true },
-        { key: '_ot',           label: 'Total Overtime Time(h)', sub: 'Q',     type: 'calc-ot',  width: 82,  filter: true },
-        { key: 'statisticRuleMode', label: 'Statistic Rule Mode', sub: 'R',   type: 'text',     width: 110, filter: true },
-        { key: 'status',        label: 'Abnormal Situation',   sub: 'S',       type: 'status',   width: 130, filter: true },
-    ];
-
-    const STATUS_OPTIONS = [
-        { value: 'AL',  label: 'AL - Annual Leave' },
-        { value: 'L',   label: 'L - Leave' },
-        { value: 'HAL', label: 'HAL - Half Day Leave' },
-        { value: 'SL',  label: 'SL - Sick Leave' },
-        { value: 'UL',  label: 'UL - Unpaid Leave' },
-        { value: 'OFF', label: 'OFF - Off Day' },
-    ];
-
-    // ============================================================
-    //  STATE
-    // ============================================================
-    let rows = [];
-    const filters = {};
-    let openFilterKey = null;
-    let filterPanelEl = null;
-
-    // ============================================================
-    //  DOM
-    // ============================================================
-    const tbody = document.getElementById('tableBody');
-    const recordCount = document.getElementById('recordCount');
-    const summaryWorkEl = document.getElementById('summaryWork');
-    const summaryOTEl = document.getElementById('summaryOT');
-    const totalBreakEl = document.getElementById('totalBreak');
-    const totalWorkEl = document.getElementById('totalWork');
-    const totalOTEl = document.getElementById('totalOT');
-    const fileInput = document.getElementById('fileInput');
-    const clearFiltersBtn = document.getElementById('clearFiltersBtn');
-    const colgroup = document.getElementById('colgroup');
-    const headerRow = document.getElementById('headerRow');
-
-    // ============================================================
-    //  HELPERS
-    // ============================================================
-    function generateId() {
-        return 'r_' + Math.random().toString(36).slice(2, 9);
-    }
-
-    function timeToMinutes(str) {
-        if (!str) return null;
-        const s = String(str).trim();
-        const m = s.match(/^(\d{1,2}):(\d{2})$/);
-        if (!m) return null;
-        const h = parseInt(m[1], 10);
-        const min = parseInt(m[2], 10);
-        if (h > 23 || min > 59) return null;
-        return h * 60 + min;
-    }
-
-    function minutesToHoursStr(minutes) {
-        if (minutes === null || minutes < 0) return '0.00';
-        return (minutes / 60).toFixed(2);
-    }
-
-    function calcDuration(inMin, outMin) {
-        if (inMin === null || outMin === null) return 0;
-        let d = outMin - inMin;
-        if (d < 0) d += 24 * 60;
-        return d;
-    }
-
-    function escapeHtml(str) {
-        if (str === null || str === undefined) return '';
-        return String(str).replace(/[&<>"]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            if (m === '"') return '&quot;';
-            return m;
-        });
-    }
-
-    // ============================================================
-    //  日期标准化：任何常见格式 → YYYY-MM-DD
-    // ============================================================
-    const MONTH_MAP = {
-        jan: 1, january: 1,
-        feb: 2, february: 2,
-        mar: 3, march: 3,
-        apr: 4, april: 4,
-        may: 5,
-        jun: 6, june: 6,
-        jul: 7, july: 7,
-        aug: 8, august: 8,
-        sep: 9, sept: 9, september: 9,
-        oct: 10, october: 10,
-        nov: 11, november: 11,
-        dec: 12, december: 12,
-    };
-
-    function pad2(n) { return String(n).padStart(2, '0'); }
-
-    function buildYMD(y, m, d) {
-        y = parseInt(y, 10);
-        m = parseInt(m, 10);
-        d = parseInt(d, 10);
-        if (!y || !m || !d) return null;
-        if (m < 1 || m > 12) return null;
-        if (d < 1 || d > 31) return null;
-        if (y < 100) y = (y < 70) ? 2000 + y : 1900 + y;
-        const dt = new Date(y, m - 1, d);
-        if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) return null;
-        return `${y}-${pad2(m)}-${pad2(d)}`;
-    }
-
-    function normalizeDate(raw) {
-        if (raw === null || raw === undefined) return '';
-        if (raw instanceof Date && !isNaN(raw)) {
-            return `${raw.getFullYear()}-${pad2(raw.getMonth() + 1)}-${pad2(raw.getDate())}`;
-        }
-
-        let s = String(raw).trim();
-        if (!s) return '';
-
-        // 1) 纯数字（Excel 序列号 / 8 位紧凑日期）
-        if (/^\d+(\.\d+)?$/.test(s)) {
-            const num = parseFloat(s);
-            if (/^\d{8}$/.test(s)) {
-                const y = s.slice(0, 4), m = s.slice(4, 6), d = s.slice(6, 8);
-                const r = buildYMD(y, m, d);
-                if (r) return r;
-            }
-            if (/^\d{5}$/.test(s) && num > 0 && num < 2958466) {
-                const ms = Math.round((num - 25569) * 86400 * 1000);
-                const dt = new Date(ms);
-                if (!isNaN(dt)) {
-                    return `${dt.getUTCFullYear()}-${pad2(dt.getUTCMonth() + 1)}-${pad2(dt.getUTCDate())}`;
-                }
-            }
-        }
-
-        // 2) 去掉时间部分
-        s = s.replace(/[T\s]+\d{1,2}:\d{2}(:\d{2})?(\.\d+)?(Z|[+-]\d{2}:?\d{2})?$/i, '').trim();
-
-        // 3) 中文：2025年10月1日
-        let m = s.match(/^(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日?$/);
-        if (m) return buildYMD(m[1], m[2], m[3]);
-
-        // 4) YYYY-MM-DD / YYYY/MM/DD / YYYY.MM.DD
-        m = s.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})$/);
-        if (m) {
-            const r = buildYMD(m[1], m[2], m[3]);
-            if (r) return r;
-        }
-
-        // 5) YY-MM-DD / YY/MM/DD
-        m = s.match(/^(\d{2})[\/\-.](\d{1,2})[\/\-.](\d{1,2})$/);
-        if (m) {
-            const r = buildYMD(m[1], m[2], m[3]);
-            if (r) return r;
-        }
-
-        // 6) A/B/C 歧义判断（默认月/日/年）
-        m = s.match(/^(\d{1,4})[\/\-.](\d{1,2})[\/\-.](\d{1,4})$/);
-        if (m) {
-            const a = parseInt(m[1], 10), b = parseInt(m[2], 10), c = parseInt(m[3], 10);
-            if (m[3].length === 4) return buildYMD(a, b, c) || s;
-            if (a > 12 && b <= 12) return buildYMD(c, b, a) || s; // 日/月/年
-            if (b > 12 && a <= 12) return buildYMD(c, a, b) || s; // 月/日/年
-            return buildYMD(c, a, b) || s;                        // 默认月/日/年
-        }
-
-        // 7) 英文月份
-        //    a) D Month YYYY
-        m = s.match(/^(\d{1,2})[\s\-\/.,]+([A-Za-z]+)[\s\-\/.,]+(\d{2,4})$/);
-        if (m) {
-            const mon = MONTH_MAP[m[2].toLowerCase()];
-            if (mon) return buildYMD(m[3], mon, m[1]) || s;
-        }
-        //    b) Month D, YYYY
-        m = s.match(/^([A-Za-z]+)[\s\-\/.,]+(\d{1,2})[\s\-\/.,]+(\d{2,4})$/);
-        if (m) {
-            const mon = MONTH_MAP[m[1].toLowerCase()];
-            if (mon) return buildYMD(m[3], mon, m[2]) || s;
-        }
-
-        // 8) 无法解析，原样返回
-        return s;
-    }
-
-    // ============================================================
-    //  CORE CALCULATION
-    // ============================================================
-    function computeRow(row) {
-        const inAM = timeToMinutes(row.clockInAM);
-        const outAM = timeToMinutes(row.clockOutAM);
-        const inPM = timeToMinutes(row.clockInPM);
-        const outPM = timeToMinutes(row.clockOutPM);
-        const inOT = timeToMinutes(row.clockInOT);
-        const outOT = timeToMinutes(row.clockOutOT);
-
-        const status = (row.status || '').toUpperCase();
-
-        const amMin = calcDuration(inAM, outAM);
-        const pmMin = calcDuration(inPM, outPM);
-        const otMin = calcDuration(inOT, outOT);
-
-        let workMin = 0, breakMin = 0, lateMin = 0, absent = false;
-
-        if (['AL', 'SL', 'UL', 'OFF'].includes(status)) {
-            workMin = 0; breakMin = 0; lateMin = 0;
-            absent = (status === 'UL');
-        } else {
-            let span = amMin + pmMin;
-            let brk = 0;
-            if (inAM !== null && outAM !== null && inPM !== null && outPM !== null) {
-                brk = 60;
-                span = Math.max(0, span - brk);
-            }
-            if (status === 'HAL') span = Math.max(amMin, pmMin);
-            workMin = span;
-            breakMin = brk;
-
-            const STD_START = 8 * 60, STD_END = 17 * 60;
-            if (inAM !== null && inAM > STD_START + 30) lateMin += inAM - (STD_START + 30);
-            if (inPM !== null && inPM > 13 * 60) lateMin += inPM - 13 * 60;
-            if (outPM !== null && outPM < STD_END) lateMin += STD_END - outPM;
-        }
-
-        return {
-            amMinutes: amMin, pmMinutes: pmMin, otMinutes: otMin,
-            breakMinutes: breakMin, workMinutes: workMin,
-            lateMinutes: lateMin, absent: absent
-        };
-    }
-
-    // ============================================================
-    //  取某列字符串值
-    // ============================================================
-    function getCellValue(row, calc, colKey) {
-        switch (colKey) {
-            case 'personId': return String(row.personId || '').trim();
-            case 'firstName': return String(row.firstName || '').trim();
-            case 'lastName': return String(row.lastName || '').trim();
-            case 'date': return String(row.date || '').trim();
-            case 'timesheet': return String(row.timesheet || '').trim();
-            case 'clockInAM': return String(row.clockInAM || '').trim();
-            case 'clockOutAM': return String(row.clockOutAM || '').trim();
-            case 'clockInPM': return String(row.clockInPM || '').trim();
-            case 'clockOutPM': return String(row.clockOutPM || '').trim();
-            case 'clockInOT': return String(row.clockInOT || '').trim();
-            case 'clockOutOT': return String(row.clockOutOT || '').trim();
-            case '_am': return minutesToHoursStr(calc.amMinutes);
-            case '_pm': return minutesToHoursStr(calc.pmMinutes);
-            case '_otSeg': return minutesToHoursStr(calc.otMinutes);
-            case '_break': return minutesToHoursStr(calc.breakMinutes);
-            case '_work': return minutesToHoursStr(calc.workMinutes);
-            case '_ot': return minutesToHoursStr(calc.otMinutes);
-            case 'statisticRuleMode': return String(row.statisticRuleMode || '').trim();
-            case 'status': return String(row.status || '').toUpperCase();
-            default: return '';
-        }
-    }
-
-    function rowPassesFilters(row, calc) {
-        for (const colKey in filters) {
-            const set = filters[colKey];
-            if (!set || set.size === 0) continue;
-            const v = getCellValue(row, calc, colKey);
-            if (!set.has(v)) return false;
-        }
-        return true;
-    }
-
-    function getFilteredRows() {
-        return rows
-            .map((row, i) => ({ row, calc: computeRow(row), idx: i }))
-            .filter(({ row, calc }) => rowPassesFilters(row, calc));
-    }
-
-    // ============================================================
-    //  表头
-    // ============================================================
-    function buildColgroup() {
-        colgroup.innerHTML = COLUMNS.map(c =>
-            `<col style="width:${c.width}px;">`
-        ).join('');
-    }
-
-    function buildHeader() {
-        headerRow.innerHTML = COLUMNS.map(c => {
-            const filterBtn = c.filter
-                ? `<button class="filter-btn" data-col="${c.key}" title="Filter">⌄</button>`
-                : '';
-            return `<th data-col="${c.key}">
-                <div class="th-inner">
-                    <span>${escapeHtml(c.label)}${filterBtn}</span>
-                </div>
-                ${c.sub ? `<span class="sub">${escapeHtml(c.sub)}</span>` : ''}
-            </th>`;
-        }).join('');
-
-        headerRow.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleFilterPanel(btn.dataset.col, btn);
-            });
-        });
-    }
-
-    // ============================================================
-    //  渲染
-    // ============================================================
-    function render() {
-        const filtered = getFilteredRows();
-
-        if (rows.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="${COLUMNS.length}">
-                        <div class="empty-state">
-                            <div style="font-size:36px;margin-bottom:8px;">📋</div>
-                            <p>No data yet. Import a Timesheet or click <strong>+ Add Row</strong>.</p>
-                        </div>
-                    </td>
-                </tr>
-            `;
-            recordCount.textContent = '0 rows';
-            summaryWorkEl.textContent = '0.00h';
-            summaryOTEl.textContent = '0.00h';
-            totalBreakEl.textContent = '0.00';
-            totalWorkEl.textContent = '0.00';
-            totalOTEl.textContent = '0.00';
-            return;
-        }
-
-        if (filtered.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="${COLUMNS.length}">
-                        <div class="empty-state">
-                            <div style="font-size:36px;margin-bottom:8px;">🔍</div>
-                            <p>No rows match the current filters.</p>
-                        </div>
-                    </td>
-                </tr>
-            `;
-        } else {
-            const frag = document.createDocumentFragment();
-            filtered.forEach(({ row, calc, idx }, displayIdx) => {
-                frag.appendChild(buildRowEl(row, calc, idx, displayIdx));
-            });
-            tbody.innerHTML = '';
-            tbody.appendChild(frag);
-        }
-
-        let totalBreakMin = 0, totalWorkMin = 0, totalOTMin = 0;
-        filtered.forEach(({ calc }) => {
-            totalBreakMin += calc.breakMinutes;
-            totalWorkMin += calc.workMinutes;
-            totalOTMin += calc.otMinutes;
-        });
-
-        recordCount.textContent = filtered.length + ' / ' + rows.length + ' rows';
-        summaryWorkEl.textContent = minutesToHoursStr(totalWorkMin) + 'h';
-        summaryOTEl.textContent = minutesToHoursStr(totalOTMin) + 'h';
-        totalBreakEl.textContent = minutesToHoursStr(totalBreakMin);
-        totalWorkEl.textContent = minutesToHoursStr(totalWorkMin);
-        totalOTEl.textContent = minutesToHoursStr(totalOTMin);
-    }
-
-    function buildRowEl(row, calc, idx, displayIdx) {
-        const tr = document.createElement('tr');
-        tr.dataset.rid = row.id;
-        if (calc.otMinutes > 0) tr.classList.add('row-overtime');
-        if (calc.absent) tr.classList.add('row-absent');
-
-        const statusVal = (row.status || '').toUpperCase();
-        let statusOptionsHtml = `<option value="" ${!statusVal ? 'selected' : ''}>— Select —</option>`;
-        STATUS_OPTIONS.forEach(opt => {
-            const sel = (opt.value === statusVal) ? 'selected' : '';
-            statusOptionsHtml += `<option value="${opt.value}" ${sel}>${opt.label}</option>`;
-        });
-
-        const cells = COLUMNS.map(c => {
-            switch (c.type) {
-                case 'index':
-                    return `<td>${displayIdx + 1}</td>`;
-                case 'text':
-                    return `<td><input class="text-input ${c.cls || ''}" data-field="${c.key}" value="${escapeHtml(row[c.key] || '')}" placeholder="${c.key === 'date' ? 'YYYY-MM-DD' : ''}"></td>`;
-                case 'time':
-                    return `<td><input class="time-input" data-field="${c.key}" value="${escapeHtml(row[c.key] || '')}" placeholder="${c.key.includes('In') ? (c.key.includes('OT') ? '18:00' : '08:00') : (c.key.includes('OT') ? '20:00' : '12:00')}"></td>`;
-                case 'calc-seg':
-                    return `<td class="calc-cell seg">${minutesToHoursStr(calc[c.key === '_am' ? 'amMinutes' : c.key === '_pm' ? 'pmMinutes' : 'otMinutes'])}</td>`;
-                case 'calc-break':
-                    return `<td class="calc-cell break">${minutesToHoursStr(calc.breakMinutes)}</td>`;
-                case 'calc':
-                    return `<td class="calc-cell ${calc.workMinutes === 0 ? 'absent' : ''}">${minutesToHoursStr(calc.workMinutes)}</td>`;
-                case 'calc-ot':
-                    return `<td class="calc-cell ${calc.otMinutes > 0 ? 'ot' : ''}">${minutesToHoursStr(calc.otMinutes)}</td>`;
-                case 'status':
-                    return `<td><select class="status-select" data-field="status" data-status="${statusVal}">${statusOptionsHtml}</select></td>`;
-                default:
-                    return '<td></td>';
-            }
-        }).join('');
-
-        tr.innerHTML = cells;
-
-        tr.querySelectorAll('input[data-field]').forEach(input => {
-            input.addEventListener('change', (e) => {
-                const field = e.target.dataset.field;
-                let val = e.target.value.trim();
-                if (field === 'date') {
-                    val = normalizeDate(val);
-                    e.target.value = val;
-                }
-                row[field] = val;
-                refreshRowAndTotals(row, tr);
-            });
-        });
-
-        tr.querySelector('.status-select').addEventListener('change', (e) => {
-            row.status = e.target.value;
-            e.target.dataset.status = e.target.value;
-            refreshRowAndTotals(row, tr);
-        });
-
-        return tr;
-    }
-
-    function refreshRowAndTotals(row, tr) {
-        const calc = computeRow(row);
-        tr.classList.toggle('row-overtime', calc.otMinutes > 0);
-        tr.classList.toggle('row-absent', calc.absent);
-
-        let tdIndex = 0;
-        COLUMNS.forEach(c => {
-            const td = tr.children[tdIndex];
-            if (c.type === 'calc-seg') {
-                const v = c.key === '_am' ? calc.amMinutes : c.key === '_pm' ? calc.pmMinutes : calc.otMinutes;
-                td.textContent = minutesToHoursStr(v);
-            } else if (c.type === 'calc-break') {
-                td.textContent = minutesToHoursStr(calc.breakMinutes);
-            } else if (c.type === 'calc') {
-                td.textContent = minutesToHoursStr(calc.workMinutes);
-                td.classList.toggle('absent', calc.workMinutes === 0);
-            } else if (c.type === 'calc-ot') {
-                td.textContent = minutesToHoursStr(calc.otMinutes);
-                td.classList.toggle('ot', calc.otMinutes > 0);
-            }
-            tdIndex++;
-        });
-
-        updateTotals();
-    }
-
-    function updateTotals() {
-        const filtered = getFilteredRows();
-        let totalBreakMin = 0, totalWorkMin = 0, totalOTMin = 0;
-        filtered.forEach(({ calc }) => {
-            totalBreakMin += calc.breakMinutes;
-            totalWorkMin += calc.workMinutes;
-            totalOTMin += calc.otMinutes;
-        });
-        recordCount.textContent = filtered.length + ' / ' + rows.length + ' rows';
-        summaryWorkEl.textContent = minutesToHoursStr(totalWorkMin) + 'h';
-        summaryOTEl.textContent = minutesToHoursStr(totalOTMin) + 'h';
-        totalBreakEl.textContent = minutesToHoursStr(totalBreakMin);
-        totalWorkEl.textContent = minutesToHoursStr(totalWorkMin);
-        totalOTEl.textContent = minutesToHoursStr(totalOTMin);
-    }
-
-    // ============================================================
-    //  筛选面板
-    // ============================================================
-    function closeFilterPanel() {
-        if (filterPanelEl) {
-            filterPanelEl.remove();
-            filterPanelEl = null;
-        }
-        openFilterKey = null;
-        document.querySelectorAll('.filter-btn.active').forEach(b => b.classList.remove('active'));
-    }
-
-    function toggleFilterPanel(colKey, anchorBtn) {
-        if (openFilterKey === colKey) { closeFilterPanel(); return; }
-        closeFilterPanel();
-        openFilterKey = colKey;
-        anchorBtn.classList.add('active');
-
-        const valuesSet = new Set();
-        rows.forEach(row => {
-            const calc = computeRow(row);
-            valuesSet.add(getCellValue(row, calc, colKey));
-        });
-        const values = Array.from(valuesSet).sort((a, b) => {
-            if (a === '') return -1;
-            if (b === '') return 1;
-            return a.localeCompare(b, undefined, { numeric: true });
-        });
-
-        const current = filters[colKey];
-
-        const panel = document.createElement('div');
-        panel.className = 'filter-panel';
-        panel.innerHTML = `
-            <div class="fp-head">
-                <input type="text" placeholder="Search values..." id="fpSearch">
-            </div>
-            <div class="fp-actions">
-                <button data-act="all">Select All</button>
-                <button data-act="none">Clear</button>
-            </div>
-            <div class="fp-list" id="fpList"></div>
-            <div class="fp-footer">
-                <button data-act="cancel">Cancel</button>
-                <button class="apply" data-act="apply">Apply</button>
-            </div>
-        `;
-        document.body.appendChild(panel);
-        filterPanelEl = panel;
-
-        const rect = anchorBtn.getBoundingClientRect();
-        const panelRect = panel.getBoundingClientRect();
-        let left = rect.left;
-        let top = rect.bottom + 6;
-        if (left + panelRect.width > window.innerWidth - 10) left = window.innerWidth - panelRect.width - 10;
-        if (top + panelRect.height > window.innerHeight - 10) top = rect.top - panelRect.height - 6;
-        panel.style.left = left + 'px';
-        panel.style.top = top + 'px';
-
-        const listEl = panel.querySelector('#fpList');
-        const searchEl = panel.querySelector('#fpSearch');
-        const checkedSet = current ? new Set(current) : new Set(values);
-
-        function renderList(keyword) {
-            const kw = (keyword || '').trim().toLowerCase();
-            const shown = values.filter(v => {
-                if (!kw) return true;
-                if (v === '') return '(empty)'.includes(kw) || 'empty'.includes(kw);
-                return v.toLowerCase().includes(kw);
-            });
-            listEl.innerHTML = shown.map(v => {
-                const checked = checkedSet.has(v) ? 'checked' : '';
-                const label = v === '' ? '<span class="empty-tag">(empty)</span>' : escapeHtml(v);
-                return `<label class="fp-item">
-                    <input type="checkbox" value="${escapeHtml(v)}" ${checked}>
-                    <span>${label}</span>
-                </label>`;
-            }).join('');
-
-            listEl.querySelectorAll('input[type=checkbox]').forEach(cb => {
-                cb.addEventListener('change', () => {
-                    if (cb.checked) checkedSet.add(cb.value);
-                    else checkedSet.delete(cb.value);
-                });
-            });
-        }
-
-        renderList('');
-        searchEl.addEventListener('input', () => renderList(searchEl.value));
-
-        panel.querySelectorAll('.fp-actions button').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const act = btn.dataset.act;
-                if (act === 'all') values.forEach(v => checkedSet.add(v));
-                else if (act === 'none') checkedSet.clear();
-                renderList(searchEl.value);
-            });
-        });
-
-        panel.querySelectorAll('.fp-footer button').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const act = btn.dataset.act;
-                if (act === 'cancel') { closeFilterPanel(); return; }
-                if (checkedSet.size === values.length) delete filters[colKey];
-                else filters[colKey] = new Set(checkedSet);
-                updateFilterButtonsUI();
-                closeFilterPanel();
-                render();
-            });
-        });
-
-        setTimeout(() => { document.addEventListener('mousedown', onDocClick); }, 0);
-
-        function onDocClick(ev) {
-            if (filterPanelEl && !filterPanelEl.contains(ev.target) && ev.target !== anchorBtn) {
-                closeFilterPanel();
-                document.removeEventListener('mousedown', onDocClick);
-            }
-        }
-    }
-
-    function updateFilterButtonsUI() {
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            const key = btn.dataset.col;
-            if (filters[key] && filters[key].size > 0) btn.classList.add('active');
-            else btn.classList.remove('active');
-        });
-        const hasAny = Object.keys(filters).some(k => filters[k] && filters[k].size > 0);
-        clearFiltersBtn.style.display = hasAny ? 'inline-flex' : 'none';
-    }
-
-    // ============================================================
-    //  导入
-    // ============================================================
-    fileInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-            try {
-                const data = new Uint8Array(evt.target.result);
-                const workbook = XLSX.read(data, { type: 'array', cellDates: true });
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '', raw: true });
-
-                if (jsonData.length < 2) {
-                    alert('File is empty or has no data rows.');
-                    return;
-                }
-
-                let headerRowIndex = 0;
-                for (let i = 0; i < Math.min(jsonData.length, 5); i++) {
-                    const rowStr = jsonData[i].join(' ').toLowerCase();
-                    if (rowStr.includes('person') || rowStr.includes('id') || rowStr.includes('name')) {
-                        headerRowIndex = i;
-                        break;
-                    }
-                }
-
-                const newRows = [];
-                for (let i = headerRowIndex + 1; i < jsonData.length; i++) {
-                    const r = jsonData[i];
-                    if (!r || r.length === 0) continue;
-                    if (r.every(c => String(c).trim() === '')) continue;
-
-                    const personId = String(r[0] || '').trim();
-                    const firstName = String(r[1] || '').trim();
-                    const lastName = String(r[2] || '').trim();
-                    const date = normalizeDate(r[3]);
-                    const timesheet = String(r[4] || '').trim();
-
-                    const clockInAM  = parseTimeValue(r[5]);
-                    const clockOutAM = parseTimeValue(r[6]);
-                    const clockInPM  = parseTimeValue(r[8]);
-                    const clockOutPM = parseTimeValue(r[9]);
-                    const clockInOT  = parseTimeValue(r[11]);
-                    const clockOutOT = parseTimeValue(r[12]);
-
-                    const statisticRuleMode = String(r[17] || '').trim();
-                    const rawStatus = String(r[18] || '').trim();
-                    const status = mapStatus(rawStatus);
-
-                    if (personId || firstName || lastName) {
-                        newRows.push({
-                            id: generateId(),
-                            personId, firstName, lastName, date, timesheet,
-                            clockInAM: clockInAM || '',
-                            clockOutAM: clockOutAM || '',
-                            clockInPM: clockInPM || '',
-                            clockOutPM: clockOutPM || '',
-                            clockInOT: clockInOT || '',
-                            clockOutOT: clockOutOT || '',
-                            statisticRuleMode,
-                            status,
-                            abnormalRaw: rawStatus
-                        });
-                    }
-                }
-
-                if (newRows.length === 0) {
-                    alert('No valid rows found. Please check the file format.');
-                    return;
-                }
-
-                if (rows.length > 0) {
-                    if (confirm('Replace current data? OK = Replace, Cancel = Append.')) rows = newRows;
-                    else rows = rows.concat(newRows);
-                } else {
-                    rows = newRows;
-                }
-
-                for (const k in filters) delete filters[k];
-                updateFilterButtonsUI();
-
-                render();
-                alert(`✅ Imported ${newRows.length} rows successfully.`);
-
-            } catch (err) {
-                console.error(err);
-                alert('Error reading file: ' + err.message);
-            }
-        };
-        reader.readAsArrayBuffer(file);
-        fileInput.value = '';
+const URL_KEY = 'payrollScriptUrl';
+const SHEET_HEADERS = [
+  'ID KOD','SITUATION','GROUP','NAME','SHIF','GAJI','Date',
+  'Clock In 01','Clock Out 01','Clock Time(h) 01',
+  'Clock In 02','Clock Out 02','Clock Time(h) 02',
+  'Clock In 03','Clock Out 03','Clock Time(h) 03',
+  'Total Break Time(h)','Total Work Time(h)','Total Over Time (h)',
+  'SITUATION WORK TIME','STATUS','HALF TT JAM','HALF TT MIN',
+  'TOTAL DEDUCTION(RM)','REMARK'
+];
+const READONLY_COLS = ['ID KOD','SITUATION','GROUP','NAME','SHIF','GAJI',
+  'Clock Time(h) 01','Clock Time(h) 02','Clock Time(h) 03',
+  'Total Break Time(h)','Total Work Time(h)','Total Over Time (h)',
+  'SITUATION WORK TIME','TOTAL DEDUCTION(RM)'];
+const STATUS_OPTIONS = ['', 'ANNUAL LEAVE','UNPAID LEAVE','HALF DAY LEAVE','SICK LEAVE','OFF DAY','EMERGENCY LEAVE','MATERNITY LEAVE'];
+
+let SCRIPT_URL = '';
+let rows = [];
+let dirty = false;
+let idleTimer = null;
+let countdownTimer = null;
+let countdownLeft = 10;
+let modalOpen = false;
+
+// ===== URL 同步 =====
+function loadSavedUrl() {
+  SCRIPT_URL = localStorage.getItem(URL_KEY) || '';
+  document.getElementById('deployUrlInput').value = SCRIPT_URL;
+}
+function applyUrl() {
+  const url = document.getElementById('deployUrlInput').value.trim();
+  if (!url) { alert('Masukkan URL terlebih dahulu.'); return; }
+  localStorage.setItem(URL_KEY, url);
+  SCRIPT_URL = url;
+  loadData();
+}
+window.addEventListener('storage', e => {
+  if (e.key === URL_KEY && e.newValue) {
+    SCRIPT_URL = e.newValue;
+    document.getElementById('deployUrlInput').value = e.newValue;
+    loadData();
+  }
+});
+
+function setSync(state, text) {
+  const b = document.getElementById('syncBadge');
+  b.className = 'sync-badge ' + (state || '');
+  document.getElementById('syncText').textContent = text;
+}
+
+// ===== 数据加载（SHEET 优先） =====
+async function loadData() {
+  if (!SCRIPT_URL) { setSync('err', 'URL belum ditetapkan'); return; }
+  setSync('busy', 'Memuatkan...');
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=getSheetData&_t=${Date.now()}`);
+    const json = await res.json();
+    if (json.status !== 'success') throw new Error(json.message || 'Gagal');
+    rows = (json.data || []).map(r => {
+      const o = {};
+      SHEET_HEADERS.forEach(h => {
+        let v = r[h];
+        if (v === undefined || v === null) v = '';
+        if (h === 'Date') v = normalizeDate(v);
+        o[h] = v;
+      });
+      return o;
     });
-
-    function mapStatus(raw) {
-        if (!raw) return '';
-        const s = raw.toUpperCase();
-        if (s.includes('ABSENT') || s.includes('MISSED PUNCH')) return 'UL';
-        if (s.startsWith('HAL')) return 'HAL';
-        if (s.startsWith('AL'))  return 'AL';
-        if (s.startsWith('SL'))  return 'SL';
-        if (s.startsWith('UL'))  return 'UL';
-        if (s.startsWith('OFF')) return 'OFF';
-        if (s.startsWith('L'))   return 'L';
-        if (s.includes('ANNUAL'))  return 'AL';
-        if (s.includes('SICK'))    return 'SL';
-        if (s.includes('UNPAID'))  return 'UL';
-        if (s.includes('HALF'))    return 'HAL';
-        if (s.includes('OFF'))     return 'OFF';
-        return '';
-    }
-
-    function parseTimeValue(val) {
-        if (val === null || val === undefined || val === '') return '';
-        // Date 对象（cellDates:true 时 Excel 时间会变成 Date）
-        if (val instanceof Date && !isNaN(val)) {
-            return `${pad2(val.getUTCHours())}:${pad2(val.getUTCMinutes())}`;
-        }
-        const s = String(val).trim();
-        if (/^\d{1,2}:\d{2}$/.test(s)) return s;
-        const num = parseFloat(s);
-        if (!isNaN(num) && num >= 0 && num < 1) {
-            const totalMinutes = Math.round(num * 24 * 60);
-            const h = Math.floor(totalMinutes / 60);
-            const m = totalMinutes % 60;
-            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-        }
-        const match12 = s.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-        if (match12) {
-            let h = parseInt(match12[1], 10);
-            const m = parseInt(match12[2], 10);
-            const ampm = match12[3].toUpperCase();
-            if (ampm === 'PM' && h < 12) h += 12;
-            if (ampm === 'AM' && h === 12) h = 0;
-            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-        }
-        return s;
-    }
-
-    // ============================================================
-    //  ADD / CLEAR / EXPORT
-    // ============================================================
-    document.getElementById('addRowBtn').addEventListener('click', function() {
-        rows.push({
-            id: generateId(),
-            personId: '', firstName: '', lastName: '',
-            date: new Date().toISOString().slice(0, 10),
-            timesheet: '',
-            clockInAM: '', clockOutAM: '',
-            clockInPM: '', clockOutPM: '',
-            clockInOT: '', clockOutOT: '',
-            statisticRuleMode: 'Even and Odd',
-            status: '', abnormalRaw: ''
-        });
-        render();
-        const wrap = document.getElementById('tableWrap');
-        wrap.scrollTop = wrap.scrollHeight;
-    });
-
-    document.getElementById('clearBtn').addEventListener('click', function() {
-        if (rows.length === 0) return;
-        if (confirm('Clear all data? This cannot be undone.')) {
-            rows = [];
-            for (const k in filters) delete filters[k];
-            updateFilterButtonsUI();
-            render();
-        }
-    });
-
-    clearFiltersBtn.addEventListener('click', function() {
-        for (const k in filters) delete filters[k];
-        updateFilterButtonsUI();
-        render();
-    });
-
-    document.getElementById('downloadTemplateBtn').addEventListener('click', function() {
-        const headers = [
-            'Person ID', 'First Name', 'Last Name', 'Date', 'Timesheet',
-            'Clock In', 'Clock Out', 'Clock Time(h)',
-            'Clock In', 'Clock Out', 'Clock Time(h)',
-            'Clock In', 'Clock Out', 'Clock Time(h)',
-            'Total Break Time(h)', 'Total Work Time(h)', 'Total Overtime Time(h)',
-            'Statistic Rule Mode', 'Abnormal Situation'
-        ];
-        const sampleRows = [
-            ['0001', 'YANG', 'PING', '2025-10-01', '8', '08:00', '12:00', '4.00', '13:00', '17:00', '4.00', '', '', '', '1.00', '8.00', '0.00', 'Even and Odd', ''],
-            ['0002', 'TAN', 'XIAO MING', '2025-10-01', '9', '08:30', '12:00', '3.50', '13:00', '17:00', '4.00', '18:00', '20:00', '2.00', '0.50', '9.50', '2.00', 'Even and Odd', 'Missed Punch'],
-            ['0003', 'SITI', 'NURHALIZA', '2025-10-01', '8', '08:00', '12:00', '4.00', '13:00', '17:00', '4.00', '', '', '', '1.00', '8.00', '0.00', 'Even and Odd', 'Absent']
-        ];
-        const ws = XLSX.utils.aoa_to_sheet([headers, ...sampleRows]);
-        ws['!cols'] = [
-            { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 10 },
-            { wch: 12 }, { wch: 12 }, { wch: 12 },
-            { wch: 12 }, { wch: 12 }, { wch: 12 },
-            { wch: 12 }, { wch: 12 }, { wch: 12 },
-            { wch: 18 }, { wch: 18 }, { wch: 20 },
-            { wch: 18 }, { wch: 18 }
-        ];
-        const instructions = [
-            ['Timesheet Template — Instructions'], [''],
-            ['1. Fill in one row per employee per day.'],
-            ['2. Date format: YYYY-MM-DD (e.g. 2025-10-01).'],
-            ['3. Time format: HH:MM (e.g. 08:00, 17:30). Use 24-hour format.'],
-            ['4. Columns "Clock In", "Clock Out" appear 3 times:'],
-            ['   - 1st group: AM session (e.g. 08:00 - 12:00)'],
-            ['   - 2nd group: PM session (e.g. 13:00 - 17:00)'],
-            ['   - 3rd group: Overtime (OT) session (if applicable)'],
-            ['5. "Abnormal Situation" column accepts:'],
-            ['   AL  - Annual Leave'], ['   L   - Leave'], ['   HAL - Half Day Leave'],
-            ['   SL  - Sick Leave'], ['   UL  - Unpaid Leave'], ['   OFF - Off Day'],
-            ['6. You may also write the full label (e.g. "AL - Annual Leave").'],
-            ['7. Import this file via "Import Timesheet" once filled.'],
-        ];
-        const ws2 = XLSX.utils.aoa_to_sheet(instructions);
-        ws2['!cols'] = [{ wch: 70 }];
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Timesheet');
-        XLSX.utils.book_append_sheet(wb, ws2, 'Instructions');
-        XLSX.writeFile(wb, 'Timesheet_Report_Template.xlsx');
-    });
-
-    document.getElementById('exportBtn').addEventListener('click', function() {
-        if (rows.length === 0) { alert('No data to export.'); return; }
-        const headers = [
-            'Person ID', 'First Name', 'Last Name', 'Date', 'Timesheet',
-            'Clock In', 'Clock Out', 'Clock Time(h)',
-            'Clock In', 'Clock Out', 'Clock Time(h)',
-            'Clock In', 'Clock Out', 'Clock Time(h)',
-            'Total Break Time(h)', 'Total Work Time(h)', 'Total Overtime Time(h)',
-            'Statistic Rule Mode', 'Abnormal Situation'
-        ];
-        const filtered = getFilteredRows();
-        const data = filtered.map(({ row, calc }) => {
-            const abnormal = row.abnormalRaw
-                ? row.abnormalRaw
-                : (STATUS_OPTIONS.find(o => o.value === row.status)?.label || '');
-            return [
-                row.personId || '', row.firstName || '', row.lastName || '',
-                row.date || '', row.timesheet || '',
-                row.clockInAM || '', row.clockOutAM || '', minutesToHoursStr(calc.amMinutes),
-                row.clockInPM || '', row.clockOutPM || '', minutesToHoursStr(calc.pmMinutes),
-                row.clockInOT || '', row.clockOutOT || '', minutesToHoursStr(calc.otMinutes),
-                minutesToHoursStr(calc.breakMinutes),
-                minutesToHoursStr(calc.workMinutes),
-                minutesToHoursStr(calc.otMinutes),
-                row.statisticRuleMode || '', abnormal
-            ];
-        });
-        const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
-        ws['!cols'] = [
-            { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 10 },
-            { wch: 12 }, { wch: 12 }, { wch: 12 },
-            { wch: 12 }, { wch: 12 }, { wch: 12 },
-            { wch: 12 }, { wch: 12 }, { wch: 12 },
-            { wch: 18 }, { wch: 18 }, { wch: 20 },
-            { wch: 18 }, { wch: 18 }
-        ];
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Timesheet');
-        XLSX.writeFile(wb, 'Timecard_Report_' + new Date().toISOString().slice(0, 10) + '.xlsx');
-    });
-
-    // ============================================================
-    //  INIT
-    // ============================================================
-    buildColgroup();
-    buildHeader();
+    dirty = false;
     render();
-    window.addEventListener('resize', closeFilterPanel);
+    setSync('ok', 'Data dimuat (' + rows.length + ')');
+  } catch (err) {
+    console.error(err);
+    setSync('err', 'Gagal muat: ' + err.message);
+  }
+}
+
+// ===== 日期/时间工具 =====
+function pad2(n){ return String(n).padStart(2,'0'); }
+function normalizeDate(v) {
+  if (!v) return '';
+  if (v instanceof Date) return `${v.getFullYear()}-${pad2(v.getMonth()+1)}-${pad2(v.getDate())}`;
+  let s = String(v).trim();
+  let m = s.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})$/);
+  if (m) return `${m[1]}-${pad2(m[2])}-${pad2(m[3])}`;
+  m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);
+  if (m) return `${m[3]}-${pad2(m[2])}-${pad2(m[1])}`;
+  return s;
+}
+function timeToMin(s) {
+  if (!s) return null;
+  const m = String(s).trim().match(/^(\d{1,2}):(\d{2})$/);
+  if (!m) return null;
+  const h = +m[1], mi = +m[2];
+  if (h > 23 || mi > 59) return null;
+  return h*60+mi;
+}
+function fmtH(min) { return (min/60).toFixed(2); }
+
+// ===== 计算 =====
+function computeRow(r) {
+  const segs = [
+    [timeToMin(r['Clock In 01']), timeToMin(r['Clock Out 01'])],
+    [timeToMin(r['Clock In 02']), timeToMin(r['Clock Out 02'])],
+    [timeToMin(r['Clock In 03']), timeToMin(r['Clock Out 03'])]
+  ];
+  const segH = segs.map(([a,b]) => (a!==null && b!==null && b>=a) ? b-a : 0);
+  const hasAnyIn = segs.some(([a])=>a!==null);
+  const missingOut = segs.some(([a,b]) => a!==null && b===null);
+
+  const totalSegMin = segH[0]+segH[1]+segH[2];
+  const workMin = hasAnyIn ? Math.max(0, totalSegMin - 60) : 0;
+  const otMin = Math.max(0, workMin - 7*60-30);
+
+  let swt = '', hl = '';
+  if (!hasAnyIn) { swt = '未存在打卡记录'; }
+  else if (missingOut) { swt = '缺少打卡记录'; hl = 'hl-red'; }
+  else if (workMin > 7*60+30) { swt = '超时工作'; hl = 'hl-green'; }
+  else { swt = '工时不足'; hl = 'hl-yellow'; }
+
+  // 扣款
+  const gaji = parseFloat(r['GAJI']) || 0;
+  const status = (r['STATUS'] || '').toUpperCase();
+  let deduct = 0;
+  if (status === 'UNPAID LEAVE') {
+    deduct = gaji / 30;
+  } else if (status === 'HALF DAY LEAVE') {
+    const j = parseFloat(r['HALF TT JAM']) || 0;
+    const m = parseFloat(r['HALF TT MIN']) || 0;
+    const hrs = j + m/60;
+    const hourly = (gaji/30)/7.5;
+    deduct = hourly * hrs;
+  }
+
+  return { segH, workMin, otMin, swt, hl, deduct };
+}
+
+// ===== 渲染 =====
+function render() {
+  const hdr = document.getElementById('headerRow');
+  hdr.innerHTML = '<th>#</th>' + SHEET_HEADERS.map(h => `<th>${h}</th>`).join('');
+  const tb = document.getElementById('tableBody');
+  if (!rows.length) {
+    tb.innerHTML = `<tr><td colspan="${SHEET_HEADERS.length+1}"><div class="empty">Tiada data. Klik "Muat Semula" atau tambah baris.</div></td></tr>`;
+    return;
+  }
+  const frag = document.createDocumentFragment();
+  rows.forEach((r, i) => frag.appendChild(buildRow(r, i)));
+  tb.innerHTML = ''; tb.appendChild(frag);
+}
+
+function buildRow(r, i) {
+  const c = computeRow(r);
+  const tr = document.createElement('tr');
+  if (c.hl) tr.classList.add(c.hl);
+  const tdIdx = document.createElement('td'); tdIdx.className = 'col-idx'; tdIdx.textContent = i+1; tr.appendChild(tdIdx);
+
+  SHEET_HEADERS.forEach(h => {
+    const td = document.createElement('td');
+    if (h === 'Clock Time(h) 01' || h === 'Clock Time(h) 02' || h === 'Clock Time(h) 03') {
+      const k = h.endsWith('01') ? 0 : h.endsWith('02') ? 1 : 2;
+      td.className = 'calc'; td.textContent = fmtH(c.segH[k]);
+    } else if (h === 'Total Break Time(h)') {
+      td.className = 'calc'; td.textContent = c.workMin>0 ? '1.00' : '0.00';
+    } else if (h === 'Total Work Time(h)') {
+      td.className = 'calc'; td.textContent = fmtH(c.workMin);
+    } else if (h === 'Total Over Time (h)') {
+      td.className = 'calc';
+      if (c.otMin > 0) {
+        const hh = Math.floor(c.otMin/60), mm = Math.floor(c.otMin%60), ss = Math.round(((c.otMin%1)*60));
+        td.textContent = `${hh}h ${mm}m ${ss}s`;
+      } else td.textContent = '0';
+    } else if (h === 'SITUATION WORK TIME') {
+      td.className = 'calc'; td.textContent = c.swt;
+    } else if (h === 'TOTAL DEDUCTION(RM)') {
+      td.className = 'calc'; td.textContent = c.deduct ? c.deduct.toFixed(2) : '0.00';
+    } else if (h === 'STATUS') {
+      const sel = document.createElement('select'); sel.className = 'cell';
+      STATUS_OPTIONS.forEach(o => {
+        const opt = document.createElement('option'); opt.value = o; opt.textContent = o || '— Pilih —';
+        if ((r[h]||'').toUpperCase() === o) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      sel.addEventListener('change', () => { r[h] = sel.value; markDirty(); refreshRow(tr, r); });
+      td.appendChild(sel);
+    } else if (READONLY_COLS.includes(h)) {
+      td.className = 'ro'; td.textContent = r[h] || '';
+    } else {
+      const inp = document.createElement('input');
+      inp.className = 'cell' + (h === 'REMARK' ? ' wide' : '');
+      inp.value = r[h] || '';
+      inp.placeholder = h === 'Date' ? 'YYYY-MM-DD' : (h.startsWith('Clock') ? 'HH:MM' : '');
+      // HALF TT 仅在 HALF DAY LEAVE 可编辑
+      if ((h === 'HALF TT JAM' || h === 'HALF TT MIN') && (r['STATUS']||'').toUpperCase() !== 'HALF DAY LEAVE') {
+        inp.disabled = true;
+      }
+      inp.addEventListener('input', () => {
+        r[h] = h === 'Date' ? normalizeDate(inp.value) : inp.value.trim();
+        markDirty();
+      });
+      inp.addEventListener('change', () => {
+        if (h === 'Date') inp.value = normalizeDate(inp.value);
+        refreshRow(tr, r);
+      });
+      td.appendChild(inp);
+    }
+    tr.appendChild(td);
+  });
+  return tr;
+}
+
+function refreshRow(tr, r) {
+  // 重建该行（简单可靠）
+  const idx = rows.indexOf(r);
+  const newTr = buildRow(r, idx);
+  tr.replaceWith(newTr);
+}
+
+// ===== 脏标记 + 自动保存 =====
+function markDirty() {
+  dirty = true;
+  setSync('busy', 'Perubahan belum disimpan');
+  if (idleTimer) clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => { if (dirty && !modalOpen) startAutoSaveCountdown(); }, 15000);
+}
+
+function startAutoSaveCountdown() {
+  modalOpen = true;
+  countdownLeft = 10;
+  document.getElementById('countdownNum').textContent = countdownLeft;
+  document.getElementById('autoSaveModal').classList.add('show');
+  countdownTimer = setInterval(() => {
+    countdownLeft--;
+    document.getElementById('countdownNum').textContent = countdownLeft;
+    if (countdownLeft <= 0) { clearInterval(countdownTimer); countdownTimer=null; closeModal(); doSave(); }
+  }, 1000);
+}
+
+function closeModal() {
+  modalOpen = false;
+  document.getElementById('autoSaveModal').classList.remove('show');
+  if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+}
+
+function autoSaveCancel() { closeModal(); /* 本次不保存 */ }
+function autoSaveConfirm() { closeModal(); doSave(); }
+
+async function manualSave() {
+  if (!SCRIPT_URL) { alert('URL belum ditetapkan.'); return; }
+  if (!rows.length) { alert('Tiada data untuk disimpan.'); return; }
+  await doSave();
+}
+
+async function doSave() {
+  if (!SCRIPT_URL) { alert('URL belum ditetapkan.'); return; }
+  setSync('busy', 'Menyimpan...');
+  try {
+    const payload = rows.map(r => {
+      const o = {};
+      SHEET_HEADERS.forEach(h => { o[h] = r[h] === undefined || r[h] === null ? '' : r[h]; });
+      return o;
+    });
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'saveSheetData', rows: payload })
+    });
+    const json = await res.json();
+    if (json.status !== 'success') throw new Error(json.message || 'Gagal');
+    dirty = false;
+    setSync('ok', 'Disimpan (' + payload.length + ' baris)');
+  } catch (err) {
+    console.error(err);
+    setSync('err', 'Gagal simpan: ' + err.message);
+    alert('❌ Gagal simpan: ' + err.message);
+  }
+}
+
+// ===== 初始化 =====
+window.addEventListener('DOMContentLoaded', () => {
+  loadSavedUrl();
+  if (SCRIPT_URL) loadData();
+  else setSync('err', 'URL belum ditetapkan');
+});
+window.addEventListener('beforeunload', e => {
+  if (dirty) { e.preventDefault(); e.returnValue = ''; }
+});
 </script>
 </body>
 </html>
