@@ -10,6 +10,15 @@
     --blue: #1a4f8a; --blue-soft: #f4f8fd; --border: #d4e0ee;
     --text: #1f2d3d; --muted: #64748b; --bg: #f7fafd;
     --red: #fecaca; --green: #c6f6d5; --yellow: #fefcbf;
+    
+    /* 新增的假期颜色 */
+    --st-al: #fca5a5;      /* ANNUAL LEAVE: 橙红色 */
+    --st-ul: #86efac;      /* UNPAID LEAVE: 青草色 */
+    --st-sl: #fef08a;      /* SICK LEAVE: 奶黄色 */
+    --st-hal: #bae6fd;     /* HALF DAY LEAVE: 天空蓝 */
+    --st-off: #3b82f6;     /* OFF DAY: 蔚蓝 (深色) */
+    --st-mat: #fbcfe8;     /* MATERNITY LEAVE: 淡粉色 */
+    --st-und: #a78bfa;     /* UNDEDUCTION LEAVE: 紫蓝色 */
   }
   body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); font-size: 13px; min-height: 100vh; }
   .topbar {
@@ -47,17 +56,37 @@
   tbody tr:hover { background: #f7fbff; }
   .ro { color: #334155; font-weight: 600; }
   .calc { background: #f6f9ff; font-weight: 700; color: #0f172a; }
-  input.cell, select.cell { width: 100%; min-width: 54px; padding: 4px 4px; font-size: 11.5px; text-align: center; border: 1px solid transparent; border-radius: 5px; background: transparent; color: #0f172a; }
+  input.cell, select.cell { width: 100%; min-width: 54px; padding: 4px 4px; font-size: 11.5px; text-align: center; border: 1px solid transparent; border-radius: 5px; background: transparent; color: #0f172a; font-weight: 600; }
   input.cell:hover, select.cell:hover { border-color: #cbd5e1; background: #fff; }
   input.cell:focus, select.cell:focus { outline: none; border-color: var(--blue); background: #fff; box-shadow: 0 0 0 2px rgba(26,79,138,.12); }
   input.cell:disabled, select.cell:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
   input.cell.wide { min-width: 120px; text-align: left; }
-  tr.hl-red td:nth-child(-n+20) { background: var(--red) !important; }
-  tr.hl-green td:nth-child(-n+20) { background: var(--green) !important; }
-  tr.hl-yellow td:nth-child(-n+20) { background: var(--yellow) !important; }
+  
+  /* 高亮状态的整合：覆盖整行 */
+  tr.hl-red td { background: var(--red) !important; }
+  tr.hl-green td { background: var(--green) !important; }
+  tr.hl-yellow td { background: var(--yellow) !important; }
+  
+  /* STATUS 颜色联动 (下拉框和名字/KOD) */
+  select.cell[data-status="ANNUAL LEAVE"] { background: var(--st-al) !important; color: #7f1d1d; }
+  select.cell[data-status="UNPAID LEAVE"] { background: var(--st-ul) !important; color: #14532d; }
+  select.cell[data-status="SICK LEAVE"] { background: var(--st-sl) !important; color: #713f12; }
+  select.cell[data-status="HALF DAY LEAVE"] { background: var(--st-hal) !important; color: #0c4a6e; }
+  select.cell[data-status="OFF DAY"] { background: var(--st-off) !important; color: #fff; }
+  select.cell[data-status="MATERNITY LEAVE"] { background: var(--st-mat) !important; color: #831843; }
+  select.cell[data-status="UNDEDUCTION LEAVE"] { background: var(--st-und) !important; color: #3b0764; }
+  
+  /* 名字和 KOD 的变色（如果是假期状态，名字变色） */
+  .name-al { background: var(--st-al) !important; color: #7f1d1d; }
+  .name-ul { background: var(--st-ul) !important; color: #14532d; }
+  .name-sl { background: var(--st-sl) !important; color: #713f12; }
+  .name-hal { background: var(--st-hal) !important; color: #0c4a6e; }
+  .name-off { background: var(--st-off) !important; color: #fff; }
+  .name-mat { background: var(--st-mat) !important; color: #831843; }
+  .name-und { background: var(--st-und) !important; color: #3b0764; }
+
   .col-idx { color: #94a3b8; font-size: 10.5px; font-weight: 600; }
   
-  /* 筛选面板 */
   .filter-panel { position: fixed; z-index: 1000; background: #fff; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 10px 30px rgba(15,23,42,.15); padding: 10px; width: 220px; max-height: 300px; display: none; flex-direction: column; font-size: 12px; }
   .filter-panel.show { display: flex; }
   .fp-head { margin-bottom: 8px; }
@@ -106,7 +135,6 @@
   </div>
 </div>
 
-<!-- 筛选面板 -->
 <div class="filter-panel" id="filterPanel">
   <div class="fp-head"><input type="text" id="fpSearch" placeholder="Cari nilai..."></div>
   <div class="fp-actions">
@@ -120,7 +148,6 @@
   </div>
 </div>
 
-<!-- 自动保存弹窗 -->
 <div class="modal-mask" id="autoSaveModal">
   <div class="modal">
     <h3>⏰ Autosave</h3>
@@ -137,6 +164,7 @@
 const URL_KEY = 'payrollScriptUrl';
 const SHEET_HEADERS = [
   'ID KOD','SITUATION','GROUP','NAME','SHIF','GAJI','Date',
+  'AL REMAIN','SL REMAIN',  // 新增的空白列
   'Clock In 01','Clock Out 01','Clock Time(h) 01',
   'Clock In 02','Clock Out 02','Clock Time(h) 02',
   'Clock In 03','Clock Out 03','Clock Time(h) 03',
@@ -145,15 +173,16 @@ const SHEET_HEADERS = [
   'TOTAL DEDUCTION(RM)','REMARK'
 ];
 const READONLY_COLS = ['ID KOD','SITUATION','GROUP','NAME','SHIF','GAJI',
+  'AL REMAIN','SL REMAIN',
   'Clock Time(h) 01','Clock Time(h) 02','Clock Time(h) 03',
   'Total Break Time(h)','Total Work Time(h)','Total Over Time (h)',
   'SITUATION WORK TIME','TOTAL DEDUCTION(RM)'];
-const STATUS_OPTIONS = ['', 'ANNUAL LEAVE','UNPAID LEAVE','HALF DAY LEAVE','SICK LEAVE','OFF DAY','EMERGENCY LEAVE','MATERNITY LEAVE'];
+const STATUS_OPTIONS = ['', 'ANNUAL LEAVE','UNPAID LEAVE','HALF DAY LEAVE','SICK LEAVE','OFF DAY','UNDEDUCTION LEAVE','MATERNITY LEAVE'];
 
 let SCRIPT_URL = '';
 let rows = [];
 let filteredRows = [];
-let filters = {}; // 存储当前激活的筛选条件
+let filters = {};
 let currentFilterCol = null;
 let tempCheckedValues = new Set();
 let dirty = false;
@@ -162,7 +191,6 @@ let countdownTimer = null;
 let countdownLeft = 10;
 let modalOpen = false;
 
-// ===== URL 同步 =====
 function loadSavedUrl() {
   SCRIPT_URL = localStorage.getItem(URL_KEY) || '';
   document.getElementById('deployUrlInput').value = SCRIPT_URL;
@@ -188,7 +216,6 @@ function setSync(state, text) {
   document.getElementById('syncText').textContent = text;
 }
 
-// ===== 数据加载 =====
 async function loadData() {
   if (!SCRIPT_URL) { setSync('err', 'URL belum ditetapkan'); return; }
   setSync('busy', 'Memuatkan...');
@@ -216,7 +243,6 @@ async function loadData() {
   }
 }
 
-// ===== 工具函数 =====
 function pad2(n){ return String(n).padStart(2,'0'); }
 function normalizeDate(v) {
   if (!v) return '';
@@ -229,11 +255,9 @@ function normalizeDate(v) {
   return s;
 }
 
-// 支持 HH:MM 或 12小时制时间字符串转换为分钟
 function timeToMin(s) {
   if (!s) return null;
   const str = String(s).trim();
-  // 格式匹配: 6:34:55 AM 或 6:34 AM
   const match12 = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i);
   if (match12) {
     let h = parseInt(match12[1], 10);
@@ -243,7 +267,6 @@ function timeToMin(s) {
     if (ampm === 'AM' && h === 12) h = 0;
     return h * 60 + m;
   }
-  // 匹配 24小时制 HH:MM
   const match24 = str.match(/^(\d{1,2}):(\d{2})$/);
   if (match24) {
     const h = parseInt(match24[1], 10), m = parseInt(match24[2], 10);
@@ -252,10 +275,8 @@ function timeToMin(s) {
   return null;
 }
 
-// ✅ 新增：将分钟数转为 HH:MM:SS 的标准时长格式
 function formatDuration(totalMinutes) {
   if (!totalMinutes || totalMinutes <= 0) return '00:00:00';
-  // 四舍五入消除浮点数误差
   const totalSeconds = Math.round(totalMinutes * 60);
   const h = Math.floor(totalSeconds / 3600);
   const m = Math.floor((totalSeconds % 3600) / 60);
@@ -263,7 +284,6 @@ function formatDuration(totalMinutes) {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-// ===== 计算逻辑 =====
 function computeRow(r) {
   const segs = [
     [timeToMin(r['Clock In 01']), timeToMin(r['Clock Out 01'])],
@@ -300,7 +320,6 @@ function computeRow(r) {
   return { segH, workMin, otMin, swt, hl, deduct };
 }
 
-// ===== 筛选与渲染 =====
 function applyFiltersAndRender() {
   filteredRows = rows.filter(r => {
     for (const col in filters) {
@@ -336,35 +355,55 @@ function render() {
 
 function buildRow(r, i) {
   const c = computeRow(r);
+  const statusVal = (r['STATUS'] || '').toUpperCase();
+  
+  let statusClass = '';
+  if (statusVal === 'ANNUAL LEAVE') statusClass = 'name-al';
+  else if (statusVal === 'UNPAID LEAVE') statusClass = 'name-ul';
+  else if (statusVal === 'SICK LEAVE') statusClass = 'name-sl';
+  else if (statusVal === 'HALF DAY LEAVE') statusClass = 'name-hal';
+  else if (statusVal === 'OFF DAY') statusClass = 'name-off';
+  else if (statusVal === 'MATERNITY LEAVE') statusClass = 'name-mat';
+  else if (statusVal === 'UNDEDUCTION LEAVE') statusClass = 'name-und';
+
   const tr = document.createElement('tr');
-  if (c.hl) tr.classList.add(c.hl);
+  // 如果打卡异常有警告色，优先展示警告色；否则展示假期底色
+  if (c.hl) {
+    tr.classList.add(c.hl);
+  } else if (statusClass) {
+    tr.classList.add(statusClass); 
+  }
+
   const tdIdx = document.createElement('td'); tdIdx.className = 'col-idx'; tdIdx.textContent = i+1; tr.appendChild(tdIdx);
 
   SHEET_HEADERS.forEach(h => {
     const td = document.createElement('td');
     if (h === 'Clock Time(h) 01' || h === 'Clock Time(h) 02' || h === 'Clock Time(h) 03') {
       const k = h.endsWith('01') ? 0 : h.endsWith('02') ? 1 : 2;
-      td.className = 'calc'; td.textContent = formatDuration(c.segH[k]); // 已修改：HH:MM:SS
+      td.className = 'calc'; td.textContent = formatDuration(c.segH[k]);
     } else if (h === 'Total Break Time(h)') {
-      td.className = 'calc'; td.textContent = c.workMin > 0 ? '01:00:00' : '00:00:00'; // 已修改：固定1小时
+      td.className = 'calc'; td.textContent = c.workMin > 0 ? '01:00:00' : '00:00:00';
     } else if (h === 'Total Work Time(h)') {
-      td.className = 'calc'; td.textContent = formatDuration(c.workMin); // 已修改：HH:MM:SS
+      td.className = 'calc'; td.textContent = formatDuration(c.workMin);
     } else if (h === 'Total Over Time (h)') {
-      td.className = 'calc';
-      td.textContent = formatDuration(c.otMin); // 已修改：HH:MM:SS
+      td.className = 'calc'; td.textContent = formatDuration(c.otMin);
     } else if (h === 'SITUATION WORK TIME') {
       td.className = 'calc'; td.textContent = c.swt;
     } else if (h === 'TOTAL DEDUCTION(RM)') {
       td.className = 'calc'; td.textContent = c.deduct ? c.deduct.toFixed(2) : '0.00';
     } else if (h === 'STATUS') {
-      const sel = document.createElement('select'); sel.className = 'cell';
+      const sel = document.createElement('select'); 
+      sel.className = 'cell';
+      sel.setAttribute('data-status', r[h] || '');
       STATUS_OPTIONS.forEach(o => {
         const opt = document.createElement('option'); opt.value = o; opt.textContent = o || '— Pilih —';
-        if ((r[h]||'').toUpperCase() === o) opt.selected = true;
+        if (statusVal === o) opt.selected = true;
         sel.appendChild(opt);
       });
       sel.addEventListener('change', () => { 
-        r[h] = sel.value; markDirty(); 
+        r[h] = sel.value; 
+        sel.setAttribute('data-status', sel.value);
+        markDirty(); 
         if (filters[h]) applyFiltersAndRender();
         else {
            const idx = filteredRows.indexOf(r);
@@ -379,7 +418,7 @@ function buildRow(r, i) {
       inp.className = 'cell' + (h === 'REMARK' ? ' wide' : '');
       inp.value = r[h] || '';
       inp.placeholder = h === 'Date' ? 'YYYY-MM-DD' : (h.startsWith('Clock') ? '6:34:55 AM' : '');
-      if ((h === 'HALF TT JAM' || h === 'HALF TT MIN') && (r['STATUS']||'').toUpperCase() !== 'HALF DAY LEAVE') {
+      if ((h === 'HALF TT JAM' || h === 'HALF TT MIN') && statusVal !== 'HALF DAY LEAVE') {
         inp.disabled = true;
       }
       inp.addEventListener('input', () => {
@@ -398,31 +437,21 @@ function buildRow(r, i) {
   return tr;
 }
 
-// ===== 筛选面板逻辑 =====
 function openFilter(col, e) {
   e.stopPropagation();
   currentFilterCol = col;
   const panel = document.getElementById('filterPanel');
   const rect = e.target.getBoundingClientRect();
-  
-  // 收集当前列所有唯一值
   const valSet = new Set();
-  rows.forEach(r => {
-    let v = r[col] ? String(r[col]).trim() : '';
-    valSet.add(v);
-  });
+  rows.forEach(r => { valSet.add(r[col] ? String(r[col]).trim() : ''); });
   const vals = Array.from(valSet).sort((a,b) => {
-    if (a === '') return -1;
-    if (b === '') return 1;
+    if (a === '') return -1; if (b === '') return 1;
     return a.localeCompare(b, undefined, {numeric: true});
   });
-
   tempCheckedValues = filters[col] ? new Set(filters[col]) : new Set(vals);
-  
   const listEl = document.getElementById('fpList');
   const searchEl = document.getElementById('fpSearch');
   searchEl.value = '';
-  
   const renderList = (kw) => {
     kw = (kw||'').toLowerCase();
     const shown = vals.filter(v => {
@@ -437,64 +466,34 @@ function openFilter(col, e) {
     }).join('');
   };
   renderList('');
-
   searchEl.oninput = () => renderList(searchEl.value);
-
-  // 定位
   panel.style.left = Math.min(rect.left, window.innerWidth - 240) + 'px';
   panel.style.top = (rect.bottom + 5) + 'px';
   panel.classList.add('show');
-  
   document.addEventListener('mousedown', closeFilterOnClickOutside);
 }
 
-function fpToggle(cb) {
-  if (cb.checked) tempCheckedValues.add(cb.value);
-  else tempCheckedValues.delete(cb.value);
-}
-function fpSelectAll() {
-  const cbs = document.querySelectorAll('#fpList input[type="checkbox"]');
-  cbs.forEach(cb => { cb.checked = true; tempCheckedValues.add(cb.value); });
-}
-function fpClearAll() {
-  const cbs = document.querySelectorAll('#fpList input[type="checkbox"]');
-  cbs.forEach(cb => { cb.checked = false; });
-  tempCheckedValues.clear();
-}
+function fpToggle(cb) { if (cb.checked) tempCheckedValues.add(cb.value); else tempCheckedValues.delete(cb.value); }
+function fpSelectAll() { document.querySelectorAll('#fpList input[type="checkbox"]').forEach(cb => { cb.checked = true; tempCheckedValues.add(cb.value); }); }
+function fpClearAll() { document.querySelectorAll('#fpList input[type="checkbox"]').forEach(cb => { cb.checked = false; }); tempCheckedValues.clear(); }
 function fpApply() {
   const allVals = new Set();
   rows.forEach(r => allVals.add(r[currentFilterCol] ? String(r[currentFilterCol]).trim() : ''));
-  
-  if (tempCheckedValues.size === allVals.size) {
-    delete filters[currentFilterCol];
-  } else {
-    filters[currentFilterCol] = new Set(tempCheckedValues);
-  }
-  fpClose();
-  applyFiltersAndRender();
+  if (tempCheckedValues.size === allVals.size) delete filters[currentFilterCol];
+  else filters[currentFilterCol] = new Set(tempCheckedValues);
+  fpClose(); applyFiltersAndRender();
 }
-function fpClose() {
-  document.getElementById('filterPanel').classList.remove('show');
-  document.removeEventListener('mousedown', closeFilterOnClickOutside);
-}
-function closeFilterOnClickOutside(e) {
-  const p = document.getElementById('filterPanel');
-  if (!p.contains(e.target) && !e.target.classList.contains('filter-btn')) {
-    fpClose();
-  }
-}
+function fpClose() { document.getElementById('filterPanel').classList.remove('show'); document.removeEventListener('mousedown', closeFilterOnClickOutside); }
+function closeFilterOnClickOutside(e) { const p = document.getElementById('filterPanel'); if (!p.contains(e.target) && !e.target.classList.contains('filter-btn')) fpClose(); }
 
-// ===== 脏标记 + 自动保存 =====
 function markDirty() {
   dirty = true;
   setSync('busy', 'Perubahan belum disimpan');
   if (idleTimer) clearTimeout(idleTimer);
   idleTimer = setTimeout(() => { if (dirty && !modalOpen) startAutoSaveCountdown(); }, 15000);
 }
-
 function startAutoSaveCountdown() {
-  modalOpen = true;
-  countdownLeft = 10;
+  modalOpen = true; countdownLeft = 10;
   document.getElementById('countdownNum').textContent = countdownLeft;
   document.getElementById('autoSaveModal').classList.add('show');
   countdownTimer = setInterval(() => {
@@ -503,13 +502,7 @@ function startAutoSaveCountdown() {
     if (countdownLeft <= 0) { clearInterval(countdownTimer); countdownTimer=null; closeModal(); doSave(); }
   }, 1000);
 }
-
-function closeModal() {
-  modalOpen = false;
-  document.getElementById('autoSaveModal').classList.remove('show');
-  if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
-}
-
+function closeModal() { modalOpen = false; document.getElementById('autoSaveModal').classList.remove('show'); if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; } }
 function autoSaveCancel() { closeModal(); }
 function autoSaveConfirm() { closeModal(); doSave(); }
 
@@ -518,7 +511,6 @@ async function manualSave() {
   if (!rows.length) { alert('Tiada data untuk disimpan.'); return; }
   await doSave();
 }
-
 async function doSave() {
   if (!SCRIPT_URL) { alert('URL belum ditetapkan.'); return; }
   setSync('busy', 'Menyimpan...');
@@ -549,9 +541,7 @@ window.addEventListener('DOMContentLoaded', () => {
   if (SCRIPT_URL) loadData();
   else setSync('err', 'URL belum ditetapkan');
 });
-window.addEventListener('beforeunload', e => {
-  if (dirty) { e.preventDefault(); e.returnValue = ''; }
-});
+window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
 </script>
 </body>
 </html>
