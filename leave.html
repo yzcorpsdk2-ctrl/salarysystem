@@ -48,16 +48,20 @@
     position: relative; min-width: 0;
   }
   .dp-item label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-  .dp-item span, .dp-item input { 
+  
+  /* 所有输入框/展示框的通用样式 */
+  .dp-item input, .dp-item span { 
     font-size: 15px; font-weight: 800; color: var(--blue); outline: none; border: none; background: transparent; width: 100%; 
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: inherit;
   }
   .dp-item input:hover, .dp-item input:focus { border-bottom: 1px solid var(--blue); }
-  
-  /* 搜索下拉 */
-  .search-wrap { position: relative; grid-column: span 2; }
+
+  /* 搜索包裹器 */
+  .search-wrap { position: relative; grid-column: span 1; }
   .search-wrap input { font-size: 14px; font-weight: 600; color: var(--text); padding: 4px 0; width: 100%; border: none; border-bottom: 2px dashed #b8cfe8; background: transparent; outline: none; }
   .search-wrap input:focus { border-bottom-color: var(--blue); }
+  
+  /* 搜索下拉 */
   .search-dropdown {
     position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--border);
     border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,.1); max-height: 250px; overflow-y: auto; z-index: 50; display: none;
@@ -134,12 +138,20 @@
 <div class="container">
   <div class="dashboard-panel" id="dashboardPanel">
     <div class="dp-grid">
+      <!-- 独立的员工搜索框 -->
       <div class="dp-item search-wrap">
-        <label>Cari (ID KOD / NAME / KUMPULAN)</label>
-        <input type="text" id="searchEmployeeInput" placeholder="Taip ID, Nama, atau Kumpulan..." autocomplete="off">
-        <div class="search-dropdown" id="searchDropdown"></div>
+        <label>Cari KOD / NAME</label>
+        <input type="text" id="searchEmpInput" placeholder="Taip ID atau Nama..." autocomplete="off">
+        <div class="search-dropdown" id="empDropdown"></div>
       </div>
-      <div class="dp-item"><label>KUMPULAN</label><span id="dpGroup" title="-">-</span></div>
+      
+      <!-- 独立的 Kumpulan 搜索框 -->
+      <div class="dp-item search-wrap">
+        <label>KUMPULAN</label>
+        <input type="text" id="searchGroupInput" placeholder="Taip Kumpulan..." autocomplete="off">
+        <div class="search-dropdown" id="groupDropdown"></div>
+      </div>
+
       <div class="dp-item"><label>SITUATION</label><span id="dpSituation">-</span></div>
       <div class="dp-item"><label>GAJI (RM)</label><span id="dpGaji">0.00</span></div>
       
@@ -212,7 +224,7 @@ const READONLY_COLS = ['ID KOD','SITUATION','GROUP','NAME','SHIF','GAJI',
 
 const STATUS_OPTIONS = ['', 'ANNUAL LEAVE','UNPAID LEAVE','HALF DAY LEAVE','SICK LEAVE','OFF DAY','UNDEDUCTION LEAVE','MATERNITY LEAVE'];
 
-// 颜色字典 (用于内联渲染)
+// 颜色字典
 const STATUS_COLORS = {
   'ANNUAL LEAVE': { bg: '#fca5a5', color: '#7f1d1d' },
   'UNPAID LEAVE': { bg: '#bbf7d0', color: '#14532d' },
@@ -239,7 +251,9 @@ let filteredRows = [];
 let staffList = []; 
 let alslData = []; 
 
+// 当前状态
 let currentSelectedCode = 'ALL'; 
+let currentGroupFilter = ''; // 群组筛选
 let filters = {};
 let currentFilterCol = null;
 let tempCheckedValues = new Set();
@@ -249,6 +263,11 @@ let idleTimer = null;
 let countdownTimer = null;
 let countdownLeft = 10;
 let modalOpen = false;
+
+// 获取所有唯一群组
+function getAllGroups() {
+  return Array.from(new Set(staffList.map(s => String(s.GroupName || '').trim()).filter(g => g)));
+}
 
 function loadSavedUrl() {
   SCRIPT_URL = localStorage.getItem(URL_KEY) || '';
@@ -301,7 +320,11 @@ async function loadData() {
     if (resStaff.result === 'success') staffList = resStaff.data || [];
     if (resALSL.status === 'success') alslData = resALSL.data || [];
 
+    // 清空搜索框，重新初始化
+    document.getElementById('searchEmpInput').value = '';
+    document.getElementById('searchGroupInput').value = '';
     selectEmployee('ALL');
+    
     setSync('ok', 'Data dimuat');
   } catch (err) {
     console.error(err);
@@ -384,103 +407,140 @@ function computeRow(r) {
   return { segH, workMin, otMin, swt, hl, deduct };
 }
 
-// ===== 搜索栏控制 =====
-const searchInput = document.getElementById('searchEmployeeInput');
-const searchDropdown = document.getElementById('searchDropdown');
+// ========================================================
+// 1. 员工 / KOD / NAME 搜索框逻辑
+// ========================================================
+const searchEmpInput = document.getElementById('searchEmpInput');
+const empDropdown = document.getElementById('empDropdown');
 
-searchInput.addEventListener('input', () => {
-  const q = searchInput.value.trim().toLowerCase();
-  if (!q) { searchDropdown.classList.remove('show'); return; }
+searchEmpInput.addEventListener('input', () => {
+  const q = searchEmpInput.value.trim().toLowerCase();
+  if (!q) { empDropdown.classList.remove('show'); return; }
   
-  // 只按 KOD, NAME 和 KUMPULAN 搜
   const matchStaff = staffList.filter(s => 
     String(s.Name || '').toLowerCase().includes(q) || 
-    String(s.Code || '').toLowerCase().includes(q) ||
-    String(s.GroupName || '').toLowerCase().includes(q)
+    String(s.Code || '').toLowerCase().includes(q)
   ).slice(0, 15);
   
-  // 收集匹配到的独立群组名
-  const uniqueGroups = Array.from(new Set(matchStaff.map(s => String(s.GroupName || '').trim()).filter(g => g)));
+  let html = `
+    <div class="sd-item all-item" onclick="selectEmployee('ALL')">
+      🌐 ALL (SEMUA PEKERJA)
+    </div>
+  `;
   
-  let html = '';
-  
-  // 如果有匹配的群组，置顶显示该群组的 ALL
-  if (uniqueGroups.length > 0) {
-    html += uniqueGroups.map(g => `
-      <div class="sd-item all-item" onclick="selectGroup('${g.replace(/'/g, "\\'")}')">
-        🏢 SEMUA KUMPULAN: <b>${g}</b>
-      </div>
-    `).join('');
-  } else {
-    // 如果没有任何匹配，也放个全公司的 ALL 兜底
-    html += `
-      <div class="sd-item all-item" onclick="selectEmployee('ALL')">
-        🌐 ALL (SEMUA PEKERJA)
-      </div>
-    `;
-  }
-  
-  // 列出匹配的具体员工
   if (matchStaff.length > 0) {
     html += matchStaff.map(m => `
       <div class="sd-item" onclick="selectEmployee('${m.Code}')">
-        <b>${m.Code}</b> - ${m.Name} <span style="color:#94a3b8;font-size:11px;">(${m.GroupName || '-'})</span>
+        <b>${m.Code}</b> - ${m.Name}
       </div>
     `).join('');
   }
   
-  searchDropdown.innerHTML = html;
-  searchDropdown.classList.add('show');
+  empDropdown.innerHTML = html;
+  empDropdown.classList.add('show');
 });
 
 document.addEventListener('click', (e) => {
-  if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
-    searchDropdown.classList.remove('show');
+  if (!searchEmpInput.contains(e.target) && !empDropdown.contains(e.target)) {
+    empDropdown.classList.remove('show');
   }
 });
 
+// ========================================================
+// 2. 独立 KUMPULAN 搜索框逻辑
+// ========================================================
+const searchGroupInput = document.getElementById('searchGroupInput');
+const groupDropdown = document.getElementById('groupDropdown');
+
+searchGroupInput.addEventListener('input', () => {
+  const q = searchGroupInput.value.trim().toLowerCase();
+  if (!q) { groupDropdown.classList.remove('show'); return; }
+  
+  const allGroups = getAllGroups();
+  const matchGroups = allGroups.filter(g => g.toLowerCase().includes(q)).slice(0, 15);
+  
+  let html = `
+    <div class="sd-item all-item" onclick="selectEmployee('ALL')">
+      🌐 ALL (SEMUA KUMPULAN)
+    </div>
+  `;
+  
+  if (matchGroups.length > 0) {
+    html += matchGroups.map(g => `
+      <div class="sd-item" onclick="selectGroup('${g.replace(/'/g, "\\'")}')">
+        🏢 SEMUA KUMPULAN: <b>${g}</b>
+      </div>
+    `).join('');
+  }
+  
+  groupDropdown.innerHTML = html;
+  groupDropdown.classList.add('show');
+});
+
+document.addEventListener('click', (e) => {
+  if (!searchGroupInput.contains(e.target) && !groupDropdown.contains(e.target)) {
+    groupDropdown.classList.remove('show');
+  }
+});
+
+
+// ========================================================
+// 3. 选中与数据联动
+// ========================================================
 function selectEmployee(code) {
   currentSelectedCode = code;
+  currentGroupFilter = ''; // 清空群组筛选
+  
   if (code === 'ALL') {
-    searchInput.value = 'ALL (SEMUA PEKERJA)';
-    document.getElementById('dpGroup').textContent = 'SEMUA KUMPULAN';
+    searchEmpInput.value = 'ALL (SEMUA PEKERJA)';
+    searchGroupInput.value = 'SEMUA KUMPULAN';
     document.getElementById('dpSituation').textContent = 'SEMUA STATUS';
     document.getElementById('dpGaji').textContent = 'JUMLAH SEMUA';
   } else {
     const staff = staffList.find(s => String(s.Code) === String(code));
     if (staff) {
-      searchInput.value = `${staff.Code} - ${staff.Name}`;
-      document.getElementById('dpGroup').textContent = staff.GroupName || '-';
+      searchEmpInput.value = `${staff.Code} - ${staff.Name}`;
+      searchGroupInput.value = staff.GroupName || '-'; // 自动填充对应的群组
       document.getElementById('dpSituation').textContent = staff.Situation || '-';
       document.getElementById('dpGaji').textContent = parseFloat(staff.Salary || 0).toFixed(2);
     }
   }
-  searchDropdown.classList.remove('show');
+  
+  empDropdown.classList.remove('show');
+  groupDropdown.classList.remove('show');
   updateDashboardStats();
   applyFiltersAndRender();
 }
 
 function selectGroup(groupName) {
-  currentSelectedCode = 'GROUP_' + groupName;
-  searchInput.value = `SEMUA KUMPULAN: ${groupName}`;
-  document.getElementById('dpGroup').textContent = groupName;
+  currentSelectedCode = 'ALL'; // 群组模式下，相当于选中了该群组所有人的集合
+  currentGroupFilter = groupName;
+  
+  searchEmpInput.value = `ALL (${groupName})`;
+  searchGroupInput.value = groupName;
+  
   document.getElementById('dpSituation').textContent = 'SEMUA STATUS';
   document.getElementById('dpGaji').textContent = 'JUMLAH KUMPULAN';
-  searchDropdown.classList.remove('show');
+  
+  empDropdown.classList.remove('show');
+  groupDropdown.classList.remove('show');
   updateDashboardStats();
   applyFiltersAndRender();
 }
 
+// ========================================================
+// 4. 数据统计与渲染
+// ========================================================
 function updateDashboardStats() {
-  if (!currentSelectedCode) return;
-
   let targetCodes = [];
-  if (currentSelectedCode === 'ALL') {
+  if (currentGroupFilter) {
+    // 群组模式
+    targetCodes = staffList.filter(s => String(s.GroupName) === currentGroupFilter).map(s => String(s.Code));
+  } else if (currentSelectedCode === 'ALL') {
+    // 全员
     targetCodes = staffList.map(s => String(s.Code));
-  } else if (currentSelectedCode.startsWith('GROUP_')) {
-    const grp = currentSelectedCode.replace('GROUP_', '');
-    targetCodes = staffList.filter(s => String(s.GroupName) === grp).map(s => String(s.Code));
   } else {
+    // 单人
     targetCodes = [String(currentSelectedCode)];
   }
 
@@ -541,14 +601,11 @@ function updateDashboardStats() {
 function applyFiltersAndRender() {
   let baseRows = allRows;
   
-  if (currentSelectedCode !== 'ALL') {
-    if (currentSelectedCode.startsWith('GROUP_')) {
-      const grp = currentSelectedCode.replace('GROUP_', '');
-      const codes = staffList.filter(s => String(s.GroupName) === grp).map(s => String(s.Code));
-      baseRows = allRows.filter(r => codes.includes(String(r['ID KOD'])));
-    } else {
-      baseRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
-    }
+  if (currentGroupFilter) {
+    const codes = staffList.filter(s => String(s.GroupName) === currentGroupFilter).map(s => String(s.Code));
+    baseRows = allRows.filter(r => codes.includes(String(r['ID KOD'])));
+  } else if (currentSelectedCode !== 'ALL') {
+    baseRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
   }
 
   filteredRows = baseRows.filter(r => {
@@ -587,7 +644,7 @@ function buildRow(r, i) {
   const c = computeRow(r);
   const tr = document.createElement('tr');
   
-  // 基础计算底色
+  // 基础计算底色 (Work Time 状态)
   let baseBg = '';
   if (c.hl) baseBg = ROW_HL_COLORS[c.hl] || '';
 
@@ -602,26 +659,24 @@ function buildRow(r, i) {
 
   SHEET_HEADERS.forEach(h => {
     const td = document.createElement('td');
-    // 默认给基础高亮色
-    if (baseBg) td.style.backgroundColor = baseBg;
-
-    // 判断是否是被强行覆盖列 (KOD 和 NAME)
+    
+    // 第一优先级：STATUS 颜色
     const isCodeOrName = (h === 'ID KOD' || h === 'NAME');
     const statusVal = (r['STATUS'] || '').toUpperCase();
+    
+    // 如果给底色（行高亮）
+    if (baseBg) td.style.backgroundColor = baseBg;
 
-    // =============== 第一优先级：STATUS 颜色 ===============
     if (isCodeOrName && statusVal && STATUS_COLORS[statusVal]) {
-      // 让 KOD 和 NAME 直接变色
+      // 强行覆盖 KOD 和 NAME
       td.style.backgroundColor = STATUS_COLORS[statusVal].bg;
       td.style.color = STATUS_COLORS[statusVal].color;
       td.style.fontWeight = '700';
     }
 
-    // 填充渲染内容
     if (h === 'SITUATION WORK TIME') {
       td.className = 'calc'; 
       td.textContent = c.swt;
-      // 如果有高亮，且没有被强制覆盖
       if (baseBg) td.style.backgroundColor = baseBg;
     } 
     else if (h === 'Clock Time(h) 01' || h === 'Clock Time(h) 02' || h === 'Clock Time(h) 03') {
@@ -642,13 +697,13 @@ function buildRow(r, i) {
     } 
     else if (h === 'THIS AL REMAIN' || h === 'THIS SL REMAIN') {
       td.className = 'calc';
-      td.textContent = currentSelectedCode !== 'ALL' && !currentSelectedCode.startsWith('GROUP_') 
+      td.textContent = (!currentGroupFilter && currentSelectedCode !== 'ALL')
         ? (h === 'THIS AL REMAIN' ? document.getElementById('dpThisAL').textContent : document.getElementById('dpThisSL').textContent)
         : '';
     }
     else if (h === 'SITUATION') {
       td.textContent = r[h] || '';
-      // =============== 第二优先级：SITUATION 背景色填满 ===============
+      // 第二优先级：SITUATION 背景色填满
       if (SITUATION_COLORS[situation]) {
         td.style.backgroundColor = SITUATION_COLORS[situation].bg;
         td.style.color = SITUATION_COLORS[situation].color;
@@ -657,7 +712,7 @@ function buildRow(r, i) {
       }
     }
     else if (h === 'STATUS') {
-      // =============== 第一优先级：STATUS 自身下拉框 ===============
+      // 第一优先级：STATUS 自身下拉框
       const sel = document.createElement('select'); sel.className = 'cell';
       STATUS_OPTIONS.forEach(o => {
         const opt = document.createElement('option'); opt.value = o; opt.textContent = o || '— Pilih —';
@@ -721,14 +776,11 @@ function openFilter(col, e) {
   
   const valSet = new Set();
   let baseRows = allRows;
-  if (currentSelectedCode !== 'ALL') {
-    if (currentSelectedCode.startsWith('GROUP_')) {
-      const grp = currentSelectedCode.replace('GROUP_', '');
-      const codes = staffList.filter(s => String(s.GroupName) === grp).map(s => String(s.Code));
-      baseRows = allRows.filter(r => codes.includes(String(r['ID KOD'])));
-    } else {
-      baseRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
-    }
+  if (currentGroupFilter) {
+    const codes = staffList.filter(s => String(s.GroupName) === currentGroupFilter).map(s => String(s.Code));
+    baseRows = allRows.filter(r => codes.includes(String(r['ID KOD'])));
+  } else if (currentSelectedCode !== 'ALL') {
+    baseRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
   }
   
   baseRows.forEach(r => valSet.add(r[col] ? String(r[col]).trim() : ''));
@@ -782,14 +834,11 @@ function fpClearAll() {
 }
 function fpApply() {
   let baseRows = allRows;
-  if (currentSelectedCode !== 'ALL') {
-    if (currentSelectedCode.startsWith('GROUP_')) {
-      const grp = currentSelectedCode.replace('GROUP_', '');
-      const codes = staffList.filter(s => String(s.GroupName) === grp).map(s => String(s.Code));
-      baseRows = allRows.filter(r => codes.includes(String(r['ID KOD'])));
-    } else {
-      baseRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
-    }
+  if (currentGroupFilter) {
+    const codes = staffList.filter(s => String(s.GroupName) === currentGroupFilter).map(s => String(s.Code));
+    baseRows = allRows.filter(r => codes.includes(String(r['ID KOD'])));
+  } else if (currentSelectedCode !== 'ALL') {
+    baseRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
   }
 
   const allVals = new Set();
@@ -854,7 +903,7 @@ async function doSave() {
       const o = {};
       SHEET_HEADERS.forEach(h => {
          if(h === 'THIS AL REMAIN' || h === 'THIS SL REMAIN') {
-             if (currentSelectedCode !== 'ALL' && !currentSelectedCode.startsWith('GROUP_') && String(r['ID KOD']) === currentSelectedCode) {
+             if (!currentGroupFilter && currentSelectedCode !== 'ALL' && String(r['ID KOD']) === currentSelectedCode) {
                  o[h] = h === 'THIS AL REMAIN' ? document.getElementById('dpThisAL').textContent : document.getElementById('dpThisSL').textContent;
              } else {
                  o[h] = r[h] || ''; 
