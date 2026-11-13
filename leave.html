@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Leave · Timecard Sheet</title>
+<title>Leave · Timecard System</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -11,7 +11,9 @@
     --text: #1f2d3d; --muted: #64748b; --bg: #f7fafd;
     --red: #fecaca; --green: #c6f6d5; --yellow: #fefcbf;
   }
-  body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); font-size: 13px; min-height: 100vh; }
+  body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); font-size: 13px; min-height: 100vh; padding-bottom: 50px; }
+  
+  /* 顶部导航 */
   .topbar {
     position: sticky; top: 0; z-index: 100; background: #fff; border-bottom: 1px solid var(--border);
     padding: 10px 18px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
@@ -22,16 +24,48 @@
   .url-box { display: flex; align-items: center; gap: 4px; flex: 1; max-width: 420px; background: var(--blue-soft); border: 1px solid var(--border); border-radius: 6px; padding: 2px; }
   .url-box input { flex: 1; border: none; background: transparent; padding: 6px 8px; font-size: 12px; outline: none; }
   .url-box button { padding: 5px 12px; border-radius: 4px; border: none; background: var(--blue); color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; }
-  .btn { background: #fff; border: 1px solid var(--border); padding: 6px 12px; border-radius: 5px; font-size: 12px; font-weight: 500; cursor: pointer; color: var(--blue); display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+  .btn { background: #fff; border: 1px solid var(--border); padding: 6px 12px; border-radius: 5px; font-size: 12px; font-weight: 500; cursor: pointer; color: var(--blue); display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; transition: all 0.2s; }
   .btn:hover { background: var(--blue-soft); }
   .btn-success { background: #0f7a54; color: #fff; border-color: #0f7a54; }
+  .btn-success:hover { background: #0c6a48; }
   .sync-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--blue-soft); border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; color: var(--muted); }
   .sync-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: #9db8d2; }
   .sync-badge.ok .dot { background: #22c55e; }
   .sync-badge.busy .dot { background: #f59e0b; }
   .sync-badge.err .dot { background: #ef4444; }
-  .container { padding: 14px 18px 40px; }
-  .table-wrap { overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: #fff; max-height: calc(100vh - 120px); position: relative; }
+
+  /* 顶部控制面板 (仪表盘) */
+  .container { max-width: 100%; padding: 14px 18px; }
+  .dashboard-panel {
+    background: #fff; border: 1px solid var(--border); border-radius: 8px;
+    padding: 16px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(15,23,42,.03);
+  }
+  .dp-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px;
+  }
+  .dp-item {
+    background: var(--blue-soft); border: 1px solid var(--border); border-radius: 6px;
+    padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;
+    position: relative;
+  }
+  .dp-item label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .dp-item span, .dp-item input { font-size: 15px; font-weight: 800; color: var(--blue); outline: none; border: none; background: transparent; width: 100%; }
+  .dp-item input:hover, .dp-item input:focus { border-bottom: 1px solid var(--blue); }
+  
+  /* 搜索下拉 */
+  .search-wrap { position: relative; grid-column: span 2; }
+  .search-wrap input { font-size: 14px; font-weight: 600; color: var(--text); padding: 4px 0; width: 100%; border: none; border-bottom: 2px dashed #b8cfe8; background: transparent; outline: none; }
+  .search-wrap input:focus { border-bottom-color: var(--blue); }
+  .search-dropdown {
+    position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--border);
+    border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,.1); max-height: 200px; overflow-y: auto; z-index: 50; display: none;
+  }
+  .search-dropdown.show { display: block; }
+  .sd-item { padding: 8px 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
+  .sd-item:hover { background: var(--blue-soft); color: var(--blue); }
+
+  /* 表格 */
+  .table-wrap { overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: #fff; max-height: calc(100vh - 320px); position: relative; }
   table { border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; font-size: 11.5px; }
   thead th {
     position: sticky; top: 0; z-index: 3; background: #eef4fb; color: #334155;
@@ -49,28 +83,22 @@
   .ro { color: #334155; font-weight: 600; }
   .calc { background: #f6f9ff; font-weight: 700; color: #0f172a; }
   
-  /* 输入框控件 */
   input.cell, select.cell { width: 100%; min-width: 54px; padding: 4px 4px; font-size: 11.5px; text-align: center; border: 1px solid transparent; border-radius: 5px; background: transparent; color: #0f172a; transition: all 0.15s; }
   input.cell:hover, select.cell:hover { border-color: #cbd5e1; background: #fff; }
   input.cell:focus, select.cell:focus { outline: none; border-color: var(--blue); background: #fff; box-shadow: 0 0 0 2px rgba(26,79,138,.12); }
   input.cell:disabled, select.cell:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
   input.cell.wide { min-width: 120px; text-align: left; }
-  
-  /* ===== 行高亮：覆盖到 SITUATION WORK TIME (第20列) ===== */
+
+  /* 行高亮 */
   tr.hl-red td:nth-child(-n+20) { background: var(--red) !important; }
   tr.hl-green td:nth-child(-n+20) { background: var(--green) !important; }
   tr.hl-yellow td:nth-child(-n+20) { background: var(--yellow) !important; }
-  
-  /* ===== SITUATION 状态列颜色 ===== */
   .sit-active { color: #15803d; font-weight: 700; }
   .sit-pending { color: #b45309; font-weight: 700; }
   .sit-inactive { color: #b91c1c; font-weight: 700; }
-  
-  /* ===== 全行红底覆盖 (INACTIVE) ===== */
   tr.row-inactive td { background: #fecaca !important; }
-  tr.row-inactive td.cell-highlight { background: #fca5a5 !important; }
 
-  /* ===== STATUS 选项与联动颜色 ===== */
+  /* STATUS 选项联动颜色 */
   select.status-ANNUAL_LEAVE { background-color: #fca5a5; color: #7f1d1d; font-weight: 600; border-color: #f87171; }
   select.status-UNPAID_LEAVE { background-color: #bbf7d0; color: #14532d; font-weight: 600; border-color: #4ade80; }
   select.status-SICK_LEAVE { background-color: #fef08a; color: #713f12; font-weight: 600; border-color: #facc15; }
@@ -78,7 +106,6 @@
   select.status-OFF_DAY { background-color: #1e3a8a; color: #ffffff; font-weight: 600; border-color: #1e3a8a; }
   select.status-MATERNITY_LEAVE { background-color: #fbcfe8; color: #831843; font-weight: 600; border-color: #f472b6; }
   select.status-UNDEDUCTION_LEAVE { background-color: #c7d2fe; color: #312e81; font-weight: 600; border-color: #818cf8; }
-
   td.bg-ANNUAL_LEAVE { background-color: #fca5a5 !important; }
   td.bg-UNPAID_LEAVE { background-color: #bbf7d0 !important; }
   td.bg-SICK_LEAVE { background-color: #fef08a !important; }
@@ -87,7 +114,7 @@
   td.bg-MATERNITY_LEAVE { background-color: #fbcfe8 !important; }
   td.bg-UNDEDUCTION_LEAVE { background-color: #c7d2fe !important; }
 
-  /* 筛选面板 */
+  /* 其它组件 */
   .filter-panel { position: fixed; z-index: 1000; background: #fff; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 10px 30px rgba(15,23,42,.15); padding: 10px; width: 220px; max-height: 300px; display: none; flex-direction: column; font-size: 12px; }
   .filter-panel.show { display: flex; }
   .fp-head { margin-bottom: 8px; }
@@ -128,6 +155,36 @@
 </div>
 
 <div class="container">
+  <!-- 顶部员工与假期汇总面板 -->
+  <div class="dashboard-panel" id="dashboardPanel">
+    <div class="dp-grid">
+      <div class="dp-item search-wrap">
+        <label>Cari Pekerja (ID / Nama)</label>
+        <input type="text" id="searchEmployeeInput" placeholder="Taip nama atau ID..." autocomplete="off">
+        <div class="search-dropdown" id="searchDropdown"></div>
+      </div>
+      <div class="dp-item"><label>Kumpulan</label><span id="dpGroup">-</span></div>
+      <div class="dp-item"><label>Situation</label><span id="dpSituation">-</span></div>
+      <div class="dp-item"><label>Gaji (RM)</label><span id="dpGaji">0.00</span></div>
+      
+      <div class="dp-item" style="background:#fff3e0;"><label>Last AL Remain (Days)</label><span id="dpLastAL">0</span></div>
+      <div class="dp-item" style="background:#e8f5e9;"><label>Last SL Remain (Days)</label><span id="dpLastSL">0</span></div>
+      <div class="dp-item"><label>AL Picked This Month</label><span id="dpPickedAL">0</span></div>
+      <div class="dp-item"><label>SL Picked This Month</label><span id="dpPickedSL">0</span></div>
+      <div class="dp-item"><label>UNPL Picked This Month</label><span id="dpPickedUNPL">0</span></div>
+      <div class="dp-item"><label>Off Days This Month</label><span id="dpPickedOFF">0</span></div>
+      <div class="dp-item"><label>Half L Picked This Month</label><span id="dpPickedHALF">0</span></div>
+      <div class="dp-item"><label>Unddctn L Picked This Month</label><span id="dpPickedUNDD">0</span></div>
+      <div class="dp-item"><label>Mtnt L Picked This Month</label><span id="dpPickedMTNT">0</span></div>
+      
+      <div class="dp-item" style="background:#d1fae5; border-color:#6ee7b7;"><label>This AL Remain (Days)</label><span id="dpThisAL">0</span></div>
+      <div class="dp-item" style="background:#d1fae5; border-color:#6ee7b7;"><label>This SL Remain (Days)</label><span id="dpThisSL">0</span></div>
+      <div class="dp-item"><label>Unpaid Leave (Days)</label><span id="dpPickedUNPL2">0</span></div>
+      <div class="dp-item" style="background:#fecaca; border-color:#f87171;"><label>Total Deduction (RM)</label><span id="dpTotalDeduct">0.00</span></div>
+    </div>
+  </div>
+
+  <!-- 表格部分 -->
   <div class="table-wrap">
     <table id="mainTable">
       <thead><tr id="headerRow"></tr></thead>
@@ -136,7 +193,7 @@
   </div>
 </div>
 
-<!-- 筛选面板 -->
+<!-- 筛选面板 & 自动保存弹窗 -->
 <div class="filter-panel" id="filterPanel">
   <div class="fp-head"><input type="text" id="fpSearch" placeholder="Cari nilai..."></div>
   <div class="fp-actions">
@@ -150,7 +207,6 @@
   </div>
 </div>
 
-<!-- 自动保存弹窗 -->
 <div class="modal-mask" id="autoSaveModal">
   <div class="modal">
     <h3>⏰ Autosave</h3>
@@ -165,31 +221,36 @@
 
 <script>
 const URL_KEY = 'payrollScriptUrl';
+// 移除 AL/SL REMAIN，新增 THIS AL/SL REMAIN
 const SHEET_HEADERS = [
-  'ID KOD','SITUATION','GROUP','NAME','SHIF','GAJI',
-  'Date','AL REMAIN','SL REMAIN', // 新增两列
+  'ID KOD','SITUATION','GROUP','NAME','SHIF','GAJI','Date',
   'Clock In 01','Clock Out 01','Clock Time(h) 01',
   'Clock In 02','Clock Out 02','Clock Time(h) 02',
   'Clock In 03','Clock Out 03','Clock Time(h) 03',
   'Total Break Time(h)','Total Work Time(h)','Total Over Time (h)',
   'SITUATION WORK TIME','STATUS','HALF TT JAM','HALF TT MIN',
-  'TOTAL DEDUCTION(RM)','REMARK'
+  'TOTAL DEDUCTION(RM)','THIS AL REMAIN','THIS SL REMAIN','REMARK'
 ];
 
 const READONLY_COLS = ['ID KOD','SITUATION','GROUP','NAME','SHIF','GAJI',
   'Clock Time(h) 01','Clock Time(h) 02','Clock Time(h) 03',
   'Total Break Time(h)','Total Work Time(h)','Total Over Time (h)',
-  'SITUATION WORK TIME','TOTAL DEDUCTION(RM)'];
+  'SITUATION WORK TIME','TOTAL DEDUCTION(RM)','THIS AL REMAIN','THIS SL REMAIN'];
 
-// 修改 EMERGENCY LEAVE 为 UNDEDUCTION LEAVE
 const STATUS_OPTIONS = ['', 'ANNUAL LEAVE','UNPAID LEAVE','HALF DAY LEAVE','SICK LEAVE','OFF DAY','UNDEDUCTION LEAVE','MATERNITY LEAVE'];
 
 let SCRIPT_URL = '';
-let rows = [];
-let filteredRows = [];
+let allRows = []; // 原始数据
+let filteredRows = []; // 表格显示数据
+let staffList = []; // 员工列表（用于搜索）
+let alslData = []; // ALSLREMAIN 数据
+
+let currentSelectedCode = null; // 当前选中的员工
+let currentFilterMonth = ''; // 当前筛选的月份(可选，此处以日期前缀匹配)
 let filters = {};
 let currentFilterCol = null;
 let tempCheckedValues = new Set();
+
 let dirty = false;
 let idleTimer = null;
 let countdownTimer = null;
@@ -221,14 +282,21 @@ function setSync(state, text) {
   document.getElementById('syncText').textContent = text;
 }
 
+// 初始化
 async function loadData() {
   if (!SCRIPT_URL) { setSync('err', 'URL belum ditetapkan'); return; }
   setSync('busy', 'Memuatkan...');
   try {
-    const res = await fetch(`${SCRIPT_URL}?action=getSheetData&_t=${Date.now()}`);
-    const json = await res.json();
-    if (json.status !== 'success') throw new Error(json.message || 'Gagal');
-    rows = (json.data || []).map(r => {
+    const [resSheet, resStaff, resALSL] = await Promise.all([
+      fetch(`${SCRIPT_URL}?action=getSheetData&_t=${Date.now()}`).then(r=>r.json()),
+      fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`).then(r=>r.json()),
+      fetch(`${SCRIPT_URL}?action=getALSLData&_t=${Date.now()}`).then(r=>r.json())
+    ]);
+
+    if (resSheet.status !== 'success') throw new Error('Gagal load SHEET');
+    
+    // 处理主表格数据
+    allRows = (resSheet.data || []).map(r => {
       const o = {};
       SHEET_HEADERS.forEach(h => {
         let v = r[h];
@@ -238,16 +306,35 @@ async function loadData() {
       });
       return o;
     });
-    dirty = false;
-    filters = {};
-    applyFiltersAndRender();
-    setSync('ok', 'Data dimuat (' + rows.length + ')');
+    
+    // 处理员工列表
+    if (resStaff.result === 'success') {
+      staffList = resStaff.data || [];
+    }
+    
+    // 处理 ALSL 数据
+    if (resALSL.status === 'success') {
+      alslData = resALSL.data || [];
+    }
+
+    // 自动选中第一个员工或者之前选中的
+    const savedCode = localStorage.getItem('leaveSelectedCode');
+    if (savedCode && staffList.some(s => String(s.Code) === String(savedCode))) {
+      selectEmployee(savedCode);
+    } else if (staffList.length > 0) {
+      selectEmployee(staffList[0].Code);
+    } else {
+      applyFiltersAndRender();
+    }
+
+    setSync('ok', 'Data dimuat');
   } catch (err) {
     console.error(err);
     setSync('err', 'Gagal muat: ' + err.message);
   }
 }
 
+// ===== 日期/时间工具 =====
 function pad2(n){ return String(n).padStart(2,'0'); }
 function normalizeDate(v) {
   if (!v) return '';
@@ -259,7 +346,6 @@ function normalizeDate(v) {
   if (m) return `${m[3]}-${pad2(m[2])}-${pad2(m[1])}`;
   return s;
 }
-
 function timeToMin(s) {
   if (!s) return null;
   const str = String(s).trim();
@@ -279,7 +365,6 @@ function timeToMin(s) {
   }
   return null;
 }
-
 function formatDuration(totalMinutes) {
   if (!totalMinutes || totalMinutes <= 0) return '00:00:00';
   const totalSeconds = Math.round(totalMinutes * 60);
@@ -289,6 +374,7 @@ function formatDuration(totalMinutes) {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
+// ===== 计算逻辑 =====
 function computeRow(r) {
   const segs = [
     [timeToMin(r['Clock In 01']), timeToMin(r['Clock Out 01'])],
@@ -325,8 +411,122 @@ function computeRow(r) {
   return { segH, workMin, otMin, swt, hl, deduct };
 }
 
+// ===== 搜索与选中员工 =====
+const searchInput = document.getElementById('searchEmployeeInput');
+const searchDropdown = document.getElementById('searchDropdown');
+
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim().toLowerCase();
+  if (!q) { searchDropdown.classList.remove('show'); return; }
+  const matches = staffList.filter(s => 
+    String(s.Name || '').toLowerCase().includes(q) || 
+    String(s.Code || '').toLowerCase().includes(q)
+  ).slice(0, 10);
+  
+  if (matches.length > 0) {
+    searchDropdown.innerHTML = matches.map(m => `
+      <div class="sd-item" onclick="selectEmployee('${m.Code}')">
+        <b>${m.Code}</b> - ${m.Name}
+      </div>
+    `).join('');
+    searchDropdown.classList.add('show');
+  } else {
+    searchDropdown.classList.remove('show');
+  }
+});
+document.addEventListener('click', (e) => {
+  if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
+    searchDropdown.classList.remove('show');
+  }
+});
+
+function selectEmployee(code) {
+  currentSelectedCode = code;
+  localStorage.setItem('leaveSelectedCode', code);
+  
+  const staff = staffList.find(s => String(s.Code) === String(code));
+  if (staff) {
+    searchInput.value = `${staff.Code} - ${staff.Name}`;
+    document.getElementById('dpGroup').textContent = staff.GroupName || '-';
+    document.getElementById('dpSituation').textContent = staff.Situation || '-';
+    document.getElementById('dpGaji').textContent = parseFloat(staff.Salary || 0).toFixed(2);
+  }
+  searchDropdown.classList.remove('show');
+  
+  updateDashboardStats();
+  applyFiltersAndRender();
+}
+
+// ===== 计算面板统计数据 =====
+function updateDashboardStats() {
+  if (!currentSelectedCode) return;
+
+  // 1. 获取 ALSL 数据
+  const alsl = alslData.find(a => String(a['ID KOD']) === String(currentSelectedCode)) || {};
+  const lastAL = parseFloat(alsl['LASTAL']) || 0;
+  const lastSL = parseFloat(alsl['LASTSL']) || 0;
+  
+  document.getElementById('dpLastAL').textContent = lastAL;
+  document.getElementById('dpLastSL').textContent = lastSL;
+
+  // 2. 获取该员工的打卡记录
+  const empRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
+  
+  // 判断月份：获取该员工最新的一条打卡记录作为“当前月”
+  let targetMonth = '';
+  if (empRows.length > 0) {
+    const dates = empRows.map(r => r['Date']).filter(d => d).sort();
+    if (dates.length > 0) targetMonth = dates[dates.length - 1].substring(0, 7); // "YYYY-MM"
+  }
+
+  // 3. 统计本月各项 STATUS 次数
+  let countAL = 0, countSL = 0, countUNPL = 0, countOFF = 0, countHALF = 0, countUNDD = 0, countMTNT = 0;
+  let totalDeduct = 0;
+
+  empRows.forEach(r => {
+    if (targetMonth && r['Date'] && r['Date'].startsWith(targetMonth)) {
+      const s = (r['STATUS'] || '').toUpperCase();
+      if (s === 'ANNUAL LEAVE') countAL++;
+      if (s === 'SICK LEAVE') countSL++;
+      if (s === 'UNPAID LEAVE') countUNPL++;
+      if (s === 'OFF DAY') countOFF++;
+      if (s === 'HALF DAY LEAVE') countHALF++;
+      if (s === 'UNDEDUCTION LEAVE') countUNDD++;
+      if (s === 'MATERNITY LEAVE') countMTNT++;
+    }
+    const c = computeRow(r);
+    totalDeduct += c.deduct;
+  });
+
+  // 4. 计算 This AL/SL Remain
+  const thisAL = lastAL - countAL;
+  const thisSL = lastSL - countSL;
+
+  // 5. 更新排版数据
+  document.getElementById('dpPickedAL').textContent = countAL;
+  document.getElementById('dpPickedSL').textContent = countSL;
+  document.getElementById('dpPickedUNPL').textContent = countUNPL;
+  document.getElementById('dpPickedOFF').textContent = countOFF;
+  document.getElementById('dpPickedHALF').textContent = countHALF;
+  document.getElementById('dpPickedUNDD').textContent = countUNDD;
+  document.getElementById('dpPickedMTNT').textContent = countMTNT;
+  
+  document.getElementById('dpThisAL').textContent = thisAL;
+  document.getElementById('dpThisSL').textContent = thisSL;
+  document.getElementById('dpPickedUNPL2').textContent = countUNPL;
+  document.getElementById('dpTotalDeduct').textContent = totalDeduct.toFixed(2);
+}
+
+// ===== 渲染表格 =====
 function applyFiltersAndRender() {
-  filteredRows = rows.filter(r => {
+  // 首先根据选中的员工进行过滤
+  let baseRows = allRows;
+  if (currentSelectedCode) {
+    baseRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
+  }
+
+  // 然后再应用列筛选
+  filteredRows = baseRows.filter(r => {
     for (const col in filters) {
       const set = filters[col];
       if (set && set.size > 0) {
@@ -350,7 +550,7 @@ function render() {
 
   const tb = document.getElementById('tableBody');
   if (!filteredRows.length) {
-    tb.innerHTML = `<tr><td colspan="${SHEET_HEADERS.length+1}"><div class="empty">Tiada data atau tiada baris sepadan dengan tapisan.</div></td></tr>`;
+    tb.innerHTML = `<tr><td colspan="${SHEET_HEADERS.length+1}"><div class="empty">Tiada data atau tiada baris sepadan.</div></td></tr>`;
     return;
   }
   const frag = document.createDocumentFragment();
@@ -373,7 +573,6 @@ function buildRow(r, i) {
   SHEET_HEADERS.forEach(h => {
     const td = document.createElement('td');
     
-    // SITUATION WORK TIME 列也覆盖颜色
     if (h === 'SITUATION WORK TIME') {
       td.className = 'calc ' + (c.hl ? c.hl.replace('hl-', 'bg-') : ''); 
       td.textContent = c.swt;
@@ -394,13 +593,19 @@ function buildRow(r, i) {
     else if (h === 'TOTAL DEDUCTION(RM)') {
       td.className = 'calc'; td.textContent = c.deduct ? c.deduct.toFixed(2) : '0.00';
     } 
+    else if (h === 'THIS AL REMAIN' || h === 'THIS SL REMAIN') {
+      // 自动从排版拿取最新的数字
+      td.className = 'calc';
+      td.textContent = h === 'THIS AL REMAIN' 
+        ? document.getElementById('dpThisAL').textContent 
+        : document.getElementById('dpThisSL').textContent;
+    }
     else if (h === 'SITUATION') {
       let cls = 'ro';
       if (situation === 'ACTIVE') cls += ' sit-active';
       else if (situation === 'PENDING') cls += ' sit-pending';
       else if (situation === 'INACTIVE') cls += ' sit-inactive';
-      td.className = cls;
-      td.textContent = r[h] || '';
+      td.className = cls; td.textContent = r[h] || '';
     }
     else if (h === 'STATUS') {
       const sel = document.createElement('select'); sel.className = 'cell';
@@ -423,6 +628,7 @@ function buildRow(r, i) {
       sel.addEventListener('change', () => { 
         r[h] = sel.value; markDirty(); 
         applyStatusColor();
+        updateDashboardStats(); // 改变状态后更新统计
         if (filters[h]) applyFiltersAndRender();
         else {
            const idx = filteredRows.indexOf(r);
@@ -448,6 +654,7 @@ function buildRow(r, i) {
       });
       inp.addEventListener('change', () => {
         if (h === 'Date') inp.value = normalizeDate(inp.value);
+        updateDashboardStats();
         const idx = filteredRows.indexOf(r);
         if (idx !== -1) { const newTr = buildRow(r, idx); tr.replaceWith(newTr); }
       });
@@ -458,6 +665,7 @@ function buildRow(r, i) {
   return tr;
 }
 
+// ===== 筛选面板 =====
 function openFilter(col, e) {
   e.stopPropagation();
   currentFilterCol = col;
@@ -465,10 +673,8 @@ function openFilter(col, e) {
   const rect = e.target.getBoundingClientRect();
   
   const valSet = new Set();
-  rows.forEach(r => {
-    let v = r[col] ? String(r[col]).trim() : '';
-    valSet.add(v);
-  });
+  let baseRows = currentSelectedCode ? allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode)) : allRows;
+  baseRows.forEach(r => valSet.add(r[col] ? String(r[col]).trim() : ''));
   const vals = Array.from(valSet).sort((a,b) => {
     if (a === '') return -1;
     if (b === '') return 1;
@@ -476,7 +682,6 @@ function openFilter(col, e) {
   });
 
   tempCheckedValues = filters[col] ? new Set(filters[col]) : new Set(vals);
-  
   const listEl = document.getElementById('fpList');
   const searchEl = document.getElementById('fpSearch');
   searchEl.value = '';
@@ -519,8 +724,9 @@ function fpClearAll() {
   tempCheckedValues.clear();
 }
 function fpApply() {
+  let baseRows = currentSelectedCode ? allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode)) : allRows;
   const allVals = new Set();
-  rows.forEach(r => allVals.add(r[currentFilterCol] ? String(r[currentFilterCol]).trim() : ''));
+  baseRows.forEach(r => allVals.add(r[currentFilterCol] ? String(r[currentFilterCol]).trim() : ''));
   
   if (tempCheckedValues.size === allVals.size) {
     delete filters[currentFilterCol];
@@ -536,11 +742,10 @@ function fpClose() {
 }
 function closeFilterOnClickOutside(e) {
   const p = document.getElementById('filterPanel');
-  if (!p.contains(e.target) && !e.target.classList.contains('filter-btn')) {
-    fpClose();
-  }
+  if (!p.contains(e.target) && !e.target.classList.contains('filter-btn')) fpClose();
 }
 
+// ===== 自动保存 =====
 function markDirty() {
   dirty = true;
   setSync('busy', 'Perubahan belum disimpan');
@@ -571,7 +776,7 @@ function autoSaveConfirm() { closeModal(); doSave(); }
 
 async function manualSave() {
   if (!SCRIPT_URL) { alert('URL belum ditetapkan.'); return; }
-  if (!rows.length) { alert('Tiada data untuk disimpan.'); return; }
+  if (!allRows.length) { alert('Tiada data untuk disimpan.'); return; }
   await doSave();
 }
 
@@ -579,9 +784,15 @@ async function doSave() {
   if (!SCRIPT_URL) { alert('URL belum ditetapkan.'); return; }
   setSync('busy', 'Menyimpan...');
   try {
-    const payload = rows.map(r => {
+    const payload = allRows.map(r => {
       const o = {};
-      SHEET_HEADERS.forEach(h => { o[h] = r[h] === undefined || r[h] === null ? '' : r[h]; });
+      SHEET_HEADERS.forEach(h => {
+         if(h === 'THIS AL REMAIN' || h === 'THIS SL REMAIN') {
+             o[h] = h === 'THIS AL REMAIN' ? document.getElementById('dpThisAL').textContent : document.getElementById('dpThisSL').textContent;
+         } else {
+             o[h] = r[h] === undefined || r[h] === null ? '' : r[h];
+         }
+      });
       return o;
     });
     const res = await fetch(SCRIPT_URL, {
