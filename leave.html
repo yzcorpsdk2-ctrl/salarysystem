@@ -24,7 +24,6 @@
   .url-box button { padding: 5px 12px; border-radius: 4px; border: none; background: var(--blue); color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; }
   .btn { background: #fff; border: 1px solid var(--border); padding: 6px 12px; border-radius: 5px; font-size: 12px; font-weight: 500; cursor: pointer; color: var(--blue); display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
   .btn:hover { background: var(--blue-soft); }
-  .btn-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
   .btn-success { background: #0f7a54; color: #fff; border-color: #0f7a54; }
   .sync-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--blue-soft); border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; color: var(--muted); }
   .sync-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: #9db8d2; }
@@ -229,6 +228,7 @@ function normalizeDate(v) {
   if (m) return `${m[3]}-${pad2(m[2])}-${pad2(m[1])}`;
   return s;
 }
+
 // 支持 HH:MM 或 12小时制时间字符串转换为分钟
 function timeToMin(s) {
   if (!s) return null;
@@ -251,7 +251,17 @@ function timeToMin(s) {
   }
   return null;
 }
-function fmtH(min) { return (min/60).toFixed(2); }
+
+// ✅ 新增：将分钟数转为 HH:MM:SS 的标准时长格式
+function formatDuration(totalMinutes) {
+  if (!totalMinutes || totalMinutes <= 0) return '00:00:00';
+  // 四舍五入消除浮点数误差
+  const totalSeconds = Math.round(totalMinutes * 60);
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
 
 // ===== 计算逻辑 =====
 function computeRow(r) {
@@ -334,17 +344,14 @@ function buildRow(r, i) {
     const td = document.createElement('td');
     if (h === 'Clock Time(h) 01' || h === 'Clock Time(h) 02' || h === 'Clock Time(h) 03') {
       const k = h.endsWith('01') ? 0 : h.endsWith('02') ? 1 : 2;
-      td.className = 'calc'; td.textContent = fmtH(c.segH[k]);
+      td.className = 'calc'; td.textContent = formatDuration(c.segH[k]); // 已修改：HH:MM:SS
     } else if (h === 'Total Break Time(h)') {
-      td.className = 'calc'; td.textContent = c.workMin>0 ? '1.00' : '0.00';
+      td.className = 'calc'; td.textContent = c.workMin > 0 ? '01:00:00' : '00:00:00'; // 已修改：固定1小时
     } else if (h === 'Total Work Time(h)') {
-      td.className = 'calc'; td.textContent = fmtH(c.workMin);
+      td.className = 'calc'; td.textContent = formatDuration(c.workMin); // 已修改：HH:MM:SS
     } else if (h === 'Total Over Time (h)') {
       td.className = 'calc';
-      if (c.otMin > 0) {
-        const hh = Math.floor(c.otMin/60), mm = Math.floor(c.otMin%60), ss = Math.round(((c.otMin%1)*60));
-        td.textContent = `${hh}h ${mm}m ${ss}s`;
-      } else td.textContent = '0';
+      td.textContent = formatDuration(c.otMin); // 已修改：HH:MM:SS
     } else if (h === 'SITUATION WORK TIME') {
       td.className = 'calc'; td.textContent = c.swt;
     } else if (h === 'TOTAL DEDUCTION(RM)') {
@@ -358,10 +365,8 @@ function buildRow(r, i) {
       });
       sel.addEventListener('change', () => { 
         r[h] = sel.value; markDirty(); 
-        // 如果当前在筛选状态且修改了该值导致不匹配，刷新
         if (filters[h]) applyFiltersAndRender();
         else {
-           // 局部刷新本行
            const idx = filteredRows.indexOf(r);
            if (idx !== -1) { const newTr = buildRow(r, idx); tr.replaceWith(newTr); }
         }
@@ -383,7 +388,6 @@ function buildRow(r, i) {
       });
       inp.addEventListener('change', () => {
         if (h === 'Date') inp.value = normalizeDate(inp.value);
-        // 重新计算该行
         const idx = filteredRows.indexOf(r);
         if (idx !== -1) { const newTr = buildRow(r, idx); tr.replaceWith(newTr); }
       });
