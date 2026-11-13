@@ -9,7 +9,8 @@
   :root {
     --blue: #1a4f8a; --blue-soft: #f4f8fd; --border: #d4e0ee;
     --text: #1f2d3d; --muted: #64748b; --bg: #f7fafd;
-    --red: #fecaca; --green: #c6f6d5; --yellow: #fefcbf;
+    /* 更淡的状态颜色 */
+    --red-light: #ffe4e6; --green-light: #dcfce7; --yellow-light: #fef9c3;
   }
   body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); font-size: 13px; min-height: 100vh; padding-bottom: 50px; }
   
@@ -46,16 +47,16 @@
   .dp-item {
     background: var(--blue-soft); border: 1px solid var(--border); border-radius: 6px;
     padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;
-    position: relative; min-width: 0; /* 修复撑破布局 */
+    position: relative; min-width: 0;
   }
   .dp-item label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
   .dp-item span, .dp-item input { 
     font-size: 15px; font-weight: 800; color: var(--blue); outline: none; border: none; background: transparent; width: 100%; 
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; /* 文字过长显示省略号 */
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .dp-item input:hover, .dp-item input:focus { border-bottom: 1px solid var(--blue); }
   
-  /* 搜索下拉 */
+  /* 搜索下拉 (包含 ID/NAME, KUMPULAN, ALL) */
   .search-wrap { position: relative; grid-column: span 2; }
   .search-wrap input { font-size: 14px; font-weight: 600; color: var(--text); padding: 4px 0; width: 100%; border: none; border-bottom: 2px dashed #b8cfe8; background: transparent; outline: none; }
   .search-wrap input:focus { border-bottom-color: var(--blue); }
@@ -92,37 +93,41 @@
   input.cell:disabled, select.cell:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
   input.cell.wide { min-width: 120px; text-align: left; }
 
-  /* ===== 状态与颜色覆盖逻辑 ===== */
+  /* ===== 行高亮覆盖 (SITUATION WORK TIME 等，颜色变淡) ===== */
+  tr.hl-red td:nth-child(-n+20) { background: var(--red-light) !important; }
+  tr.hl-green td:nth-child(-n+20) { background: var(--green-light) !important; }
+  tr.hl-yellow td:nth-child(-n+20) { background: var(--yellow-light) !important; }
   
-  /* 1. 基础行高亮 */
-  tr.hl-red td:nth-child(-n+20) { background: var(--red) !important; }
-  tr.hl-green td:nth-child(-n+20) { background: var(--green) !important; }
-  tr.hl-yellow td:nth-child(-n+20) { background: var(--yellow) !important; }
+  /* 强制让 SITUATION WORK TIME 列应用颜色 */
+  td.calc.hl-red { background: var(--red-light) !important; }
+  td.calc.hl-green { background: var(--green-light) !important; }
+  td.calc.hl-yellow { background: var(--yellow-light) !important; }
 
-  /* 2. SITUATION 完全填色覆盖 */
-  .sit-active { background-color: #22c55e !important; color: #fff !important; font-weight: 700; border-radius: 4px; }
-  .sit-pending { background-color: #f59e0b !important; color: #fff !important; font-weight: 700; border-radius: 4px; }
-  .sit-inactive { background-color: #ef4444 !important; color: #fff !important; font-weight: 700; border-radius: 4px; }
+  /* 1. SITUATION 完全填色，字体黑色 */
+  .sit-active { background-color: #86efac !important; color: #000 !important; font-weight: 700; border-radius: 4px; }
+  .sit-pending { background-color: #fcd34d !important; color: #000 !important; font-weight: 700; border-radius: 4px; }
+  .sit-inactive { background-color: #fca5a5 !important; color: #000 !important; font-weight: 700; border-radius: 4px; }
   
-  /* INACTIVE 整行强制红底 */
-  tr.row-inactive td { background: #fecaca !important; }
+  /* INACTIVE 整行背景 */
+  tr.row-inactive td { background: #ffe4e6 !important; }
 
-  /* 3. STATUS 优先级最高 (仅覆盖它自己的列和 KOD/NAME) */
-  select.status-ANNUAL_LEAVE { background-color: #fca5a5 !important; color: #7f1d1d; font-weight: 600; border-color: #f87171 !important; }
-  select.status-UNPAID_LEAVE { background-color: #bbf7d0 !important; color: #14532d; font-weight: 600; border-color: #4ade80 !important; }
-  select.status-SICK_LEAVE { background-color: #fef08a !important; color: #713f12; font-weight: 600; border-color: #facc15 !important; }
-  select.status-HALF_DAY_LEAVE { background-color: #bae6fd !important; color: #0c4a6e; font-weight: 600; border-color: #38bdf8 !important; }
-  select.status-OFF_DAY { background-color: #1e3a8a !important; color: #ffffff; font-weight: 600; border-color: #1e3a8a !important; }
-  select.status-MATERNITY_LEAVE { background-color: #fbcfe8 !important; color: #831843; font-weight: 600; border-color: #f472b6 !important; }
-  select.status-UNDEDUCTION_LEAVE { background-color: #c7d2fe !important; color: #312e81; font-weight: 600; border-color: #818cf8 !important; }
+  /* 2. STATUS 颜色最高优先级覆盖 (绝对压制其他) */
+  select.status-ANNUAL_LEAVE { background-color: #fca5a5 !important; color: #7f1d1d !important; font-weight: 600; border-color: #f87171 !important; }
+  select.status-UNPAID_LEAVE { background-color: #bbf7d0 !important; color: #14532d !important; font-weight: 600; border-color: #4ade80 !important; }
+  select.status-SICK_LEAVE { background-color: #fef08a !important; color: #713f12 !important; font-weight: 600; border-color: #facc15 !important; }
+  select.status-HALF_DAY_LEAVE { background-color: #bae6fd !important; color: #0c4a6e !important; font-weight: 600; border-color: #38bdf8 !important; }
+  select.status-OFF_DAY { background-color: #1e3a8a !important; color: #ffffff !important; font-weight: 600; border-color: #1e3a8a !important; }
+  select.status-MATERNITY_LEAVE { background-color: #fbcfe8 !important; color: #831843 !important; font-weight: 600; border-color: #f472b6 !important; }
+  select.status-UNDEDUCTION_LEAVE { background-color: #c7d2fe !important; color: #312e81 !important; font-weight: 600; border-color: #818cf8 !important; }
 
-  td.bg-ANNUAL_LEAVE { background-color: #fca5a5 !important; }
-  td.bg-UNPAID_LEAVE { background-color: #bbf7d0 !important; }
-  td.bg-SICK_LEAVE { background-color: #fef08a !important; }
-  td.bg-HALF_DAY_LEAVE { background-color: #bae6fd !important; }
-  td.bg-OFF_DAY { background-color: #1e3a8a !important; color: #fff !important; }
-  td.bg-MATERNITY_LEAVE { background-color: #fbcfe8 !important; }
-  td.bg-UNDEDUCTION_LEAVE { background-color: #c7d2fe !important; }
+  /* 针对 KOD 和 NAME 的颜色覆盖 (优先级高于行高亮) */
+  td.bg-ANNUAL_LEAVE { background-color: #fca5a5 !important; color: #7f1d1d !important; }
+  td.bg-UNPAID_LEAVE { background-color: #bbf7d0 !important; color: #14532d !important; }
+  td.bg-SICK_LEAVE { background-color: #fef08a !important; color: #713f12 !important; }
+  td.bg-HALF_DAY_LEAVE { background-color: #bae6fd !important; color: #0c4a6e !important; }
+  td.bg-OFF_DAY { background-color: #1e3a8a !important; color: #ffffff !important; }
+  td.bg-MATERNITY_LEAVE { background-color: #fbcfe8 !important; color: #831843 !important; }
+  td.bg-UNDEDUCTION_LEAVE { background-color: #c7d2fe !important; color: #312e81 !important; }
 
   /* 其它组件 */
   .filter-panel { position: fixed; z-index: 1000; background: #fff; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 10px 30px rgba(15,23,42,.15); padding: 10px; width: 220px; max-height: 300px; display: none; flex-direction: column; font-size: 12px; }
@@ -169,8 +174,8 @@
   <div class="dashboard-panel" id="dashboardPanel">
     <div class="dp-grid">
       <div class="dp-item search-wrap">
-        <label>Cari Pekerja / Kumpulan (ID / Name / Group)</label>
-        <input type="text" id="searchEmployeeInput" placeholder="Taip nama, ID, atau kumpulan..." autocomplete="off">
+        <label>Cari (ID / Name / Kumpulan)</label>
+        <input type="text" id="searchEmployeeInput" placeholder="Taip ID, Nama, atau Kumpulan..." autocomplete="off">
         <div class="search-dropdown" id="searchDropdown"></div>
       </div>
       <div class="dp-item"><label>Kumpulan</label><span id="dpGroup" title="-">-</span></div>
@@ -254,8 +259,7 @@ let filteredRows = [];
 let staffList = []; 
 let alslData = []; 
 
-let currentSelectedCode = 'ALL'; // 默认选中 ALL
-let currentFilterMonth = ''; 
+let currentSelectedCode = 'ALL'; 
 let filters = {};
 let currentFilterCol = null;
 let tempCheckedValues = new Set();
@@ -404,7 +408,7 @@ function computeRow(r) {
   return { segH, workMin, otMin, swt, hl, deduct };
 }
 
-// ===== 搜索与选中 (支持 ALL) =====
+// ===== 搜索与选中 (支持 KUMPULAN 和 ALL) =====
 const searchInput = document.getElementById('searchEmployeeInput');
 const searchDropdown = document.getElementById('searchDropdown');
 
@@ -415,26 +419,40 @@ searchInput.addEventListener('input', () => {
     return; 
   }
   
-  const matches = staffList.filter(s => 
+  // 1. 搜索员工 (按名字或编码)
+  const matchStaff = staffList.filter(s => 
     String(s.Name || '').toLowerCase().includes(q) || 
-    String(s.Code || '').toLowerCase().includes(q) ||
-    String(s.GroupName || '').toLowerCase().includes(q) // 支持搜索群组
-  ).slice(0, 15);
+    String(s.Code || '').toLowerCase().includes(q)
+  ).slice(0, 10);
   
-  let html = `
-    <div class="sd-item all-item" onclick="selectEmployee('ALL')">
-      🌐 ALL (SEMUA PEKERJA & KUMPULAN)
-    </div>
-  `;
+  // 2. 搜索群组
+  const uniqueGroups = Array.from(new Set(staffList.map(s => String(s.GroupName || '').trim()).filter(g => g)));
+  const matchGroups = uniqueGroups.filter(g => g.toLowerCase().includes(q)).slice(0, 5);
   
-  if (matches.length > 0) {
-    html += matches.map(m => `
+  let html = '';
+  
+  // 群组对应的 "ALL" 选项
+  if (matchGroups.length > 0) {
+    html += matchGroups.map(g => `
+      <div class="sd-item all-item" onclick="selectGroup('${g.replace(/'/g, "\\'")}')">
+        🏢 ALL dalam Kumpulan: <b>${g}</b>
+      </div>
+    `).join('');
+  } else {
+    html += `
+      <div class="sd-item all-item" onclick="selectEmployee('ALL')">
+        🌐 ALL (SEMUA PEKERJA)
+      </div>
+    `;
+  }
+  
+  // 员工列表
+  if (matchStaff.length > 0) {
+    html += matchStaff.map(m => `
       <div class="sd-item" onclick="selectEmployee('${m.Code}')">
         <b>${m.Code}</b> - ${m.Name} <span style="color:#94a3b8;font-size:11px;">(${m.GroupName || '-'})</span>
       </div>
     `).join('');
-  } else {
-    html += `<div class="sd-item" style="color:#94a3b8;text-align:center;">Tiada padanan dijumpai</div>`;
   }
   
   searchDropdown.innerHTML = html;
@@ -449,7 +467,6 @@ document.addEventListener('click', (e) => {
 
 function selectEmployee(code) {
   currentSelectedCode = code;
-  
   if (code === 'ALL') {
     searchInput.value = 'ALL (SEMUA PEKERJA)';
     document.getElementById('dpGroup').textContent = 'SEMUA KUMPULAN';
@@ -459,65 +476,65 @@ function selectEmployee(code) {
     const staff = staffList.find(s => String(s.Code) === String(code));
     if (staff) {
       searchInput.value = `${staff.Code} - ${staff.Name}`;
-      const grpStr = staff.GroupName || '-';
-      document.getElementById('dpGroup').textContent = grpStr;
-      document.getElementById('dpGroup').title = grpStr; // 供悬停查看全名
+      document.getElementById('dpGroup').textContent = staff.GroupName || '-';
       document.getElementById('dpSituation').textContent = staff.Situation || '-';
       document.getElementById('dpGaji').textContent = parseFloat(staff.Salary || 0).toFixed(2);
     }
   }
-  
   searchDropdown.classList.remove('show');
   updateDashboardStats();
   applyFiltersAndRender();
 }
 
-// 支持鼠标悬停显示完整群组
-document.getElementById('dpGroup').addEventListener('mouseenter', function() {
-  this.title = this.textContent;
-});
+function selectGroup(groupName) {
+  currentSelectedCode = 'GROUP_' + groupName;
+  searchInput.value = `ALL Kumpulan: ${groupName}`;
+  document.getElementById('dpGroup').textContent = groupName;
+  document.getElementById('dpSituation').textContent = 'SEMUA STATUS';
+  document.getElementById('dpGaji').textContent = 'JUMLAH KUMPULAN';
+  searchDropdown.classList.remove('show');
+  updateDashboardStats();
+  applyFiltersAndRender();
+}
 
 // ===== 计算面板统计数据 =====
 function updateDashboardStats() {
   if (!currentSelectedCode) return;
 
-  // 1. 获取目标行
-  let empRows = [];
-  let baseStaffs = [];
-  
+  // 获取当前需要统计的员工编码列表
+  let targetCodes = [];
   if (currentSelectedCode === 'ALL') {
-    empRows = allRows;
-    baseStaffs = staffList;
+    targetCodes = staffList.map(s => String(s.Code));
+  } else if (currentSelectedCode.startsWith('GROUP_')) {
+    const grp = currentSelectedCode.replace('GROUP_', '');
+    targetCodes = staffList.filter(s => String(s.GroupName) === grp).map(s => String(s.Code));
   } else {
-    empRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
-    const staff = staffList.find(s => String(s.Code) === String(currentSelectedCode));
-    if (staff) baseStaffs = [staff];
+    targetCodes = [String(currentSelectedCode)];
   }
 
-  // 2. 获取 Last AL/SL
+  // 过滤出对应的打卡数据
+  const empRows = allRows.filter(r => targetCodes.includes(String(r['ID KOD'])));
+
+  // 获取 Last AL/SL (Sum)
   let lastAL = 0, lastSL = 0;
-  if (currentSelectedCode === 'ALL') {
-    alslData.forEach(a => {
+  alslData.forEach(a => {
+    if (targetCodes.includes(String(a['ID KOD']))) {
       lastAL += parseFloat(a['LASTAL']) || 0;
       lastSL += parseFloat(a['LASTSL']) || 0;
-    });
-  } else {
-    const alsl = alslData.find(a => String(a['ID KOD']) === String(currentSelectedCode)) || {};
-    lastAL = parseFloat(alsl['LASTAL']) || 0;
-    lastSL = parseFloat(alsl['LASTSL']) || 0;
-  }
+    }
+  });
   
   document.getElementById('dpLastAL').textContent = lastAL.toFixed(2);
   document.getElementById('dpLastSL').textContent = lastSL.toFixed(2);
 
-  // 3. 判断月份（如果是ALL，寻找最新日期；如果是个人，找个人的最新日期）
+  // 判断月份
   let targetMonth = '';
   if (empRows.length > 0) {
     const dates = empRows.map(r => r['Date']).filter(d => d).sort();
     if (dates.length > 0) targetMonth = dates[dates.length - 1].substring(0, 7); 
   }
 
-  // 4. 统计各项 STATUS 次数
+  // 统计
   let countAL = 0, countSL = 0, countUNPL = 0, countOFF = 0, countHALF = 0, countUNDD = 0, countMTNT = 0;
   let totalDeduct = 0;
 
@@ -536,11 +553,9 @@ function updateDashboardStats() {
     totalDeduct += c.deduct;
   });
 
-  // 5. 计算 This AL/SL Remain
   const thisAL = lastAL - countAL;
   const thisSL = lastSL - countSL;
 
-  // 6. 更新排版数据
   document.getElementById('dpPickedAL').textContent = countAL;
   document.getElementById('dpPickedSL').textContent = countSL;
   document.getElementById('dpPickedUNPL').textContent = countUNPL;
@@ -557,13 +572,18 @@ function updateDashboardStats() {
 
 // ===== 渲染表格 =====
 function applyFiltersAndRender() {
-  // 首先根据选中的员工/群组进行过滤
   let baseRows = allRows;
-  if (currentSelectedCode && currentSelectedCode !== 'ALL') {
-    baseRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
+  
+  if (currentSelectedCode !== 'ALL') {
+    if (currentSelectedCode.startsWith('GROUP_')) {
+      const grp = currentSelectedCode.replace('GROUP_', '');
+      const codes = staffList.filter(s => String(s.GroupName) === grp).map(s => String(s.Code));
+      baseRows = allRows.filter(r => codes.includes(String(r['ID KOD'])));
+    } else {
+      baseRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
+    }
   }
 
-  // 然后再应用列筛选
   filteredRows = baseRows.filter(r => {
     for (const col in filters) {
       const set = filters[col];
@@ -610,7 +630,7 @@ function buildRow(r, i) {
     const td = document.createElement('td');
     
     if (h === 'SITUATION WORK TIME') {
-      td.className = 'calc ' + (c.hl ? c.hl.replace('hl-', 'bg-') : ''); 
+      td.className = 'calc ' + (c.hl ? c.hl : ''); 
       td.textContent = c.swt;
     } 
     else if (h === 'Clock Time(h) 01' || h === 'Clock Time(h) 02' || h === 'Clock Time(h) 03') {
@@ -631,9 +651,7 @@ function buildRow(r, i) {
     } 
     else if (h === 'THIS AL REMAIN' || h === 'THIS SL REMAIN') {
       td.className = 'calc';
-      // 如果是筛选全员，每行的数据就从该行的员工提取？原本逻辑是统一显示顶部统计，如果全员展示，这一列可能会重复。
-      // 这里做一个优化：如果当前选了单人，就显示顶部数据。如果选了ALL，就留空或显示已计算的单人值（如需计算单人剩余需遍历更复杂，暂留空或展示顶部总计）
-      td.textContent = currentSelectedCode !== 'ALL' 
+      td.textContent = currentSelectedCode !== 'ALL' && !currentSelectedCode.startsWith('GROUP_') 
         ? (h === 'THIS AL REMAIN' ? document.getElementById('dpThisAL').textContent : document.getElementById('dpThisSL').textContent)
         : '';
     }
@@ -655,6 +673,8 @@ function buildRow(r, i) {
       const applyStatusColor = () => {
         const val = (sel.value || '').toUpperCase().replace(/\s+/g, '_');
         sel.className = 'cell ' + (val ? 'status-' + val : '');
+        
+        // 强制覆盖 KOD 和 NAME 的颜色
         const codeTd = tr.children[1];
         const nameTd = tr.children[4];
         codeTd.className = 'ro ' + (val ? 'bg-' + val : '');
@@ -710,7 +730,17 @@ function openFilter(col, e) {
   const rect = e.target.getBoundingClientRect();
   
   const valSet = new Set();
-  let baseRows = currentSelectedCode !== 'ALL' ? allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode)) : allRows;
+  let baseRows = allRows;
+  if (currentSelectedCode !== 'ALL') {
+    if (currentSelectedCode.startsWith('GROUP_')) {
+      const grp = currentSelectedCode.replace('GROUP_', '');
+      const codes = staffList.filter(s => String(s.GroupName) === grp).map(s => String(s.Code));
+      baseRows = allRows.filter(r => codes.includes(String(r['ID KOD'])));
+    } else {
+      baseRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
+    }
+  }
+  
   baseRows.forEach(r => valSet.add(r[col] ? String(r[col]).trim() : ''));
   const vals = Array.from(valSet).sort((a,b) => {
     if (a === '') return -1;
@@ -761,7 +791,17 @@ function fpClearAll() {
   tempCheckedValues.clear();
 }
 function fpApply() {
-  let baseRows = currentSelectedCode !== 'ALL' ? allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode)) : allRows;
+  let baseRows = allRows;
+  if (currentSelectedCode !== 'ALL') {
+    if (currentSelectedCode.startsWith('GROUP_')) {
+      const grp = currentSelectedCode.replace('GROUP_', '');
+      const codes = staffList.filter(s => String(s.GroupName) === grp).map(s => String(s.Code));
+      baseRows = allRows.filter(r => codes.includes(String(r['ID KOD'])));
+    } else {
+      baseRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
+    }
+  }
+
   const allVals = new Set();
   baseRows.forEach(r => allVals.add(r[currentFilterCol] ? String(r[currentFilterCol]).trim() : ''));
   
@@ -825,8 +865,7 @@ async function doSave() {
       const o = {};
       SHEET_HEADERS.forEach(h => {
          if(h === 'THIS AL REMAIN' || h === 'THIS SL REMAIN') {
-             // 如果是单人更新，写入当前面板的值；否则保留原值（避免误覆盖全员）
-             if (currentSelectedCode !== 'ALL' && String(r['ID KOD']) === currentSelectedCode) {
+             if (currentSelectedCode !== 'ALL' && !currentSelectedCode.startsWith('GROUP_') && String(r['ID KOD']) === currentSelectedCode) {
                  o[h] = h === 'THIS AL REMAIN' ? document.getElementById('dpThisAL').textContent : document.getElementById('dpThisSL').textContent;
              } else {
                  o[h] = r[h] || ''; 
