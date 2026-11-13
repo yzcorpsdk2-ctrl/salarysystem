@@ -25,16 +25,14 @@
   .btn { background: #fff; border: 1px solid var(--border); padding: 6px 12px; border-radius: 5px; font-size: 12px; font-weight: 500; cursor: pointer; color: var(--blue); display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
   .btn:hover { background: var(--blue-soft); }
   .btn-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
-  .btn-primary:hover { background: #15406f; }
   .btn-success { background: #0f7a54; color: #fff; border-color: #0f7a54; }
-  .btn-success:hover { background: #0c6a48; }
   .sync-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--blue-soft); border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; color: var(--muted); }
   .sync-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: #9db8d2; }
   .sync-badge.ok .dot { background: #22c55e; }
   .sync-badge.busy .dot { background: #f59e0b; }
   .sync-badge.err .dot { background: #ef4444; }
   .container { padding: 14px 18px 40px; }
-  .table-wrap { overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: #fff; max-height: calc(100vh - 120px); }
+  .table-wrap { overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: #fff; max-height: calc(100vh - 120px); position: relative; }
   table { border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; font-size: 11.5px; }
   thead th {
     position: sticky; top: 0; z-index: 3; background: #eef4fb; color: #334155;
@@ -42,14 +40,15 @@
     padding: 8px 5px; border-right: 1px solid #dbe6f2; border-bottom: 2px solid #cbd9ea;
     white-space: nowrap; text-align: center;
   }
+  thead th .th-inner { display: flex; align-items: center; justify-content: center; gap: 4px; }
+  .filter-btn { border: none; background: transparent; cursor: pointer; font-size: 9px; color: #94a3b8; padding: 2px 4px; border-radius: 4px; }
+  .filter-btn:hover { background: #dbeafe; color: #2563eb; }
+  .filter-btn.active { color: #2563eb; background: #bfdbfe; }
   tbody td { padding: 3px 4px; border-bottom: 1px solid #eef3f9; border-right: 1px solid #f2f6fb; text-align: center; white-space: nowrap; height: 34px; }
   tbody tr:hover { background: #f7fbff; }
   .ro { color: #334155; font-weight: 600; }
   .calc { background: #f6f9ff; font-weight: 700; color: #0f172a; }
-  input.cell, select.cell {
-    width: 100%; min-width: 54px; padding: 4px 4px; font-size: 11.5px; text-align: center;
-    border: 1px solid transparent; border-radius: 5px; background: transparent; color: #0f172a;
-  }
+  input.cell, select.cell { width: 100%; min-width: 54px; padding: 4px 4px; font-size: 11.5px; text-align: center; border: 1px solid transparent; border-radius: 5px; background: transparent; color: #0f172a; }
   input.cell:hover, select.cell:hover { border-color: #cbd5e1; background: #fff; }
   input.cell:focus, select.cell:focus { outline: none; border-color: var(--blue); background: #fff; box-shadow: 0 0 0 2px rgba(26,79,138,.12); }
   input.cell:disabled, select.cell:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
@@ -58,22 +57,31 @@
   tr.hl-green td:nth-child(-n+20) { background: var(--green) !important; }
   tr.hl-yellow td:nth-child(-n+20) { background: var(--yellow) !important; }
   .col-idx { color: #94a3b8; font-size: 10.5px; font-weight: 600; }
-  .modal-mask {
-    position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 9999;
-    display: none; align-items: center; justify-content: center;
-  }
+  
+  /* 筛选面板 */
+  .filter-panel { position: fixed; z-index: 1000; background: #fff; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 10px 30px rgba(15,23,42,.15); padding: 10px; width: 220px; max-height: 300px; display: none; flex-direction: column; font-size: 12px; }
+  .filter-panel.show { display: flex; }
+  .fp-head { margin-bottom: 8px; }
+  .fp-head input { width: 100%; padding: 5px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 11px; }
+  .fp-actions { display: flex; gap: 5px; margin-bottom: 6px; }
+  .fp-actions button { flex: 1; padding: 4px; font-size: 10.5px; border: 1px solid var(--border); background: #f8fafc; border-radius: 4px; cursor: pointer; }
+  .fp-list { overflow-y: auto; flex: 1; }
+  .fp-item { display: flex; align-items: center; gap: 6px; padding: 4px 5px; border-radius: 4px; cursor: pointer; }
+  .fp-item:hover { background: #f1f5f9; }
+  .fp-item span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .fp-footer { display: flex; justify-content: flex-end; gap: 6px; margin-top: 8px; border-top: 1px solid #eef2f7; padding-top: 8px; }
+  .fp-footer button { padding: 4px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; border: 1px solid var(--border); background: #fff; }
+  .fp-footer button.apply { background: var(--blue); color: #fff; border-color: var(--blue); }
+  
+  .modal-mask { position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 9999; display: none; align-items: center; justify-content: center; }
   .modal-mask.show { display: flex; }
-  .modal {
-    background: #fff; border-radius: 12px; padding: 22px 24px; width: 360px; max-width: 92vw;
-    box-shadow: 0 20px 60px rgba(15,23,42,.35); text-align: center;
-  }
+  .modal { background: #fff; border-radius: 12px; padding: 22px 24px; width: 360px; max-width: 92vw; box-shadow: 0 20px 60px rgba(15,23,42,.35); text-align: center; }
   .modal h3 { font-size: 15px; color: var(--blue); margin-bottom: 8px; }
   .modal p { font-size: 12.5px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
   .modal .countdown { font-size: 26px; font-weight: 800; color: #dc2626; margin: 6px 0 12px; }
   .modal .actions { display: flex; gap: 8px; justify-content: center; }
   .modal .actions button { padding: 8px 18px; border-radius: 6px; font-size: 12.5px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: #fff; color: var(--text); }
   .modal .actions button.confirm { background: var(--blue); color: #fff; border-color: var(--blue); }
-  .modal .actions button:hover { filter: brightness(.96); }
   .empty { text-align: center; padding: 50px 20px; color: #94a3b8; }
 </style>
 </head>
@@ -99,6 +107,21 @@
   </div>
 </div>
 
+<!-- 筛选面板 -->
+<div class="filter-panel" id="filterPanel">
+  <div class="fp-head"><input type="text" id="fpSearch" placeholder="Cari nilai..."></div>
+  <div class="fp-actions">
+    <button onclick="fpSelectAll()">Select All</button>
+    <button onclick="fpClearAll()">Clear</button>
+  </div>
+  <div class="fp-list" id="fpList"></div>
+  <div class="fp-footer">
+    <button onclick="fpClose()">Cancel</button>
+    <button class="apply" onclick="fpApply()">Apply</button>
+  </div>
+</div>
+
+<!-- 自动保存弹窗 -->
 <div class="modal-mask" id="autoSaveModal">
   <div class="modal">
     <h3>⏰ Autosave</h3>
@@ -130,6 +153,10 @@ const STATUS_OPTIONS = ['', 'ANNUAL LEAVE','UNPAID LEAVE','HALF DAY LEAVE','SICK
 
 let SCRIPT_URL = '';
 let rows = [];
+let filteredRows = [];
+let filters = {}; // 存储当前激活的筛选条件
+let currentFilterCol = null;
+let tempCheckedValues = new Set();
 let dirty = false;
 let idleTimer = null;
 let countdownTimer = null;
@@ -162,7 +189,7 @@ function setSync(state, text) {
   document.getElementById('syncText').textContent = text;
 }
 
-// ===== 数据加载（SHEET 优先） =====
+// ===== 数据加载 =====
 async function loadData() {
   if (!SCRIPT_URL) { setSync('err', 'URL belum ditetapkan'); return; }
   setSync('busy', 'Memuatkan...');
@@ -181,7 +208,8 @@ async function loadData() {
       return o;
     });
     dirty = false;
-    render();
+    filters = {};
+    applyFiltersAndRender();
     setSync('ok', 'Data dimuat (' + rows.length + ')');
   } catch (err) {
     console.error(err);
@@ -189,7 +217,7 @@ async function loadData() {
   }
 }
 
-// ===== 日期/时间工具 =====
+// ===== 工具函数 =====
 function pad2(n){ return String(n).padStart(2,'0'); }
 function normalizeDate(v) {
   if (!v) return '';
@@ -201,17 +229,31 @@ function normalizeDate(v) {
   if (m) return `${m[3]}-${pad2(m[2])}-${pad2(m[1])}`;
   return s;
 }
+// 支持 HH:MM 或 12小时制时间字符串转换为分钟
 function timeToMin(s) {
   if (!s) return null;
-  const m = String(s).trim().match(/^(\d{1,2}):(\d{2})$/);
-  if (!m) return null;
-  const h = +m[1], mi = +m[2];
-  if (h > 23 || mi > 59) return null;
-  return h*60+mi;
+  const str = String(s).trim();
+  // 格式匹配: 6:34:55 AM 或 6:34 AM
+  const match12 = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i);
+  if (match12) {
+    let h = parseInt(match12[1], 10);
+    const m = parseInt(match12[2], 10);
+    const ampm = match12[4].toUpperCase();
+    if (ampm === 'PM' && h < 12) h += 12;
+    if (ampm === 'AM' && h === 12) h = 0;
+    return h * 60 + m;
+  }
+  // 匹配 24小时制 HH:MM
+  const match24 = str.match(/^(\d{1,2}):(\d{2})$/);
+  if (match24) {
+    const h = parseInt(match24[1], 10), m = parseInt(match24[2], 10);
+    if (h <= 23 && m <= 59) return h * 60 + m;
+  }
+  return null;
 }
 function fmtH(min) { return (min/60).toFixed(2); }
 
-// ===== 计算 =====
+// ===== 计算逻辑 =====
 function computeRow(r) {
   const segs = [
     [timeToMin(r['Clock In 01']), timeToMin(r['Clock Out 01'])],
@@ -232,7 +274,6 @@ function computeRow(r) {
   else if (workMin > 7*60+30) { swt = '超时工作'; hl = 'hl-green'; }
   else { swt = '工时不足'; hl = 'hl-yellow'; }
 
-  // 扣款
   const gaji = parseFloat(r['GAJI']) || 0;
   const status = (r['STATUS'] || '').toUpperCase();
   let deduct = 0;
@@ -249,17 +290,37 @@ function computeRow(r) {
   return { segH, workMin, otMin, swt, hl, deduct };
 }
 
-// ===== 渲染 =====
+// ===== 筛选与渲染 =====
+function applyFiltersAndRender() {
+  filteredRows = rows.filter(r => {
+    for (const col in filters) {
+      const set = filters[col];
+      if (set && set.size > 0) {
+        let val = r[col] ? String(r[col]).trim() : '';
+        if (!set.has(val)) return false;
+      }
+    }
+    return true;
+  });
+  render();
+}
+
 function render() {
   const hdr = document.getElementById('headerRow');
-  hdr.innerHTML = '<th>#</th>' + SHEET_HEADERS.map(h => `<th>${h}</th>`).join('');
+  let hHtml = '<th>#</th>';
+  SHEET_HEADERS.forEach(h => {
+    const isActive = filters[h] && filters[h].size > 0 ? 'active' : '';
+    hHtml += `<th><div class="th-inner"><span>${h}</span><button class="filter-btn ${isActive}" onclick="openFilter('${h}', event)">▼</button></div></th>`;
+  });
+  hdr.innerHTML = hHtml;
+
   const tb = document.getElementById('tableBody');
-  if (!rows.length) {
-    tb.innerHTML = `<tr><td colspan="${SHEET_HEADERS.length+1}"><div class="empty">Tiada data. Klik "Muat Semula" atau tambah baris.</div></td></tr>`;
+  if (!filteredRows.length) {
+    tb.innerHTML = `<tr><td colspan="${SHEET_HEADERS.length+1}"><div class="empty">Tiada data atau tiada baris sepadan dengan tapisan.</div></td></tr>`;
     return;
   }
   const frag = document.createDocumentFragment();
-  rows.forEach((r, i) => frag.appendChild(buildRow(r, i)));
+  filteredRows.forEach((r, i) => frag.appendChild(buildRow(r, i)));
   tb.innerHTML = ''; tb.appendChild(frag);
 }
 
@@ -295,7 +356,16 @@ function buildRow(r, i) {
         if ((r[h]||'').toUpperCase() === o) opt.selected = true;
         sel.appendChild(opt);
       });
-      sel.addEventListener('change', () => { r[h] = sel.value; markDirty(); refreshRow(tr, r); });
+      sel.addEventListener('change', () => { 
+        r[h] = sel.value; markDirty(); 
+        // 如果当前在筛选状态且修改了该值导致不匹配，刷新
+        if (filters[h]) applyFiltersAndRender();
+        else {
+           // 局部刷新本行
+           const idx = filteredRows.indexOf(r);
+           if (idx !== -1) { const newTr = buildRow(r, idx); tr.replaceWith(newTr); }
+        }
+      });
       td.appendChild(sel);
     } else if (READONLY_COLS.includes(h)) {
       td.className = 'ro'; td.textContent = r[h] || '';
@@ -303,8 +373,7 @@ function buildRow(r, i) {
       const inp = document.createElement('input');
       inp.className = 'cell' + (h === 'REMARK' ? ' wide' : '');
       inp.value = r[h] || '';
-      inp.placeholder = h === 'Date' ? 'YYYY-MM-DD' : (h.startsWith('Clock') ? 'HH:MM' : '');
-      // HALF TT 仅在 HALF DAY LEAVE 可编辑
+      inp.placeholder = h === 'Date' ? 'YYYY-MM-DD' : (h.startsWith('Clock') ? '6:34:55 AM' : '');
       if ((h === 'HALF TT JAM' || h === 'HALF TT MIN') && (r['STATUS']||'').toUpperCase() !== 'HALF DAY LEAVE') {
         inp.disabled = true;
       }
@@ -314,7 +383,9 @@ function buildRow(r, i) {
       });
       inp.addEventListener('change', () => {
         if (h === 'Date') inp.value = normalizeDate(inp.value);
-        refreshRow(tr, r);
+        // 重新计算该行
+        const idx = filteredRows.indexOf(r);
+        if (idx !== -1) { const newTr = buildRow(r, idx); tr.replaceWith(newTr); }
       });
       td.appendChild(inp);
     }
@@ -323,11 +394,90 @@ function buildRow(r, i) {
   return tr;
 }
 
-function refreshRow(tr, r) {
-  // 重建该行（简单可靠）
-  const idx = rows.indexOf(r);
-  const newTr = buildRow(r, idx);
-  tr.replaceWith(newTr);
+// ===== 筛选面板逻辑 =====
+function openFilter(col, e) {
+  e.stopPropagation();
+  currentFilterCol = col;
+  const panel = document.getElementById('filterPanel');
+  const rect = e.target.getBoundingClientRect();
+  
+  // 收集当前列所有唯一值
+  const valSet = new Set();
+  rows.forEach(r => {
+    let v = r[col] ? String(r[col]).trim() : '';
+    valSet.add(v);
+  });
+  const vals = Array.from(valSet).sort((a,b) => {
+    if (a === '') return -1;
+    if (b === '') return 1;
+    return a.localeCompare(b, undefined, {numeric: true});
+  });
+
+  tempCheckedValues = filters[col] ? new Set(filters[col]) : new Set(vals);
+  
+  const listEl = document.getElementById('fpList');
+  const searchEl = document.getElementById('fpSearch');
+  searchEl.value = '';
+  
+  const renderList = (kw) => {
+    kw = (kw||'').toLowerCase();
+    const shown = vals.filter(v => {
+      if (!kw) return true;
+      if (v === '') return '(empty)'.includes(kw) || 'kosong'.includes(kw);
+      return v.toLowerCase().includes(kw);
+    });
+    listEl.innerHTML = shown.map(v => {
+      const checked = tempCheckedValues.has(v) ? 'checked' : '';
+      const lbl = v === '' ? '<span style="color:#94a3b8;font-style:italic;">(Empty)</span>' : v;
+      return `<label class="fp-item"><input type="checkbox" value="${v}" ${checked} onchange="fpToggle(this)"><span>${lbl}</span></label>`;
+    }).join('');
+  };
+  renderList('');
+
+  searchEl.oninput = () => renderList(searchEl.value);
+
+  // 定位
+  panel.style.left = Math.min(rect.left, window.innerWidth - 240) + 'px';
+  panel.style.top = (rect.bottom + 5) + 'px';
+  panel.classList.add('show');
+  
+  document.addEventListener('mousedown', closeFilterOnClickOutside);
+}
+
+function fpToggle(cb) {
+  if (cb.checked) tempCheckedValues.add(cb.value);
+  else tempCheckedValues.delete(cb.value);
+}
+function fpSelectAll() {
+  const cbs = document.querySelectorAll('#fpList input[type="checkbox"]');
+  cbs.forEach(cb => { cb.checked = true; tempCheckedValues.add(cb.value); });
+}
+function fpClearAll() {
+  const cbs = document.querySelectorAll('#fpList input[type="checkbox"]');
+  cbs.forEach(cb => { cb.checked = false; });
+  tempCheckedValues.clear();
+}
+function fpApply() {
+  const allVals = new Set();
+  rows.forEach(r => allVals.add(r[currentFilterCol] ? String(r[currentFilterCol]).trim() : ''));
+  
+  if (tempCheckedValues.size === allVals.size) {
+    delete filters[currentFilterCol];
+  } else {
+    filters[currentFilterCol] = new Set(tempCheckedValues);
+  }
+  fpClose();
+  applyFiltersAndRender();
+}
+function fpClose() {
+  document.getElementById('filterPanel').classList.remove('show');
+  document.removeEventListener('mousedown', closeFilterOnClickOutside);
+}
+function closeFilterOnClickOutside(e) {
+  const p = document.getElementById('filterPanel');
+  if (!p.contains(e.target) && !e.target.classList.contains('filter-btn')) {
+    fpClose();
+  }
 }
 
 // ===== 脏标记 + 自动保存 =====
@@ -356,7 +506,7 @@ function closeModal() {
   if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
 }
 
-function autoSaveCancel() { closeModal(); /* 本次不保存 */ }
+function autoSaveCancel() { closeModal(); }
 function autoSaveConfirm() { closeModal(); doSave(); }
 
 async function manualSave() {
@@ -390,7 +540,6 @@ async function doSave() {
   }
 }
 
-// ===== 初始化 =====
 window.addEventListener('DOMContentLoaded', () => {
   loadSavedUrl();
   if (SCRIPT_URL) loadData();
