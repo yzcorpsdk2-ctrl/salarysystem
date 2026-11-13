@@ -46,23 +46,25 @@
   .dp-item {
     background: var(--blue-soft); border: 1px solid var(--border); border-radius: 6px;
     padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;
-    position: relative;
+    position: relative; overflow: hidden;
   }
-  .dp-item label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-  .dp-item span, .dp-item input { font-size: 15px; font-weight: 800; color: var(--blue); outline: none; border: none; background: transparent; width: 100%; }
+  .dp-item label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* 自适应文字大小，自动换行 */
+  .dp-item span, .dp-item input { font-size: clamp(12px, 1.2vw, 15px); font-weight: 800; color: var(--blue); outline: none; border: none; background: transparent; width: 100%; word-break: break-word; line-height: 1.2; }
   .dp-item input:hover, .dp-item input:focus { border-bottom: 1px solid var(--blue); }
   
   /* 搜索下拉 */
   .search-wrap { position: relative; grid-column: span 2; }
-  .search-wrap input { font-size: 14px; font-weight: 600; color: var(--text); padding: 4px 0; width: 100%; border: none; border-bottom: 2px dashed #b8cfe8; background: transparent; outline: none; }
+  .search-wrap input { font-size: 13px; font-weight: 600; color: var(--text); padding: 4px 0; width: 100%; border: none; border-bottom: 2px dashed #b8cfe8; background: transparent; outline: none; }
   .search-wrap input:focus { border-bottom-color: var(--blue); }
   .search-dropdown {
     position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--border);
     border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,.1); max-height: 200px; overflow-y: auto; z-index: 50; display: none;
   }
   .search-dropdown.show { display: block; }
-  .sd-item { padding: 8px 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
+  .sd-item { padding: 8px 12px; cursor: pointer; font-size: 12.5px; border-bottom: 1px solid #f1f5f9; }
   .sd-item:hover { background: var(--blue-soft); color: var(--blue); }
+  .sd-item.all-item { font-weight: 700; color: #0f7a54; background: #f0fdf4; border-bottom: 2px solid #bbf7d0; }
 
   /* 表格 */
   .table-wrap { overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: #fff; max-height: calc(100vh - 320px); position: relative; }
@@ -158,12 +160,21 @@
   <!-- 顶部员工与假期汇总面板 -->
   <div class="dashboard-panel" id="dashboardPanel">
     <div class="dp-grid">
+      
+      <!-- 员工搜索 -->
       <div class="dp-item search-wrap">
         <label>Cari Pekerja (ID / Nama)</label>
         <input type="text" id="searchEmployeeInput" placeholder="Taip nama atau ID..." autocomplete="off">
-        <div class="search-dropdown" id="searchDropdown"></div>
+        <div class="search-dropdown" id="searchEmployeeDropdown"></div>
       </div>
-      <div class="dp-item"><label>Kumpulan</label><span id="dpGroup">-</span></div>
+
+      <!-- Kumpulan 搜索 -->
+      <div class="dp-item search-wrap">
+        <label>Cari Kumpulan (Group)</label>
+        <input type="text" id="searchGroupInput" placeholder="Taip kumpulan..." autocomplete="off">
+        <div class="search-dropdown" id="searchGroupDropdown"></div>
+      </div>
+
       <div class="dp-item"><label>Situation</label><span id="dpSituation">-</span></div>
       <div class="dp-item"><label>Gaji (RM)</label><span id="dpGaji">0.00</span></div>
       
@@ -193,7 +204,7 @@
   </div>
 </div>
 
-<!-- 筛选面板 & 自动保存弹窗 -->
+<!-- 筛选面板 & 自动保存弹窗 (保持原样) -->
 <div class="filter-panel" id="filterPanel">
   <div class="fp-head"><input type="text" id="fpSearch" placeholder="Cari nilai..."></div>
   <div class="fp-actions">
@@ -221,7 +232,6 @@
 
 <script>
 const URL_KEY = 'payrollScriptUrl';
-// 移除 AL/SL REMAIN，新增 THIS AL/SL REMAIN
 const SHEET_HEADERS = [
   'ID KOD','SITUATION','GROUP','NAME','SHIF','GAJI','Date',
   'Clock In 01','Clock Out 01','Clock Time(h) 01',
@@ -240,13 +250,15 @@ const READONLY_COLS = ['ID KOD','SITUATION','GROUP','NAME','SHIF','GAJI',
 const STATUS_OPTIONS = ['', 'ANNUAL LEAVE','UNPAID LEAVE','HALF DAY LEAVE','SICK LEAVE','OFF DAY','UNDEDUCTION LEAVE','MATERNITY LEAVE'];
 
 let SCRIPT_URL = '';
-let allRows = []; // 原始数据
-let filteredRows = []; // 表格显示数据
-let staffList = []; // 员工列表（用于搜索）
-let alslData = []; // ALSLREMAIN 数据
+let allRows = [];
+let filteredRows = [];
+let staffList = [];
+let alslData = [];
 
-let currentSelectedCode = null; // 当前选中的员工
-let currentFilterMonth = ''; // 当前筛选的月份(可选，此处以日期前缀匹配)
+// 当前选中的 ID 和 GROUP
+let currentSelectedCode = 'ALL'; 
+let currentSelectedGroup = 'ALL';
+
 let filters = {};
 let currentFilterCol = null;
 let tempCheckedValues = new Set();
@@ -282,7 +294,6 @@ function setSync(state, text) {
   document.getElementById('syncText').textContent = text;
 }
 
-// 初始化
 async function loadData() {
   if (!SCRIPT_URL) { setSync('err', 'URL belum ditetapkan'); return; }
   setSync('busy', 'Memuatkan...');
@@ -295,7 +306,6 @@ async function loadData() {
 
     if (resSheet.status !== 'success') throw new Error('Gagal load SHEET');
     
-    // 处理主表格数据
     allRows = (resSheet.data || []).map(r => {
       const o = {};
       SHEET_HEADERS.forEach(h => {
@@ -307,25 +317,18 @@ async function loadData() {
       return o;
     });
     
-    // 处理员工列表
-    if (resStaff.result === 'success') {
-      staffList = resStaff.data || [];
-    }
-    
-    // 处理 ALSL 数据
-    if (resALSL.status === 'success') {
-      alslData = resALSL.data || [];
-    }
+    if (resStaff.result === 'success') staffList = resStaff.data || [];
+    if (resALSL.status === 'success') alslData = resALSL.data || [];
 
-    // 自动选中第一个员工或者之前选中的
-    const savedCode = localStorage.getItem('leaveSelectedCode');
-    if (savedCode && staffList.some(s => String(s.Code) === String(savedCode))) {
-      selectEmployee(savedCode);
-    } else if (staffList.length > 0) {
-      selectEmployee(staffList[0].Code);
-    } else {
-      applyFiltersAndRender();
-    }
+    // 恢复上次选择或默认 ALL
+    const savedCode = localStorage.getItem('leaveSelectedCode') || 'ALL';
+    const savedGroup = localStorage.getItem('leaveSelectedGroup') || 'ALL';
+    
+    selectGroup(savedGroup, false); // 先选组
+    selectEmployee(savedCode, false); // 再选人 (如果是ALL会覆盖组)
+    
+    updateDashboardStats();
+    applyFiltersAndRender();
 
     setSync('ok', 'Data dimuat');
   } catch (err) {
@@ -334,7 +337,6 @@ async function loadData() {
   }
 }
 
-// ===== 日期/时间工具 =====
 function pad2(n){ return String(n).padStart(2,'0'); }
 function normalizeDate(v) {
   if (!v) return '';
@@ -374,7 +376,6 @@ function formatDuration(totalMinutes) {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-// ===== 计算逻辑 =====
 function computeRow(r) {
   const segs = [
     [timeToMin(r['Clock In 01']), timeToMin(r['Clock Out 01'])],
@@ -407,83 +408,139 @@ function computeRow(r) {
     const hourly = (gaji/30)/7.5;
     deduct = hourly * hrs;
   }
-
   return { segH, workMin, otMin, swt, hl, deduct };
 }
 
-// ===== 搜索与选中员工 =====
+// ================= 搜索与选中逻辑 =================
 const searchInput = document.getElementById('searchEmployeeInput');
-const searchDropdown = document.getElementById('searchDropdown');
+const searchDropdown = document.getElementById('searchEmployeeDropdown');
+const groupInput = document.getElementById('searchGroupInput');
+const groupDropdown = document.getElementById('searchGroupDropdown');
+
+searchInput.addEventListener('focus', () => { searchInput.select(); });
+groupInput.addEventListener('focus', () => { groupInput.select(); });
 
 searchInput.addEventListener('input', () => {
   const q = searchInput.value.trim().toLowerCase();
-  if (!q) { searchDropdown.classList.remove('show'); return; }
-  const matches = staffList.filter(s => 
+  let matches = staffList.filter(s => 
     String(s.Name || '').toLowerCase().includes(q) || 
     String(s.Code || '').toLowerCase().includes(q)
-  ).slice(0, 10);
+  ).slice(0, 20);
   
+  let html = `<div class="sd-item all-item" onclick="selectEmployee('ALL')">🌐 ALL (Semua Pekerja)</div>`;
   if (matches.length > 0) {
-    searchDropdown.innerHTML = matches.map(m => `
-      <div class="sd-item" onclick="selectEmployee('${m.Code}')">
-        <b>${m.Code}</b> - ${m.Name}
-      </div>
-    `).join('');
-    searchDropdown.classList.add('show');
-  } else {
-    searchDropdown.classList.remove('show');
+    html += matches.map(m => `<div class="sd-item" onclick="selectEmployee('${m.Code}')"><b>${m.Code}</b> - ${m.Name}</div>`).join('');
   }
-});
-document.addEventListener('click', (e) => {
-  if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
-    searchDropdown.classList.remove('show');
-  }
+  searchDropdown.innerHTML = html;
+  searchDropdown.classList.add('show');
 });
 
-function selectEmployee(code) {
+groupInput.addEventListener('input', () => {
+  const q = groupInput.value.trim().toLowerCase();
+  const groups = new Set();
+  staffList.forEach(s => { if (s.GroupName) groups.add(String(s.GroupName).trim()); });
+  const matches = Array.from(groups).filter(g => g.toLowerCase().includes(q));
+
+  let html = `<div class="sd-item all-item" onclick="selectGroup('ALL')">🌐 ALL (Semua Kumpulan)</div>`;
+  if (matches.length > 0) {
+    html += matches.map(g => `<div class="sd-item" onclick="selectGroup('${g}')">${g}</div>`).join('');
+  }
+  groupDropdown.innerHTML = html;
+  groupDropdown.classList.add('show');
+});
+
+document.addEventListener('click', (e) => {
+  if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) searchDropdown.classList.remove('show');
+  if (!groupInput.contains(e.target) && !groupDropdown.contains(e.target)) groupDropdown.classList.remove('show');
+});
+
+function selectEmployee(code, renderNow = true) {
   currentSelectedCode = code;
   localStorage.setItem('leaveSelectedCode', code);
   
-  const staff = staffList.find(s => String(s.Code) === String(code));
-  if (staff) {
-    searchInput.value = `${staff.Code} - ${staff.Name}`;
-    document.getElementById('dpGroup').textContent = staff.GroupName || '-';
-    document.getElementById('dpSituation').textContent = staff.Situation || '-';
-    document.getElementById('dpGaji').textContent = parseFloat(staff.Salary || 0).toFixed(2);
+  if (code === 'ALL') {
+    searchInput.value = 'ALL (Semua Pekerja)';
+    // 选 ALL 时，重置 Group
+    currentSelectedGroup = 'ALL';
+    localStorage.setItem('leaveSelectedGroup', 'ALL');
+    groupInput.value = 'ALL (Semua Kumpulan)';
+  } else {
+    const staff = staffList.find(s => String(s.Code) === String(code));
+    if (staff) searchInput.value = `${staff.Code} - ${staff.Name}`;
   }
   searchDropdown.classList.remove('show');
   
-  updateDashboardStats();
-  applyFiltersAndRender();
+  if (renderNow) { updateDashboardStats(); applyFiltersAndRender(); }
 }
 
-// ===== 计算面板统计数据 =====
+function selectGroup(group, renderNow = true) {
+  currentSelectedGroup = group;
+  localStorage.setItem('leaveSelectedGroup', group);
+  
+  if (group === 'ALL') {
+    groupInput.value = 'ALL (Semua Kumpulan)';
+  } else {
+    groupInput.value = group;
+    // 选 Group 时，重置员工为 ALL
+    currentSelectedCode = 'ALL';
+    localStorage.setItem('leaveSelectedCode', 'ALL');
+    searchInput.value = 'ALL (Semua Pekerja)';
+  }
+  groupDropdown.classList.remove('show');
+  
+  if (renderNow) { updateDashboardStats(); applyFiltersAndRender(); }
+}
+
+// ================= 面板统计计算 =================
 function updateDashboardStats() {
-  if (!currentSelectedCode) return;
-
-  // 1. 获取 ALSL 数据
-  const alsl = alslData.find(a => String(a['ID KOD']) === String(currentSelectedCode)) || {};
-  const lastAL = parseFloat(alsl['LASTAL']) || 0;
-  const lastSL = parseFloat(alsl['LASTSL']) || 0;
+  let targetStaffCodes = [];
+  let labelGaji = 0, labelLastAL = 0, labelLastSL = 0;
   
-  document.getElementById('dpLastAL').textContent = lastAL;
-  document.getElementById('dpLastSL').textContent = lastSL;
-
-  // 2. 获取该员工的打卡记录
-  const empRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
-  
-  // 判断月份：获取该员工最新的一条打卡记录作为“当前月”
-  let targetMonth = '';
-  if (empRows.length > 0) {
-    const dates = empRows.map(r => r['Date']).filter(d => d).sort();
-    if (dates.length > 0) targetMonth = dates[dates.length - 1].substring(0, 7); // "YYYY-MM"
+  // 1. 确定要统计的员工范围
+  if (currentSelectedCode !== 'ALL') {
+    targetStaffCodes = [currentSelectedCode];
+    const staff = staffList.find(s => String(s.Code) === String(currentSelectedCode));
+    if (staff) {
+      document.getElementById('dpSituation').textContent = staff.Situation || '-';
+      labelGaji = parseFloat(staff.Salary || 0);
+    }
+  } else if (currentSelectedGroup !== 'ALL') {
+    const groupStaff = staffList.filter(s => String(s.GroupName).trim() === currentSelectedGroup);
+    targetStaffCodes = groupStaff.map(s => String(s.Code));
+    document.getElementById('dpSituation').textContent = 'GROUP';
+    labelGaji = groupStaff.reduce((sum, s) => sum + (parseFloat(s.Salary) || 0), 0);
+  } else {
+    targetStaffCodes = staffList.map(s => String(s.Code));
+    document.getElementById('dpSituation').textContent = 'ALL';
+    labelGaji = staffList.reduce((sum, s) => sum + (parseFloat(s.Salary) || 0), 0);
   }
 
-  // 3. 统计本月各项 STATUS 次数
+  document.getElementById('dpGaji').textContent = labelGaji.toFixed(2);
+
+  // 2. 统计 Last AL/SL (从 ALSLREMAIN 拿)
+  targetStaffCodes.forEach(code => {
+    const alsl = alslData.find(a => String(a['ID KOD']) === code);
+    if (alsl) {
+      labelLastAL += parseFloat(alsl['LASTAL']) || 0;
+      labelLastSL += parseFloat(alsl['LASTSL']) || 0;
+    }
+  });
+  document.getElementById('dpLastAL').textContent = labelLastAL.toFixed(1);
+  document.getElementById('dpLastSL').textContent = labelLastSL.toFixed(1);
+
+  // 3. 统计打卡记录 (限定本月)
+  let targetMonth = '';
+  if (allRows.length > 0) {
+    const dates = allRows.map(r => r['Date']).filter(d => d).sort();
+    if (dates.length > 0) targetMonth = dates[dates.length - 1].substring(0, 7);
+  }
+
   let countAL = 0, countSL = 0, countUNPL = 0, countOFF = 0, countHALF = 0, countUNDD = 0, countMTNT = 0;
   let totalDeduct = 0;
 
-  empRows.forEach(r => {
+  allRows.forEach(r => {
+    if (!targetStaffCodes.includes(String(r['ID KOD']))) return;
+
     if (targetMonth && r['Date'] && r['Date'].startsWith(targetMonth)) {
       const s = (r['STATUS'] || '').toUpperCase();
       if (s === 'ANNUAL LEAVE') countAL++;
@@ -498,11 +555,9 @@ function updateDashboardStats() {
     totalDeduct += c.deduct;
   });
 
-  // 4. 计算 This AL/SL Remain
-  const thisAL = lastAL - countAL;
-  const thisSL = lastSL - countSL;
+  const thisAL = labelLastAL - countAL;
+  const thisSL = labelLastSL - countSL;
 
-  // 5. 更新排版数据
   document.getElementById('dpPickedAL').textContent = countAL;
   document.getElementById('dpPickedSL').textContent = countSL;
   document.getElementById('dpPickedUNPL').textContent = countUNPL;
@@ -511,21 +566,24 @@ function updateDashboardStats() {
   document.getElementById('dpPickedUNDD').textContent = countUNDD;
   document.getElementById('dpPickedMTNT').textContent = countMTNT;
   
-  document.getElementById('dpThisAL').textContent = thisAL;
-  document.getElementById('dpThisSL').textContent = thisSL;
+  document.getElementById('dpThisAL').textContent = thisAL.toFixed(1);
+  document.getElementById('dpThisSL').textContent = thisSL.toFixed(1);
   document.getElementById('dpPickedUNPL2').textContent = countUNPL;
   document.getElementById('dpTotalDeduct').textContent = totalDeduct.toFixed(2);
 }
 
-// ===== 渲染表格 =====
+// ================= 渲染表格 =================
 function applyFiltersAndRender() {
-  // 首先根据选中的员工进行过滤
   let baseRows = allRows;
-  if (currentSelectedCode) {
-    baseRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
+  
+  if (currentSelectedCode !== 'ALL') {
+    baseRows = baseRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
+  } else if (currentSelectedGroup !== 'ALL') {
+    const groupStaff = staffList.filter(s => String(s.GroupName).trim() === currentSelectedGroup);
+    const codes = groupStaff.map(s => String(s.Code));
+    baseRows = baseRows.filter(r => codes.includes(String(r['ID KOD'])));
   }
 
-  // 然后再应用列筛选
   filteredRows = baseRows.filter(r => {
     for (const col in filters) {
       const set = filters[col];
@@ -564,9 +622,7 @@ function buildRow(r, i) {
   if (c.hl) tr.classList.add(c.hl);
   
   const situation = (r['SITUATION'] || '').toUpperCase();
-  if (situation === 'INACTIVE') {
-    tr.classList.add('row-inactive');
-  }
+  if (situation === 'INACTIVE') tr.classList.add('row-inactive');
 
   const tdIdx = document.createElement('td'); tdIdx.className = 'col-idx'; tdIdx.textContent = i+1; tr.appendChild(tdIdx);
 
@@ -594,11 +650,9 @@ function buildRow(r, i) {
       td.className = 'calc'; td.textContent = c.deduct ? c.deduct.toFixed(2) : '0.00';
     } 
     else if (h === 'THIS AL REMAIN' || h === 'THIS SL REMAIN') {
-      // 自动从排版拿取最新的数字
       td.className = 'calc';
-      td.textContent = h === 'THIS AL REMAIN' 
-        ? document.getElementById('dpThisAL').textContent 
-        : document.getElementById('dpThisSL').textContent;
+      // 如果是查看个别人，用该人的；如果是 ALL/GROUP，暂时用全局头部统计数字
+      td.textContent = h === 'THIS AL REMAIN' ? document.getElementById('dpThisAL').textContent : document.getElementById('dpThisSL').textContent;
     }
     else if (h === 'SITUATION') {
       let cls = 'ro';
@@ -628,7 +682,7 @@ function buildRow(r, i) {
       sel.addEventListener('change', () => { 
         r[h] = sel.value; markDirty(); 
         applyStatusColor();
-        updateDashboardStats(); // 改变状态后更新统计
+        updateDashboardStats();
         if (filters[h]) applyFiltersAndRender();
         else {
            const idx = filteredRows.indexOf(r);
@@ -645,9 +699,8 @@ function buildRow(r, i) {
       inp.className = 'cell' + (h === 'REMARK' ? ' wide' : '');
       inp.value = r[h] || '';
       inp.placeholder = h === 'Date' ? 'YYYY-MM-DD' : (h.startsWith('Clock') ? '6:34:55 AM' : '');
-      if ((h === 'HALF TT JAM' || h === 'HALF TT MIN') && (r['STATUS']||'').toUpperCase() !== 'HALF DAY LEAVE') {
-        inp.disabled = true;
-      }
+      if ((h === 'HALF TT JAM' || h === 'HALF TT MIN') && (r['STATUS']||'').toUpperCase() !== 'HALF DAY LEAVE') inp.disabled = true;
+      
       inp.addEventListener('input', () => {
         r[h] = h === 'Date' ? normalizeDate(inp.value) : inp.value.trim();
         markDirty();
@@ -665,7 +718,7 @@ function buildRow(r, i) {
   return tr;
 }
 
-// ===== 筛选面板 =====
+// ================= 列筛选面板 (保持原样) =================
 function openFilter(col, e) {
   e.stopPropagation();
   currentFilterCol = col;
@@ -673,7 +726,15 @@ function openFilter(col, e) {
   const rect = e.target.getBoundingClientRect();
   
   const valSet = new Set();
-  let baseRows = currentSelectedCode ? allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode)) : allRows;
+  let baseRows = allRows;
+  if (currentSelectedCode !== 'ALL') {
+    baseRows = baseRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
+  } else if (currentSelectedGroup !== 'ALL') {
+    const groupStaff = staffList.filter(s => String(s.GroupName).trim() === currentSelectedGroup);
+    const codes = groupStaff.map(s => String(s.Code));
+    baseRows = baseRows.filter(r => codes.includes(String(r['ID KOD'])));
+  }
+
   baseRows.forEach(r => valSet.add(r[col] ? String(r[col]).trim() : ''));
   const vals = Array.from(valSet).sort((a,b) => {
     if (a === '') return -1;
@@ -724,7 +785,15 @@ function fpClearAll() {
   tempCheckedValues.clear();
 }
 function fpApply() {
-  let baseRows = currentSelectedCode ? allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode)) : allRows;
+  let baseRows = allRows;
+  if (currentSelectedCode !== 'ALL') {
+    baseRows = baseRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
+  } else if (currentSelectedGroup !== 'ALL') {
+    const groupStaff = staffList.filter(s => String(s.GroupName).trim() === currentSelectedGroup);
+    const codes = groupStaff.map(s => String(s.Code));
+    baseRows = baseRows.filter(r => codes.includes(String(r['ID KOD'])));
+  }
+
   const allVals = new Set();
   baseRows.forEach(r => allVals.add(r[currentFilterCol] ? String(r[currentFilterCol]).trim() : ''));
   
@@ -745,7 +814,7 @@ function closeFilterOnClickOutside(e) {
   if (!p.contains(e.target) && !e.target.classList.contains('filter-btn')) fpClose();
 }
 
-// ===== 自动保存 =====
+// ================= 自动保存 =================
 function markDirty() {
   dirty = true;
   setSync('busy', 'Perubahan belum disimpan');
@@ -770,7 +839,6 @@ function closeModal() {
   document.getElementById('autoSaveModal').classList.remove('show');
   if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
 }
-
 function autoSaveCancel() { closeModal(); }
 function autoSaveConfirm() { closeModal(); doSave(); }
 
@@ -784,11 +852,13 @@ async function doSave() {
   if (!SCRIPT_URL) { alert('URL belum ditetapkan.'); return; }
   setSync('busy', 'Menyimpan...');
   try {
+    // 保存前，为当前选中的行更新最终的 THIS AL/SL REMAIN 值，防止存错
     const payload = allRows.map(r => {
       const o = {};
       SHEET_HEADERS.forEach(h => {
-         if(h === 'THIS AL REMAIN' || h === 'THIS SL REMAIN') {
-             o[h] = h === 'THIS AL REMAIN' ? document.getElementById('dpThisAL').textContent : document.getElementById('dpThisSL').textContent;
+         if (h === 'THIS AL REMAIN' || h === 'THIS SL REMAIN') {
+             // 如果是单个人保存，存他的数值，否则留空交由排版展示
+             o[h] = r[h]; 
          } else {
              o[h] = r[h] === undefined || r[h] === null ? '' : r[h];
          }
