@@ -35,32 +35,40 @@
 
   /* 顶部控制面板 (仪表盘) */
   .container { max-width: 100%; padding: 14px 18px; }
+  
+  /* 新的仪表盘布局：四组框 */
   .dashboard-panel {
     background: #fff; border: 1px solid var(--border); border-radius: 8px;
     padding: 16px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(15,23,42,.03);
+    display: flex; flex-wrap: wrap; gap: 16px;
   }
-  .dp-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px;
+  .dash-group {
+    flex: 1 1 auto; background: var(--blue-soft); border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px; display: flex; flex-direction: column; gap: 10px; min-width: 260px;
   }
-  .dp-item {
-    background: var(--blue-soft); border: 1px solid var(--border); border-radius: 6px;
-    padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;
-    position: relative; min-width: 0;
+  .dash-group-title {
+    font-size: 11px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 4px;
   }
-  .dp-item label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .dash-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+  .dash-item {
+    display: flex; flex-direction: column; gap: 2px; min-width: 0;
+    background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 6px 8px;
+  }
+  .dash-item label { font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dash-item span { font-size: 14px; font-weight: 800; color: var(--blue); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   
-  /* 所有输入框/展示框的通用样式 */
-  .dp-item input, .dp-item span { 
-    font-size: 15px; font-weight: 800; color: var(--blue); outline: none; border: none; background: transparent; width: 100%; 
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: inherit;
+  /* 搜索框内嵌样式 */
+  .dash-item.search-wrap { position: relative; padding: 0; background: transparent; border: none; }
+  .dash-item.search-wrap label { margin-bottom: 2px; }
+  .dash-item.search-wrap input {
+    font-size: 13px; font-weight: 600; color: var(--text); padding: 4px 6px; width: 100%;
+    border: 1px solid var(--border); border-radius: 4px; background: #fff; outline: none;
   }
-  .dp-item input:hover, .dp-item input:focus { border-bottom: 1px solid var(--blue); }
+  .dash-item.search-wrap input:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(26,79,138,.12); }
 
-  /* 搜索包裹器 */
-  .search-wrap { position: relative; grid-column: span 1; }
-  .search-wrap input { font-size: 14px; font-weight: 600; color: var(--text); padding: 4px 0; width: 100%; border: none; border-bottom: 2px dashed #b8cfe8; background: transparent; outline: none; }
-  .search-wrap input:focus { border-bottom-color: var(--blue); }
-  
   /* 搜索下拉 */
   .search-dropdown {
     position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--border);
@@ -136,40 +144,80 @@
 </div>
 
 <div class="container">
+  <!-- 新的仪表盘布局：四组框 -->
   <div class="dashboard-panel" id="dashboardPanel">
-    <div class="dp-grid">
-      <!-- 独立的员工搜索框 -->
-      <div class="dp-item search-wrap">
-        <label>Cari KOD / NAME</label>
-        <input type="text" id="searchEmpInput" placeholder="Taip ID atau Nama..." autocomplete="off">
-        <div class="search-dropdown" id="empDropdown"></div>
+    
+    <!-- 组 1: 基础信息 (搜索与统计) -->
+    <div class="dash-group" style="flex: 1.2;">
+      <div class="dash-group-title">MAKLUMAT ASAS</div>
+      <div class="dash-row">
+        <div class="dash-item search-wrap">
+          <label>CARI KOD / NAME</label>
+          <input type="text" id="searchEmpInput" placeholder="Taip ID atau Nama..." autocomplete="off">
+          <div class="search-dropdown" id="empDropdown"></div>
+        </div>
+        <div class="dash-item search-wrap">
+          <label>KUMPULAN</label>
+          <input type="text" id="searchGroupInput" placeholder="Taip Kumpulan..." autocomplete="off">
+          <div class="search-dropdown" id="groupDropdown"></div>
+        </div>
       </div>
-      
-      <!-- 独立的 Kumpulan 搜索框 -->
-      <div class="dp-item search-wrap">
-        <label>KUMPULAN</label>
-        <input type="text" id="searchGroupInput" placeholder="Taip Kumpulan..." autocomplete="off">
-        <div class="search-dropdown" id="groupDropdown"></div>
+      <div class="dash-row">
+        <div class="dash-item">
+          <label>SITUATION</label>
+          <span id="dpSituation">-</span>
+        </div>
+        <div class="dash-item">
+          <label>GAJI (RM)</label>
+          <span id="dpGaji">0.00</span>
+        </div>
       </div>
-
-      <div class="dp-item"><label>SITUATION</label><span id="dpSituation">-</span></div>
-      <div class="dp-item"><label>GAJI (RM)</label><span id="dpGaji">0.00</span></div>
-      
-      <div class="dp-item" style="background:#fff3e0;"><label>Last AL Remain (Days)</label><span id="dpLastAL">0</span></div>
-      <div class="dp-item" style="background:#e8f5e9;"><label>Last SL Remain (Days)</label><span id="dpLastSL">0</span></div>
-      <div class="dp-item"><label>AL Picked This Month</label><span id="dpPickedAL">0</span></div>
-      <div class="dp-item"><label>SL Picked This Month</label><span id="dpPickedSL">0</span></div>
-      <div class="dp-item"><label>UNPL Picked This Month</label><span id="dpPickedUNPL">0</span></div>
-      <div class="dp-item"><label>Off Days This Month</label><span id="dpPickedOFF">0</span></div>
-      <div class="dp-item"><label>Half L Picked This Month</label><span id="dpPickedHALF">0</span></div>
-      <div class="dp-item"><label>Unddctn L Picked This Month</label><span id="dpPickedUNDD">0</span></div>
-      <div class="dp-item"><label>Mtnt L Picked This Month</label><span id="dpPickedMTNT">0</span></div>
-      
-      <div class="dp-item" style="background:#d1fae5; border-color:#6ee7b7;"><label>This AL Remain (Days)</label><span id="dpThisAL">0</span></div>
-      <div class="dp-item" style="background:#d1fae5; border-color:#6ee7b7;"><label>This SL Remain (Days)</label><span id="dpThisSL">0</span></div>
-      <div class="dp-item"><label>Unpaid Leave (Days)</label><span id="dpPickedUNPL2">0</span></div>
-      <div class="dp-item" style="background:#fecaca; border-color:#f87171;"><label>Total Deduction (RM)</label><span id="dpTotalDeduct">0.00</span></div>
     </div>
+
+    <!-- 组 2: PICKED THIS MONTH -->
+    <div class="dash-group" style="flex: 1.5;">
+      <div class="dash-group-title">PICKED THIS MONTH</div>
+      <div class="dash-row" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="dash-item"><label>AL</label><span id="dpPickedAL">0</span></div>
+        <div class="dash-item"><label>SL</label><span id="dpPickedSL">0</span></div>
+        <div class="dash-item"><label>UNPL</label><span id="dpPickedUNPL">0</span></div>
+        <div class="dash-item"><label>OFF</label><span id="dpPickedOFF">0</span></div>
+        <div class="dash-item"><label>HALF</label><span id="dpPickedHALF">0</span></div>
+        <div class="dash-item"><label>UNDD</label><span id="dpPickedUNDD">0</span></div>
+        <div class="dash-item"><label>MTNT</label><span id="dpPickedMTNT">0</span></div>
+      </div>
+    </div>
+
+    <!-- 组 3: REMAIN (LAST + THIS) -->
+    <div class="dash-group" style="flex: 1;">
+      <div class="dash-group-title">BAKI CUTI</div>
+      <div class="dash-row">
+        <div class="dash-item" style="background:#fff3e0;"><label>LAST AL</label><span id="dpLastAL">0</span></div>
+        <div class="dash-item" style="background:#e8f5e9;"><label>LAST SL</label><span id="dpLastSL">0</span></div>
+      </div>
+      <div class="dash-row">
+        <div class="dash-item" style="background:#d1fae5; border-color:#6ee7b7;"><label>THIS AL</label><span id="dpThisAL">0</span></div>
+        <div class="dash-item" style="background:#d1fae5; border-color:#6ee7b7;"><label>THIS SL</label><span id="dpThisSL">0</span></div>
+      </div>
+    </div>
+
+    <!-- 组 4: TOTAL PICKED LEAVE & TOTAL DEDUCTION -->
+    <div class="dash-group" style="flex: 1;">
+      <div class="dash-group-title">TOTAL PICKED LEAVE</div>
+      <div class="dash-row">
+        <div class="dash-item" style="grid-column: span 2; background:#e0f2fe; border-color:#7dd3fc;">
+          <label>TOTAL PICKED LEAVE (HARI:JAM:MIN)</label>
+          <span id="dpTotalPickedLeave" style="font-size: 13px; color: #0369a1;">0 DAYS 0 HOURS 0 MIN</span>
+        </div>
+      </div>
+      <div class="dash-row" style="margin-top: 4px;">
+        <div class="dash-item" style="grid-column: span 2; background:#fecaca; border-color:#f87171;">
+          <label>TOTAL DEDUCTION (RM)</label>
+          <span id="dpTotalDeduct">0.00</span>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <div class="table-wrap">
@@ -529,18 +577,15 @@ function selectGroup(groupName) {
 }
 
 // ========================================================
-// 4. 数据统计与渲染
+// 4. 数据统计与渲染 (含新的 Total Picked Leave 计算)
 // ========================================================
 function updateDashboardStats() {
   let targetCodes = [];
   if (currentGroupFilter) {
-    // 群组模式
     targetCodes = staffList.filter(s => String(s.GroupName) === currentGroupFilter).map(s => String(s.Code));
   } else if (currentSelectedCode === 'ALL') {
-    // 全员
     targetCodes = staffList.map(s => String(s.Code));
   } else {
-    // 单人
     targetCodes = [String(currentSelectedCode)];
   }
 
@@ -565,6 +610,7 @@ function updateDashboardStats() {
 
   let countAL = 0, countSL = 0, countUNPL = 0, countOFF = 0, countHALF = 0, countUNDD = 0, countMTNT = 0;
   let totalDeduct = 0;
+  let totalPickedLeaveDays = 0; // 用于计算总请假天数（非 OFF DAY）
 
   empRows.forEach(r => {
     if (targetMonth && r['Date'] && r['Date'].startsWith(targetMonth)) {
@@ -576,10 +622,74 @@ function updateDashboardStats() {
       if (s === 'HALF DAY LEAVE') countHALF++;
       if (s === 'UNDEDUCTION LEAVE') countUNDD++;
       if (s === 'MATERNITY LEAVE') countMTNT++;
+
+      // --- 新增：计算 Total Picked Leave（排除 OFF DAY 和空状态）---
+      if (s && s !== 'OFF DAY') {
+        if (s === 'HALF DAY LEAVE') {
+          // 半天假期按 0.5 天计算
+          totalPickedLeaveDays += 0.5;
+        } else {
+          // 其他假期类型按 1 天计算
+          totalPickedLeaveDays += 1;
+        }
+      }
     }
     const c = computeRow(r);
     totalDeduct += c.deduct;
   });
+
+  // --- 新增：计算 HALF TT JAM 和 HALF TT MIN 转为小时后的部分 ---
+  let totalHalfHours = 0;
+  empRows.forEach(r => {
+    if (targetMonth && r['Date'] && r['Date'].startsWith(targetMonth)) {
+      const s = (r['STATUS'] || '').toUpperCase();
+      if (s === 'HALF DAY LEAVE') {
+        const j = parseFloat(r['HALF TT JAM']) || 0;
+        const m = parseFloat(r['HALF TT MIN']) || 0;
+        totalHalfHours += j + (m / 60);
+      }
+    }
+  });
+
+  // 将额外的小时数转换为天/小时/分钟（1天=24小时，1小时=60分钟）
+  // 但因为 HALF DAY LEAVE 已经被计算为 0.5 天，这里的小时可能超过半天，需要叠加
+  // 更准确的做法：总请假天数 = (非半天假期的天数) + (半天假期数量 * 0.5) + (额外小时数 / 24)
+  // 然而上面的 totalPickedLeaveDays 已经包含了半天假期的0.5天，如果再将小时数转换，会重复。
+  // 重新调整计算逻辑：直接统计所有请假记录，计算总天数+小时+分钟，不依赖于简单的 count。
+  
+  // 重新计算 Total Picked Leave (更精确的方式)
+  let totalDays = 0;
+  let totalHours = 0;
+  let totalMinutes = 0;
+  
+  empRows.forEach(r => {
+    if (targetMonth && r['Date'] && r['Date'].startsWith(targetMonth)) {
+      const s = (r['STATUS'] || '').toUpperCase();
+      if (!s || s === 'OFF DAY') return; // 排除 OFF DAY
+      
+      if (s === 'HALF DAY LEAVE') {
+        // 半天假期：0.5天 + 小时+分钟
+        totalDays += 0.5;
+        const j = parseFloat(r['HALF TT JAM']) || 0;
+        const m = parseFloat(r['HALF TT MIN']) || 0;
+        totalHours += j;
+        totalMinutes += m;
+      } else {
+        // 其他请假类型：1天
+        totalDays += 1;
+      }
+    }
+  });
+  
+  // 规范化时间（分钟进位到小时，小时进位到天）
+  totalHours += Math.floor(totalMinutes / 60);
+  totalMinutes = totalMinutes % 60;
+  totalDays += Math.floor(totalHours / 24);
+  totalHours = totalHours % 24;
+  
+  // 格式化显示
+  const totalPickedLeaveStr = `${Math.floor(totalDays)} DAYS ${Math.floor(totalHours)} HOURS ${Math.floor(totalMinutes)} MIN`;
+  document.getElementById('dpTotalPickedLeave').textContent = totalPickedLeaveStr;
 
   const thisAL = lastAL - countAL;
   const thisSL = lastSL - countSL;
@@ -594,7 +704,6 @@ function updateDashboardStats() {
   
   document.getElementById('dpThisAL').textContent = thisAL.toFixed(2);
   document.getElementById('dpThisSL').textContent = thisSL.toFixed(2);
-  document.getElementById('dpPickedUNPL2').textContent = countUNPL;
   document.getElementById('dpTotalDeduct').textContent = totalDeduct.toFixed(2);
 }
 
@@ -660,15 +769,12 @@ function buildRow(r, i) {
   SHEET_HEADERS.forEach(h => {
     const td = document.createElement('td');
     
-    // 第一优先级：STATUS 颜色
     const isCodeOrName = (h === 'ID KOD' || h === 'NAME');
     const statusVal = (r['STATUS'] || '').toUpperCase();
     
-    // 如果给底色（行高亮）
     if (baseBg) td.style.backgroundColor = baseBg;
 
     if (isCodeOrName && statusVal && STATUS_COLORS[statusVal]) {
-      // 强行覆盖 KOD 和 NAME
       td.style.backgroundColor = STATUS_COLORS[statusVal].bg;
       td.style.color = STATUS_COLORS[statusVal].color;
       td.style.fontWeight = '700';
@@ -703,7 +809,6 @@ function buildRow(r, i) {
     }
     else if (h === 'SITUATION') {
       td.textContent = r[h] || '';
-      // 第二优先级：SITUATION 背景色填满
       if (SITUATION_COLORS[situation]) {
         td.style.backgroundColor = SITUATION_COLORS[situation].bg;
         td.style.color = SITUATION_COLORS[situation].color;
@@ -712,7 +817,6 @@ function buildRow(r, i) {
       }
     }
     else if (h === 'STATUS') {
-      // 第一优先级：STATUS 自身下拉框
       const sel = document.createElement('select'); sel.className = 'cell';
       STATUS_OPTIONS.forEach(o => {
         const opt = document.createElement('option'); opt.value = o; opt.textContent = o || '— Pilih —';
