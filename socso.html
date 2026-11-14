@@ -14,9 +14,146 @@ body {
   min-height: 100vh;
 }
 
-/* ===== 顶部导航栏 ===== */
+/* ============================================================
+   NEW NAVBAR (adapted from dashboard.html)
+   ============================================================ */
+:root {
+  --nav-h: 52px;
+  --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover: #16345c;
+  --nav-text: #cbd9ea; --nav-accent: #4d9fff;
+  --dropdown-bg: #ffffff;
+  --dropdown-shadow: 0 8px 24px rgba(16,32,56,.15);
+  --line: #dbe3ec;
+  --line-soft: #e8eef6;
+  --navy: #1e3a5f;
+  --navy-soft: #eaf0f7;
+}
+.navbar {
+  position: sticky; top: 0; z-index: 200;
+  display: flex; align-items: stretch; flex-wrap: wrap;
+  background: linear-gradient(90deg, var(--nav-bg-1) 0%, var(--nav-bg-2) 100%);
+  padding: 0 1rem; min-height: var(--nav-h);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+  border-bottom: 1px solid rgba(77,159,255,0.18);
+  margin-bottom: 0;
+  width: 100%;
+}
+.navbar .nav-brand {
+  display: flex; align-items: center; gap: 0.55rem;
+  color: #fff; font-weight: 800; font-size: 0.78rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding-right: 1.1rem; margin-right: 0.5rem;
+  border-right: 1px solid rgba(255,255,255,0.12);
+  white-space: nowrap;
+}
+.navbar .nav-brand .logo {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: linear-gradient(135deg, #4d9fff, #1a4f8a);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 0.85rem; font-weight: 800;
+  box-shadow: 0 2px 6px rgba(77,159,255,0.35);
+}
+
+.nav-links {
+  display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px;
+  position: relative;
+}
+
+.nav-item {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  padding: 0 0.85rem; min-height: var(--nav-h);
+  color: var(--nav-text); text-decoration: none;
+  font-family: inherit; font-size: 0.73rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  background: transparent; border: none; cursor: pointer;
+  white-space: nowrap; transition: background 0.15s, color 0.15s;
+  position: relative;
+}
+.nav-item:hover, .nav-item.active { background: var(--nav-hover); color: #fff; }
+.nav-item::after {
+  content: ''; position: absolute; left: 0.85rem; right: 0.85rem; bottom: 0;
+  height: 2px; background: var(--nav-accent); transform: scaleX(0);
+  transform-origin: left; transition: transform 0.2s;
+}
+.nav-item:hover::after, .nav-item.active::after { transform: scaleX(1); }
+
+.nav-back {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 44px; padding: 0 0.6rem;
+  color: var(--nav-text);
+  background: transparent; border: none; cursor: pointer;
+  font-size: 1.1rem; transition: background 0.15s, color 0.15s;
+}
+.nav-back:hover { background: var(--nav-hover); color: #fff; }
+
+.nav-dropdown {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+}
+.nav-dropdown > .nav-item { padding-right: 0.55rem; }
+.nav-dropdown > .nav-item .fa-caret-down { font-size: 0.6rem; margin-left: 0.2rem; opacity: 0.7; }
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 180px;
+  background: var(--dropdown-bg);
+  border-radius: 8px;
+  box-shadow: var(--dropdown-shadow);
+  padding: 0.4rem 0;
+  z-index: 300;
+  border: 1px solid var(--line);
+  animation: fadeSlide 0.15s ease;
+}
+.nav-dropdown.open .dropdown-menu { display: block; }
+
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-menu a {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  color: #1e293b;
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 500;
+  transition: background 0.12s;
+  white-space: nowrap;
+}
+.dropdown-menu a:hover { background: var(--navy-soft); color: var(--navy); }
+.dropdown-menu .divider {
+  height: 1px; background: var(--line-soft); margin: 0.3rem 0.5rem;
+}
+
+.nav-chat {
+  margin-left: auto; align-self: center;
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.5rem 1rem; border: none; border-radius: 20px;
+  background: linear-gradient(135deg, #2f7fe0 0%, #1a4f8a 100%);
+  color: #fff; font-family: inherit; font-size: 0.73rem;
+  font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  cursor: pointer; white-space: nowrap;
+  box-shadow: 0 3px 12px rgba(47,127,224,0.4);
+  transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+}
+.nav-chat:hover { filter: brightness(1.12); transform: translateY(-1px); }
+.nav-chat .pulse {
+  width: 7px; height: 7px; border-radius: 50%; background: #6ef0a8;
+  box-shadow: 0 0 0 0 rgba(110,240,168,0.75); animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(110,240,168,0.7); }
+  70% { box-shadow: 0 0 0 7px rgba(110,240,168,0); }
+  100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); }
+}
+
+/* ===== 顶部导航栏（原版） ===== */
 .topbar {
-  position: sticky; top: 0; z-index: 100;
+  position: sticky; top: var(--nav-h); z-index: 100;
   background: #ffffff;
   border-bottom: 1px solid #e2e8f0;
   padding: 0.75rem 1.5rem;
@@ -375,15 +512,89 @@ tr.row-highlight td { background: #dbeafe !important; }
 
 /* ===== 打印 ===== */
 @media print {
-  .topbar, .stats-row, .page-header, .legend, .toast, .modal-overlay { display: none !important; }
+  .navbar, .topbar, .stats-row, .page-header, .legend, .toast, .modal-overlay { display: none !important; }
   .table-wrap { max-height: none; border: none; box-shadow: none; }
   body { background: #fff; }
+}
+
+/* ===== RESPONSIVE NAVBAR ===== */
+@media (max-width: 768px) {
+  .navbar { padding: 0 0.5rem; }
+  .navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
+  .navbar .nav-brand .brand-text { display: none; }
+  .nav-item { padding: 0 0.6rem; font-size: 0.68rem; }
+  .nav-chat { padding: 0.45rem 0.75rem; font-size: 0.66rem; }
 }
 </style>
 </head>
 <body>
 
-<!-- ===== 顶部导航 ===== -->
+<!-- ========== NEW NAVBAR ========== -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <span class="logo">Y</span>
+    <span class="brand-text">YZ Payroll</span>
+  </div>
+
+  <div class="nav-links" id="navLinks">
+    <button class="nav-back" id="backBtn" title="Kembali ke halaman sebelumnya">⏎</button>
+
+    <div class="nav-dropdown" id="filesDropdown">
+      <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
+      <div class="dropdown-menu">
+        <a href="dashboard.html">📊 DASHBOARD</a>
+        <a href="staffinfo.html">👥 EMPLOYEES</a>
+        <a href="leave.html">📅 TIMECARD REPORT</a>
+        <a href="overtime.html">⏱️ OVERTIME SHEET</a>
+        <div class="divider"></div>
+        <a href="epf.html">🏦 EPF</a>
+        <a href="socso.html">🛡️ SOCSO</a>
+        <a href="eis.html">📋 EIS</a>
+        <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+        <div class="divider"></div>
+        <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+        <a href="121.html">📄 121</a>
+        <a href="122.html">📄 122</a>
+        <a href="123.html">📄 123</a>
+        <a href="124.html">📄 124</a>
+      </div>
+    </div>
+
+    <a class="nav-item" href="dashboard.html">DASHBOARD</a>
+    <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
+    <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
+
+    <div class="nav-dropdown" id="carumanDropdown">
+      <button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
+      <div class="dropdown-menu">
+        <a href="epf.html">🏦 EPF</a>
+        <a href="socso.html">🛡️ SOCSO</a>
+        <a href="eis.html">📋 EIS</a>
+        <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+      </div>
+    </div>
+
+    <a class="nav-item" href="companysetting.html">SETTING</a>
+
+    <div class="nav-dropdown" id="othersDropdown">
+      <button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
+      <div class="dropdown-menu">
+        <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+        <div class="divider"></div>
+        <a href="121.html">📄 121</a>
+        <a href="122.html">📄 122</a>
+        <a href="123.html">📄 123</a>
+        <a href="124.html">📄 124</a>
+      </div>
+    </div>
+  </div>
+
+  <button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')">
+    <span class="pulse"></span> 💬 Request Chat
+  </button>
+</nav>
+
+<!-- ===== 顶部导航（原版） ===== -->
 <div class="topbar">
   <div class="brand">
     <div class="logo">S</div>
@@ -502,10 +713,59 @@ tr.row-highlight td { background: #dbeafe !important; }
 
 <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
-// ============================================================
-// SOCSO 官方数据（PERKESO Jadual Kedua Akta 4）
-// 格式：[No, 工资描述, 工资下限, 工资上限, 雇主, 员工, 合计, 第二类]
-// ============================================================
+/* ============================================================
+   NAVBAR LOGIC (dropdowns & back button)
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function() {
+  const backBtn = document.getElementById('backBtn');
+  if (backBtn) {
+    backBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.history.back();
+    });
+  }
+
+  const dropdownToggles = document.querySelectorAll('[data-dropdown-toggle]');
+  dropdownToggles.forEach(function(toggle) {
+    toggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const dropdownId = this.getAttribute('data-dropdown-toggle');
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        if (dd.id !== dropdownId + 'Dropdown') dd.classList.remove('open');
+      });
+      const wrapper = this.closest('.nav-dropdown');
+      if (wrapper) wrapper.classList.toggle('open');
+    });
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.nav-dropdown')) {
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        dd.classList.remove('open');
+      });
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        dd.classList.remove('open');
+      });
+    }
+  });
+
+  document.querySelectorAll('.dropdown-menu a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        dd.classList.remove('open');
+      });
+    });
+  });
+});
+
+/* ============================================================
+   SOCSO 官方数据 (unchanged)
+   ============================================================ */
 const SOCSO_DATA = [
   [1,  "Gaji hingga RM30",                         0,       30,      0.40,  0.10,  0.50,  0.30],
   [2,  "Gaji melebihi RM30 tetapi tidak RM50",      30.01,   50,      0.70,  0.20,  0.90,  0.50],
@@ -574,9 +834,9 @@ const SOCSO_DATA = [
   [65, "Gaji melebihi RM6,000",                       6000.01, Infinity, 104.15, 29.75, 133.90, 74.40]
 ];
 
-// ============================================================
-// 状态
-// ============================================================
+/* ============================================================
+   状态
+   ============================================================ */
 let rows = SOCSO_DATA.map(r => ({
   no: r[0],
   wage: r[1],
@@ -593,9 +853,9 @@ const PASSWORD = '0000';
 let pendingCheckbox = null;
 let highlightedRowIdx = -1;
 
-// ============================================================
-// 表头 sticky 对齐（关键修复：第 2 行表头）
-// ============================================================
+/* ============================================================
+   表头 sticky 对齐（关键修复：第 2 行表头）
+   ============================================================ */
 function fixStickyHeader() {
   const row1 = document.getElementById('headRow1');
   const row2 = document.getElementById('headRow2');
@@ -608,9 +868,9 @@ function fixStickyHeader() {
   });
 }
 
-// ============================================================
-// 渲染
-// ============================================================
+/* ============================================================
+   渲染
+   ============================================================ */
 function render() {
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
@@ -663,9 +923,9 @@ function escapeHtml(s) {
   }[c]));
 }
 
-// ============================================================
-// 薪资 → SOCSO 自动查询
-// ============================================================
+/* ============================================================
+   薪资 → SOCSO 自动查询
+   ============================================================ */
 function calcSOCSOByWage(wage) {
   const w = Number(wage);
   if (!w || w <= 0) return { employee: 0, employer: 0, total: 0, idx: -1 };
@@ -720,9 +980,9 @@ function updateCalc() {
   }
 }
 
-// ============================================================
-// 编辑切换（带密码）
-// ============================================================
+/* ============================================================
+   编辑切换（带密码）
+   ============================================================ */
 function toggleEdit(idx, checkbox) {
   if (checkbox.checked) {
     pendingCheckbox = checkbox;
@@ -770,9 +1030,9 @@ function updateField(idx, field, value) {
   render();
 }
 
-// ============================================================
-// 导出
-// ============================================================
+/* ============================================================
+   导出
+   ============================================================ */
 function handleExport(val) {
   if (!val) return;
   try {
@@ -899,9 +1159,9 @@ function exportDOC() {
   toast('Word berjaya dieksport');
 }
 
-// ============================================================
-// 导入
-// ============================================================
+/* ============================================================
+   导入
+   ============================================================ */
 function openImport() {
   document.getElementById('importModal').style.display = 'flex';
 }
@@ -998,9 +1258,9 @@ async function handleImport(file) {
   }
 }
 
-// ============================================================
-// 初始化
-// ============================================================
+/* ============================================================
+   初始化
+   ============================================================ */
 window.addEventListener('DOMContentLoaded', () => {
   const dz = document.getElementById('dropzone');
   const fi = document.getElementById('importFile');
@@ -1041,9 +1301,9 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// ============================================================
-// Toast
-// ============================================================
+/* ============================================================
+   Toast
+   ============================================================ */
 function toast(msg, isError) {
   const el = document.getElementById('toast');
   el.textContent = msg;
