@@ -188,7 +188,7 @@
       </div>
     </div>
 
-    <!-- 组 3: REMAIN (LAST + THIS) -->
+    <!-- 组 3: REMAIN (LAST + THIS + REMAIN) -->
     <div class="dash-group" style="flex: 1;">
       <div class="dash-group-title">BAKI CUTI</div>
       <div class="dash-row">
@@ -198,6 +198,11 @@
       <div class="dash-row">
         <div class="dash-item" style="background:#d1fae5; border-color:#6ee7b7;"><label>THIS AL</label><span id="dpThisAL">0</span></div>
         <div class="dash-item" style="background:#d1fae5; border-color:#6ee7b7;"><label>THIS SL</label><span id="dpThisSL">0</span></div>
+      </div>
+      <!-- 新增: REMAIN AL & SL -->
+      <div class="dash-row">
+        <div class="dash-item" style="background:#e0f2fe; border-color:#7dd3fc;"><label>REMAIN AL</label><span id="dpRemainAL">0</span></div>
+        <div class="dash-item" style="background:#e0f2fe; border-color:#7dd3fc;"><label>REMAIN SL</label><span id="dpRemainSL">0</span></div>
       </div>
     </div>
 
@@ -272,7 +277,6 @@ const READONLY_COLS = ['ID KOD','SITUATION','GROUP','NAME','SHIF','GAJI',
 
 const STATUS_OPTIONS = ['', 'ANNUAL LEAVE','UNPAID LEAVE','HALF DAY LEAVE','SICK LEAVE','OFF DAY','UNDEDUCTION LEAVE','MATERNITY LEAVE'];
 
-// 颜色字典
 const STATUS_COLORS = {
   'ANNUAL LEAVE': { bg: '#fca5a5', color: '#7f1d1d' },
   'UNPAID LEAVE': { bg: '#bbf7d0', color: '#14532d' },
@@ -288,9 +292,9 @@ const SITUATION_COLORS = {
   'INACTIVE': { bg: '#fca5a5', color: '#000000' }
 };
 const ROW_HL_COLORS = {
-  'hl-red': '#ffe4e6',    // 浅红
-  'hl-green': '#dcfce7',  // 浅绿
-  'hl-yellow': '#fef9c3'  // 浅黄
+  'hl-red': '#ffe4e6',
+  'hl-green': '#dcfce7',
+  'hl-yellow': '#fef9c3'
 };
 
 let SCRIPT_URL = '';
@@ -299,9 +303,8 @@ let filteredRows = [];
 let staffList = []; 
 let alslData = []; 
 
-// 当前状态
 let currentSelectedCode = 'ALL'; 
-let currentGroupFilter = ''; // 群组筛选
+let currentGroupFilter = ''; 
 let filters = {};
 let currentFilterCol = null;
 let tempCheckedValues = new Set();
@@ -312,7 +315,6 @@ let countdownTimer = null;
 let countdownLeft = 10;
 let modalOpen = false;
 
-// 获取所有唯一群组
 function getAllGroups() {
   return Array.from(new Set(staffList.map(s => String(s.GroupName || '').trim()).filter(g => g)));
 }
@@ -368,7 +370,6 @@ async function loadData() {
     if (resStaff.result === 'success') staffList = resStaff.data || [];
     if (resALSL.status === 'success') alslData = resALSL.data || [];
 
-    // 清空搜索框，重新初始化
     document.getElementById('searchEmpInput').value = '';
     document.getElementById('searchGroupInput').value = '';
     selectEmployee('ALL');
@@ -455,9 +456,6 @@ function computeRow(r) {
   return { segH, workMin, otMin, swt, hl, deduct };
 }
 
-// ========================================================
-// 1. 员工 / KOD / NAME 搜索框逻辑
-// ========================================================
 const searchEmpInput = document.getElementById('searchEmpInput');
 const empDropdown = document.getElementById('empDropdown');
 
@@ -494,9 +492,6 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// ========================================================
-// 2. 独立 KUMPULAN 搜索框逻辑
-// ========================================================
 const searchGroupInput = document.getElementById('searchGroupInput');
 const groupDropdown = document.getElementById('groupDropdown');
 
@@ -531,13 +526,9 @@ document.addEventListener('click', (e) => {
   }
 });
 
-
-// ========================================================
-// 3. 选中与数据联动
-// ========================================================
 function selectEmployee(code) {
   currentSelectedCode = code;
-  currentGroupFilter = ''; // 清空群组筛选
+  currentGroupFilter = ''; 
   
   if (code === 'ALL') {
     searchEmpInput.value = 'ALL (SEMUA PEKERJA)';
@@ -548,7 +539,7 @@ function selectEmployee(code) {
     const staff = staffList.find(s => String(s.Code) === String(code));
     if (staff) {
       searchEmpInput.value = `${staff.Code} - ${staff.Name}`;
-      searchGroupInput.value = staff.GroupName || '-'; // 自动填充对应的群组
+      searchGroupInput.value = staff.GroupName || '-'; 
       document.getElementById('dpSituation').textContent = staff.Situation || '-';
       document.getElementById('dpGaji').textContent = parseFloat(staff.Salary || 0).toFixed(2);
     }
@@ -561,7 +552,7 @@ function selectEmployee(code) {
 }
 
 function selectGroup(groupName) {
-  currentSelectedCode = 'ALL'; // 群组模式下，相当于选中了该群组所有人的集合
+  currentSelectedCode = 'ALL'; 
   currentGroupFilter = groupName;
   
   searchEmpInput.value = `ALL (${groupName})`;
@@ -576,9 +567,6 @@ function selectGroup(groupName) {
   applyFiltersAndRender();
 }
 
-// ========================================================
-// 4. 数据统计与渲染 (含新的 Total Picked Leave 计算)
-// ========================================================
 function updateDashboardStats() {
   let targetCodes = [];
   if (currentGroupFilter) {
@@ -610,8 +598,11 @@ function updateDashboardStats() {
 
   let countAL = 0, countSL = 0, countUNPL = 0, countOFF = 0, countHALF = 0, countUNDD = 0, countMTNT = 0;
   let totalDeduct = 0;
-  let totalPickedLeaveDays = 0; // 用于计算总请假天数（非 OFF DAY）
-
+  
+  let totalDays = 0;
+  let totalHours = 0;
+  let totalMinutes = 0;
+  
   empRows.forEach(r => {
     if (targetMonth && r['Date'] && r['Date'].startsWith(targetMonth)) {
       const s = (r['STATUS'] || '').toUpperCase();
@@ -623,14 +614,16 @@ function updateDashboardStats() {
       if (s === 'UNDEDUCTION LEAVE') countUNDD++;
       if (s === 'MATERNITY LEAVE') countMTNT++;
 
-      // --- 新增：计算 Total Picked Leave（排除 OFF DAY 和空状态）---
+      // Total Picked Leave
       if (s && s !== 'OFF DAY') {
         if (s === 'HALF DAY LEAVE') {
-          // 半天假期按 0.5 天计算
-          totalPickedLeaveDays += 0.5;
+          totalDays += 0.5;
+          const j = parseFloat(r['HALF TT JAM']) || 0;
+          const m = parseFloat(r['HALF TT MIN']) || 0;
+          totalHours += j;
+          totalMinutes += m;
         } else {
-          // 其他假期类型按 1 天计算
-          totalPickedLeaveDays += 1;
+          totalDays += 1;
         }
       }
     }
@@ -638,61 +631,22 @@ function updateDashboardStats() {
     totalDeduct += c.deduct;
   });
 
-  // --- 新增：计算 HALF TT JAM 和 HALF TT MIN 转为小时后的部分 ---
-  let totalHalfHours = 0;
-  empRows.forEach(r => {
-    if (targetMonth && r['Date'] && r['Date'].startsWith(targetMonth)) {
-      const s = (r['STATUS'] || '').toUpperCase();
-      if (s === 'HALF DAY LEAVE') {
-        const j = parseFloat(r['HALF TT JAM']) || 0;
-        const m = parseFloat(r['HALF TT MIN']) || 0;
-        totalHalfHours += j + (m / 60);
-      }
-    }
-  });
-
-  // 将额外的小时数转换为天/小时/分钟（1天=24小时，1小时=60分钟）
-  // 但因为 HALF DAY LEAVE 已经被计算为 0.5 天，这里的小时可能超过半天，需要叠加
-  // 更准确的做法：总请假天数 = (非半天假期的天数) + (半天假期数量 * 0.5) + (额外小时数 / 24)
-  // 然而上面的 totalPickedLeaveDays 已经包含了半天假期的0.5天，如果再将小时数转换，会重复。
-  // 重新调整计算逻辑：直接统计所有请假记录，计算总天数+小时+分钟，不依赖于简单的 count。
-  
-  // 重新计算 Total Picked Leave (更精确的方式)
-  let totalDays = 0;
-  let totalHours = 0;
-  let totalMinutes = 0;
-  
-  empRows.forEach(r => {
-    if (targetMonth && r['Date'] && r['Date'].startsWith(targetMonth)) {
-      const s = (r['STATUS'] || '').toUpperCase();
-      if (!s || s === 'OFF DAY') return; // 排除 OFF DAY
-      
-      if (s === 'HALF DAY LEAVE') {
-        // 半天假期：0.5天 + 小时+分钟
-        totalDays += 0.5;
-        const j = parseFloat(r['HALF TT JAM']) || 0;
-        const m = parseFloat(r['HALF TT MIN']) || 0;
-        totalHours += j;
-        totalMinutes += m;
-      } else {
-        // 其他请假类型：1天
-        totalDays += 1;
-      }
-    }
-  });
-  
-  // 规范化时间（分钟进位到小时，小时进位到天）
+  // Normalize Time
   totalHours += Math.floor(totalMinutes / 60);
   totalMinutes = totalMinutes % 60;
   totalDays += Math.floor(totalHours / 24);
   totalHours = totalHours % 24;
   
-  // 格式化显示
   const totalPickedLeaveStr = `${Math.floor(totalDays)} DAYS ${Math.floor(totalHours)} HOURS ${Math.floor(totalMinutes)} MIN`;
   document.getElementById('dpTotalPickedLeave').textContent = totalPickedLeaveStr;
 
-  const thisAL = lastAL - countAL;
-  const thisSL = lastSL - countSL;
+  // THIS AL/SL calculation
+  const thisAL = countAL; // 这里假设 THIS AL 就是本月已拿的 AL
+  const thisSL = countSL; // 这里假设 THIS SL 就是本月已拿的 SL
+
+  // REMAIN AL/SL
+  const remainAL = lastAL - thisAL;
+  const remainSL = lastSL - thisSL;
 
   document.getElementById('dpPickedAL').textContent = countAL;
   document.getElementById('dpPickedSL').textContent = countSL;
@@ -704,6 +658,10 @@ function updateDashboardStats() {
   
   document.getElementById('dpThisAL').textContent = thisAL.toFixed(2);
   document.getElementById('dpThisSL').textContent = thisSL.toFixed(2);
+  
+  document.getElementById('dpRemainAL').textContent = remainAL.toFixed(2);
+  document.getElementById('dpRemainSL').textContent = remainSL.toFixed(2);
+  
   document.getElementById('dpTotalDeduct').textContent = totalDeduct.toFixed(2);
 }
 
@@ -753,12 +711,11 @@ function buildRow(r, i) {
   const c = computeRow(r);
   const tr = document.createElement('tr');
   
-  // 基础计算底色 (Work Time 状态)
   let baseBg = '';
   if (c.hl) baseBg = ROW_HL_COLORS[c.hl] || '';
 
   const situation = (r['SITUATION'] || '').toUpperCase();
-  if (situation === 'INACTIVE') baseBg = '#ffe4e6'; // INACTIVE 整行红
+  if (situation === 'INACTIVE') baseBg = '#ffe4e6'; 
 
   const tdIdx = document.createElement('td'); 
   tdIdx.className = 'col-idx'; 
@@ -804,7 +761,7 @@ function buildRow(r, i) {
     else if (h === 'THIS AL REMAIN' || h === 'THIS SL REMAIN') {
       td.className = 'calc';
       td.textContent = (!currentGroupFilter && currentSelectedCode !== 'ALL')
-        ? (h === 'THIS AL REMAIN' ? document.getElementById('dpThisAL').textContent : document.getElementById('dpThisSL').textContent)
+        ? (h === 'THIS AL REMAIN' ? document.getElementById('dpRemainAL').textContent : document.getElementById('dpRemainSL').textContent)
         : '';
     }
     else if (h === 'SITUATION') {
@@ -1007,8 +964,9 @@ async function doSave() {
       const o = {};
       SHEET_HEADERS.forEach(h => {
          if(h === 'THIS AL REMAIN' || h === 'THIS SL REMAIN') {
+             // 这里保存 REMAIN 值
              if (!currentGroupFilter && currentSelectedCode !== 'ALL' && String(r['ID KOD']) === currentSelectedCode) {
-                 o[h] = h === 'THIS AL REMAIN' ? document.getElementById('dpThisAL').textContent : document.getElementById('dpThisSL').textContent;
+                 o[h] = h === 'THIS AL REMAIN' ? document.getElementById('dpRemainAL').textContent : document.getElementById('dpRemainSL').textContent;
              } else {
                  o[h] = r[h] || ''; 
              }
