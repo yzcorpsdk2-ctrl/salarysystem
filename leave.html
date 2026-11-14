@@ -13,7 +13,7 @@
   }
   body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); font-size: 13px; min-height: 100vh; padding-bottom: 50px; }
   
-  /* ====== 新顶部导航 (模拟截图) ====== */
+  /* ====== 新顶部导航 ====== */
   .topnav { background: var(--nav-dark); color: #fff; display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 20px; }
   .topnav-left { display: flex; align-items: center; height: 100%; }
   .topnav-brand { font-size: 15px; font-weight: 800; margin-right: 30px; display: flex; align-items: center; gap: 8px; color: #fff; letter-spacing: 0.5px; }
@@ -26,7 +26,7 @@
   .btn-request { background: #0ea5e9; color: #fff; border: none; padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
   .btn-request:hover { background: #0284c7; }
 
-  /* ====== 浅色工具栏 (含 Setting 按钮) ====== */
+  /* ====== 浅色工具栏 ====== */
   .toolbar { background: #fff; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 8px 20px; gap: 15px; box-shadow: 0 1px 3px rgba(26,79,138,.04); }
   .toolbar-left { display: flex; align-items: center; gap: 16px; flex: 1; }
   .toolbar-brand { display: flex; align-items: center; gap: 8px; color: var(--nav-dark); font-weight: 800; font-size: 15px; }
@@ -102,7 +102,7 @@
   .fp-footer button { padding: 4px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; border: 1px solid var(--border); background: #fff; }
   .fp-footer button.apply { background: var(--blue); color: #fff; border-color: var(--blue); }
 
-  /* Modal (Autosave & Setting) */
+  /* Modal */
   .modal-mask { position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 9999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
   .modal-mask.show { display: flex; }
   .modal { background: #fff; border-radius: 12px; padding: 22px 24px; width: 420px; max-width: 92vw; box-shadow: 0 20px 60px rgba(15,23,42,.35); text-align: center; }
@@ -158,9 +158,7 @@
 </div>
 
 <div class="container">
-  <!-- 仪表盘布局 -->
   <div class="dashboard-panel" id="dashboardPanel">
-    
     <div class="dash-group" style="flex: 1.2;">
       <div class="dash-group-title">MAKLUMAT ASAS</div>
       <div class="dash-row">
@@ -208,7 +206,7 @@
       </div>
       <div class="dash-row">
         <div class="dash-item" style="background:#d1fae5; border-color:#6ee7b7;"><label>THIS AL</label><span id="dpThisAL">0</span></div>
-        <div class="dash-item" style="background:#d1fae5; border-color:#6ee7b7;"><label>THIS SL</span><span id="dpThisSL">0</span></div>
+        <div class="dash-item" style="background:#d1fae5; border-color:#6ee7b7;"><label>THIS SL</label><span id="dpThisSL">0</span></div>
       </div>
       <div class="dash-row">
         <div class="dash-item" style="background:#e0f2fe; border-color:#7dd3fc;"><label>REMAIN AL</label><span id="dpRemainAL">0</span></div>
@@ -231,7 +229,6 @@
         </div>
       </div>
     </div>
-
   </div>
 
   <div class="table-wrap">
@@ -275,7 +272,6 @@
     <h3>⚙️ SETTING CENTER</h3>
     <p id="settingDesc">Masukkan kata laluan untuk mengakses tetapan kod.</p>
     
-    <!-- 密码输入阶段 -->
     <div id="settingStep1">
       <input type="password" id="settingPasswordInput" class="setting-input" placeholder="Kata Laluan (Password)...">
       <div class="actions" style="margin-top: 16px;">
@@ -284,7 +280,6 @@
       </div>
     </div>
 
-    <!-- 代码编辑阶段 (默认隐藏) -->
     <div id="settingStep2" style="display: none;">
       <p style="margin-bottom: 8px; font-size: 12px; text-align: left;">Edit core logic ( <code>overLessMin</code> calculation ).</p>
       <textarea id="settingCodeInput" class="setting-textarea"></textarea>
@@ -300,16 +295,12 @@
 const URL_KEY = 'payrollScriptUrl';
 const CODE_KEY = 'payrollCustomCalcCode';
 
-// 核心默认计算公式 (判断标准和超/少时间)
-// 注意：后续前端通过 new Function() 动态执行这段代码
 const DEFAULT_CALC_CODE = `
 // 默认计算: WorkMin - 450 (7.5小时)
-// 你可以直接修改这里的 450，或者整个公式
 const standardMinutes = 7.5 * 60; 
 return workMin - standardMinutes;
 `;
 
-// 全局变量存储当前执行逻辑
 let customCalcFunction = null;
 
 const SHEET_HEADERS = [
@@ -367,13 +358,10 @@ let countdownTimer = null;
 let countdownLeft = 10;
 let modalOpen = false;
 
-// ====== 初始化自定义计算逻辑 ======
 function initCalcFunction() {
   let code = localStorage.getItem(CODE_KEY) || DEFAULT_CALC_CODE;
   try {
-    // 使用 new Function 动态编译用户代码，接收 workMin 参数
     customCalcFunction = new Function('workMin', code);
-    // 测试执行一次防止崩溃
     customCalcFunction(450); 
   } catch (e) {
     console.error("Custom code error, fallback to default.", e);
@@ -413,22 +401,18 @@ function setSync(state, text) {
   document.getElementById('syncText').textContent = text;
 }
 
-// ====== 搜索栏的整合 ======
 document.getElementById('globalSearchInput').addEventListener('input', function(e) {
   document.getElementById('searchEmpInput').value = e.target.value;
   document.getElementById('searchEmpInput').dispatchEvent(new Event('input'));
 });
 
-// ====== Setting Center 逻辑 (带密码与哈希验证) ======
-// 为了防止 F12 直接搜索 "0000"，使用 SHA-256 哈希验证
-// "0000" 的 SHA-256 hash 为: "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccaded2e3d9a9e"
-const HASHED_PASSWORD = "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccaded2e3d9a9e";
-
-async function sha256(message) {
-  const msgBuffer = new TextEncoder().encode(message);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+// ====== 修复后的 Setting Center 逻辑 ======
+// 我们用一个简单的代码混淆。真正的密码是 "0000"。
+// 这样在代码里搜不到 0000
+function getObfuscatedPass() {
+  // 0000 的字符编码是 48, 48, 48, 48。这里做了简单的加减法混淆
+  const parts = [49, 49, 49, 49];
+  return String.fromCharCode(...parts.map(p => p - 1));
 }
 
 function openSettingCenter() {
@@ -443,16 +427,15 @@ function closeSettingCenter() {
   document.getElementById('settingModal').classList.remove('show');
 }
 
-async function verifyPassword() {
+function verifyPassword() {
   const pwd = document.getElementById('settingPasswordInput').value;
-  const hash = await sha256(pwd);
+  const realPwd = getObfuscatedPass(); // 这里动态还原出 "0000"
   
-  if (hash === HASHED_PASSWORD) {
+  if (pwd === realPwd) {
     document.getElementById('settingStep1').style.display = 'none';
     document.getElementById('settingStep2').style.display = 'block';
     document.getElementById('settingDesc').textContent = 'Edit formula di bawah (Guna pembolehubah: workMin).';
     
-    // 加载当前保存的代码
     const savedCode = localStorage.getItem(CODE_KEY) || DEFAULT_CALC_CODE;
     document.getElementById('settingCodeInput').value = savedCode.trim();
   } else {
@@ -470,23 +453,19 @@ function resetDefaultCode() {
 function saveCustomCode() {
   const newCode = document.getElementById('settingCodeInput').value;
   try {
-    // 测试新代码是否有效
     const testFn = new Function('workMin', newCode);
-    testFn(400); // 随便传一个值测试
+    testFn(400); 
     
-    // 验证通过，保存
     localStorage.setItem(CODE_KEY, newCode);
     customCalcFunction = testFn;
     closeSettingCenter();
     alert('✅ Kod berjaya disimpan & digunakan!');
     
-    // 刷新表格显示
     applyFiltersAndRender();
   } catch (err) {
     alert('❌ Ralat sintaks kod: \n' + err.message);
   }
 }
-
 
 // ====== 核心业务逻辑 ======
 async function loadData() {
@@ -601,21 +580,16 @@ function computeRow(r) {
   const totalSegMin = segH[0]+segH[1]+segH[2];
   const workMin = hasAnyIn ? Math.max(0, totalSegMin - 60) : 0;
   
-  // ==========================================
-  // 这里调用动态注入的代码 (默认是 workMin - 450)
-  // ==========================================
   let overLessMin = 0;
   if (hasAnyIn) {
     try {
       overLessMin = customCalcFunction(workMin);
     } catch (e) {
       console.error("Calc Error:", e);
-      overLessMin = workMin - 450; // Fallback
+      overLessMin = workMin - 450; 
     }
   }
 
-  // 为了高亮颜色，系统内部依然使用基础的 450 分钟判断，如果你希望颜色也随自定义逻辑变，这里也要改。
-  // 但为了安全，我们先让 "Total Over/Less Time" 跟随你的代码。高亮背景依旧按 7.5 小时标准。
   let swt = '', hl = '';
   if (!hasAnyIn) { swt = '未存在打卡记录'; }
   else if (missingOut) { swt = '缺少打卡记录'; hl = 'hl-red'; }
