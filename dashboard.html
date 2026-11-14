@@ -46,7 +46,7 @@
     color: #fff; font-size: 0.85rem; font-weight: 800;
     box-shadow: 0 2px 6px rgba(77,159,255,0.35);
   }
-  .nav-links { display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px; }
+  .nav-links { display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px; position: relative; }
   .nav-item {
     display: inline-flex; align-items: center; gap: 0.35rem;
     padding: 0 0.85rem; min-height: var(--nav-h);
@@ -64,6 +64,54 @@
     transform-origin: left; transition: transform 0.2s;
   }
   .nav-item:hover::after, .nav-item.active::after { transform: scaleX(1); }
+
+  /* Back button */
+  .nav-back {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0 1rem; min-height: var(--nav-h);
+    color: var(--nav-text); background: transparent;
+    border: none; cursor: pointer; font-size: 1.1rem;
+    transition: background 0.15s, color 0.15s;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    margin-right: 0.4rem;
+  }
+  .nav-back:hover { background: var(--nav-hover); color: #fff; }
+  .nav-back i { pointer-events: none; }
+
+  /* Dropdown */
+  .nav-dropdown { position: relative; display: inline-flex; align-items: stretch; }
+  .nav-dropdown > .nav-item { cursor: pointer; }
+  .nav-dropdown > .nav-item .chevron {
+    font-size: 0.65rem; margin-left: 0.2rem; transition: transform 0.2s;
+  }
+  .nav-dropdown.open > .nav-item .chevron { transform: rotate(180deg); }
+  .dropdown-menu {
+    display: none;
+    position: absolute; top: 100%; left: 0;
+    min-width: 200px; background: #0f2742;
+    border: 1px solid rgba(77,159,255,0.25);
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.45);
+    z-index: 300; padding: 6px 0;
+    animation: fadeSlide 0.18s ease;
+  }
+  .nav-dropdown.open .dropdown-menu { display: block; }
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .dropdown-menu a {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.6rem 1.1rem;
+    color: #cbd9ea; text-decoration: none;
+    font-size: 0.76rem; font-weight: 600;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+  }
+  .dropdown-menu a:hover { background: var(--nav-hover); color: #fff; }
+  .dropdown-menu a i { width: 16px; text-align: center; font-size: 0.8rem; color: var(--nav-accent); }
+
   .nav-chat {
     margin-left: auto; align-self: center;
     display: inline-flex; align-items: center; gap: 0.45rem;
@@ -230,6 +278,7 @@
     .navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
     .navbar .nav-brand .brand-text { display: none; }
     .nav-item { padding: 0 0.6rem; font-size: 0.68rem; }
+    .nav-back { padding: 0 0.7rem; }
     .nav-chat { padding: 0.45rem 0.75rem; font-size: 0.66rem; }
     .topbar { padding: 0.6rem 1rem; }
     .container { padding: 1rem; }
@@ -237,6 +286,7 @@
     .page-header h1 { font-size: 1.2rem; }
     .employee-grid { grid-template-columns: 1fr; }
     .url-box { max-width: 100%; flex: 1 1 100%; }
+    .dropdown-menu { min-width: 180px; }
   }
 </style>
 </head>
@@ -247,10 +297,34 @@
     <span class="logo">Y</span>
     <span class="brand-text">YZ Payroll</span>
   </div>
+
+  <!-- Back button -->
+  <button class="nav-back" type="button" onclick="goBack()" title="Kembali ke halaman sebelumnya">
+    <i class="fas fa-arrow-left"></i>
+  </button>
+
   <div class="nav-links">
-    <a class="nav-item active" href="dashboard.html">📊 Dashboard</a>
-    <a class="nav-item" href="staffinfo.html">👥 Employees</a>
+    <a class="nav-item" href="files.html">📁 FILES</a>
+    <a class="nav-item active" href="dashboard.html">📊 DASHBOARD</a>
+    <a class="nav-item" href="staffinfo.html">👥 EMPLOYEES</a>
+    <a class="nav-item" href="leave.html">⏱️ TIMECARD REPORT</a>
+
+    <!-- CARUMAN dropdown -->
+    <div class="nav-dropdown" id="carumanDropdown">
+      <button class="nav-item" type="button" onclick="toggleDropdown(event)">
+        💰 CARUMAN <i class="fas fa-chevron-down chevron"></i>
+      </button>
+      <div class="dropdown-menu">
+        <a href="epf.html"><i class="fas fa-piggy-bank"></i> EPF</a>
+        <a href="socso.html"><i class="fas fa-shield-alt"></i> SOCSO</a>
+        <a href="eis.html"><i class="fas fa-briefcase"></i> EIS</a>
+        <a href="24jamlindungan.html"><i class="fas fa-clock"></i> 24 JAM LINDUNGAN</a>
+      </div>
+    </div>
+
+    <a class="nav-item" href="setting.html">⚙️ SETTING</a>
   </div>
+
   <button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')">
     <span class="pulse"></span> 💬 Request Chat
   </button>
@@ -317,6 +391,31 @@ let SCRIPT_URL = '';
 let allEmployees = [];
 let filteredEmployees = [];
 
+/* ---- Back button logic ---- */
+function goBack() {
+  if (window.history.length > 1) {
+    window.history.back();
+  } else {
+    // If no history, do nothing (or could go to a default page)
+    console.log('No previous page in history.');
+  }
+}
+
+/* ---- Dropdown toggle ---- */
+function toggleDropdown(event) {
+  event.stopPropagation();
+  const dd = document.getElementById('carumanDropdown');
+  dd.classList.toggle('open');
+}
+// Close dropdown when clicking elsewhere
+document.addEventListener('click', function(e) {
+  const dd = document.getElementById('carumanDropdown');
+  if (dd && dd.classList.contains('open') && !dd.contains(e.target)) {
+    dd.classList.remove('open');
+  }
+});
+
+/* ---- Existing functions (unchanged except minor additions) ---- */
 async function createEmployeeSheets() {
   if (!SCRIPT_URL) { alert('Sila tetapkan URL Deploy terlebih dahulu.'); return; }
   const btn = document.getElementById('btnCreateSheets');
