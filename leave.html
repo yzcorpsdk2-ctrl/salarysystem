@@ -431,7 +431,7 @@ function formatDuration(totalMinutes) {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-// 新增：处理负数时间的格式化
+// 处理负数时间的格式化
 function formatOverLessTime(totalMinutes) {
   if (totalMinutes === 0) return '00:00:00';
   const isNegative = totalMinutes < 0;
@@ -837,7 +837,10 @@ function buildRow(r, i) {
       const inp = document.createElement('input');
       inp.className = 'cell' + (h === 'REMARK' ? ' wide' : '');
       inp.value = r[h] || '';
-      inp.placeholder = h === 'Date' ? 'YYYY-MM-DD' : (h.startsWith('Clock') ? '6:34:55 AM' : '');
+      
+      // 修改这里：去掉了原本的 placeholder 占位符
+      inp.placeholder = ''; 
+      
       if ((h === 'HALF TT JAM' || h === 'HALF TT MIN') && statusVal !== 'HALF DAY LEAVE') {
         inp.disabled = true;
       }
