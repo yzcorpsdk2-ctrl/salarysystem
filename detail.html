@@ -6,6 +6,7 @@
 <title>Slip Gaji Pekerja · Sistem Penggajian</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
+  /* ===== ROOT & RESET ===== */
   :root{
     --navy:#1e3a5f; --navy-dark:#152c48; --navy-soft:#eaf0f7;
     --green:#0f7a4d; --green-dark:#0b5c3a; --green-light:#e6f4ec;
@@ -15,7 +16,8 @@
     --radius:14px;
     --shadow-sm:0 1px 2px rgba(16,32,56,.05), 0 2px 10px rgba(16,32,56,.05);
     --shadow-md:0 8px 24px rgba(16,32,56,.10);
-    /* nav vars */
+
+    /* NAVBAR VARS (aligned with dashboard.html) */
     --nav-h: 52px;
     --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover: #16345c;
     --nav-text: #cbd9ea; --nav-accent: #4d9fff;
@@ -28,10 +30,13 @@
     font-family:'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
     background:radial-gradient(1200px 600px at 50% -10%, #e2eaf6 0%, #eef2f7 55%, #e9eef5 100%);
     color:var(--ink); font-size:15px; line-height:1.5;
-    padding:26px 18px 60px; display:flex; justify-content:center; align-items:flex-start; min-height:100vh;
+    padding: 0 18px 60px; /* Top padding removed to flush navbar */
+    display:flex; flex-direction: column; align-items: center; min-height:100vh;
   }
 
-  /* ============ NAVBAR (sama seperti dashboard) ============ */
+  /* ============================================================
+     NEW NAVBAR (adapted from dashboard.html)
+     ============================================================ */
   .navbar {
     position: sticky; top: 0; z-index: 200;
     display: flex; align-items: stretch; flex-wrap: wrap;
@@ -39,7 +44,11 @@
     padding: 0 1rem; min-height: var(--nav-h);
     box-shadow: 0 2px 12px rgba(0,0,0,0.25);
     border-bottom: 1px solid rgba(77,159,255,0.18);
-    width: 100%; max-width: 1280px; margin: 0 auto 20px;
+    width: calc(100% + 36px);
+    margin-left: -18px;
+    margin-right: -18px;
+    margin-bottom: 20px;
+    border-radius: 0;
   }
   .navbar .nav-brand {
     display: flex; align-items: center; gap: 0.55rem;
@@ -95,9 +104,7 @@
     align-items: stretch;
   }
   .nav-dropdown > .nav-item { padding-right: 0.55rem; }
-  .nav-dropdown > .nav-item .fa-caret-down {
-    font-size: 0.6rem; margin-left: 0.2rem; opacity: 0.7;
-  }
+  .nav-dropdown > .nav-item .fa-caret-down { font-size: 0.6rem; margin-left: 0.2rem; opacity: 0.7; }
   .dropdown-menu {
     display: none;
     position: absolute;
@@ -113,10 +120,12 @@
     animation: fadeSlide 0.15s ease;
   }
   .nav-dropdown.open .dropdown-menu { display: block; }
+
   @keyframes fadeSlide {
     from { opacity: 0; transform: translateY(-6px); }
     to   { opacity: 1; transform: translateY(0); }
   }
+
   .dropdown-menu a {
     display: flex; align-items: center; gap: 0.5rem;
     padding: 0.5rem 1rem;
@@ -154,16 +163,19 @@
     100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); }
   }
 
-  /* ============ ASAL PAYSLIP ============ */
+  /* ===== PAYSLIP CONTAINER (original, with adjusted padding) ===== */
   .payslip-container{
     width:100%; max-width:1280px; background:var(--card); border:1px solid #e2e9f1;
     border-radius:18px; box-shadow:0 1px 2px rgba(16,32,56,.06), 0 18px 48px rgba(16,32,56,.12);
     padding:30px 34px 34px; position:relative; overflow:hidden;
+    margin-top: 8px;
   }
   .payslip-container::before{
     content:''; position:absolute; inset:0 0 auto 0; height:4px;
     background:linear-gradient(90deg, var(--navy) 0%, var(--navy) 58%, var(--green) 58%, var(--green) 100%);
   }
+
+  /* ===== (Keep all original styles unchanged below) ===== */
   .payslip-header{
     display:flex; justify-content:space-between; align-items:flex-start; gap:18px; flex-wrap:wrap;
     padding-bottom:16px; margin-bottom:22px; border-bottom:1px solid var(--line); position:relative;
@@ -362,12 +374,22 @@
   @media (max-width: 760px){ .columns{ grid-template-columns:1fr; } .summary{ grid-template-columns:1fr; } .extra-grid{ grid-template-columns:1fr; } .payslip-container{ padding:24px 20px 28px; } .brand h1{ font-size:1.2rem; } }
   @media (max-width: 540px){ body{ padding:14px 10px 40px; } .payslip-container{ padding:20px 14px 24px; border-radius:14px; } .field-grid{ grid-template-columns:1fr; } .payslip-header{ flex-direction:column; } .header-badges{ justify-content:flex-start; } .btn-group{ width:100%; } .btn{ flex:1 1 auto; } .line-item{ flex-wrap:wrap; } .amount{ width:100%; } .extra-card .amount{ width:100%; } }
 
+  @media (max-width: 768px) {
+    .navbar { padding: 0 0.5rem; width: calc(100% + 20px); margin-left: -10px; margin-right: -10px; }
+    .navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
+    .navbar .nav-brand .brand-text { display: none; }
+    .nav-item { padding: 0 0.6rem; font-size: 0.68rem; }
+    .nav-chat { padding: 0.45rem 0.75rem; font-size: 0.66rem; }
+    body { padding: 0 10px 40px; }
+  }
+
   @media print{
     *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
     body{ background:#fff; padding:0; display:block; font-size:12px; }
-    .payslip-container{ box-shadow:none; border:none; border-radius:0; max-width:none; padding:0; }
+    .navbar { display: none !important; }
+    .payslip-container{ box-shadow:none; border:none; border-radius:0; max-width:none; padding:0; margin-top: 0; }
     .payslip-container::before{ display:none; }
-    .action-bar, .mini-btn, .mini-edit-btn, .no-print, .url-bar, .navbar{ display:none !important; }
+    .action-bar, .mini-btn, .mini-edit-btn, .no-print, .url-bar{ display:none !important; }
     .sum-card, .meta-card.basic-card{ box-shadow:none; }
     .panel, .extra-card, .meta-card, .sum-card{ break-inside:avoid; page-break-inside:avoid; }
     .amount{ background:transparent !important; border-color:#dde5ee !important; box-shadow:none !important; }
@@ -378,7 +400,7 @@
 </head>
 <body>
 
-<!-- ========== NAVBAR ========== -->
+<!-- ========== NEW NAVBAR (adapted) ========== -->
 <nav class="navbar">
   <div class="nav-brand">
     <span class="logo">Y</span>
@@ -386,10 +408,8 @@
   </div>
 
   <div class="nav-links" id="navLinks">
-    <!-- Back button -->
     <button class="nav-back" id="backBtn" title="Kembali ke halaman sebelumnya">⏎</button>
 
-    <!-- FILES dropdown -->
     <div class="nav-dropdown" id="filesDropdown">
       <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
       <div class="dropdown-menu">
@@ -411,16 +431,10 @@
       </div>
     </div>
 
-    <!-- DASHBOARD -->
     <a class="nav-item" href="dashboard.html">DASHBOARD</a>
-
-    <!-- EMPLOYEES -->
     <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
-
-    <!-- TIMECARD REPORT -->
     <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
 
-    <!-- CARUMAN dropdown -->
     <div class="nav-dropdown" id="carumanDropdown">
       <button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
       <div class="dropdown-menu">
@@ -431,10 +445,8 @@
       </div>
     </div>
 
-    <!-- SETTING -->
     <a class="nav-item" href="companysetting.html">SETTING</a>
 
-    <!-- OTHERS dropdown -->
     <div class="nav-dropdown" id="othersDropdown">
       <button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
       <div class="dropdown-menu">
@@ -453,7 +465,7 @@
   </button>
 </nav>
 
-<!-- ========== PAYSLIP ========== -->
+<!-- ========== ORIGINAL PAYSLIP CONTAINER ========== -->
 <div class="payslip-container" id="payslipContainer">
 
   <header class="payslip-header">
@@ -641,7 +653,9 @@
 (function () {
   'use strict';
 
-  /* ============ NAVBAR DROPDOWN & BACK BUTTON ============ */
+  /* ============================================================
+     NAVBAR LOGIC (dropdowns & back button)
+     ============================================================ */
   document.addEventListener('DOMContentLoaded', function() {
     const backBtn = document.getElementById('backBtn');
     if (backBtn) {
@@ -689,7 +703,9 @@
     });
   });
 
-  /* ============ PAYSLIP LOGIC (tidak diubah) ============ */
+  /* ============================================================
+     ORIGINAL PAYSLIP LOGIC (unchanged)
+     ============================================================ */
   const STORAGE_KEY = 'payrollEmployees';
   const URL_KEY = 'payrollScriptUrl';
 
@@ -1252,6 +1268,7 @@
     setSyncStatus('Tiada data', 'error');
   }
 
+  /* ===== EVENT BINDINGS ===== */
   Object.values(inputs).forEach(inp => {
     if (!inp) return;
     inp.addEventListener('input', updateCalc);
