@@ -16,6 +16,8 @@
     --nav-text: #cbd9ea; --nav-accent: #4d9fff;
     --shadow-sm: 0 1px 2px rgba(16,32,56,.05), 0 2px 10px rgba(16,32,56,.05);
     --shadow-md: 0 8px 24px rgba(16,32,56,.10);
+    --dropdown-bg: #ffffff;
+    --dropdown-shadow: 0 8px 24px rgba(16,32,56,.15);
   }
   body {
     font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -23,6 +25,8 @@
     min-height: 100vh; line-height: 1.5; font-size: 14px;
     -webkit-font-smoothing: antialiased;
   }
+
+  /* ---------- NAVBAR (with dropdown support) ---------- */
   .navbar {
     position: sticky; top: 0; z-index: 200;
     display: flex; align-items: stretch; flex-wrap: wrap;
@@ -46,7 +50,13 @@
     color: #fff; font-size: 0.85rem; font-weight: 800;
     box-shadow: 0 2px 6px rgba(77,159,255,0.35);
   }
-  .nav-links { display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px; position: relative; }
+
+  .nav-links {
+    display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px;
+    position: relative;
+  }
+
+  /* generic nav item */
   .nav-item {
     display: inline-flex; align-items: center; gap: 0.35rem;
     padding: 0 0.85rem; min-height: var(--nav-h);
@@ -65,53 +75,65 @@
   }
   .nav-item:hover::after, .nav-item.active::after { transform: scaleX(1); }
 
-  /* Back button */
+  /* back button – slightly distinct */
   .nav-back {
     display: inline-flex; align-items: center; justify-content: center;
-    padding: 0 1rem; min-height: var(--nav-h);
-    color: var(--nav-text); background: transparent;
-    border: none; cursor: pointer; font-size: 1.1rem;
-    transition: background 0.15s, color 0.15s;
-    border-right: 1px solid rgba(255,255,255,0.08);
-    margin-right: 0.4rem;
+    min-width: 44px; padding: 0 0.6rem;
+    color: var(--nav-text);
+    background: transparent; border: none; cursor: pointer;
+    font-size: 1.1rem; transition: background 0.15s, color 0.15s;
   }
   .nav-back:hover { background: var(--nav-hover); color: #fff; }
-  .nav-back i { pointer-events: none; }
 
-  /* Dropdown */
-  .nav-dropdown { position: relative; display: inline-flex; align-items: stretch; }
-  .nav-dropdown > .nav-item { cursor: pointer; }
-  .nav-dropdown > .nav-item .chevron {
-    font-size: 0.65rem; margin-left: 0.2rem; transition: transform 0.2s;
+  /* dropdown wrapper */
+  .nav-dropdown {
+    position: relative;
+    display: inline-flex;
+    align-items: stretch;
   }
-  .nav-dropdown.open > .nav-item .chevron { transform: rotate(180deg); }
+  .nav-dropdown > .nav-item {
+    padding-right: 0.55rem;
+  }
+  .nav-dropdown > .nav-item .fa-caret-down {
+    font-size: 0.6rem; margin-left: 0.2rem; opacity: 0.7;
+  }
   .dropdown-menu {
     display: none;
-    position: absolute; top: 100%; left: 0;
-    min-width: 200px; background: #0f2742;
-    border: 1px solid rgba(77,159,255,0.25);
-    border-radius: 0 0 8px 8px;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.45);
-    z-index: 300; padding: 6px 0;
-    animation: fadeSlide 0.18s ease;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 180px;
+    background: var(--dropdown-bg);
+    border-radius: 8px;
+    box-shadow: var(--dropdown-shadow);
+    padding: 0.4rem 0;
+    z-index: 300;
+    border: 1px solid var(--epf-border);
+    animation: fadeSlide 0.15s ease;
   }
   .nav-dropdown.open .dropdown-menu { display: block; }
+
   @keyframes fadeSlide {
     from { opacity: 0; transform: translateY(-6px); }
-    to { opacity: 1; transform: translateY(0); }
+    to   { opacity: 1; transform: translateY(0); }
   }
+
   .dropdown-menu a {
-    display: flex; align-items: center; gap: 0.6rem;
-    padding: 0.6rem 1.1rem;
-    color: #cbd9ea; text-decoration: none;
-    font-size: 0.76rem; font-weight: 600;
-    letter-spacing: 0.04em; text-transform: uppercase;
-    transition: background 0.15s, color 0.15s;
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    color: var(--epf-text);
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 500;
+    transition: background 0.12s;
     white-space: nowrap;
   }
-  .dropdown-menu a:hover { background: var(--nav-hover); color: #fff; }
-  .dropdown-menu a i { width: 16px; text-align: center; font-size: 0.8rem; color: var(--nav-accent); }
+  .dropdown-menu a:hover { background: var(--epf-blue-soft); color: var(--epf-blue); }
+  .dropdown-menu .divider {
+    height: 1px; background: var(--epf-border-soft); margin: 0.3rem 0.5rem;
+  }
 
+  /* chat button */
   .nav-chat {
     margin-left: auto; align-self: center;
     display: inline-flex; align-items: center; gap: 0.45rem;
@@ -133,6 +155,8 @@
     70% { box-shadow: 0 0 0 7px rgba(110,240,168,0); }
     100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); }
   }
+
+  /* ---------- TOPBAR ---------- */
   .topbar {
     position: sticky; top: var(--nav-h); z-index: 100; background: #ffffff;
     border-bottom: 1px solid var(--epf-border); padding: 0.65rem 1.75rem;
@@ -278,7 +302,6 @@
     .navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
     .navbar .nav-brand .brand-text { display: none; }
     .nav-item { padding: 0 0.6rem; font-size: 0.68rem; }
-    .nav-back { padding: 0 0.7rem; }
     .nav-chat { padding: 0.45rem 0.75rem; font-size: 0.66rem; }
     .topbar { padding: 0.6rem 1rem; }
     .container { padding: 1rem; }
@@ -286,43 +309,79 @@
     .page-header h1 { font-size: 1.2rem; }
     .employee-grid { grid-template-columns: 1fr; }
     .url-box { max-width: 100%; flex: 1 1 100%; }
-    .dropdown-menu { min-width: 180px; }
   }
 </style>
 </head>
 <body>
 
+<!-- ========== NAVBAR (UPDATED) ========== -->
 <nav class="navbar">
   <div class="nav-brand">
     <span class="logo">Y</span>
     <span class="brand-text">YZ Payroll</span>
   </div>
 
-  <!-- Back button -->
-  <button class="nav-back" type="button" onclick="goBack()" title="Kembali ke halaman sebelumnya">
-    <i class="fas fa-arrow-left"></i>
-  </button>
+  <div class="nav-links" id="navLinks">
+    <!-- Back button (always first) -->
+    <button class="nav-back" id="backBtn" title="Kembali ke halaman sebelumnya">⏎</button>
 
-  <div class="nav-links">
-    <a class="nav-item" href="files.html">📁 FILES</a>
-    <a class="nav-item active" href="dashboard.html">📊 DASHBOARD</a>
-    <a class="nav-item" href="staffinfo.html">👥 EMPLOYEES</a>
-    <a class="nav-item" href="leave.html">⏱️ TIMECARD REPORT</a>
-
-    <!-- CARUMAN dropdown -->
-    <div class="nav-dropdown" id="carumanDropdown">
-      <button class="nav-item" type="button" onclick="toggleDropdown(event)">
-        💰 CARUMAN <i class="fas fa-chevron-down chevron"></i>
-      </button>
+    <!-- FILES dropdown (acts as "all pages" summary) -->
+    <div class="nav-dropdown" id="filesDropdown">
+      <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
       <div class="dropdown-menu">
-        <a href="epf.html"><i class="fas fa-piggy-bank"></i> EPF</a>
-        <a href="socso.html"><i class="fas fa-shield-alt"></i> SOCSO</a>
-        <a href="eis.html"><i class="fas fa-briefcase"></i> EIS</a>
-        <a href="24jamlindungan.html"><i class="fas fa-clock"></i> 24 JAM LINDUNGAN</a>
+        <a href="dashboard.html">📊 DASHBOARD</a>
+        <a href="staffinfo.html">👥 EMPLOYEES</a>
+        <a href="leave.html">📅 TIMECARD REPORT</a>
+        <a href="overtime.html">⏱️ OVERTIME SHEET</a>
+        <div class="divider"></div>
+        <a href="epf.html">🏦 EPF</a>
+        <a href="socso.html">🛡️ SOCSO</a>
+        <a href="eis.html">📋 EIS</a>
+        <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+        <div class="divider"></div>
+        <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+        <a href="121.html">📄 121</a>
+        <a href="122.html">📄 122</a>
+        <a href="123.html">📄 123</a>
+        <a href="124.html">📄 124</a>
       </div>
     </div>
 
-    <a class="nav-item" href="setting.html">⚙️ SETTING</a>
+    <!-- DASHBOARD (active) -->
+    <a class="nav-item active" href="dashboard.html">DASHBOARD</a>
+
+    <!-- EMPLOYEES -->
+    <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
+
+    <!-- TIMECARD REPORT -->
+    <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
+
+    <!-- CARUMAN dropdown -->
+    <div class="nav-dropdown" id="carumanDropdown">
+      <button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
+      <div class="dropdown-menu">
+        <a href="epf.html">🏦 EPF</a>
+        <a href="socso.html">🛡️ SOCSO</a>
+        <a href="eis.html">📋 EIS</a>
+        <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+      </div>
+    </div>
+
+    <!-- SETTING -->
+    <a class="nav-item" href="companysetting.html">SETTING</a>
+
+    <!-- OTHERS dropdown (extra, as requested by user) -->
+    <div class="nav-dropdown" id="othersDropdown">
+      <button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
+      <div class="dropdown-menu">
+        <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+        <div class="divider"></div>
+        <a href="121.html">📄 121</a>
+        <a href="122.html">📄 122</a>
+        <a href="123.html">📄 123</a>
+        <a href="124.html">📄 124</a>
+      </div>
+    </div>
   </div>
 
   <button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')">
@@ -330,10 +389,11 @@
   </button>
 </nav>
 
+<!-- ========== TOPBAR (unchanged) ========== -->
 <div class="topbar">
   <div class="brand"><div class="logo">P</div> Payroll Dashboard</div>
   <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
-  
+
   <div class="search-box">
     <i class="fas fa-search"></i>
     <input type="text" id="searchInput" placeholder="Cari Nama / Kod / Kumpulan..." oninput="filterCards()">
@@ -359,6 +419,7 @@
   </button>
 </div>
 
+<!-- ========== MAIN CONTAINER ========== -->
 <div class="container">
   <div class="page-header">
     <div class="info">
@@ -381,6 +442,66 @@
 </div>
 
 <script>
+/* ============================================================
+   NAVBAR DROPDOWN & BACK BUTTON LOGIC
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function() {
+  // Back button
+  const backBtn = document.getElementById('backBtn');
+  if (backBtn) {
+    backBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.history.back();
+    });
+  }
+
+  // Dropdown toggle for elements with data-dropdown-toggle
+  const dropdownToggles = document.querySelectorAll('[data-dropdown-toggle]');
+  dropdownToggles.forEach(function(toggle) {
+    toggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const dropdownId = this.getAttribute('data-dropdown-toggle');
+      // close all other dropdowns
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        if (dd.id !== dropdownId + 'Dropdown') dd.classList.remove('open');
+      });
+      // toggle current
+      const wrapper = this.closest('.nav-dropdown');
+      if (wrapper) wrapper.classList.toggle('open');
+    });
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.nav-dropdown')) {
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        dd.classList.remove('open');
+      });
+    }
+  });
+
+  // Close dropdown when pressing Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        dd.classList.remove('open');
+      });
+    }
+  });
+
+  // Close dropdown on link click (so navigation is clean)
+  document.querySelectorAll('.dropdown-menu a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        dd.classList.remove('open');
+      });
+    });
+  });
+});
+
+/* ============================================================
+   ORIGINAL PAYROLL LOGIC (unchanged from here)
+   ============================================================ */
 const URL_KEY = 'payrollScriptUrl';
 const STORAGE_KEY = 'payrollEmployees';
 const SELECTED_CODE_KEY = 'payrollSelectedCode';
@@ -391,31 +512,6 @@ let SCRIPT_URL = '';
 let allEmployees = [];
 let filteredEmployees = [];
 
-/* ---- Back button logic ---- */
-function goBack() {
-  if (window.history.length > 1) {
-    window.history.back();
-  } else {
-    // If no history, do nothing (or could go to a default page)
-    console.log('No previous page in history.');
-  }
-}
-
-/* ---- Dropdown toggle ---- */
-function toggleDropdown(event) {
-  event.stopPropagation();
-  const dd = document.getElementById('carumanDropdown');
-  dd.classList.toggle('open');
-}
-// Close dropdown when clicking elsewhere
-document.addEventListener('click', function(e) {
-  const dd = document.getElementById('carumanDropdown');
-  if (dd && dd.classList.contains('open') && !dd.contains(e.target)) {
-    dd.classList.remove('open');
-  }
-});
-
-/* ---- Existing functions (unchanged except minor additions) ---- */
 async function createEmployeeSheets() {
   if (!SCRIPT_URL) { alert('Sila tetapkan URL Deploy terlebih dahulu.'); return; }
   const btn = document.getElementById('btnCreateSheets');
