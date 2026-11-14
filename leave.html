@@ -392,9 +392,12 @@ function normalizeDate(v) {
   if (m) return `${m[3]}-${pad2(m[2])}-${pad2(m[1])}`;
   return s;
 }
+
 function timeToMin(s) {
   if (!s) return null;
   const str = String(s).trim();
+  
+  // 匹配 12 小时制格式: "6:34:55 AM" 或 "06:34 AM"
   const match12 = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i);
   if (match12) {
     let h = parseInt(match12[1], 10);
@@ -404,13 +407,24 @@ function timeToMin(s) {
     if (ampm === 'AM' && h === 12) h = 0;
     return h * 60 + m;
   }
-  const match24 = str.match(/^(\d{1,2}):(\d{2})$/);
+  
+  // 匹配 24 小时制格式: "13:53:59" 或 "13:53"
+  const match24 = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
   if (match24) {
     const h = parseInt(match24[1], 10), m = parseInt(match24[2], 10);
     if (h <= 23 && m <= 59) return h * 60 + m;
   }
+  
+  // 匹配奇异的带日期格式（兜底）: "Sat Dec 30 1899 13:53:59"
+  const matchFallback = str.match(/(\d{1,2}):(\d{2}):(\d{2})/);
+  if (matchFallback) {
+    const h = parseInt(matchFallback[1], 10), m = parseInt(matchFallback[2], 10);
+    if (h <= 23 && m <= 59) return h * 60 + m;
+  }
+
   return null;
 }
+
 function formatDuration(totalMinutes) {
   if (!totalMinutes || totalMinutes <= 0) return '00:00:00';
   const totalSeconds = Math.round(totalMinutes * 60);
@@ -641,8 +655,8 @@ function updateDashboardStats() {
   document.getElementById('dpTotalPickedLeave').textContent = totalPickedLeaveStr;
 
   // THIS AL/SL calculation
-  const thisAL = countAL; // 这里假设 THIS AL 就是本月已拿的 AL
-  const thisSL = countSL; // 这里假设 THIS SL 就是本月已拿的 SL
+  const thisAL = countAL;
+  const thisSL = countSL;
 
   // REMAIN AL/SL
   const remainAL = lastAL - thisAL;
