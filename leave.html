@@ -10,20 +10,157 @@
     --blue: #1a4f8a; --blue-soft: #f4f8fd; --border: #d4e0ee;
     --text: #1f2d3d; --muted: #64748b; --bg: #f7fafd;
     --nav-dark: #1a2b4c; --nav-hover: #243a66;
+
+    /* NAVBAR VARS (aligned with dashboard.html) */
+    --nav-h: 52px;
+    --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover2: #16345c;
+    --nav-text: #cbd9ea; --nav-accent: #4d9fff;
+    --dropdown-bg: #ffffff;
+    --dropdown-shadow: 0 8px 24px rgba(16,32,56,.15);
+    --line: #dbe3ec;
+    --line-soft: #e8eef6;
+    --navy: #1e3a5f;
+    --navy-soft: #eaf0f7;
   }
   body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); font-size: 13px; min-height: 100vh; padding-bottom: 50px; }
-  
-  /* ====== 新顶部导航 ====== */
+
+  /* ============================================================
+     NEW NAVBAR (adapted from dashboard.html)
+     ============================================================ */
+  .navbar {
+    position: sticky; top: 0; z-index: 200;
+    display: flex; align-items: stretch; flex-wrap: wrap;
+    background: linear-gradient(90deg, var(--nav-bg-1) 0%, var(--nav-bg-2) 100%);
+    padding: 0 1rem; min-height: var(--nav-h);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    border-bottom: 1px solid rgba(77,159,255,0.18);
+    margin-bottom: 0;
+    width: 100%;
+  }
+  .navbar .nav-brand {
+    display: flex; align-items: center; gap: 0.55rem;
+    color: #fff; font-weight: 800; font-size: 0.78rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding-right: 1.1rem; margin-right: 0.5rem;
+    border-right: 1px solid rgba(255,255,255,0.12);
+    white-space: nowrap;
+  }
+  .navbar .nav-brand .logo {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: linear-gradient(135deg, #4d9fff, #1a4f8a);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 0.85rem; font-weight: 800;
+    box-shadow: 0 2px 6px rgba(77,159,255,0.35);
+  }
+
+  .nav-links {
+    display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px;
+    position: relative;
+  }
+
+  .nav-item {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    padding: 0 0.85rem; min-height: var(--nav-h);
+    color: var(--nav-text); text-decoration: none;
+    font-family: inherit; font-size: 0.73rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    background: transparent; border: none; cursor: pointer;
+    white-space: nowrap; transition: background 0.15s, color 0.15s;
+    position: relative;
+  }
+  .nav-item:hover, .nav-item.active { background: var(--nav-hover2); color: #fff; }
+  .nav-item::after {
+    content: ''; position: absolute; left: 0.85rem; right: 0.85rem; bottom: 0;
+    height: 2px; background: var(--nav-accent); transform: scaleX(0);
+    transform-origin: left; transition: transform 0.2s;
+  }
+  .nav-item:hover::after, .nav-item.active::after { transform: scaleX(1); }
+
+  .nav-back {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 44px; padding: 0 0.6rem;
+    color: var(--nav-text);
+    background: transparent; border: none; cursor: pointer;
+    font-size: 1.1rem; transition: background 0.15s, color 0.15s;
+  }
+  .nav-back:hover { background: var(--nav-hover2); color: #fff; }
+
+  .nav-dropdown {
+    position: relative;
+    display: inline-flex;
+    align-items: stretch;
+  }
+  .nav-dropdown > .nav-item { padding-right: 0.55rem; }
+  .nav-dropdown > .nav-item .fa-caret-down { font-size: 0.6rem; margin-left: 0.2rem; opacity: 0.7; }
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 180px;
+    background: var(--dropdown-bg);
+    border-radius: 8px;
+    box-shadow: var(--dropdown-shadow);
+    padding: 0.4rem 0;
+    z-index: 300;
+    border: 1px solid var(--line);
+    animation: fadeSlide 0.15s ease;
+  }
+  .nav-dropdown.open .dropdown-menu { display: block; }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .dropdown-menu a {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    color: #1e293b;
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 500;
+    transition: background 0.12s;
+    white-space: nowrap;
+  }
+  .dropdown-menu a:hover { background: var(--navy-soft); color: var(--navy); }
+  .dropdown-menu .divider {
+    height: 1px; background: var(--line-soft); margin: 0.3rem 0.5rem;
+  }
+
+  .nav-chat {
+    margin-left: auto; align-self: center;
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    padding: 0.5rem 1rem; border: none; border-radius: 20px;
+    background: linear-gradient(135deg, #2f7fe0 0%, #1a4f8a 100%);
+    color: #fff; font-family: inherit; font-size: 0.73rem;
+    font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer; white-space: nowrap;
+    box-shadow: 0 3px 12px rgba(47,127,224,0.4);
+    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+  }
+  .nav-chat:hover { filter: brightness(1.12); transform: translateY(-1px); }
+  .nav-chat .pulse {
+    width: 7px; height: 7px; border-radius: 50%; background: #6ef0a8;
+    box-shadow: 0 0 0 0 rgba(110,240,168,0.75); animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(110,240,168,0.7); }
+    70% { box-shadow: 0 0 0 7px rgba(110,240,168,0); }
+    100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); }
+  }
+
+  /* ====== 原有顶部导航 (保留但去掉 sticky 冲突) ====== */
   .topnav { background: var(--nav-dark); color: #fff; display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 20px; }
   .topnav-left { display: flex; align-items: center; height: 100%; }
   .topnav-brand { font-size: 15px; font-weight: 800; margin-right: 30px; display: flex; align-items: center; gap: 8px; color: #fff; letter-spacing: 0.5px; }
   .topnav-brand .y-icon { background: #007bff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
-  .nav-links { display: flex; height: 100%; }
-  .nav-link { padding: 0 20px; display: flex; align-items: center; font-size: 12px; font-weight: 700; color: #a0b2cf; cursor: pointer; text-transform: uppercase; border-bottom: 3px solid transparent; transition: all 0.2s; }
-  .nav-link:hover { background: var(--nav-hover); color: #fff; }
-  .nav-link.active { color: #fff; border-bottom-color: #007bff; background: var(--nav-hover); }
+  .nav-links2 { display: flex; height: 100%; }
+  .nav-link2 { padding: 0 20px; display: flex; align-items: center; font-size: 12px; font-weight: 700; color: #a0b2cf; cursor: pointer; text-transform: uppercase; border-bottom: 3px solid transparent; transition: all 0.2s; }
+  .nav-link2:hover { background: var(--nav-hover); color: #fff; }
+  .nav-link2.active { color: #fff; border-bottom-color: #007bff; background: var(--nav-hover); }
   .topnav-right { display: flex; align-items: center; }
-  
+
   /* 改为 TIPS 按钮 */
   .btn-tips { background: #0ea5e9; color: #fff; border: none; padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.2s; }
   .btn-tips:hover { background: #0284c7; }
@@ -47,7 +184,7 @@
   .btn-success:hover { background: #15803d; color: #fff; }
   .btn-setting { background: #f1f5f9; color: #0f172a; border-color: #cbd5e1; }
   .btn-setting:hover { background: #e2e8f0; color: #000; }
-  
+
   .sync-badge { display: inline-flex; align-items: center; gap: 5px; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; color: #047857; }
   .sync-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; }
 
@@ -114,7 +251,7 @@
   .modal .actions { display: flex; gap: 8px; justify-content: center; }
   .modal .actions button { padding: 8px 18px; border-radius: 6px; font-size: 12.5px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: #fff; color: var(--text); }
   .modal .actions button.confirm { background: var(--blue); color: #fff; border-color: var(--blue); }
-  
+
   /* Setting Center 专用 */
   .setting-modal { width: 600px; text-align: left; }
   .setting-modal h3 { text-align: center; }
@@ -148,17 +285,91 @@
   .tour-tooltip h4 { font-size: 15px; color: #007bff; font-weight: 800; }
   .tour-tooltip p { font-size: 12.5px; color: #334155; line-height: 1.5; }
   .tour-tooltip .tour-hint { font-size: 11px; color: #94a3b8; font-style: italic; margin-top: 6px; }
+
+  /* ===== RESPONSIVE NAVBAR ===== */
+  @media (max-width: 768px) {
+    .navbar { padding: 0 0.5rem; }
+    .navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
+    .navbar .nav-brand .brand-text { display: none; }
+    .nav-item { padding: 0 0.6rem; font-size: 0.68rem; }
+    .nav-chat { padding: 0.45rem 0.75rem; font-size: 0.66rem; }
+  }
 </style>
 </head>
 <body>
 
-<!-- ====== 新顶部深色导航 ====== -->
+<!-- ========== NEW NAVBAR ========== -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <span class="logo">Y</span>
+    <span class="brand-text">YZ Payroll</span>
+  </div>
+
+  <div class="nav-links" id="navLinks">
+    <button class="nav-back" id="backBtn" title="Kembali ke halaman sebelumnya">⏎</button>
+
+    <div class="nav-dropdown" id="filesDropdown">
+      <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
+      <div class="dropdown-menu">
+        <a href="dashboard.html">📊 DASHBOARD</a>
+        <a href="staffinfo.html">👥 EMPLOYEES</a>
+        <a href="leave.html">📅 TIMECARD REPORT</a>
+        <a href="overtime.html">⏱️ OVERTIME SHEET</a>
+        <div class="divider"></div>
+        <a href="epf.html">🏦 EPF</a>
+        <a href="socso.html">🛡️ SOCSO</a>
+        <a href="eis.html">📋 EIS</a>
+        <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+        <div class="divider"></div>
+        <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+        <a href="121.html">📄 121</a>
+        <a href="122.html">📄 122</a>
+        <a href="123.html">📄 123</a>
+        <a href="124.html">📄 124</a>
+      </div>
+    </div>
+
+    <a class="nav-item" href="dashboard.html">DASHBOARD</a>
+    <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
+    <a class="nav-item active" href="leave.html">TIMECARD REPORT</a>
+
+    <div class="nav-dropdown" id="carumanDropdown">
+      <button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
+      <div class="dropdown-menu">
+        <a href="epf.html">🏦 EPF</a>
+        <a href="socso.html">🛡️ SOCSO</a>
+        <a href="eis.html">📋 EIS</a>
+        <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+      </div>
+    </div>
+
+    <a class="nav-item" href="companysetting.html">SETTING</a>
+
+    <div class="nav-dropdown" id="othersDropdown">
+      <button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
+      <div class="dropdown-menu">
+        <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+        <div class="divider"></div>
+        <a href="121.html">📄 121</a>
+        <a href="122.html">📄 122</a>
+        <a href="123.html">📄 123</a>
+        <a href="124.html">📄 124</a>
+      </div>
+    </div>
+  </div>
+
+  <button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')">
+    <span class="pulse"></span> 💬 Request Chat
+  </button>
+</nav>
+
+<!-- ====== 原有顶部深色导航 ====== -->
 <div class="topnav">
   <div class="topnav-left">
     <div class="topnav-brand"><div class="y-icon">Y</div> YZ PAYROLL</div>
-    <div class="nav-links">
-      <div class="nav-link active">📊 DASHBOARD</div>
-      <div class="nav-link">👤 EMPLOYEES</div>
+    <div class="nav-links2">
+      <div class="nav-link2 active">📊 DASHBOARD</div>
+      <div class="nav-link2">👤 EMPLOYEES</div>
     </div>
   </div>
   <div class="topnav-right">
@@ -301,7 +512,7 @@
   <div class="modal setting-modal">
     <h3>⚙️ SETTING CENTER</h3>
     <p id="settingDesc">Masukkan kata laluan untuk mengakses tetapan kod.</p>
-    
+
     <div id="settingStep1">
       <input type="password" id="settingPasswordInput" class="setting-input" placeholder="Kata Laluan (Password)...">
       <div class="actions" style="margin-top: 16px;">
@@ -341,7 +552,7 @@
   <div class="modal tips-modal">
     <h3>📖 PANDUAN SISTEM PAYROLL</h3>
     <p class="subtitle">Ketahui fungsi setiap bahagian di dashboard ini.</p>
-    
+
     <div class="tips-section">
       <h4>1. Toolbar Atas (Top Bar)</h4>
       <ul>
@@ -387,6 +598,59 @@
 
 
 <script>
+/* ============================================================
+   NAVBAR LOGIC (dropdowns & back button)
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function() {
+  const backBtn = document.getElementById('backBtn');
+  if (backBtn) {
+    backBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.history.back();
+    });
+  }
+
+  const dropdownToggles = document.querySelectorAll('[data-dropdown-toggle]');
+  dropdownToggles.forEach(function(toggle) {
+    toggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const dropdownId = this.getAttribute('data-dropdown-toggle');
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        if (dd.id !== dropdownId + 'Dropdown') dd.classList.remove('open');
+      });
+      const wrapper = this.closest('.nav-dropdown');
+      if (wrapper) wrapper.classList.toggle('open');
+    });
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.nav-dropdown')) {
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        dd.classList.remove('open');
+      });
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        dd.classList.remove('open');
+      });
+    }
+  });
+
+  document.querySelectorAll('.dropdown-menu a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        dd.classList.remove('open');
+      });
+    });
+  });
+});
+
+/* ============================================================
+   ORIGINAL PAYROLL LOGIC (unchanged)
+   ============================================================ */
 const URL_KEY = 'payrollScriptUrl';
 const CODE_KEY = 'payrollCustomCalcCode';
 
@@ -435,13 +699,13 @@ const ROW_HL_COLORS = {
 };
 
 let SCRIPT_URL = '';
-let allRows = []; 
-let filteredRows = []; 
-let staffList = []; 
-let alslData = []; 
+let allRows = [];
+let filteredRows = [];
+let staffList = [];
+let alslData = [];
 
-let currentSelectedCode = 'ALL'; 
-let currentGroupFilter = ''; 
+let currentSelectedCode = 'ALL';
+let currentGroupFilter = '';
 let filters = {};
 let currentFilterCol = null;
 let tempCheckedValues = new Set();
@@ -467,7 +731,7 @@ function initCalcFunction() {
   let code = localStorage.getItem(CODE_KEY) || DEFAULT_CALC_CODE;
   try {
     customCalcFunction = new Function('workMin', code);
-    customCalcFunction(450); 
+    customCalcFunction(450);
   } catch (e) {
     console.error("Custom code error, fallback to default.", e);
     customCalcFunction = new Function('workMin', DEFAULT_CALC_CODE);
@@ -538,7 +802,7 @@ function startTour() {
 
 function nextTourStep() {
   tourStepIndex++;
-  
+
   // 如果结束了
   if (tourStepIndex >= tourSteps.length) {
     endTour();
@@ -552,33 +816,28 @@ function nextTourStep() {
   const mask = document.getElementById('tourMask');
 
   if (!el) {
-    nextTourStep(); // 如果找不到元素，直接跳过
+    nextTourStep();
     return;
   }
 
-  // 滚动到元素可见
   el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
   setTimeout(() => {
     const rect = el.getBoundingClientRect();
-    
-    // 设置高亮框
+
     highlight.style.left = (rect.left - 6) + 'px';
     highlight.style.top = (rect.top - 6) + 'px';
     highlight.style.width = (rect.width + 12) + 'px';
     highlight.style.height = (rect.height + 12) + 'px';
     highlight.classList.add('show');
 
-    // 设置提示框位置 (在元素下方)
     let tooltipTop = rect.bottom + 15;
     let tooltipLeft = rect.left;
-    
-    // 如果下方空间不够，放到上方
+
     if (tooltipTop + 150 > window.innerHeight) {
       tooltipTop = rect.top - 160;
     }
-    
-    // 防止超出右边
+
     if (tooltipLeft + 300 > window.innerWidth) {
       tooltipLeft = window.innerWidth - 320;
     }
@@ -589,7 +848,7 @@ function nextTourStep() {
 
     document.getElementById('tourTitle').textContent = step.title;
     document.getElementById('tourDesc').textContent = step.desc;
-  }, 300); // 等待滚动完成
+  }, 300);
 }
 
 function endTour() {
@@ -620,12 +879,12 @@ function closeSettingCenter() {
 function verifyPassword() {
   const pwd = document.getElementById('settingPasswordInput').value;
   const realPwd = getObfuscatedPass();
-  
+
   if (pwd === realPwd) {
     document.getElementById('settingStep1').style.display = 'none';
     document.getElementById('settingStep2').style.display = 'block';
     document.getElementById('settingDesc').textContent = 'Edit formula di bawah (Guna pembolehubah: workMin).';
-    
+
     const savedCode = localStorage.getItem(CODE_KEY) || DEFAULT_CALC_CODE;
     document.getElementById('settingCodeInput').value = savedCode.trim();
   } else {
@@ -644,13 +903,13 @@ function saveCustomCode() {
   const newCode = document.getElementById('settingCodeInput').value;
   try {
     const testFn = new Function('workMin', newCode);
-    testFn(400); 
-    
+    testFn(400);
+
     localStorage.setItem(CODE_KEY, newCode);
     customCalcFunction = testFn;
     closeSettingCenter();
     alert('✅ Kod berjaya disimpan & digunakan!');
-    
+
     applyFiltersAndRender();
   } catch (err) {
     alert('❌ Ralat sintaks kod: \n' + err.message);
@@ -669,7 +928,7 @@ async function loadData() {
     ]);
 
     if (resSheet.status !== 'success') throw new Error('Gagal load SHEET');
-    
+
     allRows = (resSheet.data || []).map(r => {
       const o = {};
       SHEET_HEADERS.forEach(h => {
@@ -680,14 +939,14 @@ async function loadData() {
       });
       return o;
     });
-    
+
     if (resStaff.result === 'success') staffList = resStaff.data || [];
     if (resALSL.status === 'success') alslData = resALSL.data || [];
 
     document.getElementById('searchEmpInput').value = '';
     document.getElementById('searchGroupInput').value = '';
     selectEmployee('ALL');
-    
+
     setSync('ok', 'Data dimuat');
   } catch (err) {
     console.error(err);
@@ -710,7 +969,7 @@ function normalizeDate(v) {
 function timeToMin(s) {
   if (!s) return null;
   const str = String(s).trim();
-  
+
   const match12 = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i);
   if (match12) {
     let h = parseInt(match12[1], 10);
@@ -720,13 +979,13 @@ function timeToMin(s) {
     if (ampm === 'AM' && h === 12) h = 0;
     return h * 60 + m;
   }
-  
+
   const match24 = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
   if (match24) {
     const h = parseInt(match24[1], 10), m = parseInt(match24[2], 10);
     if (h <= 23 && m <= 59) return h * 60 + m;
   }
-  
+
   const matchFallback = str.match(/(\d{1,2}):(\d{2}):(\d{2})/);
   if (matchFallback) {
     const h = parseInt(matchFallback[1], 10), m = parseInt(matchFallback[2], 10);
@@ -769,14 +1028,14 @@ function computeRow(r) {
 
   const totalSegMin = segH[0]+segH[1]+segH[2];
   const workMin = hasAnyIn ? Math.max(0, totalSegMin - 60) : 0;
-  
+
   let overLessMin = 0;
   if (hasAnyIn) {
     try {
       overLessMin = customCalcFunction(workMin);
     } catch (e) {
       console.error("Calc Error:", e);
-      overLessMin = workMin - 450; 
+      overLessMin = workMin - 450;
     }
   }
 
@@ -808,18 +1067,18 @@ const empDropdown = document.getElementById('empDropdown');
 searchEmpInput.addEventListener('input', () => {
   const q = searchEmpInput.value.trim().toLowerCase();
   if (!q) { empDropdown.classList.remove('show'); return; }
-  
-  const matchStaff = staffList.filter(s => 
-    String(s.Name || '').toLowerCase().includes(q) || 
+
+  const matchStaff = staffList.filter(s =>
+    String(s.Name || '').toLowerCase().includes(q) ||
     String(s.Code || '').toLowerCase().includes(q)
   ).slice(0, 15);
-  
+
   let html = `
     <div class="sd-item all-item" onclick="selectEmployee('ALL')">
       🌐 ALL (SEMUA PEKERJA)
     </div>
   `;
-  
+
   if (matchStaff.length > 0) {
     html += matchStaff.map(m => `
       <div class="sd-item" onclick="selectEmployee('${m.Code}')">
@@ -827,7 +1086,7 @@ searchEmpInput.addEventListener('input', () => {
       </div>
     `).join('');
   }
-  
+
   empDropdown.innerHTML = html;
   empDropdown.classList.add('show');
 });
@@ -844,16 +1103,16 @@ const groupDropdown = document.getElementById('groupDropdown');
 searchGroupInput.addEventListener('input', () => {
   const q = searchGroupInput.value.trim().toLowerCase();
   if (!q) { groupDropdown.classList.remove('show'); return; }
-  
+
   const allGroups = getAllGroups();
   const matchGroups = allGroups.filter(g => g.toLowerCase().includes(q)).slice(0, 15);
-  
+
   let html = `
     <div class="sd-item all-item" onclick="selectEmployee('ALL')">
       🌐 ALL (SEMUA KUMPULAN)
     </div>
   `;
-  
+
   if (matchGroups.length > 0) {
     html += matchGroups.map(g => `
       <div class="sd-item" onclick="selectGroup('${g.replace(/'/g, "\\'")}')">
@@ -861,7 +1120,7 @@ searchGroupInput.addEventListener('input', () => {
       </div>
     `).join('');
   }
-  
+
   groupDropdown.innerHTML = html;
   groupDropdown.classList.add('show');
 });
@@ -874,8 +1133,8 @@ document.addEventListener('click', (e) => {
 
 function selectEmployee(code) {
   currentSelectedCode = code;
-  currentGroupFilter = ''; 
-  
+  currentGroupFilter = '';
+
   if (code === 'ALL') {
     searchEmpInput.value = 'ALL (SEMUA PEKERJA)';
     searchGroupInput.value = 'SEMUA KUMPULAN';
@@ -885,12 +1144,12 @@ function selectEmployee(code) {
     const staff = staffList.find(s => String(s.Code) === String(code));
     if (staff) {
       searchEmpInput.value = `${staff.Code} - ${staff.Name}`;
-      searchGroupInput.value = staff.GroupName || '-'; 
+      searchGroupInput.value = staff.GroupName || '-';
       document.getElementById('dpSituation').textContent = staff.Situation || '-';
       document.getElementById('dpGaji').textContent = parseFloat(staff.Salary || 0).toFixed(2);
     }
   }
-  
+
   empDropdown.classList.remove('show');
   groupDropdown.classList.remove('show');
   updateDashboardStats();
@@ -898,15 +1157,15 @@ function selectEmployee(code) {
 }
 
 function selectGroup(groupName) {
-  currentSelectedCode = 'ALL'; 
+  currentSelectedCode = 'ALL';
   currentGroupFilter = groupName;
-  
+
   searchEmpInput.value = `ALL (${groupName})`;
   searchGroupInput.value = groupName;
-  
+
   document.getElementById('dpSituation').textContent = 'SEMUA STATUS';
   document.getElementById('dpGaji').textContent = 'JUMLAH KUMPULAN';
-  
+
   empDropdown.classList.remove('show');
   groupDropdown.classList.remove('show');
   updateDashboardStats();
@@ -932,23 +1191,23 @@ function updateDashboardStats() {
       lastSL += parseFloat(a['LASTSL']) || 0;
     }
   });
-  
+
   document.getElementById('dpLastAL').textContent = lastAL.toFixed(2);
   document.getElementById('dpLastSL').textContent = lastSL.toFixed(2);
 
   let targetMonth = '';
   if (empRows.length > 0) {
     const dates = empRows.map(r => r['Date']).filter(d => d).sort();
-    if (dates.length > 0) targetMonth = dates[dates.length - 1].substring(0, 7); 
+    if (dates.length > 0) targetMonth = dates[dates.length - 1].substring(0, 7);
   }
 
   let countAL = 0, countSL = 0, countUNPL = 0, countOFF = 0, countHALF = 0, countUNDD = 0, countMTNT = 0;
   let totalDeduct = 0;
-  
+
   let totalDays = 0;
   let totalHours = 0;
   let totalMinutes = 0;
-  
+
   empRows.forEach(r => {
     if (targetMonth && r['Date'] && r['Date'].startsWith(targetMonth)) {
       const s = (r['STATUS'] || '').toUpperCase();
@@ -980,7 +1239,7 @@ function updateDashboardStats() {
   totalMinutes = totalMinutes % 60;
   totalDays += Math.floor(totalHours / 24);
   totalHours = totalHours % 24;
-  
+
   const totalPickedLeaveStr = `${Math.floor(totalDays)} DAYS ${Math.floor(totalHours)} HOURS ${Math.floor(totalMinutes)} MIN`;
   document.getElementById('dpTotalPickedLeave').textContent = totalPickedLeaveStr;
 
@@ -997,19 +1256,19 @@ function updateDashboardStats() {
   document.getElementById('dpPickedHALF').textContent = countHALF;
   document.getElementById('dpPickedUNDD').textContent = countUNDD;
   document.getElementById('dpPickedMTNT').textContent = countMTNT;
-  
+
   document.getElementById('dpThisAL').textContent = thisAL.toFixed(2);
   document.getElementById('dpThisSL').textContent = thisSL.toFixed(2);
-  
+
   document.getElementById('dpRemainAL').textContent = remainAL.toFixed(2);
   document.getElementById('dpRemainSL').textContent = remainSL.toFixed(2);
-  
+
   document.getElementById('dpTotalDeduct').textContent = totalDeduct.toFixed(2);
 }
 
 function applyFiltersAndRender() {
   let baseRows = allRows;
-  
+
   if (currentGroupFilter) {
     const codes = staffList.filter(s => String(s.GroupName) === currentGroupFilter).map(s => String(s.Code));
     baseRows = allRows.filter(r => codes.includes(String(r['ID KOD'])));
@@ -1052,25 +1311,25 @@ function render() {
 function buildRow(r, i) {
   const c = computeRow(r);
   const tr = document.createElement('tr');
-  
+
   let baseBg = '';
   if (c.hl) baseBg = ROW_HL_COLORS[c.hl] || '';
 
   const situation = (r['SITUATION'] || '').toUpperCase();
-  if (situation === 'INACTIVE') baseBg = '#ffe4e6'; 
+  if (situation === 'INACTIVE') baseBg = '#ffe4e6';
 
-  const tdIdx = document.createElement('td'); 
-  tdIdx.className = 'col-idx'; 
-  tdIdx.textContent = i+1; 
+  const tdIdx = document.createElement('td');
+  tdIdx.className = 'col-idx';
+  tdIdx.textContent = i+1;
   if (baseBg) tdIdx.style.backgroundColor = baseBg;
   tr.appendChild(tdIdx);
 
   SHEET_HEADERS.forEach(h => {
     const td = document.createElement('td');
-    
+
     const isCodeOrName = (h === 'ID KOD' || h === 'NAME');
     const statusVal = (r['STATUS'] || '').toUpperCase();
-    
+
     if (baseBg) td.style.backgroundColor = baseBg;
 
     if (isCodeOrName && statusVal && STATUS_COLORS[statusVal]) {
@@ -1080,29 +1339,29 @@ function buildRow(r, i) {
     }
 
     if (h === 'SITUATION WORK TIME') {
-      td.className = 'calc'; 
+      td.className = 'calc';
       td.textContent = c.swt;
       if (baseBg) td.style.backgroundColor = baseBg;
-    } 
+    }
     else if (h === 'Clock Time(h) 01' || h === 'Clock Time(h) 02' || h === 'Clock Time(h) 03') {
       const k = h.endsWith('01') ? 0 : h.endsWith('02') ? 1 : 2;
       td.className = 'calc'; td.textContent = formatDuration(c.segH[k]);
-    } 
+    }
     else if (h === 'Total Break Time(h)') {
       td.className = 'calc'; td.textContent = c.workMin > 0 ? '01:00:00' : '00:00:00';
-    } 
+    }
     else if (h === 'Total Work Time(h)') {
       td.className = 'calc'; td.textContent = formatDuration(c.workMin);
-    } 
+    }
     else if (h === 'Total Over/Less Time (h)') {
-      td.className = 'calc'; 
-      td.textContent = formatOverLessTime(c.otMin); 
-      if (c.otMin < 0) td.style.color = '#dc2626'; 
-      else if (c.otMin > 0) td.style.color = '#16a34a'; 
-    } 
+      td.className = 'calc';
+      td.textContent = formatOverLessTime(c.otMin);
+      if (c.otMin < 0) td.style.color = '#dc2626';
+      else if (c.otMin > 0) td.style.color = '#16a34a';
+    }
     else if (h === 'TOTAL DEDUCTION(RM)') {
       td.className = 'calc'; td.textContent = c.deduct ? c.deduct.toFixed(2) : '0.00';
-    } 
+    }
     else if (h === 'THIS AL REMAIN' || h === 'THIS SL REMAIN') {
       td.className = 'calc';
       td.textContent = (!currentGroupFilter && currentSelectedCode !== 'ALL')
@@ -1125,7 +1384,7 @@ function buildRow(r, i) {
         if ((r[h]||'').toUpperCase() === o) opt.selected = true;
         sel.appendChild(opt);
       });
-      
+
       if (statusVal && STATUS_COLORS[statusVal]) {
         sel.style.backgroundColor = STATUS_COLORS[statusVal].bg;
         sel.style.color = STATUS_COLORS[statusVal].color;
@@ -1135,9 +1394,9 @@ function buildRow(r, i) {
         sel.style.backgroundColor = 'transparent';
       }
 
-      sel.addEventListener('change', () => { 
-        r[h] = sel.value; markDirty(); 
-        updateDashboardStats(); 
+      sel.addEventListener('change', () => {
+        r[h] = sel.value; markDirty();
+        updateDashboardStats();
         if (filters[h]) applyFiltersAndRender();
         else {
            const idx = filteredRows.indexOf(r);
@@ -1145,16 +1404,16 @@ function buildRow(r, i) {
         }
       });
       td.appendChild(sel);
-    } 
+    }
     else if (READONLY_COLS.includes(h)) {
       td.className = 'ro'; td.textContent = r[h] || '';
-    } 
+    }
     else {
       const inp = document.createElement('input');
       inp.className = 'cell' + (h === 'REMARK' ? ' wide' : '');
       inp.value = r[h] || '';
-      inp.placeholder = ''; 
-      
+      inp.placeholder = '';
+
       if ((h === 'HALF TT JAM' || h === 'HALF TT MIN') && statusVal !== 'HALF DAY LEAVE') {
         inp.disabled = true;
       }
@@ -1180,7 +1439,7 @@ function openFilter(col, e) {
   currentFilterCol = col;
   const panel = document.getElementById('filterPanel');
   const rect = e.target.getBoundingClientRect();
-  
+
   const valSet = new Set();
   let baseRows = allRows;
   if (currentGroupFilter) {
@@ -1189,7 +1448,7 @@ function openFilter(col, e) {
   } else if (currentSelectedCode !== 'ALL') {
     baseRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
   }
-  
+
   baseRows.forEach(r => valSet.add(r[col] ? String(r[col]).trim() : ''));
   const vals = Array.from(valSet).sort((a,b) => {
     if (a === '') return -1;
@@ -1201,7 +1460,7 @@ function openFilter(col, e) {
   const listEl = document.getElementById('fpList');
   const searchEl = document.getElementById('fpSearch');
   searchEl.value = '';
-  
+
   const renderList = (kw) => {
     kw = (kw||'').toLowerCase();
     const shown = vals.filter(v => {
@@ -1222,7 +1481,7 @@ function openFilter(col, e) {
   panel.style.left = Math.min(rect.left, window.innerWidth - 240) + 'px';
   panel.style.top = (rect.bottom + 5) + 'px';
   panel.classList.add('show');
-  
+
   document.addEventListener('mousedown', closeFilterOnClickOutside);
 }
 
@@ -1250,7 +1509,7 @@ function fpApply() {
 
   const allVals = new Set();
   baseRows.forEach(r => allVals.add(r[currentFilterCol] ? String(r[currentFilterCol]).trim() : ''));
-  
+
   if (tempCheckedValues.size === allVals.size) {
     delete filters[currentFilterCol];
   } else {
@@ -1313,7 +1572,7 @@ async function doSave() {
              if (!currentGroupFilter && currentSelectedCode !== 'ALL' && String(r['ID KOD']) === currentSelectedCode) {
                  o[h] = h === 'THIS AL REMAIN' ? document.getElementById('dpRemainAL').textContent : document.getElementById('dpRemainSL').textContent;
              } else {
-                 o[h] = r[h] || ''; 
+                 o[h] = r[h] || '';
              }
          } else {
              o[h] = r[h] === undefined || r[h] === null ? '' : r[h];
