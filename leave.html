@@ -265,14 +265,14 @@ const SHEET_HEADERS = [
   'Clock In 01','Clock Out 01','Clock Time(h) 01',
   'Clock In 02','Clock Out 02','Clock Time(h) 02',
   'Clock In 03','Clock Out 03','Clock Time(h) 03',
-  'Total Break Time(h)','Total Work Time(h)','Total Over Time (h)',
+  'Total Break Time(h)','Total Work Time(h)','Total Over/Less Time (h)',
   'SITUATION WORK TIME','STATUS','HALF TT JAM','HALF TT MIN',
   'TOTAL DEDUCTION(RM)','THIS AL REMAIN','THIS SL REMAIN','REMARK'
 ];
 
 const READONLY_COLS = ['ID KOD','SITUATION','GROUP','NAME','SHIF','GAJI',
   'Clock Time(h) 01','Clock Time(h) 02','Clock Time(h) 03',
-  'Total Break Time(h)','Total Work Time(h)','Total Over Time (h)',
+  'Total Break Time(h)','Total Work Time(h)','Total Over/Less Time (h)',
   'SITUATION WORK TIME','TOTAL DEDUCTION(RM)','THIS AL REMAIN','THIS SL REMAIN'];
 
 const STATUS_OPTIONS = ['', 'ANNUAL LEAVE','UNPAID LEAVE','HALF DAY LEAVE','SICK LEAVE','OFF DAY','UNDEDUCTION LEAVE','MATERNITY LEAVE'];
@@ -397,7 +397,6 @@ function timeToMin(s) {
   if (!s) return null;
   const str = String(s).trim();
   
-  // 匹配 12 小时制格式: "6:34:55 AM" 或 "06:34 AM"
   const match12 = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i);
   if (match12) {
     let h = parseInt(match12[1], 10);
@@ -408,14 +407,12 @@ function timeToMin(s) {
     return h * 60 + m;
   }
   
-  // 匹配 24 小时制格式: "13:53:59" 或 "13:53"
   const match24 = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
   if (match24) {
     const h = parseInt(match24[1], 10), m = parseInt(match24[2], 10);
     if (h <= 23 && m <= 59) return h * 60 + m;
   }
   
-  // 匹配奇异的带日期格式（兜底）: "Sat Dec 30 1899 13:53:59"
   const matchFallback = str.match(/(\d{1,2}):(\d{2}):(\d{2})/);
   if (matchFallback) {
     const h = parseInt(matchFallback[1], 10), m = parseInt(matchFallback[2], 10);
@@ -434,6 +431,19 @@ function formatDuration(totalMinutes) {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
+// 新增：处理负数时间的格式化
+function formatOverLessTime(totalMinutes) {
+  if (totalMinutes === 0) return '00:00:00';
+  const isNegative = totalMinutes < 0;
+  const absMinutes = Math.abs(totalMinutes);
+  const totalSeconds = Math.round(absMinutes * 60);
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+  const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  return isNegative ? `-${timeStr}` : timeStr;
+}
+
 function computeRow(r) {
   const segs = [
     [timeToMin(r['Clock In 01']), timeToMin(r['Clock Out 01'])],
@@ -446,12 +456,14 @@ function computeRow(r) {
 
   const totalSegMin = segH[0]+segH[1]+segH[2];
   const workMin = hasAnyIn ? Math.max(0, totalSegMin - 60) : 0;
-  const otMin = Math.max(0, workMin - 7*60-30);
+  
+  // 计算超过或少于 7小时30分 (450分钟) 的时间
+  const overLessMin = hasAnyIn ? (workMin - 450) : 0; 
 
   let swt = '', hl = '';
   if (!hasAnyIn) { swt = '未存在打卡记录'; }
   else if (missingOut) { swt = '缺少打卡记录'; hl = 'hl-red'; }
-  else if (workMin > 7*60+30) { swt = '超时工作'; hl = 'hl-green'; }
+  else if (workMin > 450) { swt = '超时工作'; hl = 'hl-green'; }
   else { swt = '工时不足'; hl = 'hl-yellow'; }
 
   const gaji = parseFloat(r['GAJI']) || 0;
@@ -467,7 +479,7 @@ function computeRow(r) {
     deduct = hourly * hrs;
   }
 
-  return { segH, workMin, otMin, swt, hl, deduct };
+  return { segH, workMin, otMin: overLessMin, swt, hl, deduct };
 }
 
 const searchEmpInput = document.getElementById('searchEmpInput');
@@ -766,8 +778,11 @@ function buildRow(r, i) {
     else if (h === 'Total Work Time(h)') {
       td.className = 'calc'; td.textContent = formatDuration(c.workMin);
     } 
-    else if (h === 'Total Over Time (h)') {
-      td.className = 'calc'; td.textContent = formatDuration(c.otMin);
+    else if (h === 'Total Over/Less Time (h)') {
+      td.className = 'calc'; 
+      td.textContent = formatOverLessTime(c.otMin); 
+      if (c.otMin < 0) td.style.color = '#dc2626'; // 少于显示红色
+      else if (c.otMin > 0) td.style.color = '#16a34a'; // 多出显示绿色
     } 
     else if (h === 'TOTAL DEDUCTION(RM)') {
       td.className = 'calc'; td.textContent = c.deduct ? c.deduct.toFixed(2) : '0.00';
