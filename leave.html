@@ -128,6 +128,7 @@
     height: 1px; background: var(--line-soft); margin: 0.3rem 0.5rem;
   }
 
+  /* 将 Request Chat 改为 Tips 按钮样式，但保持原本的外形结构 */
   .nav-chat {
     margin-left: auto; align-self: center;
     display: inline-flex; align-items: center; gap: 0.45rem;
@@ -149,21 +150,6 @@
     70% { box-shadow: 0 0 0 7px rgba(110,240,168,0); }
     100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); }
   }
-
-  /* ====== 原有顶部导航 (保留但去掉 sticky 冲突) ====== */
-  .topnav { background: var(--nav-dark); color: #fff; display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 20px; }
-  .topnav-left { display: flex; align-items: center; height: 100%; }
-  .topnav-brand { font-size: 15px; font-weight: 800; margin-right: 30px; display: flex; align-items: center; gap: 8px; color: #fff; letter-spacing: 0.5px; }
-  .topnav-brand .y-icon { background: #007bff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
-  .nav-links2 { display: flex; height: 100%; }
-  .nav-link2 { padding: 0 20px; display: flex; align-items: center; font-size: 12px; font-weight: 700; color: #a0b2cf; cursor: pointer; text-transform: uppercase; border-bottom: 3px solid transparent; transition: all 0.2s; }
-  .nav-link2:hover { background: var(--nav-hover); color: #fff; }
-  .nav-link2.active { color: #fff; border-bottom-color: #007bff; background: var(--nav-hover); }
-  .topnav-right { display: flex; align-items: center; }
-
-  /* 改为 TIPS 按钮 */
-  .btn-tips { background: #0ea5e9; color: #fff; border: none; padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.2s; }
-  .btn-tips:hover { background: #0284c7; }
 
   /* ====== 浅色工具栏 ====== */
   .toolbar { background: #fff; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 8px 20px; gap: 15px; box-shadow: 0 1px 3px rgba(26,79,138,.04); }
@@ -275,10 +261,19 @@
   .tips-actions .btn-detail { background: #e2e8f0; color: #0f172a; }
   .tips-actions .btn-close { background: transparent; color: var(--muted); font-weight: 600; }
 
-  /* 遮罩与高亮浮窗 (Walkthrough) */
-  .tour-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; display: none; cursor: pointer; }
+  /* 遮罩与高亮浮窗 (Walkthrough) - 已修复白块遮挡问题 */
+  .tour-mask { position: fixed; inset: 0; z-index: 10000; display: none; cursor: pointer; }
   .tour-mask.show { display: block; }
-  .tour-highlight { position: absolute; background: #fff; box-shadow: 0 0 0 9999px rgba(0,0,0,0.6); border-radius: 8px; z-index: 10001; display: none; transition: all 0.3s ease; pointer-events: none; }
+  .tour-highlight { 
+    position: absolute; 
+    background: transparent; 
+    outline: 9999px solid rgba(0,0,0,0.6); /* 使用 outline 替代 box-shadow 避免白块覆盖 */
+    border-radius: 8px; 
+    z-index: 10001; 
+    display: none; 
+    transition: all 0.3s ease; 
+    pointer-events: none; 
+  }
   .tour-highlight.show { display: block; }
   .tour-tooltip { position: absolute; background: #fff; border-radius: 8px; padding: 16px; width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 10002; display: none; flex-direction: column; gap: 8px; border-top: 4px solid #007bff; }
   .tour-tooltip.show { display: flex; }
@@ -358,25 +353,11 @@
     </div>
   </div>
 
-  <button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')">
-    <span class="pulse"></span> 💬 Request Chat
+  <!-- 将原本的 Request Chat 改为 TIPS 按钮，功能转移至此 -->
+  <button class="nav-chat" type="button" onclick="openTipsChoice()">
+    <span class="pulse"></span> ❓ TIPS
   </button>
 </nav>
-
-<!-- ====== 原有顶部深色导航 ====== -->
-<div class="topnav">
-  <div class="topnav-left">
-    <div class="topnav-brand"><div class="y-icon">Y</div> YZ PAYROLL</div>
-    <div class="nav-links2">
-      <div class="nav-link2 active">📊 DASHBOARD</div>
-      <div class="nav-link2">👤 EMPLOYEES</div>
-    </div>
-  </div>
-  <div class="topnav-right">
-    <!-- 改为 TIPS 按钮 -->
-    <button class="btn-tips" onclick="openTipsChoice()">❓ TIPS</button>
-  </div>
-</div>
 
 <!-- ====== 浅色工具栏 ====== -->
 <div class="toolbar" id="tour-toolbar">
@@ -825,10 +806,11 @@ function nextTourStep() {
   setTimeout(() => {
     const rect = el.getBoundingClientRect();
 
-    highlight.style.left = (rect.left - 6) + 'px';
-    highlight.style.top = (rect.top - 6) + 'px';
-    highlight.style.width = (rect.width + 12) + 'px';
-    highlight.style.height = (rect.height + 12) + 'px';
+    // 因为 highlighter 使用了 outline，这里不需要再给 top 加上 scroll 偏移，只需对照视口位置即可
+    highlight.style.left = rect.left + 'px';
+    highlight.style.top = rect.top + 'px';
+    highlight.style.width = rect.width + 'px';
+    highlight.style.height = rect.height + 'px';
     highlight.classList.add('show');
 
     let tooltipTop = rect.bottom + 15;
