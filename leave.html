@@ -23,8 +23,10 @@
   .nav-link:hover { background: var(--nav-hover); color: #fff; }
   .nav-link.active { color: #fff; border-bottom-color: #007bff; background: var(--nav-hover); }
   .topnav-right { display: flex; align-items: center; }
-  .btn-request { background: #0ea5e9; color: #fff; border: none; padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-  .btn-request:hover { background: #0284c7; }
+  
+  /* 改为 TIPS 按钮 */
+  .btn-tips { background: #0ea5e9; color: #fff; border: none; padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.2s; }
+  .btn-tips:hover { background: #0284c7; }
 
   /* ====== 浅色工具栏 ====== */
   .toolbar { background: #fff; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 8px 20px; gap: 15px; box-shadow: 0 1px 3px rgba(26,79,138,.04); }
@@ -119,6 +121,33 @@
   .setting-input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; margin-bottom: 12px; outline: none; }
   .setting-textarea { width: 100%; height: 200px; padding: 10px; font-family: monospace; font-size: 12px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 12px; resize: vertical; outline: none; background: #f8fafc; }
   .setting-textarea:focus { border-color: var(--blue); background: #fff; }
+
+  /* ====== TIPS 浮窗/弹窗专用 ====== */
+  .tips-modal { width: 650px; max-width: 95vw; text-align: left; padding: 24px 30px; }
+  .tips-modal h3 { font-size: 20px; color: var(--nav-dark); margin-bottom: 12px; text-align: center; }
+  .tips-modal p.subtitle { text-align: center; margin-bottom: 20px; color: var(--muted); font-size: 13px; }
+  .tips-section { margin-bottom: 18px; border-left: 4px solid #007bff; padding-left: 12px; background: #f8fafc; padding: 10px 12px; border-radius: 0 6px 6px 0; }
+  .tips-section h4 { font-size: 14px; color: #1a4f8a; margin-bottom: 6px; font-weight: 800; }
+  .tips-section ul { list-style-type: none; margin-left: 0; }
+  .tips-section li { font-size: 12.5px; color: #334155; margin-bottom: 4px; line-height: 1.5; }
+  .tips-section li strong { color: #0f172a; }
+  .tips-actions { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+  .tips-actions button { padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: transform 0.1s; }
+  .tips-actions button:active { transform: scale(0.98); }
+  .tips-actions .btn-tour { background: #007bff; color: #fff; }
+  .tips-actions .btn-detail { background: #e2e8f0; color: #0f172a; }
+  .tips-actions .btn-close { background: transparent; color: var(--muted); font-weight: 600; }
+
+  /* 遮罩与高亮浮窗 (Walkthrough) */
+  .tour-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; display: none; cursor: pointer; }
+  .tour-mask.show { display: block; }
+  .tour-highlight { position: absolute; background: #fff; box-shadow: 0 0 0 9999px rgba(0,0,0,0.6); border-radius: 8px; z-index: 10001; display: none; transition: all 0.3s ease; pointer-events: none; }
+  .tour-highlight.show { display: block; }
+  .tour-tooltip { position: absolute; background: #fff; border-radius: 8px; padding: 16px; width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 10002; display: none; flex-direction: column; gap: 8px; border-top: 4px solid #007bff; }
+  .tour-tooltip.show { display: flex; }
+  .tour-tooltip h4 { font-size: 15px; color: #007bff; font-weight: 800; }
+  .tour-tooltip p { font-size: 12.5px; color: #334155; line-height: 1.5; }
+  .tour-tooltip .tour-hint { font-size: 11px; color: #94a3b8; font-style: italic; margin-top: 6px; }
 </style>
 </head>
 <body>
@@ -133,12 +162,13 @@
     </div>
   </div>
   <div class="topnav-right">
-    <button class="btn-request">💬 REQUEST CHAT</button>
+    <!-- 改为 TIPS 按钮 -->
+    <button class="btn-tips" onclick="openTipsChoice()">❓ TIPS</button>
   </div>
 </div>
 
 <!-- ====== 浅色工具栏 ====== -->
-<div class="toolbar">
+<div class="toolbar" id="tour-toolbar">
   <div class="toolbar-left">
     <div class="toolbar-brand"><div class="logo">P</div> Payroll Dashboard</div>
     <div class="toolbar-search">
@@ -159,7 +189,7 @@
 
 <div class="container">
   <div class="dashboard-panel" id="dashboardPanel">
-    <div class="dash-group" style="flex: 1.2;">
+    <div class="dash-group" id="tour-basic-info" style="flex: 1.2;">
       <div class="dash-group-title">MAKLUMAT ASAS</div>
       <div class="dash-row">
         <div class="dash-item search-wrap">
@@ -185,7 +215,7 @@
       </div>
     </div>
 
-    <div class="dash-group" style="flex: 1.5;">
+    <div class="dash-group" id="tour-picked-month" style="flex: 1.5;">
       <div class="dash-group-title">PICKED THIS MONTH</div>
       <div class="dash-row" style="grid-template-columns: repeat(3, 1fr);">
         <div class="dash-item"><label>AL</label><span id="dpPickedAL">0</span></div>
@@ -198,7 +228,7 @@
       </div>
     </div>
 
-    <div class="dash-group" style="flex: 1;">
+    <div class="dash-group" id="tour-baki-cuti" style="flex: 1;">
       <div class="dash-group-title">BAKI CUTI</div>
       <div class="dash-row">
         <div class="dash-item" style="background:#fff3e0;"><label>LAST AL</label><span id="dpLastAL">0</span></div>
@@ -214,7 +244,7 @@
       </div>
     </div>
 
-    <div class="dash-group" style="flex: 1;">
+    <div class="dash-group" id="tour-total-leave" style="flex: 1;">
       <div class="dash-group-title">TOTAL PICKED LEAVE</div>
       <div class="dash-row">
         <div class="dash-item" style="grid-column: span 2; background:#e0f2fe; border-color:#7dd3fc;">
@@ -231,7 +261,7 @@
     </div>
   </div>
 
-  <div class="table-wrap">
+  <div class="table-wrap" id="tour-table">
     <table id="mainTable">
       <thead><tr id="headerRow"></tr></thead>
       <tbody id="tableBody"></tbody>
@@ -291,12 +321,76 @@
   </div>
 </div>
 
+<!-- ====== TIPS 选择弹窗 ====== -->
+<div class="modal-mask" id="tipsChoiceModal">
+  <div class="modal" style="width: 400px;">
+    <h3 style="color: #007bff;">❓ BANTUAN & PANDUAN</h3>
+    <p>Pilih jenis panduan yang anda mahukan.</p>
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+      <button class="btn-outline" style="padding: 12px; justify-content: center; font-size: 14px;" onclick="startTour()">✨ Panduan Visual (Walkthrough)</button>
+      <button class="btn-outline" style="padding: 12px; justify-content: center; font-size: 14px;" onclick="openTipsModal()">📖 Panduan Terperinci (Baca Teks)</button>
+    </div>
+    <div class="actions" style="margin-top: 20px;">
+      <button onclick="closeTipsChoice()">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== TIPS 详细弹窗 (Modal) ====== -->
+<div class="modal-mask" id="tipsDetailModal">
+  <div class="modal tips-modal">
+    <h3>📖 PANDUAN SISTEM PAYROLL</h3>
+    <p class="subtitle">Ketahui fungsi setiap bahagian di dashboard ini.</p>
+    
+    <div class="tips-section">
+      <h4>1. Toolbar Atas (Top Bar)</h4>
+      <ul>
+        <li><strong>URL Box:</strong> Memasukkan link Apps Script untuk sambung ke Google Sheet.</li>
+        <li><strong>SETTING:</strong> Tempat ubah formula kiraan (Perlu kata laluan).</li>
+        <li><strong>Simpan / Muat Semula:</strong> Simpan ke Sheet atau ambil data terbaru.</li>
+      </ul>
+    </div>
+
+    <div class="tips-section">
+      <h4>2. Maklumat Asas & Cuti</h4>
+      <ul>
+        <li><strong>CARI KOD / KUMPULAN:</strong> Tapis pekerja ikut nama atau kumpulan.</li>
+        <li><strong>PICKED THIS MONTH:</strong> Jumlah cuti yang diambil bulan ini (AL, SL, dll).</li>
+        <li><strong>BAKI CUTI:</strong> Baki cuti tahun lepas (LAST), cuti diambil bulan ini (THIS), dan baki semasa (REMAIN). Jika merah, cuti telah <em>overdraft</em>.</li>
+      </ul>
+    </div>
+
+    <div class="tips-section">
+      <h4>3. Jadual Kehadiran (Table)</h4>
+      <ul>
+        <li><strong>Total Work Time:</strong> Masa bekerja selepas tolak rehat 1 jam.</li>
+        <li><strong>Over/Less Time:</strong> Hijau jika lebih 7.5 jam, Merah jika kurang.</li>
+        <li><strong>STATUS:</strong> Pilih jenis cuti (Contoh: Annual Leave, Half Day).</li>
+        <li><strong>TOTAL DEDUCTION:</strong> Potongan gaji automatik jika ambil cuti tanpa gaji.</li>
+      </ul>
+    </div>
+
+    <div class="tips-actions">
+      <button class="btn-close" onclick="closeTipsModal()">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== TIPS 浮窗 (Walkthrough) ====== -->
+<div class="tour-mask" id="tourMask" onclick="nextTourStep()"></div>
+<div class="tour-highlight" id="tourHighlight"></div>
+<div class="tour-tooltip" id="tourTooltip">
+  <h4 id="tourTitle">Title</h4>
+  <p id="tourDesc">Description</p>
+  <div class="tour-hint">Klik di mana-mana untuk teruskan ➔</div>
+</div>
+
+
 <script>
 const URL_KEY = 'payrollScriptUrl';
 const CODE_KEY = 'payrollCustomCalcCode';
 
 const DEFAULT_CALC_CODE = `
-// 默认计算: WorkMin - 450 (7.5小时)
 const standardMinutes = 7.5 * 60; 
 return workMin - standardMinutes;
 `;
@@ -358,6 +452,17 @@ let countdownTimer = null;
 let countdownLeft = 10;
 let modalOpen = false;
 
+// ====== TIPS 走马灯状态 ======
+let tourStepIndex = -1;
+const tourSteps = [
+  { elementId: 'tour-toolbar', title: 'Toolbar Utama', desc: 'Di sini anda boleh masukkan URL Apps Script, buka tetapan formula (SETTING), dan simpan/muat semula data dari Google Sheet.' },
+  { elementId: 'tour-basic-info', title: 'Maklumat Asas', desc: 'Gunakan kotak carian ini untuk tapis pekerja mengikut Nama/Kod atau Kumpulan. Anda juga boleh lihat status semasa dan gaji asas mereka.' },
+  { elementId: 'tour-picked-month', title: 'Cuti Bulan Ini', desc: 'Menunjukkan jumlah cuti yang telah diambil oleh pekerja pada bulan semasa (Annual, Sick, Off Day, dll).' },
+  { elementId: 'tour-baki-cuti', title: 'Baki Cuti', desc: 'LAST: Baki tahun lepas. THIS: Diambil bulan ini. REMAIN: Baki semasa (Jika merah, bermaksud cuti telah overdraft).' },
+  { elementId: 'tour-total-leave', title: 'Jumlah Cuti & Potongan', desc: 'Ringkasan jumlah cuti diambil dan jumlah potongan gaji (RM) untuk bulan ini.' },
+  { elementId: 'tour-table', title: 'Jadual Kehadiran', desc: 'Senarai penuh rekod harian. Anda boleh ubah STATUS cuti, lihat Total Over/Less Time, dan sistem akan kira potongan secara automatik.' }
+];
+
 function initCalcFunction() {
   let code = localStorage.getItem(CODE_KEY) || DEFAULT_CALC_CODE;
   try {
@@ -406,11 +511,96 @@ document.getElementById('globalSearchInput').addEventListener('input', function(
   document.getElementById('searchEmpInput').dispatchEvent(new Event('input'));
 });
 
+// ====== TIPS 控制逻辑 ======
+function openTipsChoice() {
+  document.getElementById('tipsChoiceModal').classList.add('show');
+}
+
+function closeTipsChoice() {
+  document.getElementById('tipsChoiceModal').classList.remove('show');
+}
+
+function openTipsModal() {
+  closeTipsChoice();
+  document.getElementById('tipsDetailModal').classList.add('show');
+}
+
+function closeTipsModal() {
+  document.getElementById('tipsDetailModal').classList.remove('show');
+}
+
+function startTour() {
+  closeTipsChoice();
+  tourStepIndex = -1;
+  document.getElementById('tourMask').classList.add('show');
+  nextTourStep();
+}
+
+function nextTourStep() {
+  tourStepIndex++;
+  
+  // 如果结束了
+  if (tourStepIndex >= tourSteps.length) {
+    endTour();
+    return;
+  }
+
+  const step = tourSteps[tourStepIndex];
+  const el = document.getElementById(step.elementId);
+  const highlight = document.getElementById('tourHighlight');
+  const tooltip = document.getElementById('tourTooltip');
+  const mask = document.getElementById('tourMask');
+
+  if (!el) {
+    nextTourStep(); // 如果找不到元素，直接跳过
+    return;
+  }
+
+  // 滚动到元素可见
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  setTimeout(() => {
+    const rect = el.getBoundingClientRect();
+    
+    // 设置高亮框
+    highlight.style.left = (rect.left - 6) + 'px';
+    highlight.style.top = (rect.top - 6) + 'px';
+    highlight.style.width = (rect.width + 12) + 'px';
+    highlight.style.height = (rect.height + 12) + 'px';
+    highlight.classList.add('show');
+
+    // 设置提示框位置 (在元素下方)
+    let tooltipTop = rect.bottom + 15;
+    let tooltipLeft = rect.left;
+    
+    // 如果下方空间不够，放到上方
+    if (tooltipTop + 150 > window.innerHeight) {
+      tooltipTop = rect.top - 160;
+    }
+    
+    // 防止超出右边
+    if (tooltipLeft + 300 > window.innerWidth) {
+      tooltipLeft = window.innerWidth - 320;
+    }
+
+    tooltip.style.top = tooltipTop + 'px';
+    tooltip.style.left = tooltipLeft + 'px';
+    tooltip.classList.add('show');
+
+    document.getElementById('tourTitle').textContent = step.title;
+    document.getElementById('tourDesc').textContent = step.desc;
+  }, 300); // 等待滚动完成
+}
+
+function endTour() {
+  document.getElementById('tourMask').classList.remove('show');
+  document.getElementById('tourHighlight').classList.remove('show');
+  document.getElementById('tourTooltip').classList.remove('show');
+  tourStepIndex = -1;
+}
+
 // ====== 修复后的 Setting Center 逻辑 ======
-// 我们用一个简单的代码混淆。真正的密码是 "0000"。
-// 这样在代码里搜不到 0000
 function getObfuscatedPass() {
-  // 0000 的字符编码是 48, 48, 48, 48。这里做了简单的加减法混淆
   const parts = [49, 49, 49, 49];
   return String.fromCharCode(...parts.map(p => p - 1));
 }
@@ -429,7 +619,7 @@ function closeSettingCenter() {
 
 function verifyPassword() {
   const pwd = document.getElementById('settingPasswordInput').value;
-  const realPwd = getObfuscatedPass(); // 这里动态还原出 "0000"
+  const realPwd = getObfuscatedPass();
   
   if (pwd === realPwd) {
     document.getElementById('settingStep1').style.display = 'none';
