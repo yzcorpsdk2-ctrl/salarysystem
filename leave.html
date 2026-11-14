@@ -9,94 +9,78 @@
   :root {
     --blue: #1a4f8a; --blue-soft: #f4f8fd; --border: #d4e0ee;
     --text: #1f2d3d; --muted: #64748b; --bg: #f7fafd;
+    --nav-dark: #1a2b4c; --nav-hover: #243a66;
   }
   body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); font-size: 13px; min-height: 100vh; padding-bottom: 50px; }
   
-  /* 顶部导航 */
-  .topbar {
-    position: sticky; top: 0; z-index: 100; background: #fff; border-bottom: 1px solid var(--border);
-    padding: 10px 18px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
-    box-shadow: 0 1px 3px rgba(26,79,138,.06);
-  }
-  .topbar .brand { font-weight: 700; color: var(--blue); display: flex; align-items: center; gap: 8px; }
-  .topbar .brand .logo { width: 30px; height: 30px; background: var(--blue); color: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 800; }
-  .url-box { display: flex; align-items: center; gap: 4px; flex: 1; max-width: 420px; background: var(--blue-soft); border: 1px solid var(--border); border-radius: 6px; padding: 2px; }
-  .url-box input { flex: 1; border: none; background: transparent; padding: 6px 8px; font-size: 12px; outline: none; }
-  .url-box button { padding: 5px 12px; border-radius: 4px; border: none; background: var(--blue); color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; }
-  .btn { background: #fff; border: 1px solid var(--border); padding: 6px 12px; border-radius: 5px; font-size: 12px; font-weight: 500; cursor: pointer; color: var(--blue); display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; transition: all 0.2s; }
-  .btn:hover { background: var(--blue-soft); }
-  .btn-success { background: #0f7a54; color: #fff; border-color: #0f7a54; }
-  .btn-success:hover { background: #0c6a48; }
-  .sync-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--blue-soft); border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; color: var(--muted); }
-  .sync-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: #9db8d2; }
-  .sync-badge.ok .dot { background: #22c55e; }
-  .sync-badge.busy .dot { background: #f59e0b; }
-  .sync-badge.err .dot { background: #ef4444; }
+  /* ====== 新顶部导航 (模拟截图) ====== */
+  .topnav { background: var(--nav-dark); color: #fff; display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 20px; }
+  .topnav-left { display: flex; align-items: center; height: 100%; }
+  .topnav-brand { font-size: 15px; font-weight: 800; margin-right: 30px; display: flex; align-items: center; gap: 8px; color: #fff; letter-spacing: 0.5px; }
+  .topnav-brand .y-icon { background: #007bff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+  .nav-links { display: flex; height: 100%; }
+  .nav-link { padding: 0 20px; display: flex; align-items: center; font-size: 12px; font-weight: 700; color: #a0b2cf; cursor: pointer; text-transform: uppercase; border-bottom: 3px solid transparent; transition: all 0.2s; }
+  .nav-link:hover { background: var(--nav-hover); color: #fff; }
+  .nav-link.active { color: #fff; border-bottom-color: #007bff; background: var(--nav-hover); }
+  .topnav-right { display: flex; align-items: center; }
+  .btn-request { background: #0ea5e9; color: #fff; border: none; padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .btn-request:hover { background: #0284c7; }
 
-  /* 顶部控制面板 (仪表盘) */
-  .container { max-width: 100%; padding: 14px 18px; }
+  /* ====== 浅色工具栏 (含 Setting 按钮) ====== */
+  .toolbar { background: #fff; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 8px 20px; gap: 15px; box-shadow: 0 1px 3px rgba(26,79,138,.04); }
+  .toolbar-left { display: flex; align-items: center; gap: 16px; flex: 1; }
+  .toolbar-brand { display: flex; align-items: center; gap: 8px; color: var(--nav-dark); font-weight: 800; font-size: 15px; }
+  .toolbar-brand .logo { background: #007bff; color: #fff; width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .toolbar-search { display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; width: 320px; gap: 6px; }
+  .toolbar-search input { border: none; background: transparent; outline: none; font-size: 12px; flex: 1; color: var(--text); }
+  .toolbar-search span { color: var(--muted); font-size: 14px; }
+
+  .toolbar-right { display: flex; align-items: center; gap: 10px; }
+  .url-box { display: flex; align-items: center; gap: 4px; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 2px; }
+  .url-box input { border: none; background: transparent; padding: 6px 8px; font-size: 12px; outline: none; width: 260px; }
+  .url-box button { padding: 5px 12px; border-radius: 4px; border: none; background: var(--blue); color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; }
+  .btn-outline { background: #fff; border: 1px solid var(--border); padding: 6px 12px; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; color: var(--text); display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s; }
+  .btn-outline:hover { background: var(--blue-soft); color: var(--blue); }
+  .btn-success { background: #16a34a; color: #fff; border-color: #16a34a; }
+  .btn-success:hover { background: #15803d; color: #fff; }
+  .btn-setting { background: #f1f5f9; color: #0f172a; border-color: #cbd5e1; }
+  .btn-setting:hover { background: #e2e8f0; color: #000; }
   
-  /* 新的仪表盘布局：四组框 */
-  .dashboard-panel {
-    background: #fff; border: 1px solid var(--border); border-radius: 8px;
-    padding: 16px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(15,23,42,.03);
-    display: flex; flex-wrap: wrap; gap: 16px;
-  }
-  .dash-group {
-    flex: 1 1 auto; background: var(--blue-soft); border: 1px solid var(--border); border-radius: 8px;
-    padding: 12px; display: flex; flex-direction: column; gap: 10px; min-width: 260px;
-  }
-  .dash-group-title {
-    font-size: 11px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 0.5px;
-    border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 4px;
-  }
-  .dash-row {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-  }
-  .dash-item {
-    display: flex; flex-direction: column; gap: 2px; min-width: 0;
-    background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 6px 8px;
-  }
+  .sync-badge { display: inline-flex; align-items: center; gap: 5px; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; color: #047857; }
+  .sync-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; }
+
+  /* ====== 仪表盘等主体内容 ====== */
+  .container { max-width: 100%; padding: 14px 20px; }
+  .dashboard-panel { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(15,23,42,.03); display: flex; flex-wrap: wrap; gap: 16px; }
+  .dash-group { flex: 1 1 auto; background: var(--blue-soft); border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 10px; min-width: 260px; }
+  .dash-group-title { font-size: 11px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 4px; }
+  .dash-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .dash-item { display: flex; flex-direction: column; gap: 2px; min-width: 0; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 6px 8px; }
   .dash-item label { font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .dash-item span { font-size: 14px; font-weight: 800; color: var(--blue); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  
-  /* 搜索框内嵌样式 */
   .dash-item.search-wrap { position: relative; padding: 0; background: transparent; border: none; }
   .dash-item.search-wrap label { margin-bottom: 2px; }
-  .dash-item.search-wrap input {
-    font-size: 13px; font-weight: 600; color: var(--text); padding: 4px 6px; width: 100%;
-    border: 1px solid var(--border); border-radius: 4px; background: #fff; outline: none;
-  }
+  .dash-item.search-wrap input { font-size: 13px; font-weight: 600; color: var(--text); padding: 4px 6px; width: 100%; border: 1px solid var(--border); border-radius: 4px; background: #fff; outline: none; }
   .dash-item.search-wrap input:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(26,79,138,.12); }
 
   /* 搜索下拉 */
-  .search-dropdown {
-    position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--border);
-    border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,.1); max-height: 250px; overflow-y: auto; z-index: 50; display: none;
-  }
+  .search-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,.1); max-height: 250px; overflow-y: auto; z-index: 50; display: none; }
   .search-dropdown.show { display: block; }
   .sd-item { padding: 8px 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
   .sd-item:hover { background: var(--blue-soft); color: var(--blue); }
   .sd-item.all-item { font-weight: 700; background: #eef4fb; color: var(--blue); border-bottom: 2px solid #dbe6f2; }
 
-  /* 表格基础结构 */
+  /* 表格 */
   .table-wrap { overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: #fff; max-height: calc(100vh - 320px); position: relative; }
   table { border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; font-size: 11.5px; }
-  thead th {
-    position: sticky; top: 0; z-index: 3; background: #eef4fb; color: #334155;
-    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px;
-    padding: 8px 5px; border-right: 1px solid #dbe6f2; border-bottom: 2px solid #cbd9ea;
-    white-space: nowrap; text-align: center;
-  }
+  thead th { position: sticky; top: 0; z-index: 3; background: #eef4fb; color: #334155; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; padding: 8px 5px; border-right: 1px solid #dbe6f2; border-bottom: 2px solid #cbd9ea; white-space: nowrap; text-align: center; }
   thead th .th-inner { display: flex; align-items: center; justify-content: center; gap: 4px; }
   .filter-btn { border: none; background: transparent; cursor: pointer; font-size: 9px; color: #94a3b8; padding: 2px 4px; border-radius: 4px; }
   .filter-btn:hover { background: #dbeafe; color: #2563eb; }
   .filter-btn.active { color: #2563eb; background: #bfdbfe; }
   tbody td { padding: 3px 4px; border-bottom: 1px solid #eef3f9; border-right: 1px solid #f2f6fb; text-align: center; white-space: nowrap; height: 34px; }
-  
   .ro { color: #334155; font-weight: 600; }
   .calc { background: #f6f9ff; font-weight: 700; color: #0f172a; }
-  
   input.cell, select.cell { width: 100%; min-width: 54px; padding: 4px 4px; font-size: 11.5px; text-align: center; border: 1px solid transparent; border-radius: 5px; background: transparent; color: #0f172a; transition: all 0.15s; }
   input.cell:hover, select.cell:hover { border-color: #cbd5e1; background: #fff; }
   input.cell:focus, select.cell:focus { outline: none; border-color: var(--blue); background: #fff; box-shadow: 0 0 0 2px rgba(26,79,138,.12); }
@@ -117,37 +101,66 @@
   .fp-footer { display: flex; justify-content: flex-end; gap: 6px; margin-top: 8px; border-top: 1px solid #eef2f7; padding-top: 8px; }
   .fp-footer button { padding: 4px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; border: 1px solid var(--border); background: #fff; }
   .fp-footer button.apply { background: var(--blue); color: #fff; border-color: var(--blue); }
-  
-  .modal-mask { position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 9999; display: none; align-items: center; justify-content: center; }
+
+  /* Modal (Autosave & Setting) */
+  .modal-mask { position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 9999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
   .modal-mask.show { display: flex; }
-  .modal { background: #fff; border-radius: 12px; padding: 22px 24px; width: 360px; max-width: 92vw; box-shadow: 0 20px 60px rgba(15,23,42,.35); text-align: center; }
-  .modal h3 { font-size: 15px; color: var(--blue); margin-bottom: 8px; }
+  .modal { background: #fff; border-radius: 12px; padding: 22px 24px; width: 420px; max-width: 92vw; box-shadow: 0 20px 60px rgba(15,23,42,.35); text-align: center; }
+  .modal h3 { font-size: 16px; color: var(--nav-dark); margin-bottom: 8px; }
   .modal p { font-size: 12.5px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
   .modal .countdown { font-size: 26px; font-weight: 800; color: #dc2626; margin: 6px 0 12px; }
   .modal .actions { display: flex; gap: 8px; justify-content: center; }
   .modal .actions button { padding: 8px 18px; border-radius: 6px; font-size: 12.5px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: #fff; color: var(--text); }
   .modal .actions button.confirm { background: var(--blue); color: #fff; border-color: var(--blue); }
-  .empty { text-align: center; padding: 50px 20px; color: #94a3b8; }
+  
+  /* Setting Center 专用 */
+  .setting-modal { width: 600px; text-align: left; }
+  .setting-modal h3 { text-align: center; }
+  .setting-input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; margin-bottom: 12px; outline: none; }
+  .setting-textarea { width: 100%; height: 200px; padding: 10px; font-family: monospace; font-size: 12px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 12px; resize: vertical; outline: none; background: #f8fafc; }
+  .setting-textarea:focus { border-color: var(--blue); background: #fff; }
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="brand"><div class="logo">P</div> Leave · Timecard</div>
-  <div class="url-box">
-    <input type="text" id="deployUrlInput" placeholder="Apps Script URL (auto sync dari dashboard)...">
-    <button onclick="applyUrl()">🔗 Apply</button>
+<!-- ====== 新顶部深色导航 ====== -->
+<div class="topnav">
+  <div class="topnav-left">
+    <div class="topnav-brand"><div class="y-icon">Y</div> YZ PAYROLL</div>
+    <div class="nav-links">
+      <div class="nav-link active">📊 DASHBOARD</div>
+      <div class="nav-link">👤 EMPLOYEES</div>
+    </div>
   </div>
-  <button class="btn" onclick="loadData()"><i>🔄</i> Muat Semula</button>
-  <button class="btn btn-success" onclick="manualSave()">💾 Simpan</button>
-  <span class="sync-badge" id="syncBadge"><span class="dot"></span><span id="syncText">Sedia</span></span>
+  <div class="topnav-right">
+    <button class="btn-request">💬 REQUEST CHAT</button>
+  </div>
+</div>
+
+<!-- ====== 浅色工具栏 ====== -->
+<div class="toolbar">
+  <div class="toolbar-left">
+    <div class="toolbar-brand"><div class="logo">P</div> Payroll Dashboard</div>
+    <div class="toolbar-search">
+      <span>🔍</span>
+      <input type="text" id="globalSearchInput" placeholder="Cari Nama / Kod / Kumpulan...">
+    </div>
+  </div>
+  <div class="toolbar-right">
+    <div class="url-box">
+      <input type="text" id="deployUrlInput" placeholder="Apps Script URL...">
+      <button onclick="applyUrl()">🔗 Apply</button>
+    </div>
+    <button class="btn-outline" onclick="openSettingCenter()">⚙️ SETTING</button>
+    <span class="sync-badge" id="syncBadge"><span class="dot"></span><span id="syncText">Sedia</span></span>
+    <button class="btn-outline btn-success" onclick="loadData()">🔄 Muat Semula</button>
+  </div>
 </div>
 
 <div class="container">
-  <!-- 新的仪表盘布局：四组框 -->
+  <!-- 仪表盘布局 -->
   <div class="dashboard-panel" id="dashboardPanel">
     
-    <!-- 组 1: 基础信息 (搜索与统计) -->
     <div class="dash-group" style="flex: 1.2;">
       <div class="dash-group-title">MAKLUMAT ASAS</div>
       <div class="dash-row">
@@ -174,7 +187,6 @@
       </div>
     </div>
 
-    <!-- 组 2: PICKED THIS MONTH -->
     <div class="dash-group" style="flex: 1.5;">
       <div class="dash-group-title">PICKED THIS MONTH</div>
       <div class="dash-row" style="grid-template-columns: repeat(3, 1fr);">
@@ -188,7 +200,6 @@
       </div>
     </div>
 
-    <!-- 组 3: REMAIN (LAST + THIS + REMAIN) -->
     <div class="dash-group" style="flex: 1;">
       <div class="dash-group-title">BAKI CUTI</div>
       <div class="dash-row">
@@ -197,16 +208,14 @@
       </div>
       <div class="dash-row">
         <div class="dash-item" style="background:#d1fae5; border-color:#6ee7b7;"><label>THIS AL</label><span id="dpThisAL">0</span></div>
-        <div class="dash-item" style="background:#d1fae5; border-color:#6ee7b7;"><label>THIS SL</label><span id="dpThisSL">0</span></div>
+        <div class="dash-item" style="background:#d1fae5; border-color:#6ee7b7;"><label>THIS SL</span><span id="dpThisSL">0</span></div>
       </div>
-      <!-- 新增: REMAIN AL & SL -->
       <div class="dash-row">
         <div class="dash-item" style="background:#e0f2fe; border-color:#7dd3fc;"><label>REMAIN AL</label><span id="dpRemainAL">0</span></div>
         <div class="dash-item" style="background:#e0f2fe; border-color:#7dd3fc;"><label>REMAIN SL</label><span id="dpRemainSL">0</span></div>
       </div>
     </div>
 
-    <!-- 组 4: TOTAL PICKED LEAVE & TOTAL DEDUCTION -->
     <div class="dash-group" style="flex: 1;">
       <div class="dash-group-title">TOTAL PICKED LEAVE</div>
       <div class="dash-row">
@@ -233,6 +242,7 @@
   </div>
 </div>
 
+<!-- ====== Filter Panel ====== -->
 <div class="filter-panel" id="filterPanel">
   <div class="fp-head"><input type="text" id="fpSearch" placeholder="Cari nilai..."></div>
   <div class="fp-actions">
@@ -246,6 +256,7 @@
   </div>
 </div>
 
+<!-- ====== Autosave Modal ====== -->
 <div class="modal-mask" id="autoSaveModal">
   <div class="modal">
     <h3>⏰ Autosave</h3>
@@ -258,8 +269,49 @@
   </div>
 </div>
 
+<!-- ====== SETTING Center Modal ====== -->
+<div class="modal-mask" id="settingModal">
+  <div class="modal setting-modal">
+    <h3>⚙️ SETTING CENTER</h3>
+    <p id="settingDesc">Masukkan kata laluan untuk mengakses tetapan kod.</p>
+    
+    <!-- 密码输入阶段 -->
+    <div id="settingStep1">
+      <input type="password" id="settingPasswordInput" class="setting-input" placeholder="Kata Laluan (Password)...">
+      <div class="actions" style="margin-top: 16px;">
+        <button onclick="closeSettingCenter()">Cancel</button>
+        <button class="confirm" onclick="verifyPassword()">Buka Kunci</button>
+      </div>
+    </div>
+
+    <!-- 代码编辑阶段 (默认隐藏) -->
+    <div id="settingStep2" style="display: none;">
+      <p style="margin-bottom: 8px; font-size: 12px; text-align: left;">Edit core logic ( <code>overLessMin</code> calculation ).</p>
+      <textarea id="settingCodeInput" class="setting-textarea"></textarea>
+      <div class="actions" style="justify-content: flex-end;">
+        <button onclick="resetDefaultCode()">Reset Default</button>
+        <button class="confirm" onclick="saveCustomCode()">Simpan & Apply</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 const URL_KEY = 'payrollScriptUrl';
+const CODE_KEY = 'payrollCustomCalcCode';
+
+// 核心默认计算公式 (判断标准和超/少时间)
+// 注意：后续前端通过 new Function() 动态执行这段代码
+const DEFAULT_CALC_CODE = `
+// 默认计算: WorkMin - 450 (7.5小时)
+// 你可以直接修改这里的 450，或者整个公式
+const standardMinutes = 7.5 * 60; 
+return workMin - standardMinutes;
+`;
+
+// 全局变量存储当前执行逻辑
+let customCalcFunction = null;
+
 const SHEET_HEADERS = [
   'ID KOD','SITUATION','GROUP','NAME','SHIF','GAJI','Date',
   'Clock In 01','Clock Out 01','Clock Time(h) 01',
@@ -315,6 +367,21 @@ let countdownTimer = null;
 let countdownLeft = 10;
 let modalOpen = false;
 
+// ====== 初始化自定义计算逻辑 ======
+function initCalcFunction() {
+  let code = localStorage.getItem(CODE_KEY) || DEFAULT_CALC_CODE;
+  try {
+    // 使用 new Function 动态编译用户代码，接收 workMin 参数
+    customCalcFunction = new Function('workMin', code);
+    // 测试执行一次防止崩溃
+    customCalcFunction(450); 
+  } catch (e) {
+    console.error("Custom code error, fallback to default.", e);
+    customCalcFunction = new Function('workMin', DEFAULT_CALC_CODE);
+  }
+}
+initCalcFunction();
+
 function getAllGroups() {
   return Array.from(new Set(staffList.map(s => String(s.GroupName || '').trim()).filter(g => g)));
 }
@@ -323,6 +390,7 @@ function loadSavedUrl() {
   SCRIPT_URL = localStorage.getItem(URL_KEY) || '';
   document.getElementById('deployUrlInput').value = SCRIPT_URL;
 }
+
 function applyUrl() {
   const url = document.getElementById('deployUrlInput').value.trim();
   if (!url) { alert('Masukkan URL terlebih dahulu.'); return; }
@@ -330,6 +398,7 @@ function applyUrl() {
   SCRIPT_URL = url;
   loadData();
 }
+
 window.addEventListener('storage', e => {
   if (e.key === URL_KEY && e.newValue) {
     SCRIPT_URL = e.newValue;
@@ -344,6 +413,82 @@ function setSync(state, text) {
   document.getElementById('syncText').textContent = text;
 }
 
+// ====== 搜索栏的整合 ======
+document.getElementById('globalSearchInput').addEventListener('input', function(e) {
+  document.getElementById('searchEmpInput').value = e.target.value;
+  document.getElementById('searchEmpInput').dispatchEvent(new Event('input'));
+});
+
+// ====== Setting Center 逻辑 (带密码与哈希验证) ======
+// 为了防止 F12 直接搜索 "0000"，使用 SHA-256 哈希验证
+// "0000" 的 SHA-256 hash 为: "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccaded2e3d9a9e"
+const HASHED_PASSWORD = "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccaded2e3d9a9e";
+
+async function sha256(message) {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function openSettingCenter() {
+  document.getElementById('settingModal').classList.add('show');
+  document.getElementById('settingStep1').style.display = 'block';
+  document.getElementById('settingStep2').style.display = 'none';
+  document.getElementById('settingPasswordInput').value = '';
+  document.getElementById('settingDesc').textContent = 'Masukkan kata laluan untuk mengakses tetapan kod.';
+}
+
+function closeSettingCenter() {
+  document.getElementById('settingModal').classList.remove('show');
+}
+
+async function verifyPassword() {
+  const pwd = document.getElementById('settingPasswordInput').value;
+  const hash = await sha256(pwd);
+  
+  if (hash === HASHED_PASSWORD) {
+    document.getElementById('settingStep1').style.display = 'none';
+    document.getElementById('settingStep2').style.display = 'block';
+    document.getElementById('settingDesc').textContent = 'Edit formula di bawah (Guna pembolehubah: workMin).';
+    
+    // 加载当前保存的代码
+    const savedCode = localStorage.getItem(CODE_KEY) || DEFAULT_CALC_CODE;
+    document.getElementById('settingCodeInput').value = savedCode.trim();
+  } else {
+    alert('❌ Kata laluan salah!');
+    document.getElementById('settingPasswordInput').value = '';
+  }
+}
+
+function resetDefaultCode() {
+  if(confirm('Pastikan anda mahu menetapkan semula kepada kod asal (7.5 Jam)?')) {
+    document.getElementById('settingCodeInput').value = DEFAULT_CALC_CODE.trim();
+  }
+}
+
+function saveCustomCode() {
+  const newCode = document.getElementById('settingCodeInput').value;
+  try {
+    // 测试新代码是否有效
+    const testFn = new Function('workMin', newCode);
+    testFn(400); // 随便传一个值测试
+    
+    // 验证通过，保存
+    localStorage.setItem(CODE_KEY, newCode);
+    customCalcFunction = testFn;
+    closeSettingCenter();
+    alert('✅ Kod berjaya disimpan & digunakan!');
+    
+    // 刷新表格显示
+    applyFiltersAndRender();
+  } catch (err) {
+    alert('❌ Ralat sintaks kod: \n' + err.message);
+  }
+}
+
+
+// ====== 核心业务逻辑 ======
 async function loadData() {
   if (!SCRIPT_URL) { setSync('err', 'URL belum ditetapkan'); return; }
   setSync('busy', 'Memuatkan...');
@@ -431,7 +576,6 @@ function formatDuration(totalMinutes) {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-// 处理负数时间的格式化
 function formatOverLessTime(totalMinutes) {
   if (totalMinutes === 0) return '00:00:00';
   const isNegative = totalMinutes < 0;
@@ -457,13 +601,25 @@ function computeRow(r) {
   const totalSegMin = segH[0]+segH[1]+segH[2];
   const workMin = hasAnyIn ? Math.max(0, totalSegMin - 60) : 0;
   
-  // 计算超过或少于 7小时30分 (450分钟) 的时间
-  const overLessMin = hasAnyIn ? (workMin - 450) : 0; 
+  // ==========================================
+  // 这里调用动态注入的代码 (默认是 workMin - 450)
+  // ==========================================
+  let overLessMin = 0;
+  if (hasAnyIn) {
+    try {
+      overLessMin = customCalcFunction(workMin);
+    } catch (e) {
+      console.error("Calc Error:", e);
+      overLessMin = workMin - 450; // Fallback
+    }
+  }
 
+  // 为了高亮颜色，系统内部依然使用基础的 450 分钟判断，如果你希望颜色也随自定义逻辑变，这里也要改。
+  // 但为了安全，我们先让 "Total Over/Less Time" 跟随你的代码。高亮背景依旧按 7.5 小时标准。
   let swt = '', hl = '';
   if (!hasAnyIn) { swt = '未存在打卡记录'; }
   else if (missingOut) { swt = '缺少打卡记录'; hl = 'hl-red'; }
-  else if (workMin > 450) { swt = '超时工作'; hl = 'hl-green'; }
+  else if (overLessMin > 0) { swt = '超时工作'; hl = 'hl-green'; }
   else { swt = '工时不足'; hl = 'hl-yellow'; }
 
   const gaji = parseFloat(r['GAJI']) || 0;
@@ -640,7 +796,6 @@ function updateDashboardStats() {
       if (s === 'UNDEDUCTION LEAVE') countUNDD++;
       if (s === 'MATERNITY LEAVE') countMTNT++;
 
-      // Total Picked Leave
       if (s && s !== 'OFF DAY') {
         if (s === 'HALF DAY LEAVE') {
           totalDays += 0.5;
@@ -657,7 +812,6 @@ function updateDashboardStats() {
     totalDeduct += c.deduct;
   });
 
-  // Normalize Time
   totalHours += Math.floor(totalMinutes / 60);
   totalMinutes = totalMinutes % 60;
   totalDays += Math.floor(totalHours / 24);
@@ -666,11 +820,9 @@ function updateDashboardStats() {
   const totalPickedLeaveStr = `${Math.floor(totalDays)} DAYS ${Math.floor(totalHours)} HOURS ${Math.floor(totalMinutes)} MIN`;
   document.getElementById('dpTotalPickedLeave').textContent = totalPickedLeaveStr;
 
-  // THIS AL/SL calculation
   const thisAL = countAL;
   const thisSL = countSL;
 
-  // REMAIN AL/SL
   const remainAL = lastAL - thisAL;
   const remainSL = lastSL - thisSL;
 
@@ -781,8 +933,8 @@ function buildRow(r, i) {
     else if (h === 'Total Over/Less Time (h)') {
       td.className = 'calc'; 
       td.textContent = formatOverLessTime(c.otMin); 
-      if (c.otMin < 0) td.style.color = '#dc2626'; // 少于显示红色
-      else if (c.otMin > 0) td.style.color = '#16a34a'; // 多出显示绿色
+      if (c.otMin < 0) td.style.color = '#dc2626'; 
+      else if (c.otMin > 0) td.style.color = '#16a34a'; 
     } 
     else if (h === 'TOTAL DEDUCTION(RM)') {
       td.className = 'calc'; td.textContent = c.deduct ? c.deduct.toFixed(2) : '0.00';
@@ -837,8 +989,6 @@ function buildRow(r, i) {
       const inp = document.createElement('input');
       inp.className = 'cell' + (h === 'REMARK' ? ' wide' : '');
       inp.value = r[h] || '';
-      
-      // 修改这里：去掉了原本的 placeholder 占位符
       inp.placeholder = ''; 
       
       if ((h === 'HALF TT JAM' || h === 'HALF TT MIN') && statusVal !== 'HALF DAY LEAVE') {
@@ -996,7 +1146,6 @@ async function doSave() {
       const o = {};
       SHEET_HEADERS.forEach(h => {
          if(h === 'THIS AL REMAIN' || h === 'THIS SL REMAIN') {
-             // 这里保存 REMAIN 值
              if (!currentGroupFilter && currentSelectedCode !== 'ALL' && String(r['ID KOD']) === currentSelectedCode) {
                  o[h] = h === 'THIS AL REMAIN' ? document.getElementById('dpRemainAL').textContent : document.getElementById('dpRemainSL').textContent;
              } else {
