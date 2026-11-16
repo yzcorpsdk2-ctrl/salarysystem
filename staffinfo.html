@@ -14,6 +14,7 @@
             --nav-h: 52px;
             --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover: #16345c;
             --nav-text: #cbd9ea; --nav-accent: #4d9fff;
+
             --dropdown-bg: #ffffff;
             --dropdown-shadow: 0 8px 24px rgba(16,32,56,.15);
             --line: #dbe3ec;
@@ -28,7 +29,7 @@
             -webkit-font-smoothing: antialiased; font-size: 14px;
         }
 
-        /* ==================== 导航栏 ==================== */
+        /* ==================== NAVBAR ==================== */
         .navbar {
             position: sticky; top: 0; z-index: 200;
             display: flex; align-items: stretch; flex-wrap: wrap;
@@ -85,16 +86,17 @@
         .nav-dropdown > .nav-item .fa-caret-down { font-size: 0.6rem; margin-left: 0.2rem; opacity: 0.7; }
         .dropdown-menu {
             display: none; position: absolute; top: 100%; left: 0; min-width: 180px;
-            background: var(--dropdown-bg); border-radius: 8px; box-shadow: var(--dropdown-shadow);
-            padding: 0.4rem 0; z-index: 300; border: 1px solid var(--line);
-            animation: fadeSlide 0.15s ease;
+            background: var(--dropdown-bg); border-radius: 8px;
+            box-shadow: var(--dropdown-shadow); padding: 0.4rem 0;
+            z-index: 300; border: 1px solid var(--line); animation: fadeSlide 0.15s ease;
         }
         .nav-dropdown.open .dropdown-menu { display: block; }
         @keyframes fadeSlide { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
         .dropdown-menu a {
-            display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem;
-            color: #1e293b; text-decoration: none; font-size: 0.78rem; font-weight: 500;
-            transition: background 0.12s; white-space: nowrap;
+            display: flex; align-items: center; gap: 0.5rem;
+            padding: 0.5rem 1rem; color: #1e293b; text-decoration: none;
+            font-size: 0.78rem; font-weight: 500; transition: background 0.12s; white-space: nowrap;
         }
         .dropdown-menu a:hover { background: var(--navy-soft); color: var(--navy); }
         .dropdown-menu .divider { height: 1px; background: var(--line-soft); margin: 0.3rem 0.5rem; }
@@ -357,7 +359,7 @@
             margin-top: 0.6rem; display: none;
         }
 
-        /* Loading Spinner */
+        /* ==================== Loading Spinner ==================== */
         .loading-spinner {
             display: inline-block; width: 16px; height: 16px;
             border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid #fff;
@@ -366,7 +368,36 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* 响应式 */
+        /* ==================== 预设提醒弹窗 ==================== */
+        .reminder-toast {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            width: 350px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border-left: 5px solid #dd6b20;
+            z-index: 9999;
+            display: none;
+            animation: slideInRight 0.3s ease;
+        }
+        @keyframes slideInRight { from { transform: translateX(120%); } to { transform: translateX(0); } }
+        .reminder-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.8rem 1rem; border-bottom: 1px solid #edf2f7;
+            background: #fdf8ec; border-radius: 8px 8px 0 0;
+        }
+        .reminder-header h4 { margin: 0; font-size: 0.9rem; color: #7a5a12; }
+        .reminder-close { cursor: pointer; font-weight: bold; color: #a0aec0; font-size: 1.2rem; }
+        .reminder-close:hover { color: #e53e3e; }
+        .reminder-body { padding: 1rem; max-height: 250px; overflow-y: auto; }
+        .reminder-item { font-size: 0.8rem; padding: 0.5rem 0; border-bottom: 1px dashed #e2e8f0; }
+        .reminder-item:last-child { border-bottom: none; }
+        .reminder-item strong { color: #1a4f8a; }
+        .reminder-item .time { color: #c53030; font-weight: 600; }
+
+        /* ==================== 响应式 ==================== */
         @media (max-width: 768px) {
             .navbar { padding: 0 0.5rem; }
             .navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
@@ -379,21 +410,22 @@
             .page-header h1 { font-size: 1.2rem; }
             .filter-row { flex-direction: column; gap: 0.75rem; }
             .filter-group { flex: 1 1 100%; }
-            .profile-field label { flex: 0 0 130px; font-size: 0.7rem; }
+            .profile-field label { flex: 0 0 100px; font-size: 0.7rem; }
             .profile-field input, .profile-field select { font-size: 0.78rem; }
+            .reminder-toast { width: 90%; right: 5%; top: 60px; }
         }
     </style>
 </head>
 <body>
 
-<!-- 导航栏 -->
+<!-- ==================== 顶部深色导航栏 ==================== -->
 <nav class="navbar">
     <div class="nav-brand">
         <span class="logo">Y</span>
         <span class="brand-text">YZ Staff</span>
     </div>
     <div class="nav-links" id="navLinks">
-        <button class="nav-back" id="backBtn" title="Kembali">⏎</button>
+        <button class="nav-back" id="backBtn" title="Kembali ke halaman sebelumnya">⏎</button>
 
         <div class="nav-dropdown" id="filesDropdown">
             <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down">▾</i></button>
@@ -450,7 +482,7 @@
     </button>
 </nav>
 
-<!-- 工具栏 -->
+<!-- ==================== 工具栏 ==================== -->
 <div class="topbar">
     <div class="brand">
         <div class="logo">👥</div>
@@ -467,7 +499,18 @@
     </select>
 </div>
 
+<!-- 预设提醒弹窗 -->
+<div class="reminder-toast" id="reminderToast">
+    <div class="reminder-header">
+        <h4>⏰ Situation 预设提醒</h4>
+        <span class="reminder-close" onclick="closeReminderToast()">×</span>
+    </div>
+    <div class="reminder-body" id="reminderBody"></div>
+</div>
+
 <div class="container" id="mainContent">
+
+    <!-- 页面标题 -->
     <div class="page-header">
         <div class="info">
             <h1 id="mainTitle">📇 Staff Info</h1>
@@ -476,10 +519,13 @@
         </div>
     </div>
 
+    <!-- 状态栏 -->
     <div id="statusBar" class="status-bar">🔌 Memuatkan data...</div>
+
+    <!-- 警告框 -->
     <div id="alert" class="alert"></div>
 
-    <!-- 筛选 -->
+    <!-- 筛选区域 -->
     <div id="filterSection" class="filter-section">
         <div class="filter-row">
             <div class="filter-group">
@@ -523,9 +569,10 @@
             <button class="btn btn-danger" style="width:100%;margin-top:0.5rem;" onclick="logoutAndGoBack()">🚪 Log Keluar & Kembali</button>
         </div>
     </div>
+
 </div>
 
-<!-- 员工登录弹窗 -->
+<!-- ==================== 员工登录弹窗 ==================== -->
 <div class="login-overlay" id="loginOverlay">
     <div class="login-box">
         <h3>🔐 Log Masuk Staf</h3>
@@ -545,7 +592,7 @@
     </div>
 </div>
 
-<!-- 新增员工弹窗 -->
+<!-- ==================== 新增员工弹窗 ==================== -->
 <div class="login-overlay" id="addStaffOverlay">
     <div class="login-box" style="max-width:560px;max-height:88vh;overflow-y:auto;text-align:left;">
         <h3 style="text-align:center;">➕ Tambah Staf Baru</h3>
@@ -559,12 +606,17 @@
 </div>
 
 <script>
-    // ============================================================
-    //  导航逻辑
-    // ============================================================
+    /* ============================================================
+       NAVBAR LOGIC
+       ============================================================ */
     document.addEventListener('DOMContentLoaded', function() {
         const backBtn = document.getElementById('backBtn');
-        if (backBtn) backBtn.addEventListener('click', function(e) { e.preventDefault(); window.history.back(); });
+        if (backBtn) {
+            backBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.history.back();
+            });
+        }
 
         const dropdownToggles = document.querySelectorAll('[data-dropdown-toggle]');
         dropdownToggles.forEach(function(toggle) {
@@ -581,29 +633,38 @@
 
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.nav-dropdown')) {
-                document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); });
+                document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+                    dd.classList.remove('open');
+                });
             }
         });
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); });
+                document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+                    dd.classList.remove('open');
+                });
             }
         });
 
         document.querySelectorAll('.dropdown-menu a').forEach(function(link) {
             link.addEventListener('click', function() {
-                document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); });
+                document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+                    dd.classList.remove('open');
+                });
             });
         });
     });
 
     // ============================================================
-    //  配置与状态
+    //  KONFIGURASI
     // ============================================================
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwKo4wPwdg6202DvA-aY9-6C2INe4zWcQQeZqjGFDN626LNQx9r44MpSt83LwxvWT61w/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMvU6u4HEWNoULZedWPs3XvjJMY8fb-J3UDCRbNeRnijj7DDbqPXnb07RlL2st0xsmHQ/exec';
     const SHEET_NAME = 'STAFF LOGIN RECORD';
 
+    // ============================================================
+    //  STATE
+    // ============================================================
     let allStaff = [];
     let branches = [];
     let isLoading = false;
@@ -611,6 +672,7 @@
     let isLoggedIn = false;
     let currentLanguage = 'ms';
 
+    // DOM Elements
     const branchSelect = document.getElementById('branchSelect');
     const statusSelect = document.getElementById('statusSelect');
     const staffListEl = document.getElementById('staffList');
@@ -623,6 +685,7 @@
     const filterSection = document.getElementById('filterSection');
     const staffListContainer = document.getElementById('staffListContainer');
 
+    // Staff Login
     const loginOverlay = document.getElementById('loginOverlay');
     const loginCode = document.getElementById('loginCode');
     const loginPassword = document.getElementById('loginPassword');
@@ -631,92 +694,147 @@
     const loginBtn = document.getElementById('loginBtn');
 
     // ============================================================
-    //  测试连接
+    //  TEST CONNECTION
     // ============================================================
     async function testConnection() {
-        updateStatus('🔍 Menguji sambungan...', 'info');
+        updateStatus('🔍 Menguji sambungan ke Google Sheets...', 'info');
         showAlert('🔍 Menguji sambungan...', 'info');
+
         try {
             const url = `${SCRIPT_URL}?action=getData&_t=${Date.now()}`;
             const response = await fetch(url);
             const text = await response.text();
+
             let data;
-            try { data = JSON.parse(text); } catch (e) {
-                updateStatus('❌ Response bukan JSON', 'error');
-                showAlert('❌ Server tidak mengembalikan JSON.', 'error');
+            try { data = JSON.parse(text); }
+            catch (e) {
+                updateStatus('❌ Response bukan JSON: ' + text.substring(0, 100), 'error');
+                showAlert('❌ Server tidak mengembalikan JSON. Sila semak Apps Script deployment.', 'error');
                 return;
             }
+
             if (data && data.result === 'success') {
                 const count = Array.isArray(data.data) ? data.data.length : 0;
-                updateStatus(`✅ Sambungan berjaya! ${count} rekod.`, 'success');
-                showAlert(`✅ Sambungan berjaya! ${count} rekod.`, 'success');
+                updateStatus(`✅ Sambungan berjaya! Ditemui ${count} rekod.`, 'success');
+                showAlert(`✅ Sambungan berjaya! Ditemui ${count} rekod.`, 'success');
             } else if (Array.isArray(data)) {
-                updateStatus(`✅ Sambungan berjaya! ${data.length} rekod.`, 'success');
-                showAlert(`✅ Sambungan berjaya! ${data.length} rekod.`, 'success');
+                updateStatus(`✅ Sambungan berjaya! Ditemui ${data.length} rekod.`, 'success');
+                showAlert(`✅ Sambungan berjaya! Ditemui ${data.length} rekod.`, 'success');
             } else {
-                updateStatus('⚠️ Sambungan berjaya tetapi format data tidak dijangka.', 'debug');
+                updateStatus('⚠️ Sambungan berjaya tetapi data tidak seperti dijangka.', 'debug');
+                showAlert('⚠️ Sambungan berjaya tetapi format data tidak dijangka.', 'info');
             }
         } catch (err) {
             updateStatus('❌ Gagal menyambung: ' + err.message, 'error');
-            showAlert('❌ Gagal menyambung: ' + err.message, 'error');
+            showAlert('❌ Gagal menyambung ke server: ' + err.message, 'error');
         }
     }
 
     // ============================================================
-    //  翻译
+    //  TRANSLATIONS
     // ============================================================
     const translations = {
         ms: {
-            title: '📇 Staff Info', subTitle: 'Pilih cawangan & lihat senarai staf',
-            profileTitle: '👤 Profil Staf', editHint: '✏️ Klik pada mana-mana medan untuk sunting',
-            saveBtn: '💾 Simpan Perubahan', logoutBtn: '🚪 Log Keluar & Kembali',
-            saveSuccess: '✅ Data berjaya disimpan!', saveFail: '❌ Gagal menyimpan data.',
-            networkError: '⚠️ Ralat rangkaian', noData: 'Tiada staf untuk paparan.',
-            selectBranch: '-- Pilih Cawangan --', allStatus: 'Semua Status',
-            groupName: '🏢 Cawangan (GroupName)', statusLabel: '📌 Status (Situation)',
-            loading: '🔌 Memuatkan data...', connected: '✅ Bersambung! {count} rekod ditemui.',
-            othersPlaceholder: 'Sila nyatakan cawangan lain...', emptyOthers: 'Sila nyatakan cawangan lain.',
-            confirmLogout: 'Anda pasti mahu log keluar?', staffLoginTitle: '🔐 Log Masuk Staf',
-            staffLoginSub: 'Masukkan Code dan Password', staffLoginCode: 'Code',
-            staffLoginPassword: 'Password', staffLoginBtn: '🔓 Log Masuk', cancelBtn: 'Batal',
-            staffLoginSuccess: '✅ Log masuk berjaya!', staffLoginError: 'Code atau Password salah!',
-            saving: 'Menyimpan...', saved: 'Disimpan', situationLabel: '📌 Situation (Status)'
+            title: '📇 Staff Info',
+            subTitle: 'Pilih cawangan & lihat senarai staf',
+            profileTitle: '👤 Profil Staf',
+            editHint: '✏️ Klik pada mana-mana medan untuk sunting',
+            saveBtn: '💾 Simpan Perubahan',
+            logoutBtn: '🚪 Log Keluar & Kembali',
+            saveSuccess: '✅ Data berjaya disimpan ke Google Sheets!',
+            saveFail: '❌ Gagal menyimpan data ke Google Sheets.',
+            networkError: '⚠️ Ralat rangkaian',
+            noData: 'Tiada staf untuk paparan.',
+            selectBranch: '-- Pilih Cawangan --',
+            allStatus: 'Semua Status',
+            groupName: '🏢 Cawangan (GroupName)',
+            statusLabel: '📌 Status (Situation)',
+            loading: '🔌 Memuatkan data...',
+            connected: '✅ Bersambung! {count} rekod ditemui.',
+            othersPlaceholder: 'Sila nyatakan cawangan lain...',
+            emptyOthers: 'Sila nyatakan cawangan lain di ruangan yang disediakan.',
+            confirmLogout: 'Anda pasti mahu log keluar?',
+            staffLoginTitle: '🔐 Log Masuk Staf',
+            staffLoginSub: 'Masukkan Code dan Password untuk melihat profil',
+            staffLoginCode: 'Code',
+            staffLoginPassword: 'Password',
+            staffLoginBtn: '🔓 Log Masuk',
+            cancelBtn: 'Batal',
+            staffLoginSuccess: '✅ Log masuk berjaya!',
+            staffLoginError: 'Code atau Password salah!',
+            saving: 'Menyimpan ke Google Sheets...',
+            saved: 'Disimpan',
+            situationLabel: '📌 Situation (Status)'
         },
         en: {
-            title: '📇 Staff Info', subTitle: 'Select branch & view staff list',
-            profileTitle: '👤 Staff Profile', editHint: '✏️ Click on any field to edit',
-            saveBtn: '💾 Save Changes', logoutBtn: '🚪 Logout & Back',
-            saveSuccess: '✅ Data saved successfully!', saveFail: '❌ Failed to save data.',
-            networkError: '⚠️ Network error', noData: 'No staff to display.',
-            selectBranch: '-- Select Branch --', allStatus: 'All Status',
-            groupName: '🏢 Branch (GroupName)', statusLabel: '📌 Status (Situation)',
-            loading: '🔌 Loading data...', connected: '✅ Connected! {count} records.',
-            othersPlaceholder: 'Please specify other branch...', emptyOthers: 'Please specify other branch.',
-            confirmLogout: 'Are you sure you want to logout?', staffLoginTitle: '🔐 Staff Login',
-            staffLoginSub: 'Enter Code and Password', staffLoginCode: 'Code',
-            staffLoginPassword: 'Password', staffLoginBtn: '🔓 Login', cancelBtn: 'Cancel',
-            staffLoginSuccess: '✅ Login successful!', staffLoginError: 'Incorrect Code or Password!',
-            saving: 'Saving...', saved: 'Saved', situationLabel: '📌 Situation (Status)'
+            title: '📇 Staff Info',
+            subTitle: 'Select branch & view staff list',
+            profileTitle: '👤 Staff Profile',
+            editHint: '✏️ Click on any field to edit',
+            saveBtn: '💾 Save Changes',
+            logoutBtn: '🚪 Logout & Back',
+            saveSuccess: '✅ Data saved to Google Sheets successfully!',
+            saveFail: '❌ Failed to save data to Google Sheets.',
+            networkError: '⚠️ Network error',
+            noData: 'No staff to display.',
+            selectBranch: '-- Select Branch --',
+            allStatus: 'All Status',
+            groupName: '🏢 Branch (GroupName)',
+            statusLabel: '📌 Status (Situation)',
+            loading: '🔌 Loading data...',
+            connected: '✅ Connected! {count} records found.',
+            othersPlaceholder: 'Please specify other branch...',
+            emptyOthers: 'Please specify other branch in the field provided.',
+            confirmLogout: 'Are you sure you want to logout?',
+            staffLoginTitle: '🔐 Staff Login',
+            staffLoginSub: 'Enter Code and Password to view profile',
+            staffLoginCode: 'Code',
+            staffLoginPassword: 'Password',
+            staffLoginBtn: '🔓 Login',
+            cancelBtn: 'Cancel',
+            staffLoginSuccess: '✅ Login successful!',
+            staffLoginError: 'Incorrect Code or Password!',
+            saving: 'Saving to Google Sheets...',
+            saved: 'Saved',
+            situationLabel: '📌 Situation (Status)'
         },
         zh: {
-            title: '📇 员工信息', subTitle: '选择分店并查看员工列表',
-            profileTitle: '👤 员工资料', editHint: '✏️ 点击任意字段进行编辑',
-            saveBtn: '💾 保存修改', logoutBtn: '🚪 退出并返回',
-            saveSuccess: '✅ 数据已成功保存！', saveFail: '❌ 保存数据失败。',
-            networkError: '⚠️ 网络错误', noData: '没有员工可显示。',
-            selectBranch: '-- 选择分店 --', allStatus: '所有状态',
-            groupName: '🏢 分店 (GroupName)', statusLabel: '📌 状态 (Situation)',
-            loading: '🔌 加载数据中...', connected: '✅ 已连接！找到 {count} 条记录。',
-            othersPlaceholder: '请注明其他分店...', emptyOthers: '请在提供的字段中注明其他分店。',
-            confirmLogout: '您确定要退出登录吗？', staffLoginTitle: '🔐 员工登录',
-            staffLoginSub: '输入代码和密码以查看资料', staffLoginCode: '员工代码',
-            staffLoginPassword: '密码', staffLoginBtn: '🔓 登录', cancelBtn: '取消',
-            staffLoginSuccess: '✅ 登录成功！', staffLoginError: '代码或密码错误！',
-            saving: '正在保存...', saved: '已保存', situationLabel: '📌 状态 (Situation)'
+            title: '📇 员工信息',
+            subTitle: '选择分店并查看员工列表',
+            profileTitle: '👤 员工资料',
+            editHint: '✏️ 点击任意字段进行编辑',
+            saveBtn: '💾 保存修改',
+            logoutBtn: '🚪 退出并返回',
+            saveSuccess: '✅ 数据已成功保存到 Google Sheets！',
+            saveFail: '❌ 保存数据到 Google Sheets 失败。',
+            networkError: '⚠️ 网络错误',
+            noData: '没有员工可显示。',
+            selectBranch: '-- 选择分店 --',
+            allStatus: '所有状态',
+            groupName: '🏢 分店 (GroupName)',
+            statusLabel: '📌 状态 (Situation)',
+            loading: '🔌 加载数据中...',
+            connected: '✅ 已连接！找到 {count} 条记录。',
+            othersPlaceholder: '请注明其他分店...',
+            emptyOthers: '请在提供的字段中注明其他分店。',
+            confirmLogout: '您确定要退出登录吗？',
+            staffLoginTitle: '🔐 员工登录',
+            staffLoginSub: '输入代码和密码以查看资料',
+            staffLoginCode: '员工代码',
+            staffLoginPassword: '密码',
+            staffLoginBtn: '🔓 登录',
+            cancelBtn: '取消',
+            staffLoginSuccess: '✅ 登录成功！',
+            staffLoginError: '代码或密码错误！',
+            saving: '正在保存到 Google Sheets...',
+            saved: '已保存',
+            situationLabel: '📌 状态 (Situation)'
         }
     };
 
-    function t(key) { return translations[currentLanguage]?.[key] || key; }
+    function t(key) {
+        return translations[currentLanguage]?.[key] || key;
+    }
 
     function setLanguage(lang) {
         currentLanguage = lang;
@@ -730,6 +848,7 @@
         document.getElementById('profileTitle').textContent = t('profileTitle');
         document.querySelector('.profile-edit-hint').textContent = t('editHint');
         document.getElementById('saveProfileBtn').textContent = t('saveBtn');
+
         const branchSel = document.getElementById('branchSelect');
         if (branchSel.options.length > 0) branchSel.options[0].text = t('selectBranch');
         const statusSel = document.getElementById('statusSelect');
@@ -738,7 +857,7 @@
     }
 
     // ============================================================
-    //  辅助函数
+    //  ALERT & STATUS
     // ============================================================
     function showAlert(msg, type = 'error') {
         alertBox.textContent = msg;
@@ -761,6 +880,9 @@
         return `<span class="status-badge ${cls}">${label}</span>`;
     }
 
+    // ============================================================
+    //  BRANCH HANDLING
+    // ============================================================
     function handleBranchChange() {
         const selected = branchSelect.value;
         if (selected === 'Others') {
@@ -778,22 +900,27 @@
     otherBranchInput.addEventListener('input', renderStaffList);
 
     // ============================================================
-    //  获取数据
+    //  FETCH DATA (兼容所有格式)
     // ============================================================
     async function fetchStaffData() {
         isLoading = true;
         updateStatus('⏳ Menghubungi server...', 'info');
+
         try {
             const url = `${SCRIPT_URL}?action=getData&_t=${Date.now()}`;
             const response = await fetch(url);
-            if (!response.ok) throw new Error('HTTP ' + response.status);
+            if (!response.ok) throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+
             const rawResult = await response.json();
             let dataArray;
 
-            if (rawResult && rawResult.result === 'success' && Array.isArray(rawResult.data)) dataArray = rawResult.data;
-            else if (Array.isArray(rawResult)) dataArray = rawResult;
-            else if (rawResult && rawResult.data && Array.isArray(rawResult.data)) dataArray = rawResult.data;
-            else throw new Error('Format data tidak dikenali.');
+            if (rawResult && rawResult.result === 'success' && Array.isArray(rawResult.data)) {
+                dataArray = rawResult.data;
+            } else if (Array.isArray(rawResult)) {
+                dataArray = rawResult;
+            } else {
+                throw new Error('Format data tidak dikenali.');
+            }
 
             if (!dataArray || dataArray.length === 0) throw new Error('Tiada data ditemui.');
 
@@ -801,26 +928,74 @@
             let staff = [];
             const branchSet = new Set();
 
-            if (Array.isArray(firstRow)) {
+            // 如果是对象数组（你的 Apps Script 返回的就是这种格式）
+            if (typeof firstRow === 'object' && !Array.isArray(firstRow)) {
+                for (const row of dataArray) {
+                    const code = (row.Code || '').toString().trim();
+                    const name = (row.Name || '').toString().trim();
+                    if (!code || !name) continue;
+
+                    const userObj = {
+                        Code: code,
+                        GroupName: (row.GroupName || 'Tidak Diketahui').toString().trim(),
+                        Name: name,
+                        Situation: (row.Situation || 'Unknown').toString().trim(),
+                        LoginPassword: (row.LoginPassword || '').toString().trim(),
+                        Jantina: (row.Jantina || '').toString().trim(),
+                        TarikhLahir: (row.TarikhLahir || '').toString().trim(),
+                        Salary: (row.Salary || '').toString().trim(),
+                        IC: (row.IC || '').toString().trim(),
+                        Jawatan: (row.Jawatan || '').toString().trim(),
+                        TarikhMasukKerja: (row.TarikhMasukKerja || '').toString().trim(),
+                        TelefonNo: (row.TelefonNo || '').toString().trim(),
+                        Email: (row.Email || '').toString().trim(),
+                        ShiftType: (row.ShiftType || '').toString().trim(),
+                        OffDay: (row.OffDay || '').toString().trim(),
+                        AlamatTetap: (row.AlamatTetap || '').toString().trim(),
+                        NamaWaris: (row.NamaWaris || '').toString().trim(),
+                        AlamatWaris: (row.AlamatWaris || '').toString().trim(),
+                        BankNama: (row.BankNama || '').toString().trim(),
+                        BankAccountNo: (row.BankAccountNo || '').toString().trim(),
+                        EPF: (row.EPF || '').toString().trim(),
+                        PERKESO: (row.PERKESO || '').toString().trim(),
+                        EIS: (row.EIS || '').toString().trim(),
+                        Lindungan: (row.Lindungan || '').toString().trim(),
+                        YellowCard: (row.YellowCard || '').toString().trim(),
+                        PhoneType: (row.PhoneType || '').toString().trim(),
+                        SignupDate: (row.SignupDate || '').toString().trim(),
+                        UpdateDate: (row.UpdateDate || '').toString().trim(),
+                        // 新增的预设字段
+                        PresetSituation: (row.PresetSituation || '').toString().trim(),
+                        PresetDateTime: (row.PresetDateTime || '').toString().trim(),
+                        IsPresetApplied: (row.IsPresetApplied || 'FALSE').toString().trim().toUpperCase(),
+                        PresetNotifiedAt: (row.PresetNotifiedAt || '').toString().trim()
+                    };
+                    staff.push(userObj);
+                    if (userObj.GroupName && userObj.GroupName !== 'Tidak Diketahui') {
+                        branchSet.add(userObj.GroupName);
+                    }
+                }
+            } else {
+                // 数组格式（旧版备份）
                 const idx = {
                     situation: 1, loginPwd: 28, name: 4, code: 3, group: 2,
                     jantina: 5, tarikhLahir: 6, salary: 7, ic: 8, jawatan: 9,
                     tarikhMasuk: 10, telefon: 11, email: 12, shift: 13, offDay: 14,
                     alamatTetap: 15, namaWaris: 16, alamatWaris: 17, bankNama: 18,
                     bankAccount: 19, epf: 20, perkeso: 21, eis: 22, lindungan: 23,
-                    yellowCard: 24, phoneType: 25, signupDate: 26, updateDate: 27,
-                    presetSituation: 29, presetDateTime: 30, isPresetApplied: 31
+                    yellowCard: 24, phoneType: 25, signupDate: 26, updateDate: 27
                 };
                 for (let i = 1; i < dataArray.length; i++) {
                     const row = dataArray[i];
-                    if (!Array.isArray(row)) continue;
-                    const group = (row[idx.group] || '').toString().trim();
+                    if (!Array.isArray(row) || row.length < 5) continue;
                     const code = (row[idx.code] || '').toString().trim();
                     const name = (row[idx.name] || '').toString().trim();
                     if (!code || !name) continue;
 
                     const userObj = {
-                        Code: code, GroupName: group || 'Tidak Diketahui', Name: name,
+                        Code: code,
+                        GroupName: (row[idx.group] || 'Tidak Diketahui').toString().trim(),
+                        Name: name,
                         Situation: (row[idx.situation] || 'Unknown').toString().trim(),
                         LoginPassword: (row[idx.loginPwd] || '').toString().trim(),
                         Jantina: (row[idx.jantina] || '').toString().trim(),
@@ -846,118 +1021,34 @@
                         PhoneType: (row[idx.phoneType] || '').toString().trim(),
                         SignupDate: (row[idx.signupDate] || '').toString().trim(),
                         UpdateDate: (row[idx.updateDate] || '').toString().trim(),
-                        PresetSituation: (row[idx.presetSituation] || '').toString().trim(),
-                        PresetDateTime: (row[idx.presetDateTime] || '').toString().trim(),
-                        IsPresetApplied: (row[idx.isPresetApplied] || '').toString().trim()
+                        PresetSituation: '',
+                        PresetDateTime: '',
+                        IsPresetApplied: 'FALSE',
+                        PresetNotifiedAt: ''
                     };
                     staff.push(userObj);
-                    if (group) branchSet.add(group);
-                }
-            } else if (typeof firstRow === 'object' && firstRow !== null) {
-                const sampleKeys = Object.keys(firstRow);
-                const findKey = (possibleNames) => {
-                    for (const name of possibleNames) {
-                        const found = sampleKeys.find(k => k.toLowerCase() === name.toLowerCase());
-                        if (found) return found;
+                    if (userObj.GroupName && userObj.GroupName !== 'Tidak Diketahui') {
+                        branchSet.add(userObj.GroupName);
                     }
-                    for (const name of possibleNames) {
-                        const found = sampleKeys.find(k => k.toLowerCase().includes(name.toLowerCase()));
-                        if (found) return found;
-                    }
-                    return null;
-                };
-                const fieldMap = {
-                    situation: findKey(['Situation', 'STATUS']),
-                    loginPwd: findKey(['LoginPassword', 'Password']),
-                    group: findKey(['GroupName', 'Group', 'Cawangan']),
-                    name: findKey(['Name', 'Nama']),
-                    code: findKey(['Code', 'Kod', 'ID']),
-                    jantina: findKey(['Jantina', 'Gender']),
-                    tarikhLahir: findKey(['TarikhLahir', 'DOB']),
-                    salary: findKey(['Salary', 'Gaji']),
-                    ic: findKey(['IC', 'Passport']),
-                    jawatan: findKey(['Jawatan', 'Position']),
-                    tarikhMasuk: findKey(['TarikhMasukKerja', 'StartDate']),
-                    telefon: findKey(['TelefonNo', 'Phone']),
-                    email: findKey(['Email']),
-                    shift: findKey(['ShiftType', 'Shift']),
-                    offDay: findKey(['OffDay', 'Off']),
-                    alamatTetap: findKey(['AlamatTetap', 'Address']),
-                    namaWaris: findKey(['NamaWaris', 'NextOfKin']),
-                    alamatWaris: findKey(['AlamatWaris']),
-                    bankNama: findKey(['BankNama', 'Bank']),
-                    bankAccount: findKey(['BankAccountNo', 'AccountNo']),
-                    epf: findKey(['EPF', 'KWSP']),
-                    perkeso: findKey(['PERKESO']),
-                    eis: findKey(['EIS']),
-                    lindungan: findKey(['Lindungan', '24Jam']),
-                    yellowCard: findKey(['YellowCard', 'Yellow']),
-                    phoneType: findKey(['PhoneType', 'Device']),
-                    signupDate: findKey(['SignupDate']),
-                    updateDate: findKey(['UpdateDate']),
-                    presetSituation: findKey(['PresetSituation']),
-                    presetDateTime: findKey(['PresetDateTime']),
-                    isPresetApplied: findKey(['IsPresetApplied'])
-                };
-
-                if (!fieldMap.name || !fieldMap.code) throw new Error('Header tidak dijumpai. Keys: ' + sampleKeys.join(', '));
-
-                for (const row of dataArray) {
-                    if (typeof row !== 'object' || row === null) continue;
-                    const code = (row[fieldMap.code] || '').toString().trim();
-                    const name = (row[fieldMap.name] || '').toString().trim();
-                    if (!code || !name) continue;
-
-                    const userObj = {
-                        Code: code,
-                        GroupName: fieldMap.group ? (row[fieldMap.group] || 'Tidak Diketahui').toString().trim() : 'Tidak Diketahui',
-                        Name: name,
-                        Situation: fieldMap.situation ? (row[fieldMap.situation] || 'Unknown').toString().trim() : 'Unknown',
-                        LoginPassword: fieldMap.loginPwd ? (row[fieldMap.loginPwd] || '').toString().trim() : '',
-                        Jantina: fieldMap.jantina ? (row[fieldMap.jantina] || '').toString().trim() : '',
-                        TarikhLahir: fieldMap.tarikhLahir ? (row[fieldMap.tarikhLahir] || '').toString().trim() : '',
-                        Salary: fieldMap.salary ? (row[fieldMap.salary] || '').toString().trim() : '',
-                        IC: fieldMap.ic ? (row[fieldMap.ic] || '').toString().trim() : '',
-                        Jawatan: fieldMap.jawatan ? (row[fieldMap.jawatan] || '').toString().trim() : '',
-                        TarikhMasukKerja: fieldMap.tarikhMasuk ? (row[fieldMap.tarikhMasuk] || '').toString().trim() : '',
-                        TelefonNo: fieldMap.telefon ? (row[fieldMap.telefon] || '').toString().trim() : '',
-                        Email: fieldMap.email ? (row[fieldMap.email] || '').toString().trim() : '',
-                        ShiftType: fieldMap.shift ? (row[fieldMap.shift] || '').toString().trim() : '',
-                        OffDay: fieldMap.offDay ? (row[fieldMap.offDay] || '').toString().trim() : '',
-                        AlamatTetap: fieldMap.alamatTetap ? (row[fieldMap.alamatTetap] || '').toString().trim() : '',
-                        NamaWaris: fieldMap.namaWaris ? (row[fieldMap.namaWaris] || '').toString().trim() : '',
-                        AlamatWaris: fieldMap.alamatWaris ? (row[fieldMap.alamatWaris] || '').toString().trim() : '',
-                        BankNama: fieldMap.bankNama ? (row[fieldMap.bankNama] || '').toString().trim() : '',
-                        BankAccountNo: fieldMap.bankAccount ? (row[fieldMap.bankAccount] || '').toString().trim() : '',
-                        EPF: fieldMap.epf ? (row[fieldMap.epf] || '').toString().trim() : '',
-                        PERKESO: fieldMap.perkeso ? (row[fieldMap.perkeso] || '').toString().trim() : '',
-                        EIS: fieldMap.eis ? (row[fieldMap.eis] || '').toString().trim() : '',
-                        Lindungan: fieldMap.lindungan ? (row[fieldMap.lindungan] || '').toString().trim() : '',
-                        YellowCard: fieldMap.yellowCard ? (row[fieldMap.yellowCard] || '').toString().trim() : '',
-                        PhoneType: fieldMap.phoneType ? (row[fieldMap.phoneType] || '').toString().trim() : '',
-                        SignupDate: fieldMap.signupDate ? (row[fieldMap.signupDate] || '').toString().trim() : '',
-                        UpdateDate: fieldMap.updateDate ? (row[fieldMap.updateDate] || '').toString().trim() : '',
-                        PresetSituation: fieldMap.presetSituation ? (row[fieldMap.presetSituation] || '').toString().trim() : '',
-                        PresetDateTime: fieldMap.presetDateTime ? (row[fieldMap.presetDateTime] || '').toString().trim() : '',
-                        IsPresetApplied: fieldMap.isPresetApplied ? (row[fieldMap.isPresetApplied] || '').toString().trim() : ''
-                    };
-                    staff.push(userObj);
-                    if (userObj.GroupName && userObj.GroupName !== 'Tidak Diketahui') branchSet.add(userObj.GroupName);
                 }
-            } else {
-                throw new Error('Format data tidak disokong.');
             }
 
-            if (staff.length === 0) throw new Error('Tiada rekod staf yang sah.');
             allStaff = staff;
             branches = Array.from(branchSet).sort((a, b) => a.localeCompare(b));
+
             const msg = t('connected').replace('{count}', staff.length);
             updateStatus(msg, 'success');
+
+            // 加载完成后检查预设提醒
+            checkPresetReminders();
+
             return true;
+
         } catch (err) {
             console.error('❌ Ralat fetch:', err);
             updateStatus(`❌ Gagal: ${err.message}`, 'error');
-            allStaff = []; branches = [];
+            allStaff = [];
+            branches = [];
             return false;
         } finally {
             isLoading = false;
@@ -965,18 +1056,93 @@
     }
 
     // ============================================================
-    //  渲染列表
+    //  预设提醒逻辑
+    // ============================================================
+    function checkPresetReminders() {
+        // 检查是否在2小时冷却期内
+        const lastCloseTime = localStorage.getItem('presetToastClosedAt');
+        if (lastCloseTime) {
+            const hoursDiff = (new Date().getTime() - parseInt(lastCloseTime)) / (1000 * 60 * 60);
+            if (hoursDiff < 2) {
+                return; // 2小时内不再提醒
+            }
+        }
+
+        const now = new Date().getTime();
+        const overdueStaff = [];
+
+        allStaff.forEach(staff => {
+            // 必须有预设时间、预设状态，且未完成
+            if (staff.PresetDateTime && staff.PresetSituation && staff.IsPresetApplied !== 'TRUE') {
+                // 处理时间格式，兼容 datetime-local (YYYY-MM-DDTHH:mm) 和标准格式
+                let presetTime = new Date(staff.PresetDateTime).getTime();
+                if (isNaN(presetTime)) {
+                    // 尝试替换空格为 T
+                    presetTime = new Date(staff.PresetDateTime.replace(' ', 'T')).getTime();
+                }
+                
+                if (!isNaN(presetTime) && now >= presetTime) {
+                    overdueStaff.push(staff);
+                }
+            }
+        });
+
+        if (overdueStaff.length > 0) {
+            showReminderToast(overdueStaff);
+        } else {
+            document.getElementById('reminderToast').style.display = 'none';
+        }
+    }
+
+    function showReminderToast(staffList) {
+        const toast = document.getElementById('reminderToast');
+        const body = document.getElementById('reminderBody');
+        
+        let html = '';
+        staffList.forEach(s => {
+            let dateStr = s.PresetDateTime;
+            try {
+                const d = new Date(s.PresetDateTime);
+                if (!isNaN(d.getTime())) dateStr = d.toLocaleString();
+            } catch(e) {}
+            
+            html += `
+                <div class="reminder-item">
+                    <strong>${s.Name} (${s.Code})</strong><br>
+                    预设已到期: <span class="time">${dateStr}</span><br>
+                    应改为: <strong>${s.PresetSituation}</strong> (目前: ${s.Situation})
+                </div>
+            `;
+        });
+        
+        body.innerHTML = html;
+        toast.style.display = 'block';
+    }
+
+    function closeReminderToast() {
+        document.getElementById('reminderToast').style.display = 'none';
+        // 记录关闭时间，2小时后才允许再次弹出
+        localStorage.setItem('presetToastClosedAt', new Date().getTime().toString());
+    }
+
+    // 每 10 分钟自动检查一次
+    setInterval(checkPresetReminders, 10 * 60 * 1000);
+
+    // ============================================================
+    //  RENDER STAFF LIST
     // ============================================================
     function renderStaffList() {
         let selectedBranch = branchSelect.value;
         if (selectedBranch === 'Others') {
             const otherVal = otherBranchInput.value.trim();
-            if (otherVal) selectedBranch = otherVal;
-            else {
+            if (otherVal) {
+                selectedBranch = otherVal;
+            } else {
                 staffListEl.innerHTML = `<div class="empty-state"><span class="icon">✏️</span>${t('emptyOthers')}</div>`;
                 return;
             }
         }
+
         const selectedStatus = statusSelect.value;
         let filtered = allStaff;
         if (selectedBranch) filtered = filtered.filter(s => s.GroupName === selectedBranch);
@@ -984,7 +1150,12 @@
         filtered.sort((a, b) => a.Name.localeCompare(b.Name));
 
         if (filtered.length === 0) {
-            staffListEl.innerHTML = `<div class="empty-state"><span class="icon">📭</span>${t('noData')}</div>`;
+            staffListEl.innerHTML = `
+                <div class="empty-state">
+                    <span class="icon">📭</span>${t('noData')}
+                    ${selectedBranch ? `<br><small style="color:#a0aec0;">Cawangan: ${selectedBranch}</small>` : ''}
+                    ${selectedStatus ? `<br><small style="color:#a0aec0;">Status: ${selectedStatus}</small>` : ''}
+                </div>`;
             return;
         }
 
@@ -1000,8 +1171,10 @@
                     </div>
                     <div class="status-wrap">
                         ${statusBadge}
-                        <button class="btn btn-sm btn-danger" style="padding:0.2rem 0.6rem;font-size:0.7rem;"
-                                onclick="event.stopPropagation(); deleteStaff('${safeCode}');" title="Padam">🗑</button>
+                        <button class="btn btn-sm btn-danger"
+                                style="padding:0.2rem 0.6rem;font-size:0.7rem;"
+                                onclick="event.stopPropagation(); deleteStaff('${safeCode}');"
+                                title="Padam">🗑</button>
                         <span class="arrow">›</span>
                     </div>
                 </div>`;
@@ -1010,7 +1183,7 @@
     }
 
     // ============================================================
-    //  登录与资料展示
+    //  STAFF LOGIN
     // ============================================================
     function openStaffLogin(code) {
         if (isLoggedIn) {
@@ -1021,6 +1194,7 @@
             }
             return;
         }
+
         loginCode.value = code;
         loginPassword.value = '';
         loginError.style.display = 'none';
@@ -1031,32 +1205,50 @@
         loginPassword.focus();
     }
 
-    function closeStaffLogin() { loginOverlay.classList.remove('active'); }
+    function closeStaffLogin() {
+        loginOverlay.classList.remove('active');
+    }
 
     function performStaffLogin() {
         const code = loginCode.value.trim();
         const password = loginPassword.value.trim();
+
         if (!code || !password) {
             loginError.textContent = 'Sila masukkan Code dan Password.';
-            loginError.style.display = 'block'; loginSuccess.style.display = 'none'; return;
+            loginError.style.display = 'block';
+            loginSuccess.style.display = 'none';
+            return;
         }
+
         loginBtn.disabled = true;
         loginBtn.innerHTML = `<span class="loading-spinner"></span>Memproses...`;
-        loginError.style.display = 'none'; loginSuccess.style.display = 'none';
+        loginError.style.display = 'none';
+        loginSuccess.style.display = 'none';
 
         const staff = allStaff.find(s => s.Code === code);
+
         if (!staff) {
-            loginBtn.disabled = false; loginBtn.textContent = t('staffLoginBtn');
-            loginError.textContent = 'Code tidak dijumpai!'; loginError.style.display = 'block'; return;
-        }
-        if (staff.LoginPassword !== password) {
-            loginBtn.disabled = false; loginBtn.textContent = t('staffLoginBtn');
-            loginError.textContent = t('staffLoginError'); loginError.style.display = 'block';
-            loginPassword.value = ''; loginPassword.focus(); return;
+            loginBtn.disabled = false;
+            loginBtn.textContent = t('staffLoginBtn');
+            loginError.textContent = 'Code tidak dijumpai!';
+            loginError.style.display = 'block';
+            return;
         }
 
-        loginSuccess.textContent = t('staffLoginSuccess'); loginSuccess.style.display = 'block';
-        loginBtn.disabled = false; loginBtn.textContent = t('staffLoginBtn');
+        if (staff.LoginPassword !== password) {
+            loginBtn.disabled = false;
+            loginBtn.textContent = t('staffLoginBtn');
+            loginError.textContent = t('staffLoginError');
+            loginError.style.display = 'block';
+            loginPassword.value = '';
+            loginPassword.focus();
+            return;
+        }
+
+        loginSuccess.textContent = t('staffLoginSuccess');
+        loginSuccess.style.display = 'block';
+        loginBtn.disabled = false;
+        loginBtn.textContent = t('staffLoginBtn');
 
         setTimeout(() => {
             loginOverlay.classList.remove('active');
@@ -1066,12 +1258,18 @@
         }, 600);
     }
 
-    loginPassword.addEventListener('keydown', function(e) { if (e.key === 'Enter') performStaffLogin(); });
-    loginCode.addEventListener('keydown', function(e) { if (e.key === 'Enter') loginPassword.focus(); });
-    loginOverlay.addEventListener('click', function(e) { if (e.target === this) closeStaffLogin(); });
+    loginPassword.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') performStaffLogin();
+    });
+    loginCode.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') loginPassword.focus();
+    });
+    loginOverlay.addEventListener('click', function(e) {
+        if (e.target === this) closeStaffLogin();
+    });
 
     // ============================================================
-    //  显示资料
+    //  SHOW PROFILE (包含预设字段)
     // ============================================================
     function showProfile(user) {
         filterSection.style.display = 'none';
@@ -1080,16 +1278,26 @@
         profileFields.innerHTML = '';
 
         const fields = [
-            'Situation', 'GroupName', 'Code', 'Name', 'Jantina', 'TarikhLahir',
+            'Situation', 
+            'PresetSituation', 
+            'PresetDateTime', 
+            'IsPresetApplied', 
+            'PresetNotifiedAt', // 新增的预设字段
+            'GroupName', 'Code', 'Name', 'Jantina', 'TarikhLahir',
             'Salary', 'IC', 'Jawatan', 'TarikhMasukKerja', 'TelefonNo', 'Email',
             'ShiftType', 'OffDay', 'AlamatTetap', 'NamaWaris', 'AlamatWaris',
             'BankNama', 'BankAccountNo', 'EPF', 'PERKESO', 'EIS',
             'Lindungan', 'YellowCard', 'LoginPassword', 'PhoneType',
-            'PresetSituation', 'PresetDateTime', 'SignupDate', 'UpdateDate'
+            'SignupDate', 'UpdateDate'
         ];
 
         const labels = {
-            Situation: '📌 Situation (Status)', GroupName: 'Group Name', Code: 'Code',
+            Situation: '📌 Situation (Status)', 
+            PresetSituation: '⏰ 预设状态 (Preset Situation)', 
+            PresetDateTime: '📅 预设时间 (Preset DateTime)', 
+            IsPresetApplied: '✅ 已完成预设 (IsPresetApplied)', 
+            PresetNotifiedAt: '🔔 上次提醒时间',
+            GroupName: 'Group Name', Code: 'Code',
             Name: 'Name', Jantina: 'Jantina', TarikhLahir: 'Tarikh Lahir',
             Salary: 'Salary', IC: 'IC/Passport/Doc.No', Jawatan: 'Jawatan',
             TarikhMasukKerja: 'Tarikh Masuk Kerja', TelefonNo: 'Telefon No.',
@@ -1099,8 +1307,7 @@
             BankAccountNo: 'Bank Account No.', EPF: 'EPF (kwsp) No.',
             PERKESO: 'PERKESO NO.', EIS: 'EIS NO.', Lindungan: '24Jam Lindungan',
             YellowCard: 'Kad Kebersihan (Yellow Card)', LoginPassword: 'Login Password',
-            PhoneType: 'Phone Type', SignupDate: 'Signup Date', UpdateDate: 'Update Date',
-            PresetSituation: '⏰ 预设状态 (Preset Status)', PresetDateTime: '⏰ 预设时间 (Preset Time)'
+            PhoneType: 'Phone Type', SignupDate: 'Signup Date', UpdateDate: 'Update Date'
         };
 
         const situationOptions = ['ACTIVE', 'INACTIVE', 'PENDING'];
@@ -1115,15 +1322,22 @@
 
             let input;
 
-            if (key === 'Situation') {
+            if (key === 'Situation' || key === 'PresetSituation') {
                 input = document.createElement('select');
                 input.className = 'situation-select';
                 situationOptions.forEach(opt => {
                     const option = document.createElement('option');
-                    option.value = opt; option.textContent = opt;
+                    option.value = opt;
+                    option.textContent = opt;
                     if (String(val).toUpperCase() === opt) option.selected = true;
                     input.appendChild(option);
                 });
+                // 允许清空预设
+                const emptyOpt = document.createElement('option');
+                emptyOpt.value = '';
+                emptyOpt.textContent = '-- 无预设 --';
+                input.appendChild(emptyOpt);
+
                 const valLower = String(val).toLowerCase();
                 if (valLower === 'active') input.classList.add('active');
                 else if (valLower === 'inactive') input.classList.add('inactive');
@@ -1135,66 +1349,73 @@
                     if (newVal === 'active') this.classList.add('active');
                     else if (newVal === 'inactive') this.classList.add('inactive');
                     else if (newVal === 'pending') this.classList.add('pending');
-                    currentUser.Situation = this.value;
+                    currentUser[key] = this.value;
                     currentUser.UpdateDate = new Date().toISOString();
                     const saveBtn = document.getElementById('saveProfileBtn');
                     saveBtn.textContent = '💾 ' + t('saveBtn') + ' ⚡';
                     saveBtn.style.background = '#dd6b20';
                 });
-            } else if (key === 'PresetSituation') {
-                input = document.createElement('select');
-                input.innerHTML = `
-                    <option value="">-- 无 --</option>
-                    <option value="ACTIVE">ACTIVE</option>
-                    <option value="INACTIVE">INACTIVE</option>
-                    <option value="PENDING">PENDING</option>
-                `;
+            } else if (key === 'Code' || key === 'SignupDate' || key === 'UpdateDate' || key === 'PresetNotifiedAt') {
+                input = document.createElement('input');
+                input.type = 'text';
                 input.value = val;
-                input.addEventListener('change', function() {
-                    currentUser.PresetSituation = this.value;
-                    const saveBtn = document.getElementById('saveProfileBtn');
-                    saveBtn.textContent = '💾 ' + t('saveBtn') + ' ⚡';
-                    saveBtn.style.background = '#dd6b20';
-                });
+                input.readOnly = true;
             } else if (key === 'PresetDateTime') {
+                // 使用 datetime-local 格式方便选择时间
                 input = document.createElement('input');
                 input.type = 'datetime-local';
+                // 处理日期格式转换
                 if (val) {
                     try {
                         const d = new Date(val);
-                        const tzOffset = d.getTimezoneOffset() * 60000;
-                        const localISOTime = (new Date(d - tzOffset)).toISOString().slice(0, 16);
-                        input.value = localISOTime;
+                        if (!isNaN(d.getTime())) {
+                            const tzoffset = d.getTimezoneOffset() * 60000;
+                            const localISOTime = (new Date(d - tzoffset)).toISOString().slice(0, 16);
+                            input.value = localISOTime;
+                        }
                     } catch(e) { input.value = ''; }
                 }
                 input.addEventListener('change', function() {
-                    if (this.value) {
-                        const localDate = new Date(this.value);
-                        currentUser.PresetDateTime = localDate.toISOString();
-                    } else {
-                        currentUser.PresetDateTime = '';
-                    }
+                    currentUser[key] = this.value;
+                    currentUser.UpdateDate = new Date().toISOString();
                     const saveBtn = document.getElementById('saveProfileBtn');
                     saveBtn.textContent = '💾 ' + t('saveBtn') + ' ⚡';
                     saveBtn.style.background = '#dd6b20';
                 });
-            } else if (key === 'Code' || key === 'SignupDate' || key === 'UpdateDate') {
-                input = document.createElement('input');
-                input.type = 'text'; input.value = val; input.readOnly = true;
+            } else if (key === 'IsPresetApplied') {
+                input = document.createElement('select');
+                ['FALSE', 'TRUE'].forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.textContent = opt;
+                    if (String(val).toUpperCase() === opt) option.selected = true;
+                    input.appendChild(option);
+                });
+                input.addEventListener('change', function() {
+                    currentUser[key] = this.value;
+                    currentUser.UpdateDate = new Date().toISOString();
+                    const saveBtn = document.getElementById('saveProfileBtn');
+                    saveBtn.textContent = '💾 ' + t('saveBtn') + ' ⚡';
+                    saveBtn.style.background = '#dd6b20';
+                });
             } else if (key === 'LoginPassword') {
                 input = document.createElement('input');
-                input.type = 'password'; input.value = val;
+                input.type = 'password';
+                input.value = val;
             } else {
                 input = document.createElement('input');
-                input.type = 'text'; input.value = val;
+                input.type = 'text';
+                input.value = val;
             }
 
             input.dataset.field = key;
             input.id = 'prof_' + key;
-            input.placeholder = 'Klik untuk sunting';
+            if (key !== 'Situation' && key !== 'PresetSituation' && key !== 'IsPresetApplied') {
+                input.placeholder = 'Klik untuk sunting';
+            }
 
-            if (key !== 'Situation' && key !== 'PresetSituation' && key !== 'PresetDateTime' &&
-                key !== 'Code' && key !== 'SignupDate' && key !== 'UpdateDate') {
+            // 针对所有输入框（除了只读的），添加 change 事件
+            if (key !== 'Situation' && key !== 'PresetSituation' && key !== 'PresetDateTime' && key !== 'IsPresetApplied' && key !== 'Code' && key !== 'SignupDate' && key !== 'UpdateDate' && key !== 'PresetNotifiedAt') {
                 input.addEventListener('change', function() {
                     currentUser[key] = this.value;
                     currentUser.UpdateDate = new Date().toISOString();
@@ -1218,12 +1439,14 @@
     }
 
     // ============================================================
-    //  保存资料
+    //  SAVE PROFILE (含自动完成检测)
     // ============================================================
     function saveProfile() {
         if (!currentUser || !currentUser.Code) {
-            showAlert('Tiada data untuk disimpan.', 'error'); return;
+            showAlert('Tiada data untuk disimpan.', 'error');
+            return;
         }
+
         const btn = document.getElementById('saveProfileBtn');
         btn.innerHTML = `<span class="loading-spinner"></span>${t('saving')}`;
         btn.disabled = true;
@@ -1231,10 +1454,16 @@
         const inputs = profileFields.querySelectorAll('input');
         inputs.forEach(el => {
             const field = el.dataset.field;
-            if (field && field !== 'Code' && field !== 'SignupDate' && field !== 'UpdateDate') {
-                currentUser[field] = el.value;
+            if (field && field !== 'Code' && field !== 'SignupDate' && field !== 'UpdateDate' && field !== 'PresetNotifiedAt') {
+                // datetime-local 的值需要转成标准格式
+                if (field === 'PresetDateTime' && el.value) {
+                    currentUser[field] = el.value; // 例如 2026-11-12T17:20
+                } else {
+                    currentUser[field] = el.value;
+                }
             }
         });
+
         const selects = profileFields.querySelectorAll('select');
         selects.forEach(el => {
             const field = el.dataset.field;
@@ -1242,6 +1471,11 @@
         });
 
         currentUser.UpdateDate = new Date().toISOString();
+
+        // 自动完成检测：如果当前状态等于预设状态，自动设为 TRUE
+        if (currentUser.PresetSituation && currentUser.Situation === currentUser.PresetSituation) {
+            currentUser.IsPresetApplied = 'TRUE';
+        }
 
         const payload = {
             action: 'update',
@@ -1273,9 +1507,11 @@
             Situation: currentUser.Situation || 'Unknown',
             SignupDate: currentUser.SignupDate || '',
             UpdateDate: currentUser.UpdateDate || '',
+            // 新增的预设字段
             PresetSituation: currentUser.PresetSituation || '',
             PresetDateTime: currentUser.PresetDateTime || '',
-            IsPresetApplied: currentUser.IsPresetApplied || ''
+            IsPresetApplied: currentUser.IsPresetApplied || 'FALSE',
+            PresetNotifiedAt: currentUser.PresetNotifiedAt || ''
         };
 
         updateStatus('⏳ Menyimpan ke Google Sheets...', 'saving');
@@ -1286,40 +1522,57 @@
             body: new URLSearchParams(payload)
         })
         .then(response => {
-            if (!response.ok) throw new Error('HTTP ' + response.status);
+            if (!response.ok) throw new Error('HTTP ' + response.status + ': ' + response.statusText);
             return response.json();
         })
         .then(result => {
             btn.innerHTML = '💾 ' + t('saveBtn') + ' ✅';
-            btn.disabled = false; btn.style.background = '#0f7a54';
+            btn.disabled = false;
+            btn.style.background = '#0f7a54';
+
             if (result.result === 'success') {
                 showAlert('✅ ' + t('saveSuccess'), 'success');
-                updateStatus('✅ Data disimpan', 'success');
+                updateStatus('✅ Data disimpan ke Google Sheets', 'success');
                 const idx = allStaff.findIndex(s => s.Code === currentUser.Code);
                 if (idx !== -1) allStaff[idx] = { ...currentUser };
-                setTimeout(() => { btn.innerHTML = '💾 ' + t('saveBtn'); btn.style.background = '#0f7a54'; }, 3000);
+
+                // 更新完成后，刷新提醒
+                checkPresetReminders();
+
+                setTimeout(() => {
+                    btn.innerHTML = '💾 ' + t('saveBtn');
+                    btn.style.background = '#0f7a54';
+                }, 3000);
             } else {
-                showAlert('❌ ' + t('saveFail') + ': ' + (result.message || 'Error'), 'error');
+                showAlert('❌ ' + t('saveFail') + ': ' + (result.message || 'Unknown error'), 'error');
                 updateStatus('❌ Gagal menyimpan', 'error');
                 btn.innerHTML = '💾 ' + t('saveBtn') + ' ❌';
-                setTimeout(() => { btn.innerHTML = '💾 ' + t('saveBtn'); btn.style.background = '#0f7a54'; }, 3000);
+                setTimeout(() => {
+                    btn.innerHTML = '💾 ' + t('saveBtn');
+                    btn.style.background = '#0f7a54';
+                }, 3000);
             }
         })
         .catch(err => {
             btn.innerHTML = '💾 ' + t('saveBtn') + ' ❌';
-            btn.disabled = false; btn.style.background = '#c53030';
+            btn.disabled = false;
+            btn.style.background = '#c53030';
             showAlert('⚠️ ' + t('networkError') + ': ' + err.message, 'error');
             updateStatus('❌ Ralat: ' + err.message, 'error');
-            setTimeout(() => { btn.innerHTML = '💾 ' + t('saveBtn'); btn.style.background = '#0f7a54'; }, 4000);
+            setTimeout(() => {
+                btn.innerHTML = '💾 ' + t('saveBtn');
+                btn.style.background = '#0f7a54';
+            }, 4000);
         });
     }
 
     // ============================================================
-    //  退出与删除
+    //  LOGOUT
     // ============================================================
     function logoutAndGoBack() {
         if (!confirm(t('confirmLogout'))) return;
-        isLoggedIn = false; currentUser = null;
+        isLoggedIn = false;
+        currentUser = null;
         profileView.style.display = 'none';
         filterSection.style.display = 'block';
         staffListContainer.style.display = 'block';
@@ -1327,39 +1580,41 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function goBackToIndex() { window.location.href = 'index.html'; }
+    function goBackToIndex() {
+        window.location.href = 'index.html';
+    }
 
-    // ============================================================
-    //  添加员工
-    // ============================================================
+    /* ============================================================
+       新增员工
+       ============================================================ */
     const ADD_FIELDS = [
-        { key: 'Code', label: '🔑 Code *', required: true },
-        { key: 'Name', label: '👤 Name *', required: true },
-        { key: 'GroupName', label: '🏢 GroupName' },
-        { key: 'Jantina', label: '⚧ Jantina' },
-        { key: 'TarikhLahir', label: '🎂 Tarikh Lahir' },
-        { key: 'Salary', label: '💰 Salary' },
-        { key: 'IC', label: '🪪 IC / Passport' },
-        { key: 'Jawatan', label: '💼 Jawatan' },
+        { key: 'Code',             label: '🔑 Code *',                        required: true },
+        { key: 'Name',             label: '👤 Name *',                        required: true },
+        { key: 'GroupName',        label: '🏢 GroupName' },
+        { key: 'Jantina',          label: '⚧ Jantina' },
+        { key: 'TarikhLahir',      label: '🎂 Tarikh Lahir' },
+        { key: 'Salary',           label: '💰 Salary' },
+        { key: 'IC',               label: '🪪 IC / Passport' },
+        { key: 'Jawatan',          label: '💼 Jawatan' },
         { key: 'TarikhMasukKerja', label: '📅 Tarikh Masuk Kerja' },
-        { key: 'TelefonNo', label: '📱 Telefon No' },
-        { key: 'Email', label: '✉️ Email' },
-        { key: 'ShiftType', label: '🕐 Shift Type' },
-        { key: 'OffDay', label: '🛌 Off Day' },
-        { key: 'AlamatTetap', label: '🏠 Alamat Tetap' },
-        { key: 'NamaWaris', label: '👨‍👩‍👧 Nama Waris' },
-        { key: 'AlamatWaris', label: '🏠 Alamat Waris' },
-        { key: 'BankNama', label: '🏦 Bank Nama' },
-        { key: 'BankAccountNo', label: '💳 Bank Account No' },
-        { key: 'EPF', label: 'EPF (kwsp) No' },
-        { key: 'PERKESO', label: 'PERKESO No' },
-        { key: 'EIS', label: 'EIS No' },
-        { key: 'Lindungan', label: '24Jam Lindungan' },
-        { key: 'YellowCard', label: '🟨 Kad Kebersihan' },
-        { key: 'LoginPassword', label: '🔒 Login Password' },
-        { key: 'PhoneType', label: '📱 Phone Type' },
-        { key: 'PresetSituation', label: '⏰ Preset Status' },
-        { key: 'PresetDateTime', label: '⏰ Preset Time (YYYY-MM-DDTHH:mm)' }
+        { key: 'TelefonNo',        label: '📱 Telefon No' },
+        { key: 'Email',            label: '✉️ Email' },
+        { key: 'ShiftType',        label: '🕐 Shift Type' },
+        { key: 'OffDay',           label: '🛌 Off Day' },
+        { key: 'AlamatTetap',      label: '🏠 Alamat Tetap' },
+        { key: 'NamaWaris',        label: '👨‍👩‍👧 Nama Waris' },
+        { key: 'AlamatWaris',      label: '🏠 Alamat Waris' },
+        { key: 'BankNama',         label: '🏦 Bank Nama' },
+        { key: 'BankAccountNo',    label: '💳 Bank Account No' },
+        { key: 'EPF',              label: 'EPF (kwsp) No' },
+        { key: 'PERKESO',          label: 'PERKESO No' },
+        { key: 'EIS',              label: 'EIS No' },
+        { key: 'Lindungan',        label: '24Jam Lindungan' },
+        { key: 'YellowCard',       label: '🟨 Kad Kebersihan (Yellow Card)' },
+        { key: 'LoginPassword',    label: '🔒 Login Password' },
+        { key: 'PhoneType',        label: '📱 Phone Type' },
+        { key: 'PresetSituation',  label: '⏰ 预设状态' }, // 新增
+        { key: 'PresetDateTime',   label: '📅 预设时间' }  // 新增
     ];
 
     function openAddStaffModal() {
@@ -1375,7 +1630,9 @@
             input.dataset.field = f.key;
             input.id = 'add_' + f.key;
             input.placeholder = f.required ? 'Wajib diisi' : 'Optional';
-            div.appendChild(label); div.appendChild(input); box.appendChild(div);
+            div.appendChild(label);
+            div.appendChild(input);
+            box.appendChild(div);
         });
         document.getElementById('addStaffError').style.display = 'none';
         document.getElementById('addStaffSuccess').style.display = 'none';
@@ -1384,7 +1641,9 @@
         document.getElementById('addStaffOverlay').classList.add('active');
     }
 
-    function closeAddStaffModal() { document.getElementById('addStaffOverlay').classList.remove('active'); }
+    function closeAddStaffModal() {
+        document.getElementById('addStaffOverlay').classList.remove('active');
+    }
 
     function submitAddStaff() {
         const btn = document.getElementById('addStaffBtn');
@@ -1394,25 +1653,28 @@
         const payload = { action: 'signup' };
         ADD_FIELDS.forEach(f => {
             const el = document.getElementById('add_' + f.key);
-            if (el) {
-                let val = el.value.trim();
-                if (f.key === 'PresetDateTime' && val) {
-                    val = new Date(val).toISOString();
-                }
-                payload[f.key] = val;
-            }
+            payload[f.key] = el ? el.value.trim() : '';
         });
+        
+        // 确保新员工默认未完成预设
+        payload.IsPresetApplied = 'FALSE';
 
         if (!payload.Code || !payload.Name) {
-            errEl.textContent = 'Code dan Name wajib diisi.'; errEl.style.display = 'block'; return;
+            errEl.textContent = 'Code dan Name wajib diisi.';
+            errEl.style.display = 'block';
+            return;
         }
+
         if (allStaff.some(s => String(s.Code).trim() === payload.Code)) {
-            errEl.textContent = 'Code sudah wujud: ' + payload.Code; errEl.style.display = 'block'; return;
+            errEl.textContent = 'Code sudah wujud: ' + payload.Code;
+            errEl.style.display = 'block';
+            return;
         }
 
         btn.disabled = true;
         btn.innerHTML = '<span class="loading-spinner"></span>Menyimpan...';
-        errEl.style.display = 'none'; okEl.style.display = 'none';
+        errEl.style.display = 'none';
+        okEl.style.display = 'none';
 
         fetch(SCRIPT_URL, {
             method: 'POST',
@@ -1432,24 +1694,28 @@
                     showAlert('✅ Staf ' + payload.Code + ' berjaya ditambah', 'success');
                 }, 700);
             } else {
-                errEl.textContent = '❌ ' + (result.message || 'Gagal');
+                errEl.textContent = '❌ ' + (result.message || result.error || 'Gagal');
                 errEl.style.display = 'block';
-                btn.disabled = false; btn.textContent = '💾 Simpan Staf Baru';
+                btn.disabled = false;
+                btn.textContent = '💾 Simpan Staf Baru';
             }
         })
         .catch(err => {
             errEl.textContent = '❌ Ralat: ' + err.message;
             errEl.style.display = 'block';
-            btn.disabled = false; btn.textContent = '💾 Simpan Staf Baru';
+            btn.disabled = false;
+            btn.textContent = '💾 Simpan Staf Baru';
         });
     }
 
-    // ============================================================
-    //  删除
-    // ============================================================
+    /* ============================================================
+       删除员工
+       ============================================================ */
     function deleteStaff(code) {
-        if (!confirm('Padam staf ' + code + '?')) return;
+        if (!confirm('Padam staf ' + code + '? Tindakan ini tidak boleh diundur.')) return;
+
         updateStatus('⏳ Memadam ' + code + '...', 'saving');
+
         fetch(SCRIPT_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -1459,12 +1725,13 @@
         .then(result => {
             if (result.result === 'success') {
                 allStaff = allStaff.filter(s => String(s.Code).trim() !== String(code).trim());
-                rebuildBranchDropdown(); renderStaffList();
+                rebuildBranchDropdown();
+                renderStaffList();
                 updateStatus('✅ ' + code + ' dipadam', 'success');
                 showAlert('✅ Staf ' + code + ' berjaya dipadam', 'success');
             } else {
                 updateStatus('❌ ' + (result.message || 'Gagal'), 'error');
-                showAlert('❌ ' + (result.message || 'Gagal'), 'error');
+                showAlert('❌ ' + (result.message || 'Gagal memadam'), 'error');
             }
         })
         .catch(err => {
@@ -1473,27 +1740,31 @@
         });
     }
 
-    // ============================================================
-    //  辅助：重建分店下拉
-    // ============================================================
+    /* ============================================================
+       辅助：重建 Cawangan 下拉
+       ============================================================ */
     function rebuildBranchDropdown() {
         branchSelect.innerHTML = '<option value="">-- Pilih Cawangan --</option>';
         branches = Array.from(new Set(allStaff.map(s => s.GroupName).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
         branches.forEach(b => {
             const opt = document.createElement('option');
-            opt.value = b; opt.textContent = b; branchSelect.appendChild(opt);
+            opt.value = b; opt.textContent = b;
+            branchSelect.appendChild(opt);
         });
         const optOthers = document.createElement('option');
-        optOthers.value = 'Others'; optOthers.textContent = 'Others (Lain-lain)';
+        optOthers.value = 'Others';
+        optOthers.textContent = 'Others (Lain-lain)';
         branchSelect.appendChild(optOthers);
     }
 
     // ============================================================
-    //  初始化
+    //  INIT
     // ============================================================
     async function init() {
         setLanguage('ms');
+
         const success = await fetchStaffData();
+
         if (success && allStaff.length > 0) {
             rebuildBranchDropdown();
             renderStaffList();
@@ -1501,22 +1772,30 @@
             staffListEl.innerHTML = `
                 <div class="empty-state">
                     <span class="icon">⚠️</span>
-                    Gagal memuatkan data.
+                    Gagal memuatkan data. Sila semak semula sambungan atau sheet.
+                    <br><small style="color:#a0aec0;">Pastikan sheet "${SHEET_NAME}" wujud dan mempunyai data.</small>
                     <br><br>
-                    <button class="btn btn-primary" onclick="testConnection()">🔧 Test Connection</button>
+                    <button class="btn btn-primary" onclick="testConnection()" style="width:auto;padding:8px 24px;display:inline-block;">🔧 Test Connection</button>
                 </div>`;
         }
+
         branchSelect.addEventListener('change', handleBranchChange);
         statusSelect.addEventListener('change', renderStaffList);
 
+        // 弹窗外部点击关闭
         const addOverlay = document.getElementById('addStaffOverlay');
-        if (addOverlay) addOverlay.addEventListener('click', function(e) { if (e.target === this) closeAddStaffModal(); });
+        if (addOverlay) {
+            addOverlay.addEventListener('click', function(e) {
+                if (e.target === this) closeAddStaffModal();
+            });
+        }
     }
 
+    // 每 10 分钟自动检查一次预设
+    setInterval(checkPresetReminders, 10 * 60 * 1000);
+
+    // START
     init();
 </script>
-
-<!-- 引入通用的预设状态检查及提醒组件 -->
-<script src="preset-checker.js"></script>
 </body>
 </html>
