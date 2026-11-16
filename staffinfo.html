@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Staff Info · 员工信息</title>
     <style>
-        /* ==================== 全局变量（与 salary.html 一致） ==================== */
+        /* ==================== 全局变量 ==================== */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
             --epf-blue: #1a4f8a; --epf-blue-light: #e8f0fa; --epf-blue-soft: #f4f8fd;
@@ -14,8 +14,6 @@
             --nav-h: 52px;
             --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover: #16345c;
             --nav-text: #cbd9ea; --nav-accent: #4d9fff;
-
-            /* NEW navbar dropdown vars */
             --dropdown-bg: #ffffff;
             --dropdown-shadow: 0 8px 24px rgba(16,32,56,.15);
             --line: #dbe3ec;
@@ -30,9 +28,7 @@
             -webkit-font-smoothing: antialiased; font-size: 14px;
         }
 
-        /* ============================================================
-           NEW NAVBAR (adapted from dashboard.html)
-           ============================================================ */
+        /* ==================== 导航栏 ==================== */
         .navbar {
             position: sticky; top: 0; z-index: 200;
             display: flex; align-items: stretch; flex-wrap: wrap;
@@ -84,48 +80,24 @@
         }
         .nav-back:hover { background: var(--nav-hover); color: #fff; }
 
-        .nav-dropdown {
-            position: relative;
-            display: inline-flex;
-            align-items: stretch;
-        }
+        .nav-dropdown { position: relative; display: inline-flex; align-items: stretch; }
         .nav-dropdown > .nav-item { padding-right: 0.55rem; }
         .nav-dropdown > .nav-item .fa-caret-down { font-size: 0.6rem; margin-left: 0.2rem; opacity: 0.7; }
         .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            min-width: 180px;
-            background: var(--dropdown-bg);
-            border-radius: 8px;
-            box-shadow: var(--dropdown-shadow);
-            padding: 0.4rem 0;
-            z-index: 300;
-            border: 1px solid var(--line);
+            display: none; position: absolute; top: 100%; left: 0; min-width: 180px;
+            background: var(--dropdown-bg); border-radius: 8px; box-shadow: var(--dropdown-shadow);
+            padding: 0.4rem 0; z-index: 300; border: 1px solid var(--line);
             animation: fadeSlide 0.15s ease;
         }
         .nav-dropdown.open .dropdown-menu { display: block; }
-
-        @keyframes fadeSlide {
-            from { opacity: 0; transform: translateY(-6px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
+        @keyframes fadeSlide { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
         .dropdown-menu a {
-            display: flex; align-items: center; gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            color: #1e293b;
-            text-decoration: none;
-            font-size: 0.78rem;
-            font-weight: 500;
-            transition: background 0.12s;
-            white-space: nowrap;
+            display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem;
+            color: #1e293b; text-decoration: none; font-size: 0.78rem; font-weight: 500;
+            transition: background 0.12s; white-space: nowrap;
         }
         .dropdown-menu a:hover { background: var(--navy-soft); color: var(--navy); }
-        .dropdown-menu .divider {
-            height: 1px; background: var(--line-soft); margin: 0.3rem 0.5rem;
-        }
+        .dropdown-menu .divider { height: 1px; background: var(--line-soft); margin: 0.3rem 0.5rem; }
 
         .nav-chat {
             margin-left: auto; align-self: center;
@@ -307,7 +279,7 @@
         }
         .profile-field label {
             font-weight: 600; color: var(--epf-muted); font-size: 0.75rem;
-            flex: 0 0 140px; text-transform: uppercase; letter-spacing: 0.03em;
+            flex: 0 0 160px; text-transform: uppercase; letter-spacing: 0.03em;
         }
         .profile-field input, .profile-field select {
             border: 1px solid var(--epf-border); border-radius: 5px;
@@ -327,13 +299,12 @@
         .situation-select.inactive { color: #9b2c2c; background: #fed7d7; border-color: #9b2c2c !important; }
         .situation-select.pending { color: #975a16; background: #fefcbf; border-color: #975a16 !important; }
 
-        /* ==================== 弹窗（登录 + 新增员工） ==================== */
+        /* ==================== 弹窗 ==================== */
         .login-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(11, 27, 48, 0.55); display: none;
             align-items: center; justify-content: center; z-index: 1000;
-            backdrop-filter: blur(4px);
-            padding: 1rem;
+            backdrop-filter: blur(4px); padding: 1rem;
         }
         .login-overlay.active { display: flex; }
         .login-overlay .login-box {
@@ -386,7 +357,7 @@
             margin-top: 0.6rem; display: none;
         }
 
-        /* ==================== Loading Spinner ==================== */
+        /* Loading Spinner */
         .loading-spinner {
             display: inline-block; width: 16px; height: 16px;
             border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid #fff;
@@ -395,7 +366,7 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* ==================== 响应式 ==================== */
+        /* 响应式 */
         @media (max-width: 768px) {
             .navbar { padding: 0 0.5rem; }
             .navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
@@ -408,21 +379,21 @@
             .page-header h1 { font-size: 1.2rem; }
             .filter-row { flex-direction: column; gap: 0.75rem; }
             .filter-group { flex: 1 1 100%; }
-            .profile-field label { flex: 0 0 100px; font-size: 0.7rem; }
+            .profile-field label { flex: 0 0 130px; font-size: 0.7rem; }
             .profile-field input, .profile-field select { font-size: 0.78rem; }
         }
     </style>
 </head>
 <body>
 
-<!-- ==================== 顶部深色导航栏 ==================== -->
+<!-- 导航栏 -->
 <nav class="navbar">
     <div class="nav-brand">
         <span class="logo">Y</span>
         <span class="brand-text">YZ Staff</span>
     </div>
     <div class="nav-links" id="navLinks">
-        <button class="nav-back" id="backBtn" title="Kembali ke halaman sebelumnya">⏎</button>
+        <button class="nav-back" id="backBtn" title="Kembali">⏎</button>
 
         <div class="nav-dropdown" id="filesDropdown">
             <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down">▾</i></button>
@@ -479,7 +450,7 @@
     </button>
 </nav>
 
-<!-- ==================== 工具栏 ==================== -->
+<!-- 工具栏 -->
 <div class="topbar">
     <div class="brand">
         <div class="logo">👥</div>
@@ -497,8 +468,6 @@
 </div>
 
 <div class="container" id="mainContent">
-
-    <!-- 页面标题 -->
     <div class="page-header">
         <div class="info">
             <h1 id="mainTitle">📇 Staff Info</h1>
@@ -507,13 +476,10 @@
         </div>
     </div>
 
-    <!-- 状态栏 -->
     <div id="statusBar" class="status-bar">🔌 Memuatkan data...</div>
-
-    <!-- 警告框 -->
     <div id="alert" class="alert"></div>
 
-    <!-- 筛选区域 -->
+    <!-- 筛选 -->
     <div id="filterSection" class="filter-section">
         <div class="filter-row">
             <div class="filter-group">
@@ -557,10 +523,9 @@
             <button class="btn btn-danger" style="width:100%;margin-top:0.5rem;" onclick="logoutAndGoBack()">🚪 Log Keluar & Kembali</button>
         </div>
     </div>
-
 </div>
 
-<!-- ==================== 员工登录弹窗 ==================== -->
+<!-- 员工登录弹窗 -->
 <div class="login-overlay" id="loginOverlay">
     <div class="login-box">
         <h3>🔐 Log Masuk Staf</h3>
@@ -580,7 +545,7 @@
     </div>
 </div>
 
-<!-- ==================== 新增员工弹窗 ==================== -->
+<!-- 新增员工弹窗 -->
 <div class="login-overlay" id="addStaffOverlay">
     <div class="login-box" style="max-width:560px;max-height:88vh;overflow-y:auto;text-align:left;">
         <h3 style="text-align:center;">➕ Tambah Staf Baru</h3>
@@ -594,17 +559,12 @@
 </div>
 
 <script>
-    /* ============================================================
-       NAVBAR LOGIC (dropdowns & back button)
-       ============================================================ */
+    // ============================================================
+    //  导航逻辑
+    // ============================================================
     document.addEventListener('DOMContentLoaded', function() {
         const backBtn = document.getElementById('backBtn');
-        if (backBtn) {
-            backBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                window.history.back();
-            });
-        }
+        if (backBtn) backBtn.addEventListener('click', function(e) { e.preventDefault(); window.history.back(); });
 
         const dropdownToggles = document.querySelectorAll('[data-dropdown-toggle]');
         dropdownToggles.forEach(function(toggle) {
@@ -621,38 +581,29 @@
 
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.nav-dropdown')) {
-                document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
-                    dd.classList.remove('open');
-                });
+                document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); });
             }
         });
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
-                    dd.classList.remove('open');
-                });
+                document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); });
             }
         });
 
         document.querySelectorAll('.dropdown-menu a').forEach(function(link) {
             link.addEventListener('click', function() {
-                document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
-                    dd.classList.remove('open');
-                });
+                document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); });
             });
         });
     });
 
     // ============================================================
-    //  KONFIGURASI
+    //  配置与状态
     // ============================================================
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMvU6u4HEWNoULZedWPs3XvjJMY8fb-J3UDCRbNeRnijj7DDbqPXnb07RlL2st0xsmHQ/exec';
     const SHEET_NAME = 'STAFF LOGIN RECORD';
 
-    // ============================================================
-    //  STATE
-    // ============================================================
     let allStaff = [];
     let branches = [];
     let isLoading = false;
@@ -660,7 +611,6 @@
     let isLoggedIn = false;
     let currentLanguage = 'ms';
 
-    // DOM Elements
     const branchSelect = document.getElementById('branchSelect');
     const statusSelect = document.getElementById('statusSelect');
     const staffListEl = document.getElementById('staffList');
@@ -673,7 +623,6 @@
     const filterSection = document.getElementById('filterSection');
     const staffListContainer = document.getElementById('staffListContainer');
 
-    // Staff Login
     const loginOverlay = document.getElementById('loginOverlay');
     const loginCode = document.getElementById('loginCode');
     const loginPassword = document.getElementById('loginPassword');
@@ -682,147 +631,92 @@
     const loginBtn = document.getElementById('loginBtn');
 
     // ============================================================
-    //  TEST CONNECTION（已修正）
+    //  测试连接
     // ============================================================
     async function testConnection() {
-        updateStatus('🔍 Menguji sambungan ke Google Sheets...', 'info');
+        updateStatus('🔍 Menguji sambungan...', 'info');
         showAlert('🔍 Menguji sambungan...', 'info');
-
         try {
             const url = `${SCRIPT_URL}?action=getData&_t=${Date.now()}`;
             const response = await fetch(url);
             const text = await response.text();
-
             let data;
-            try { data = JSON.parse(text); }
-            catch (e) {
-                updateStatus('❌ Response bukan JSON: ' + text.substring(0, 100), 'error');
-                showAlert('❌ Server tidak mengembalikan JSON. Sila semak Apps Script deployment.', 'error');
+            try { data = JSON.parse(text); } catch (e) {
+                updateStatus('❌ Response bukan JSON', 'error');
+                showAlert('❌ Server tidak mengembalikan JSON.', 'error');
                 return;
             }
-
             if (data && data.result === 'success') {
                 const count = Array.isArray(data.data) ? data.data.length : 0;
-                updateStatus(`✅ Sambungan berjaya! Ditemui ${count} rekod.`, 'success');
-                showAlert(`✅ Sambungan berjaya! Ditemui ${count} rekod.`, 'success');
+                updateStatus(`✅ Sambungan berjaya! ${count} rekod.`, 'success');
+                showAlert(`✅ Sambungan berjaya! ${count} rekod.`, 'success');
             } else if (Array.isArray(data)) {
-                updateStatus(`✅ Sambungan berjaya! Ditemui ${data.length} rekod.`, 'success');
-                showAlert(`✅ Sambungan berjaya! Ditemui ${data.length} rekod.`, 'success');
+                updateStatus(`✅ Sambungan berjaya! ${data.length} rekod.`, 'success');
+                showAlert(`✅ Sambungan berjaya! ${data.length} rekod.`, 'success');
             } else {
-                updateStatus('⚠️ Sambungan berjaya tetapi data tidak seperti dijangka.', 'debug');
-                showAlert('⚠️ Sambungan berjaya tetapi format data tidak dijangka.', 'info');
+                updateStatus('⚠️ Sambungan berjaya tetapi format data tidak dijangka.', 'debug');
             }
         } catch (err) {
             updateStatus('❌ Gagal menyambung: ' + err.message, 'error');
-            showAlert('❌ Gagal menyambung ke server: ' + err.message, 'error');
+            showAlert('❌ Gagal menyambung: ' + err.message, 'error');
         }
     }
 
     // ============================================================
-    //  TRANSLATIONS
+    //  翻译
     // ============================================================
     const translations = {
         ms: {
-            title: '📇 Staff Info',
-            subTitle: 'Pilih cawangan & lihat senarai staf',
-            profileTitle: '👤 Profil Staf',
-            editHint: '✏️ Klik pada mana-mana medan untuk sunting',
-            saveBtn: '💾 Simpan Perubahan',
-            logoutBtn: '🚪 Log Keluar & Kembali',
-            saveSuccess: '✅ Data berjaya disimpan ke Google Sheets!',
-            saveFail: '❌ Gagal menyimpan data ke Google Sheets.',
-            networkError: '⚠️ Ralat rangkaian',
-            noData: 'Tiada staf untuk paparan.',
-            selectBranch: '-- Pilih Cawangan --',
-            allStatus: 'Semua Status',
-            groupName: '🏢 Cawangan (GroupName)',
-            statusLabel: '📌 Status (Situation)',
-            loading: '🔌 Memuatkan data...',
-            connected: '✅ Bersambung! {count} rekod ditemui.',
-            othersPlaceholder: 'Sila nyatakan cawangan lain...',
-            emptyOthers: 'Sila nyatakan cawangan lain di ruangan yang disediakan.',
-            confirmLogout: 'Anda pasti mahu log keluar?',
-            staffLoginTitle: '🔐 Log Masuk Staf',
-            staffLoginSub: 'Masukkan Code dan Password untuk melihat profil',
-            staffLoginCode: 'Code',
-            staffLoginPassword: 'Password',
-            staffLoginBtn: '🔓 Log Masuk',
-            cancelBtn: 'Batal',
-            staffLoginSuccess: '✅ Log masuk berjaya!',
-            staffLoginError: 'Code atau Password salah!',
-            saving: 'Menyimpan ke Google Sheets...',
-            saved: 'Disimpan',
-            situationLabel: '📌 Situation (Status)'
+            title: '📇 Staff Info', subTitle: 'Pilih cawangan & lihat senarai staf',
+            profileTitle: '👤 Profil Staf', editHint: '✏️ Klik pada mana-mana medan untuk sunting',
+            saveBtn: '💾 Simpan Perubahan', logoutBtn: '🚪 Log Keluar & Kembali',
+            saveSuccess: '✅ Data berjaya disimpan!', saveFail: '❌ Gagal menyimpan data.',
+            networkError: '⚠️ Ralat rangkaian', noData: 'Tiada staf untuk paparan.',
+            selectBranch: '-- Pilih Cawangan --', allStatus: 'Semua Status',
+            groupName: '🏢 Cawangan (GroupName)', statusLabel: '📌 Status (Situation)',
+            loading: '🔌 Memuatkan data...', connected: '✅ Bersambung! {count} rekod ditemui.',
+            othersPlaceholder: 'Sila nyatakan cawangan lain...', emptyOthers: 'Sila nyatakan cawangan lain.',
+            confirmLogout: 'Anda pasti mahu log keluar?', staffLoginTitle: '🔐 Log Masuk Staf',
+            staffLoginSub: 'Masukkan Code dan Password', staffLoginCode: 'Code',
+            staffLoginPassword: 'Password', staffLoginBtn: '🔓 Log Masuk', cancelBtn: 'Batal',
+            staffLoginSuccess: '✅ Log masuk berjaya!', staffLoginError: 'Code atau Password salah!',
+            saving: 'Menyimpan...', saved: 'Disimpan', situationLabel: '📌 Situation (Status)'
         },
         en: {
-            title: '📇 Staff Info',
-            subTitle: 'Select branch & view staff list',
-            profileTitle: '👤 Staff Profile',
-            editHint: '✏️ Click on any field to edit',
-            saveBtn: '💾 Save Changes',
-            logoutBtn: '🚪 Logout & Back',
-            saveSuccess: '✅ Data saved to Google Sheets successfully!',
-            saveFail: '❌ Failed to save data to Google Sheets.',
-            networkError: '⚠️ Network error',
-            noData: 'No staff to display.',
-            selectBranch: '-- Select Branch --',
-            allStatus: 'All Status',
-            groupName: '🏢 Branch (GroupName)',
-            statusLabel: '📌 Status (Situation)',
-            loading: '🔌 Loading data...',
-            connected: '✅ Connected! {count} records found.',
-            othersPlaceholder: 'Please specify other branch...',
-            emptyOthers: 'Please specify other branch in the field provided.',
-            confirmLogout: 'Are you sure you want to logout?',
-            staffLoginTitle: '🔐 Staff Login',
-            staffLoginSub: 'Enter Code and Password to view profile',
-            staffLoginCode: 'Code',
-            staffLoginPassword: 'Password',
-            staffLoginBtn: '🔓 Login',
-            cancelBtn: 'Cancel',
-            staffLoginSuccess: '✅ Login successful!',
-            staffLoginError: 'Incorrect Code or Password!',
-            saving: 'Saving to Google Sheets...',
-            saved: 'Saved',
-            situationLabel: '📌 Situation (Status)'
+            title: '📇 Staff Info', subTitle: 'Select branch & view staff list',
+            profileTitle: '👤 Staff Profile', editHint: '✏️ Click on any field to edit',
+            saveBtn: '💾 Save Changes', logoutBtn: '🚪 Logout & Back',
+            saveSuccess: '✅ Data saved successfully!', saveFail: '❌ Failed to save data.',
+            networkError: '⚠️ Network error', noData: 'No staff to display.',
+            selectBranch: '-- Select Branch --', allStatus: 'All Status',
+            groupName: '🏢 Branch (GroupName)', statusLabel: '📌 Status (Situation)',
+            loading: '🔌 Loading data...', connected: '✅ Connected! {count} records.',
+            othersPlaceholder: 'Please specify other branch...', emptyOthers: 'Please specify other branch.',
+            confirmLogout: 'Are you sure you want to logout?', staffLoginTitle: '🔐 Staff Login',
+            staffLoginSub: 'Enter Code and Password', staffLoginCode: 'Code',
+            staffLoginPassword: 'Password', staffLoginBtn: '🔓 Login', cancelBtn: 'Cancel',
+            staffLoginSuccess: '✅ Login successful!', staffLoginError: 'Incorrect Code or Password!',
+            saving: 'Saving...', saved: 'Saved', situationLabel: '📌 Situation (Status)'
         },
         zh: {
-            title: '📇 员工信息',
-            subTitle: '选择分店并查看员工列表',
-            profileTitle: '👤 员工资料',
-            editHint: '✏️ 点击任意字段进行编辑',
-            saveBtn: '💾 保存修改',
-            logoutBtn: '🚪 退出并返回',
-            saveSuccess: '✅ 数据已成功保存到 Google Sheets！',
-            saveFail: '❌ 保存数据到 Google Sheets 失败。',
-            networkError: '⚠️ 网络错误',
-            noData: '没有员工可显示。',
-            selectBranch: '-- 选择分店 --',
-            allStatus: '所有状态',
-            groupName: '🏢 分店 (GroupName)',
-            statusLabel: '📌 状态 (Situation)',
-            loading: '🔌 加载数据中...',
-            connected: '✅ 已连接！找到 {count} 条记录。',
-            othersPlaceholder: '请注明其他分店...',
-            emptyOthers: '请在提供的字段中注明其他分店。',
-            confirmLogout: '您确定要退出登录吗？',
-            staffLoginTitle: '🔐 员工登录',
-            staffLoginSub: '输入代码和密码以查看资料',
-            staffLoginCode: '员工代码',
-            staffLoginPassword: '密码',
-            staffLoginBtn: '🔓 登录',
-            cancelBtn: '取消',
-            staffLoginSuccess: '✅ 登录成功！',
-            staffLoginError: '代码或密码错误！',
-            saving: '正在保存到 Google Sheets...',
-            saved: '已保存',
-            situationLabel: '📌 状态 (Situation)'
+            title: '📇 员工信息', subTitle: '选择分店并查看员工列表',
+            profileTitle: '👤 员工资料', editHint: '✏️ 点击任意字段进行编辑',
+            saveBtn: '💾 保存修改', logoutBtn: '🚪 退出并返回',
+            saveSuccess: '✅ 数据已成功保存！', saveFail: '❌ 保存数据失败。',
+            networkError: '⚠️ 网络错误', noData: '没有员工可显示。',
+            selectBranch: '-- 选择分店 --', allStatus: '所有状态',
+            groupName: '🏢 分店 (GroupName)', statusLabel: '📌 状态 (Situation)',
+            loading: '🔌 加载数据中...', connected: '✅ 已连接！找到 {count} 条记录。',
+            othersPlaceholder: '请注明其他分店...', emptyOthers: '请在提供的字段中注明其他分店。',
+            confirmLogout: '您确定要退出登录吗？', staffLoginTitle: '🔐 员工登录',
+            staffLoginSub: '输入代码和密码以查看资料', staffLoginCode: '员工代码',
+            staffLoginPassword: '密码', staffLoginBtn: '🔓 登录', cancelBtn: '取消',
+            staffLoginSuccess: '✅ 登录成功！', staffLoginError: '代码或密码错误！',
+            saving: '正在保存...', saved: '已保存', situationLabel: '📌 状态 (Situation)'
         }
     };
 
-    function t(key) {
-        return translations[currentLanguage]?.[key] || key;
-    }
+    function t(key) { return translations[currentLanguage]?.[key] || key; }
 
     function setLanguage(lang) {
         currentLanguage = lang;
@@ -836,7 +730,6 @@
         document.getElementById('profileTitle').textContent = t('profileTitle');
         document.querySelector('.profile-edit-hint').textContent = t('editHint');
         document.getElementById('saveProfileBtn').textContent = t('saveBtn');
-
         const branchSel = document.getElementById('branchSelect');
         if (branchSel.options.length > 0) branchSel.options[0].text = t('selectBranch');
         const statusSel = document.getElementById('statusSelect');
@@ -845,7 +738,7 @@
     }
 
     // ============================================================
-    //  ALERT & STATUS
+    //  辅助函数
     // ============================================================
     function showAlert(msg, type = 'error') {
         alertBox.textContent = msg;
@@ -868,9 +761,6 @@
         return `<span class="status-badge ${cls}">${label}</span>`;
     }
 
-    // ============================================================
-    //  BRANCH HANDLING
-    // ============================================================
     function handleBranchChange() {
         const selected = branchSelect.value;
         if (selected === 'Others') {
@@ -888,46 +778,22 @@
     otherBranchInput.addEventListener('input', renderStaffList);
 
     // ============================================================
-    //  FETCH DATA
+    //  获取数据 (加入了新的预设字段读取)
     // ============================================================
     async function fetchStaffData() {
         isLoading = true;
         updateStatus('⏳ Menghubungi server...', 'info');
-
         try {
             const url = `${SCRIPT_URL}?action=getData&_t=${Date.now()}`;
             const response = await fetch(url);
-            if (!response.ok) throw new Error('HTTP ' + response.status + ': ' + response.statusText);
-
+            if (!response.ok) throw new Error('HTTP ' + response.status);
             const rawResult = await response.json();
             let dataArray;
 
-            if (rawResult && rawResult.result === 'success' && Array.isArray(rawResult.data)) {
-                dataArray = rawResult.data;
-            } else if (Array.isArray(rawResult)) {
-                dataArray = rawResult;
-            } else if (rawResult && rawResult.data && Array.isArray(rawResult.data)) {
-                dataArray = rawResult.data;
-            } else if (rawResult && rawResult.values && Array.isArray(rawResult.values)) {
-                dataArray = rawResult.values;
-            } else if (rawResult && rawResult.rows && Array.isArray(rawResult.rows)) {
-                dataArray = rawResult.rows;
-            } else if (typeof rawResult === 'object' && rawResult !== null) {
-                const keys = Object.keys(rawResult);
-                if (keys.length > 0 && keys.every(k => !isNaN(parseInt(k)))) {
-                    dataArray = Object.values(rawResult);
-                } else {
-                    const possibleFields = ['Code', 'Name', 'GroupName', 'Situation'];
-                    const hasStaffFields = possibleFields.some(f => rawResult[f] !== undefined);
-                    if (hasStaffFields) {
-                        dataArray = [rawResult];
-                    } else {
-                        throw new Error('Format data tidak dikenali: ' + JSON.stringify(rawResult).substring(0, 200));
-                    }
-                }
-            } else {
-                throw new Error('Format data tidak dikenali.');
-            }
+            if (rawResult && rawResult.result === 'success' && Array.isArray(rawResult.data)) dataArray = rawResult.data;
+            else if (Array.isArray(rawResult)) dataArray = rawResult;
+            else if (rawResult && rawResult.data && Array.isArray(rawResult.data)) dataArray = rawResult.data;
+            else throw new Error('Format data tidak dikenali.');
 
             if (!dataArray || dataArray.length === 0) throw new Error('Tiada data ditemui.');
 
@@ -936,28 +802,28 @@
             const branchSet = new Set();
 
             if (Array.isArray(firstRow)) {
+                // 数组式读取（兼容旧格式）
                 const idx = {
                     situation: 1, loginPwd: 28, name: 4, code: 3, group: 2,
                     jantina: 5, tarikhLahir: 6, salary: 7, ic: 8, jawatan: 9,
                     tarikhMasuk: 10, telefon: 11, email: 12, shift: 13, offDay: 14,
                     alamatTetap: 15, namaWaris: 16, alamatWaris: 17, bankNama: 18,
                     bankAccount: 19, epf: 20, perkeso: 21, eis: 22, lindungan: 23,
-                    yellowCard: 24, phoneType: 25, signupDate: 26, updateDate: 27
+                    yellowCard: 24, phoneType: 25, signupDate: 26, updateDate: 27,
+                    presetSituation: 29, presetDateTime: 30, isPresetApplied: 31 // 新增
                 };
                 for (let i = 1; i < dataArray.length; i++) {
                     const row = dataArray[i];
                     if (!Array.isArray(row)) continue;
-                    if (row.length <= Math.max(idx.situation, idx.loginPwd, idx.name, idx.code, idx.group)) continue;
                     const group = (row[idx.group] || '').toString().trim();
                     const code = (row[idx.code] || '').toString().trim();
                     const name = (row[idx.name] || '').toString().trim();
-                    const situation = (row[idx.situation] || '').toString().trim();
-                    const loginPwd = (row[idx.loginPwd] || '').toString().trim();
                     if (!code || !name) continue;
 
                     const userObj = {
                         Code: code, GroupName: group || 'Tidak Diketahui', Name: name,
-                        Situation: situation || 'Unknown', LoginPassword: loginPwd,
+                        Situation: (row[idx.situation] || 'Unknown').toString().trim(),
+                        LoginPassword: (row[idx.loginPwd] || '').toString().trim(),
                         Jantina: (row[idx.jantina] || '').toString().trim(),
                         TarikhLahir: (row[idx.tarikhLahir] || '').toString().trim(),
                         Salary: (row[idx.salary] || '').toString().trim(),
@@ -980,12 +846,16 @@
                         YellowCard: (row[idx.yellowCard] || '').toString().trim(),
                         PhoneType: (row[idx.phoneType] || '').toString().trim(),
                         SignupDate: (row[idx.signupDate] || '').toString().trim(),
-                        UpdateDate: (row[idx.updateDate] || '').toString().trim()
+                        UpdateDate: (row[idx.updateDate] || '').toString().trim(),
+                        PresetSituation: (row[idx.presetSituation] || '').toString().trim(),
+                        PresetDateTime: (row[idx.presetDateTime] || '').toString().trim(),
+                        IsPresetApplied: (row[idx.isPresetApplied] || '').toString().trim()
                     };
                     staff.push(userObj);
                     if (group) branchSet.add(group);
                 }
             } else if (typeof firstRow === 'object' && firstRow !== null) {
+                // 对象式读取（推荐）
                 const sampleKeys = Object.keys(firstRow);
                 const findKey = (possibleNames) => {
                     for (const name of possibleNames) {
@@ -998,56 +868,53 @@
                     }
                     return null;
                 };
-                const situationKey = findKey(['Situation', 'situation', 'STATUS', 'Status']);
-                const loginPwdKey = findKey(['LoginPassword', 'loginPassword', 'Password', 'password']);
-                const nameKey = findKey(['Name', 'name', 'Nama', 'nama']);
-                const codeKey = findKey(['Code', 'code', 'Kod', 'kod', 'ID']);
-                const groupKey = findKey(['GroupName', 'groupName', 'Group', 'group', 'Cawangan', 'cawangan']);
-
-                if (!nameKey || !codeKey) {
-                    throw new Error('Header tidak dijumpai. Keys: ' + sampleKeys.join(', '));
-                }
-
                 const fieldMap = {
-                    situation: situationKey,
-                    loginPwd: loginPwdKey,
-                    group: groupKey,
-                    jantina: findKey(['Jantina', 'jantina', 'Gender', 'gender']),
-                    tarikhLahir: findKey(['TarikhLahir', 'tarikhLahir', 'DateOfBirth', 'DOB']),
-                    salary: findKey(['Salary', 'salary', 'Gaji', 'gaji']),
-                    ic: findKey(['IC', 'ic', 'Passport', 'passport', 'DocNo']),
-                    jawatan: findKey(['Jawatan', 'jawatan', 'Position', 'position']),
-                    tarikhMasuk: findKey(['TarikhMasukKerja', 'tarikhMasukKerja', 'StartDate', 'startDate']),
-                    telefon: findKey(['TelefonNo', 'telefonNo', 'Phone', 'phone']),
-                    email: findKey(['Email', 'email']),
-                    shift: findKey(['ShiftType', 'shiftType', 'Shift', 'shift']),
-                    offDay: findKey(['OffDay', 'offDay', 'Off', 'off']),
-                    alamatTetap: findKey(['AlamatTetap', 'alamatTetap', 'Address', 'address']),
-                    namaWaris: findKey(['NamaWaris', 'namaWaris', 'NextOfKin', 'nextOfKin']),
-                    alamatWaris: findKey(['AlamatWaris', 'alamatWaris', 'NextOfKinAddress']),
-                    bankNama: findKey(['BankNama', 'bankNama', 'Bank', 'bank']),
-                    bankAccount: findKey(['BankAccountNo', 'bankAccountNo', 'AccountNo', 'accountNo']),
-                    epf: findKey(['EPF', 'epf', 'KWSP', 'kwsp']),
-                    perkeso: findKey(['PERKESO', 'perkeso']),
-                    eis: findKey(['EIS', 'eis']),
-                    lindungan: findKey(['Lindungan', 'lindungan', '24Jam', '24jam']),
-                    yellowCard: findKey(['YellowCard', 'yellowCard', 'Yellow', 'yellow']),
-                    phoneType: findKey(['PhoneType', 'phoneType', 'Device', 'device']),
-                    signupDate: findKey(['SignupDate', 'signupDate']),
-                    updateDate: findKey(['UpdateDate', 'updateDate'])
+                    situation: findKey(['Situation', 'STATUS']),
+                    loginPwd: findKey(['LoginPassword', 'Password']),
+                    group: findKey(['GroupName', 'Group', 'Cawangan']),
+                    name: findKey(['Name', 'Nama']),
+                    code: findKey(['Code', 'Kod', 'ID']),
+                    jantina: findKey(['Jantina', 'Gender']),
+                    tarikhLahir: findKey(['TarikhLahir', 'DOB']),
+                    salary: findKey(['Salary', 'Gaji']),
+                    ic: findKey(['IC', 'Passport']),
+                    jawatan: findKey(['Jawatan', 'Position']),
+                    tarikhMasuk: findKey(['TarikhMasukKerja', 'StartDate']),
+                    telefon: findKey(['TelefonNo', 'Phone']),
+                    email: findKey(['Email']),
+                    shift: findKey(['ShiftType', 'Shift']),
+                    offDay: findKey(['OffDay', 'Off']),
+                    alamatTetap: findKey(['AlamatTetap', 'Address']),
+                    namaWaris: findKey(['NamaWaris', 'NextOfKin']),
+                    alamatWaris: findKey(['AlamatWaris']),
+                    bankNama: findKey(['BankNama', 'Bank']),
+                    bankAccount: findKey(['BankAccountNo', 'AccountNo']),
+                    epf: findKey(['EPF', 'KWSP']),
+                    perkeso: findKey(['PERKESO']),
+                    eis: findKey(['EIS']),
+                    lindungan: findKey(['Lindungan', '24Jam']),
+                    yellowCard: findKey(['YellowCard', 'Yellow']),
+                    phoneType: findKey(['PhoneType', 'Device']),
+                    signupDate: findKey(['SignupDate']),
+                    updateDate: findKey(['UpdateDate']),
+                    presetSituation: findKey(['PresetSituation']),
+                    presetDateTime: findKey(['PresetDateTime']),
+                    isPresetApplied: findKey(['IsPresetApplied'])
                 };
+
+                if (!fieldMap.name || !fieldMap.code) throw new Error('Header tidak dijumpai. Keys: ' + sampleKeys.join(', '));
 
                 for (const row of dataArray) {
                     if (typeof row !== 'object' || row === null) continue;
-                    const code = (row[codeKey] || '').toString().trim();
-                    const name = (row[nameKey] || '').toString().trim();
+                    const code = (row[fieldMap.code] || '').toString().trim();
+                    const name = (row[fieldMap.name] || '').toString().trim();
                     if (!code || !name) continue;
 
                     const userObj = {
                         Code: code,
-                        GroupName: fieldMap.group ? (row[fieldMap.group] || '').toString().trim() || 'Tidak Diketahui' : 'Tidak Diketahui',
+                        GroupName: fieldMap.group ? (row[fieldMap.group] || 'Tidak Diketahui').toString().trim() : 'Tidak Diketahui',
                         Name: name,
-                        Situation: fieldMap.situation ? (row[fieldMap.situation] || '').toString().trim() || 'Unknown' : 'Unknown',
+                        Situation: fieldMap.situation ? (row[fieldMap.situation] || 'Unknown').toString().trim() : 'Unknown',
                         LoginPassword: fieldMap.loginPwd ? (row[fieldMap.loginPwd] || '').toString().trim() : '',
                         Jantina: fieldMap.jantina ? (row[fieldMap.jantina] || '').toString().trim() : '',
                         TarikhLahir: fieldMap.tarikhLahir ? (row[fieldMap.tarikhLahir] || '').toString().trim() : '',
@@ -1071,7 +938,10 @@
                         YellowCard: fieldMap.yellowCard ? (row[fieldMap.yellowCard] || '').toString().trim() : '',
                         PhoneType: fieldMap.phoneType ? (row[fieldMap.phoneType] || '').toString().trim() : '',
                         SignupDate: fieldMap.signupDate ? (row[fieldMap.signupDate] || '').toString().trim() : '',
-                        UpdateDate: fieldMap.updateDate ? (row[fieldMap.updateDate] || '').toString().trim() : ''
+                        UpdateDate: fieldMap.updateDate ? (row[fieldMap.updateDate] || '').toString().trim() : '',
+                        PresetSituation: fieldMap.presetSituation ? (row[fieldMap.presetSituation] || '').toString().trim() : '',
+                        PresetDateTime: fieldMap.presetDateTime ? (row[fieldMap.presetDateTime] || '').toString().trim() : '',
+                        IsPresetApplied: fieldMap.isPresetApplied ? (row[fieldMap.isPresetApplied] || '').toString().trim() : ''
                     };
                     staff.push(userObj);
                     if (userObj.GroupName && userObj.GroupName !== 'Tidak Diketahui') branchSet.add(userObj.GroupName);
@@ -1081,19 +951,15 @@
             }
 
             if (staff.length === 0) throw new Error('Tiada rekod staf yang sah.');
-
             allStaff = staff;
             branches = Array.from(branchSet).sort((a, b) => a.localeCompare(b));
-
             const msg = t('connected').replace('{count}', staff.length);
             updateStatus(msg, 'success');
             return true;
-
         } catch (err) {
             console.error('❌ Ralat fetch:', err);
             updateStatus(`❌ Gagal: ${err.message}`, 'error');
-            allStaff = [];
-            branches = [];
+            allStaff = []; branches = [];
             return false;
         } finally {
             isLoading = false;
@@ -1101,20 +967,18 @@
     }
 
     // ============================================================
-    //  RENDER STAFF LIST（含 🗑 删除按钮）
+    //  渲染列表
     // ============================================================
     function renderStaffList() {
         let selectedBranch = branchSelect.value;
         if (selectedBranch === 'Others') {
             const otherVal = otherBranchInput.value.trim();
-            if (otherVal) {
-                selectedBranch = otherVal;
-            } else {
+            if (otherVal) selectedBranch = otherVal;
+            else {
                 staffListEl.innerHTML = `<div class="empty-state"><span class="icon">✏️</span>${t('emptyOthers')}</div>`;
                 return;
             }
         }
-
         const selectedStatus = statusSelect.value;
         let filtered = allStaff;
         if (selectedBranch) filtered = filtered.filter(s => s.GroupName === selectedBranch);
@@ -1122,12 +986,7 @@
         filtered.sort((a, b) => a.Name.localeCompare(b.Name));
 
         if (filtered.length === 0) {
-            staffListEl.innerHTML = `
-                <div class="empty-state">
-                    <span class="icon">📭</span>${t('noData')}
-                    ${selectedBranch ? `<br><small style="color:#a0aec0;">Cawangan: ${selectedBranch}</small>` : ''}
-                    ${selectedStatus ? `<br><small style="color:#a0aec0;">Status: ${selectedStatus}</small>` : ''}
-                </div>`;
+            staffListEl.innerHTML = `<div class="empty-state"><span class="icon">📭</span>${t('noData')}</div>`;
             return;
         }
 
@@ -1143,10 +1002,8 @@
                     </div>
                     <div class="status-wrap">
                         ${statusBadge}
-                        <button class="btn btn-sm btn-danger"
-                                style="padding:0.2rem 0.6rem;font-size:0.7rem;"
-                                onclick="event.stopPropagation(); deleteStaff('${safeCode}');"
-                                title="Padam">🗑</button>
+                        <button class="btn btn-sm btn-danger" style="padding:0.2rem 0.6rem;font-size:0.7rem;"
+                                onclick="event.stopPropagation(); deleteStaff('${safeCode}');" title="Padam">🗑</button>
                         <span class="arrow">›</span>
                     </div>
                 </div>`;
@@ -1155,7 +1012,7 @@
     }
 
     // ============================================================
-    //  STAFF LOGIN
+    //  登录与资料展示
     // ============================================================
     function openStaffLogin(code) {
         if (isLoggedIn) {
@@ -1166,7 +1023,6 @@
             }
             return;
         }
-
         loginCode.value = code;
         loginPassword.value = '';
         loginError.style.display = 'none';
@@ -1177,50 +1033,32 @@
         loginPassword.focus();
     }
 
-    function closeStaffLogin() {
-        loginOverlay.classList.remove('active');
-    }
+    function closeStaffLogin() { loginOverlay.classList.remove('active'); }
 
     function performStaffLogin() {
         const code = loginCode.value.trim();
         const password = loginPassword.value.trim();
-
         if (!code || !password) {
             loginError.textContent = 'Sila masukkan Code dan Password.';
-            loginError.style.display = 'block';
-            loginSuccess.style.display = 'none';
-            return;
+            loginError.style.display = 'block'; loginSuccess.style.display = 'none'; return;
         }
-
         loginBtn.disabled = true;
         loginBtn.innerHTML = `<span class="loading-spinner"></span>Memproses...`;
-        loginError.style.display = 'none';
-        loginSuccess.style.display = 'none';
+        loginError.style.display = 'none'; loginSuccess.style.display = 'none';
 
         const staff = allStaff.find(s => s.Code === code);
-
         if (!staff) {
-            loginBtn.disabled = false;
-            loginBtn.textContent = t('staffLoginBtn');
-            loginError.textContent = 'Code tidak dijumpai!';
-            loginError.style.display = 'block';
-            return;
+            loginBtn.disabled = false; loginBtn.textContent = t('staffLoginBtn');
+            loginError.textContent = 'Code tidak dijumpai!'; loginError.style.display = 'block'; return;
         }
-
         if (staff.LoginPassword !== password) {
-            loginBtn.disabled = false;
-            loginBtn.textContent = t('staffLoginBtn');
-            loginError.textContent = t('staffLoginError');
-            loginError.style.display = 'block';
-            loginPassword.value = '';
-            loginPassword.focus();
-            return;
+            loginBtn.disabled = false; loginBtn.textContent = t('staffLoginBtn');
+            loginError.textContent = t('staffLoginError'); loginError.style.display = 'block';
+            loginPassword.value = ''; loginPassword.focus(); return;
         }
 
-        loginSuccess.textContent = t('staffLoginSuccess');
-        loginSuccess.style.display = 'block';
-        loginBtn.disabled = false;
-        loginBtn.textContent = t('staffLoginBtn');
+        loginSuccess.textContent = t('staffLoginSuccess'); loginSuccess.style.display = 'block';
+        loginBtn.disabled = false; loginBtn.textContent = t('staffLoginBtn');
 
         setTimeout(() => {
             loginOverlay.classList.remove('active');
@@ -1230,18 +1068,12 @@
         }, 600);
     }
 
-    loginPassword.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') performStaffLogin();
-    });
-    loginCode.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') loginPassword.focus();
-    });
-    loginOverlay.addEventListener('click', function(e) {
-        if (e.target === this) closeStaffLogin();
-    });
+    loginPassword.addEventListener('keydown', function(e) { if (e.key === 'Enter') performStaffLogin(); });
+    loginCode.addEventListener('keydown', function(e) { if (e.key === 'Enter') loginPassword.focus(); });
+    loginOverlay.addEventListener('click', function(e) { if (e.target === this) closeStaffLogin(); });
 
     // ============================================================
-    //  SHOW PROFILE
+    //  显示资料 (增加了预设字段)
     // ============================================================
     function showProfile(user) {
         filterSection.style.display = 'none';
@@ -1249,13 +1081,14 @@
         profileView.style.display = 'block';
         profileFields.innerHTML = '';
 
+        // 加入预设字段
         const fields = [
             'Situation', 'GroupName', 'Code', 'Name', 'Jantina', 'TarikhLahir',
             'Salary', 'IC', 'Jawatan', 'TarikhMasukKerja', 'TelefonNo', 'Email',
             'ShiftType', 'OffDay', 'AlamatTetap', 'NamaWaris', 'AlamatWaris',
             'BankNama', 'BankAccountNo', 'EPF', 'PERKESO', 'EIS',
             'Lindungan', 'YellowCard', 'LoginPassword', 'PhoneType',
-            'SignupDate', 'UpdateDate'
+            'PresetSituation', 'PresetDateTime', 'SignupDate', 'UpdateDate'
         ];
 
         const labels = {
@@ -1269,7 +1102,8 @@
             BankAccountNo: 'Bank Account No.', EPF: 'EPF (kwsp) No.',
             PERKESO: 'PERKESO NO.', EIS: 'EIS NO.', Lindungan: '24Jam Lindungan',
             YellowCard: 'Kad Kebersihan (Yellow Card)', LoginPassword: 'Login Password',
-            PhoneType: 'Phone Type', SignupDate: 'Signup Date', UpdateDate: 'Update Date'
+            PhoneType: 'Phone Type', SignupDate: 'Signup Date', UpdateDate: 'Update Date',
+            PresetSituation: '⏰ 预设状态 (Preset Status)', PresetDateTime: '⏰ 预设时间 (Preset Time)'
         };
 
         const situationOptions = ['ACTIVE', 'INACTIVE', 'PENDING'];
@@ -1289,8 +1123,7 @@
                 input.className = 'situation-select';
                 situationOptions.forEach(opt => {
                     const option = document.createElement('option');
-                    option.value = opt;
-                    option.textContent = opt;
+                    option.value = opt; option.textContent = opt;
                     if (String(val).toUpperCase() === opt) option.selected = true;
                     input.appendChild(option);
                 });
@@ -1311,26 +1144,61 @@
                     saveBtn.textContent = '💾 ' + t('saveBtn') + ' ⚡';
                     saveBtn.style.background = '#dd6b20';
                 });
+            } else if (key === 'PresetSituation') {
+                input = document.createElement('select');
+                input.innerHTML = `
+                    <option value="">-- 无 --</option>
+                    <option value="ACTIVE">ACTIVE</option>
+                    <option value="INACTIVE">INACTIVE</option>
+                    <option value="PENDING">PENDING</option>
+                `;
+                input.value = val;
+                input.addEventListener('change', function() {
+                    currentUser.PresetSituation = this.value;
+                    const saveBtn = document.getElementById('saveProfileBtn');
+                    saveBtn.textContent = '💾 ' + t('saveBtn') + ' ⚡';
+                    saveBtn.style.background = '#dd6b20';
+                });
+            } else if (key === 'PresetDateTime') {
+                input = document.createElement('input');
+                input.type = 'datetime-local';
+                if (val) {
+                    try {
+                        const d = new Date(val);
+                        const tzOffset = d.getTimezoneOffset() * 60000;
+                        const localISOTime = (new Date(d - tzOffset)).toISOString().slice(0, 16);
+                        input.value = localISOTime;
+                    } catch(e) { input.value = ''; }
+                }
+                input.addEventListener('change', function() {
+                    // 存回标准 ISO 格式，方便 Apps Script 识别
+                    if (this.value) {
+                        const localDate = new Date(this.value);
+                        currentUser.PresetDateTime = localDate.toISOString();
+                    } else {
+                        currentUser.PresetDateTime = '';
+                    }
+                    const saveBtn = document.getElementById('saveProfileBtn');
+                    saveBtn.textContent = '💾 ' + t('saveBtn') + ' ⚡';
+                    saveBtn.style.background = '#dd6b20';
+                });
             } else if (key === 'Code' || key === 'SignupDate' || key === 'UpdateDate') {
                 input = document.createElement('input');
-                input.type = 'text';
-                input.value = val;
-                input.readOnly = true;
+                input.type = 'text'; input.value = val; input.readOnly = true;
             } else if (key === 'LoginPassword') {
                 input = document.createElement('input');
-                input.type = 'password';
-                input.value = val;
+                input.type = 'password'; input.value = val;
             } else {
                 input = document.createElement('input');
-                input.type = 'text';
-                input.value = val;
+                input.type = 'text'; input.value = val;
             }
 
             input.dataset.field = key;
             input.id = 'prof_' + key;
             input.placeholder = 'Klik untuk sunting';
 
-            if (key !== 'Situation' && key !== 'Code' && key !== 'SignupDate' && key !== 'UpdateDate') {
+            if (key !== 'Situation' && key !== 'PresetSituation' && key !== 'PresetDateTime' &&
+                key !== 'Code' && key !== 'SignupDate' && key !== 'UpdateDate') {
                 input.addEventListener('change', function() {
                     currentUser[key] = this.value;
                     currentUser.UpdateDate = new Date().toISOString();
@@ -1354,14 +1222,12 @@
     }
 
     // ============================================================
-    //  SAVE PROFILE
+    //  保存资料 (加入了预设字段)
     // ============================================================
     function saveProfile() {
         if (!currentUser || !currentUser.Code) {
-            showAlert('Tiada data untuk disimpan.', 'error');
-            return;
+            showAlert('Tiada data untuk disimpan.', 'error'); return;
         }
-
         const btn = document.getElementById('saveProfileBtn');
         btn.innerHTML = `<span class="loading-spinner"></span>${t('saving')}`;
         btn.disabled = true;
@@ -1373,7 +1239,6 @@
                 currentUser[field] = el.value;
             }
         });
-
         const selects = profileFields.querySelectorAll('select');
         selects.forEach(el => {
             const field = el.dataset.field;
@@ -1411,7 +1276,11 @@
             PhoneType: currentUser.PhoneType || '',
             Situation: currentUser.Situation || 'Unknown',
             SignupDate: currentUser.SignupDate || '',
-            UpdateDate: currentUser.UpdateDate || ''
+            UpdateDate: currentUser.UpdateDate || '',
+            // 新增字段
+            PresetSituation: currentUser.PresetSituation || '',
+            PresetDateTime: currentUser.PresetDateTime || '',
+            IsPresetApplied: currentUser.IsPresetApplied || ''
         };
 
         updateStatus('⏳ Menyimpan ke Google Sheets...', 'saving');
@@ -1422,62 +1291,40 @@
             body: new URLSearchParams(payload)
         })
         .then(response => {
-            if (!response.ok) throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+            if (!response.ok) throw new Error('HTTP ' + response.status);
             return response.json();
         })
         .then(result => {
             btn.innerHTML = '💾 ' + t('saveBtn') + ' ✅';
-            btn.disabled = false;
-            btn.style.background = '#0f7a54';
-
+            btn.disabled = false; btn.style.background = '#0f7a54';
             if (result.result === 'success') {
                 showAlert('✅ ' + t('saveSuccess'), 'success');
-                updateStatus('✅ Data disimpan ke Google Sheets', 'success');
+                updateStatus('✅ Data disimpan', 'success');
                 const idx = allStaff.findIndex(s => s.Code === currentUser.Code);
                 if (idx !== -1) allStaff[idx] = { ...currentUser };
-
-                const situationSelect = document.querySelector('select[data-field="Situation"]');
-                if (situationSelect) {
-                    situationSelect.className = 'situation-select';
-                    const val = situationSelect.value.toLowerCase();
-                    if (val === 'active') situationSelect.classList.add('active');
-                    else if (val === 'inactive') situationSelect.classList.add('inactive');
-                    else if (val === 'pending') situationSelect.classList.add('pending');
-                }
-                setTimeout(() => {
-                    btn.innerHTML = '💾 ' + t('saveBtn');
-                    btn.style.background = '#0f7a54';
-                }, 3000);
+                setTimeout(() => { btn.innerHTML = '💾 ' + t('saveBtn'); btn.style.background = '#0f7a54'; }, 3000);
             } else {
-                showAlert('❌ ' + t('saveFail') + ': ' + (result.message || 'Unknown error'), 'error');
+                showAlert('❌ ' + t('saveFail') + ': ' + (result.message || 'Error'), 'error');
                 updateStatus('❌ Gagal menyimpan', 'error');
                 btn.innerHTML = '💾 ' + t('saveBtn') + ' ❌';
-                setTimeout(() => {
-                    btn.innerHTML = '💾 ' + t('saveBtn');
-                    btn.style.background = '#0f7a54';
-                }, 3000);
+                setTimeout(() => { btn.innerHTML = '💾 ' + t('saveBtn'); btn.style.background = '#0f7a54'; }, 3000);
             }
         })
         .catch(err => {
             btn.innerHTML = '💾 ' + t('saveBtn') + ' ❌';
-            btn.disabled = false;
-            btn.style.background = '#c53030';
+            btn.disabled = false; btn.style.background = '#c53030';
             showAlert('⚠️ ' + t('networkError') + ': ' + err.message, 'error');
             updateStatus('❌ Ralat: ' + err.message, 'error');
-            setTimeout(() => {
-                btn.innerHTML = '💾 ' + t('saveBtn');
-                btn.style.background = '#0f7a54';
-            }, 4000);
+            setTimeout(() => { btn.innerHTML = '💾 ' + t('saveBtn'); btn.style.background = '#0f7a54'; }, 4000);
         });
     }
 
     // ============================================================
-    //  LOGOUT
+    //  退出与删除
     // ============================================================
     function logoutAndGoBack() {
         if (!confirm(t('confirmLogout'))) return;
-        isLoggedIn = false;
-        currentUser = null;
+        isLoggedIn = false; currentUser = null;
         profileView.style.display = 'none';
         filterSection.style.display = 'block';
         staffListContainer.style.display = 'block';
@@ -1485,39 +1332,39 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function goBackToIndex() {
-        window.location.href = 'index.html';
-    }
+    function goBackToIndex() { window.location.href = 'index.html'; }
 
-    /* ============================================================
-       新增：添加员工
-       ============================================================ */
+    // ============================================================
+    //  添加员工
+    // ============================================================
     const ADD_FIELDS = [
-        { key: 'Code',             label: '🔑 Code *',                        required: true },
-        { key: 'Name',             label: '👤 Name *',                        required: true },
-        { key: 'GroupName',        label: '🏢 GroupName' },
-        { key: 'Jantina',          label: '⚧ Jantina' },
-        { key: 'TarikhLahir',      label: '🎂 Tarikh Lahir' },
-        { key: 'Salary',           label: '💰 Salary' },
-        { key: 'IC',               label: '🪪 IC / Passport' },
-        { key: 'Jawatan',          label: '💼 Jawatan' },
+        { key: 'Code', label: '🔑 Code *', required: true },
+        { key: 'Name', label: '👤 Name *', required: true },
+        { key: 'GroupName', label: '🏢 GroupName' },
+        { key: 'Jantina', label: '⚧ Jantina' },
+        { key: 'TarikhLahir', label: '🎂 Tarikh Lahir' },
+        { key: 'Salary', label: '💰 Salary' },
+        { key: 'IC', label: '🪪 IC / Passport' },
+        { key: 'Jawatan', label: '💼 Jawatan' },
         { key: 'TarikhMasukKerja', label: '📅 Tarikh Masuk Kerja' },
-        { key: 'TelefonNo',        label: '📱 Telefon No' },
-        { key: 'Email',            label: '✉️ Email' },
-        { key: 'ShiftType',        label: '🕐 Shift Type' },
-        { key: 'OffDay',           label: '🛌 Off Day' },
-        { key: 'AlamatTetap',      label: '🏠 Alamat Tetap' },
-        { key: 'NamaWaris',        label: '👨‍👩‍👧 Nama Waris' },
-        { key: 'AlamatWaris',      label: '🏠 Alamat Waris' },
-        { key: 'BankNama',         label: '🏦 Bank Nama' },
-        { key: 'BankAccountNo',    label: '💳 Bank Account No' },
-        { key: 'EPF',              label: 'EPF (kwsp) No' },
-        { key: 'PERKESO',          label: 'PERKESO No' },
-        { key: 'EIS',              label: 'EIS No' },
-        { key: 'Lindungan',        label: '24Jam Lindungan' },
-        { key: 'YellowCard',       label: '🟨 Kad Kebersihan (Yellow Card)' },
-        { key: 'LoginPassword',    label: '🔒 Login Password' },
-        { key: 'PhoneType',        label: '📱 Phone Type' }
+        { key: 'TelefonNo', label: '📱 Telefon No' },
+        { key: 'Email', label: '✉️ Email' },
+        { key: 'ShiftType', label: '🕐 Shift Type' },
+        { key: 'OffDay', label: '🛌 Off Day' },
+        { key: 'AlamatTetap', label: '🏠 Alamat Tetap' },
+        { key: 'NamaWaris', label: '👨‍👩‍👧 Nama Waris' },
+        { key: 'AlamatWaris', label: '🏠 Alamat Waris' },
+        { key: 'BankNama', label: '🏦 Bank Nama' },
+        { key: 'BankAccountNo', label: '💳 Bank Account No' },
+        { key: 'EPF', label: 'EPF (kwsp) No' },
+        { key: 'PERKESO', label: 'PERKESO No' },
+        { key: 'EIS', label: 'EIS No' },
+        { key: 'Lindungan', label: '24Jam Lindungan' },
+        { key: 'YellowCard', label: '🟨 Kad Kebersihan' },
+        { key: 'LoginPassword', label: '🔒 Login Password' },
+        { key: 'PhoneType', label: '📱 Phone Type' },
+        { key: 'PresetSituation', label: '⏰ Preset Status' },
+        { key: 'PresetDateTime', label: '⏰ Preset Time (YYYY-MM-DDTHH:mm)' }
     ];
 
     function openAddStaffModal() {
@@ -1529,13 +1376,11 @@
             const label = document.createElement('label');
             label.textContent = f.label;
             const input = document.createElement('input');
-            input.type = 'text';
+            input.type = f.key === 'PresetDateTime' ? 'datetime-local' : 'text';
             input.dataset.field = f.key;
             input.id = 'add_' + f.key;
             input.placeholder = f.required ? 'Wajib diisi' : 'Optional';
-            div.appendChild(label);
-            div.appendChild(input);
-            box.appendChild(div);
+            div.appendChild(label); div.appendChild(input); box.appendChild(div);
         });
         document.getElementById('addStaffError').style.display = 'none';
         document.getElementById('addStaffSuccess').style.display = 'none';
@@ -1544,9 +1389,7 @@
         document.getElementById('addStaffOverlay').classList.add('active');
     }
 
-    function closeAddStaffModal() {
-        document.getElementById('addStaffOverlay').classList.remove('active');
-    }
+    function closeAddStaffModal() { document.getElementById('addStaffOverlay').classList.remove('active'); }
 
     function submitAddStaff() {
         const btn = document.getElementById('addStaffBtn');
@@ -1556,25 +1399,26 @@
         const payload = { action: 'signup' };
         ADD_FIELDS.forEach(f => {
             const el = document.getElementById('add_' + f.key);
-            payload[f.key] = el ? el.value.trim() : '';
+            if (el) {
+                let val = el.value.trim();
+                if (f.key === 'PresetDateTime' && val) {
+                    // 转成 ISO
+                    val = new Date(val).toISOString();
+                }
+                payload[f.key] = val;
+            }
         });
 
         if (!payload.Code || !payload.Name) {
-            errEl.textContent = 'Code dan Name wajib diisi.';
-            errEl.style.display = 'block';
-            return;
+            errEl.textContent = 'Code dan Name wajib diisi.'; errEl.style.display = 'block'; return;
         }
-
         if (allStaff.some(s => String(s.Code).trim() === payload.Code)) {
-            errEl.textContent = 'Code sudah wujud: ' + payload.Code;
-            errEl.style.display = 'block';
-            return;
+            errEl.textContent = 'Code sudah wujud: ' + payload.Code; errEl.style.display = 'block'; return;
         }
 
         btn.disabled = true;
         btn.innerHTML = '<span class="loading-spinner"></span>Menyimpan...';
-        errEl.style.display = 'none';
-        okEl.style.display = 'none';
+        errEl.style.display = 'none'; okEl.style.display = 'none';
 
         fetch(SCRIPT_URL, {
             method: 'POST',
@@ -1594,28 +1438,24 @@
                     showAlert('✅ Staf ' + payload.Code + ' berjaya ditambah', 'success');
                 }, 700);
             } else {
-                errEl.textContent = '❌ ' + (result.message || result.error || 'Gagal');
+                errEl.textContent = '❌ ' + (result.message || 'Gagal');
                 errEl.style.display = 'block';
-                btn.disabled = false;
-                btn.textContent = '💾 Simpan Staf Baru';
+                btn.disabled = false; btn.textContent = '💾 Simpan Staf Baru';
             }
         })
         .catch(err => {
             errEl.textContent = '❌ Ralat: ' + err.message;
             errEl.style.display = 'block';
-            btn.disabled = false;
-            btn.textContent = '💾 Simpan Staf Baru';
+            btn.disabled = false; btn.textContent = '💾 Simpan Staf Baru';
         });
     }
 
-    /* ============================================================
-       新增：删除员工
-       ============================================================ */
+    // ============================================================
+    //  删除
+    // ============================================================
     function deleteStaff(code) {
-        if (!confirm('Padam staf ' + code + '? Tindakan ini tidak boleh diundur.')) return;
-
+        if (!confirm('Padam staf ' + code + '?')) return;
         updateStatus('⏳ Memadam ' + code + '...', 'saving');
-
         fetch(SCRIPT_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -1625,13 +1465,12 @@
         .then(result => {
             if (result.result === 'success') {
                 allStaff = allStaff.filter(s => String(s.Code).trim() !== String(code).trim());
-                rebuildBranchDropdown();
-                renderStaffList();
+                rebuildBranchDropdown(); renderStaffList();
                 updateStatus('✅ ' + code + ' dipadam', 'success');
                 showAlert('✅ Staf ' + code + ' berjaya dipadam', 'success');
             } else {
                 updateStatus('❌ ' + (result.message || 'Gagal'), 'error');
-                showAlert('❌ ' + (result.message || 'Gagal memadam'), 'error');
+                showAlert('❌ ' + (result.message || 'Gagal'), 'error');
             }
         })
         .catch(err => {
@@ -1640,31 +1479,27 @@
         });
     }
 
-    /* ============================================================
-       辅助：重建 Cawangan 下拉
-       ============================================================ */
+    // ============================================================
+    //  辅助：重建分店下拉
+    // ============================================================
     function rebuildBranchDropdown() {
         branchSelect.innerHTML = '<option value="">-- Pilih Cawangan --</option>';
         branches = Array.from(new Set(allStaff.map(s => s.GroupName).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
         branches.forEach(b => {
             const opt = document.createElement('option');
-            opt.value = b; opt.textContent = b;
-            branchSelect.appendChild(opt);
+            opt.value = b; opt.textContent = b; branchSelect.appendChild(opt);
         });
         const optOthers = document.createElement('option');
-        optOthers.value = 'Others';
-        optOthers.textContent = 'Others (Lain-lain)';
+        optOthers.value = 'Others'; optOthers.textContent = 'Others (Lain-lain)';
         branchSelect.appendChild(optOthers);
     }
 
     // ============================================================
-    //  INIT（无需页面登录，直接加载）
+    //  初始化
     // ============================================================
     async function init() {
         setLanguage('ms');
-
         const success = await fetchStaffData();
-
         if (success && allStaff.length > 0) {
             rebuildBranchDropdown();
             renderStaffList();
@@ -1672,28 +1507,18 @@
             staffListEl.innerHTML = `
                 <div class="empty-state">
                     <span class="icon">⚠️</span>
-                    Gagal memuatkan data. Sila semak semula sambungan atau sheet.
-                    <br><small style="color:#a0aec0;">Pastikan sheet "${SHEET_NAME}" wujud dan mempunyai data.</small>
+                    Gagal memuatkan data.
                     <br><br>
-                    <button class="btn btn-primary" onclick="testConnection()" style="width:auto;padding:8px 24px;display:inline-block;">🔧 Test Connection</button>
+                    <button class="btn btn-primary" onclick="testConnection()">🔧 Test Connection</button>
                 </div>`;
         }
-
         branchSelect.addEventListener('change', handleBranchChange);
         statusSelect.addEventListener('change', renderStaffList);
 
-        // 弹窗外部点击关闭
         const addOverlay = document.getElementById('addStaffOverlay');
-        if (addOverlay) {
-            addOverlay.addEventListener('click', function(e) {
-                if (e.target === this) closeAddStaffModal();
-            });
-        }
+        if (addOverlay) addOverlay.addEventListener('click', function(e) { if (e.target === this) closeAddStaffModal(); });
     }
 
-    // ============================================================
-    //  START（直接启动，无页面登录）
-    // ============================================================
     init();
 </script>
 </body>
