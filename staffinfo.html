@@ -601,7 +601,6 @@
     // ============================================================
     //  配置与状态
     // ============================================================
-    // 请确认这里的 URL 是最新的
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwKo4wPwdg6202DvA-aY9-6C2INe4zWcQQeZqjGFDN626LNQx9r44MpSt83LwxvWT61w/exec';
     const SHEET_NAME = 'STAFF LOGIN RECORD';
 
@@ -611,7 +610,6 @@
     let currentUser = null;
     let isLoggedIn = false;
     let currentLanguage = 'ms';
-    let scannerInterval = null; // 定时扫描器
 
     const branchSelect = document.getElementById('branchSelect');
     const statusSelect = document.getElementById('statusSelect');
@@ -780,7 +778,7 @@
     otherBranchInput.addEventListener('input', renderStaffList);
 
     // ============================================================
-    //  获取数据 (加入了新的预设字段读取)
+    //  获取数据
     // ============================================================
     async function fetchStaffData() {
         isLoading = true;
@@ -804,7 +802,6 @@
             const branchSet = new Set();
 
             if (Array.isArray(firstRow)) {
-                // 数组式读取（兼容旧格式）
                 const idx = {
                     situation: 1, loginPwd: 28, name: 4, code: 3, group: 2,
                     jantina: 5, tarikhLahir: 6, salary: 7, ic: 8, jawatan: 9,
@@ -857,7 +854,6 @@
                     if (group) branchSet.add(group);
                 }
             } else if (typeof firstRow === 'object' && firstRow !== null) {
-                // 对象式读取
                 const sampleKeys = Object.keys(firstRow);
                 const findKey = (possibleNames) => {
                     for (const name of possibleNames) {
@@ -1075,7 +1071,7 @@
     loginOverlay.addEventListener('click', function(e) { if (e.target === this) closeStaffLogin(); });
 
     // ============================================================
-    //  显示资料 (增加了预设字段)
+    //  显示资料
     // ============================================================
     function showProfile(user) {
         filterSection.style.display = 'none';
@@ -1493,73 +1489,6 @@
     }
 
     // ============================================================
-    //  【新增】前端定时扫描器（每小时执行一次）
-    // ============================================================
-    function startPresetScanner() {
-        // 先清除已有的定时器，防止重复
-        if (scannerInterval) clearInterval(scannerInterval);
-
-        // 每小时扫描一次 (3600000 毫秒)
-        scannerInterval = setInterval(async () => {
-            console.log('⏰ 开始定时扫描预设状态...');
-            
-            // 1. 重新拉取最新数据
-            const success = await fetchStaffData();
-            if (!success) return;
-
-            // 2. 遍历检查
-            let updatedAny = false;
-            const now = new Date();
-
-            for (const staff of allStaff) {
-                // 跳过没有预设或已执行的
-                if (!staff.PresetSituation || !staff.PresetDateTime) continue;
-                if (String(staff.IsPresetApplied).toUpperCase() === 'TRUE') continue;
-
-                // 解析时间
-                const presetDate = new Date(staff.PresetDateTime);
-                if (isNaN(presetDate.getTime())) continue; // 时间格式无效
-
-                // 如果当前时间 >= 预设时间
-                if (now >= presetDate) {
-                    console.log(`⏰ 检测到时间到达，自动更新：${staff.Code}`);
-                    
-                    staff.Situation = staff.PresetSituation;
-                    staff.IsPresetApplied = 'TRUE';
-                    staff.UpdateDate = new Date().toISOString();
-
-                    // 发送静默更新请求
-                    try {
-                        await fetch(SCRIPT_URL, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                            body: new URLSearchParams({
-                                action: 'update',
-                                Code: staff.Code,
-                                Situation: staff.Situation,
-                                IsPresetApplied: staff.IsPresetApplied,
-                                UpdateDate: staff.UpdateDate
-                            })
-                        });
-                        updatedAny = true;
-                        showAlert(`⏰ 自动更新：${staff.Name} 状态变为 ${staff.PresetSituation}`, 'success');
-                    } catch (err) {
-                        console.error('自动更新失败', err);
-                    }
-                }
-            }
-
-            // 3. 如果有任何更新，刷新列表展示
-            if (updatedAny) {
-                renderStaffList();
-                updateStatus(`✅ 扫描完成，已自动更新部分员工状态`, 'success');
-            } else {
-                console.log('✅ 扫描完成，无需更新。');
-            }
-        }, 3600000); // 1 小时 = 3600000 ms
-    }
-
-    // ============================================================
     //  初始化
     // ============================================================
     async function init() {
@@ -1568,9 +1497,6 @@
         if (success && allStaff.length > 0) {
             rebuildBranchDropdown();
             renderStaffList();
-            
-            // 启动前端定时扫描
-            startPresetScanner();
         } else {
             staffListEl.innerHTML = `
                 <div class="empty-state">
@@ -1589,5 +1515,8 @@
 
     init();
 </script>
+
+<!-- 引入通用的预设状态检查及提醒组件 -->
+<script src="preset-checker.js"></script>
 </body>
 </html>
