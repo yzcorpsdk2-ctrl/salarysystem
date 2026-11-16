@@ -297,6 +297,20 @@
     margin-right: 6px; vertical-align: middle;
   }
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+  /* ==================== 预设提醒弹窗 ==================== */
+  .reminder-toast { position: fixed; top: 70px; right: 20px; width: 350px; background: #fff; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border-left: 5px solid #dd6b20; z-index: 9999; display: none; animation: slideInRight 0.3s ease; }
+  @keyframes slideInRight { from { transform: translateX(120%); } to { transform: translateX(0); } }
+  .reminder-header { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 1rem; border-bottom: 1px solid #edf2f7; background: #fdf8ec; border-radius: 8px 8px 0 0; }
+  .reminder-header h4 { margin: 0; font-size: 0.9rem; color: #7a5a12; }
+  .reminder-close { cursor: pointer; font-weight: bold; color: #a0aec0; font-size: 1.2rem; }
+  .reminder-close:hover { color: #e53e3e; }
+  .reminder-body { padding: 1rem; max-height: 250px; overflow-y: auto; }
+  .reminder-item { font-size: 0.8rem; padding: 0.5rem 0; border-bottom: 1px dashed #e2e8f0; }
+  .reminder-item:last-child { border-bottom: none; }
+  .reminder-item strong { color: #1a4f8a; }
+  .reminder-item .time { color: #c53030; font-weight: 600; }
+
   @media (max-width: 768px) {
     .navbar { padding: 0 0.5rem; }
     .navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
@@ -309,12 +323,22 @@
     .page-header h1 { font-size: 1.2rem; }
     .employee-grid { grid-template-columns: 1fr; }
     .url-box { max-width: 100%; flex: 1 1 100%; }
+    .reminder-toast { width: 90%; right: 5%; top: 60px; }
   }
 </style>
 </head>
 <body>
 
-<!-- ========== NAVBAR (UPDATED) ========== -->
+<!-- ========== 预设提醒弹窗 ========== -->
+<div class="reminder-toast" id="reminderToast">
+    <div class="reminder-header">
+        <h4>⏰ Situation 预设提醒</h4>
+        <span class="reminder-close" onclick="closeReminderToast()">×</span>
+    </div>
+    <div class="reminder-body" id="reminderBody"></div>
+</div>
+
+<!-- ========== NAVBAR ========== -->
 <nav class="navbar">
   <div class="nav-brand">
     <span class="logo">Y</span>
@@ -322,10 +346,8 @@
   </div>
 
   <div class="nav-links" id="navLinks">
-    <!-- Back button (always first) -->
     <button class="nav-back" id="backBtn" title="Kembali ke halaman sebelumnya">⏎</button>
 
-    <!-- FILES dropdown (acts as "all pages" summary) -->
     <div class="nav-dropdown" id="filesDropdown">
       <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
       <div class="dropdown-menu">
@@ -347,16 +369,10 @@
       </div>
     </div>
 
-    <!-- DASHBOARD (active) -->
     <a class="nav-item active" href="dashboard.html">DASHBOARD</a>
-
-    <!-- EMPLOYEES -->
     <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
-
-    <!-- TIMECARD REPORT -->
     <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
 
-    <!-- CARUMAN dropdown -->
     <div class="nav-dropdown" id="carumanDropdown">
       <button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
       <div class="dropdown-menu">
@@ -367,10 +383,8 @@
       </div>
     </div>
 
-    <!-- SETTING -->
     <a class="nav-item" href="companysetting.html">SETTING</a>
 
-    <!-- OTHERS dropdown (extra, as requested by user) -->
     <div class="nav-dropdown" id="othersDropdown">
       <button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
       <div class="dropdown-menu">
@@ -389,7 +403,7 @@
   </button>
 </nav>
 
-<!-- ========== TOPBAR (unchanged) ========== -->
+<!-- ========== TOPBAR ========== -->
 <div class="topbar">
   <div class="brand"><div class="logo">P</div> Payroll Dashboard</div>
   <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
@@ -446,7 +460,6 @@
    NAVBAR DROPDOWN & BACK BUTTON LOGIC
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function() {
-  // Back button
   const backBtn = document.getElementById('backBtn');
   if (backBtn) {
     backBtn.addEventListener('click', function(e) {
@@ -455,23 +468,19 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Dropdown toggle for elements with data-dropdown-toggle
   const dropdownToggles = document.querySelectorAll('[data-dropdown-toggle]');
   dropdownToggles.forEach(function(toggle) {
     toggle.addEventListener('click', function(e) {
       e.stopPropagation();
       const dropdownId = this.getAttribute('data-dropdown-toggle');
-      // close all other dropdowns
       document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
         if (dd.id !== dropdownId + 'Dropdown') dd.classList.remove('open');
       });
-      // toggle current
       const wrapper = this.closest('.nav-dropdown');
       if (wrapper) wrapper.classList.toggle('open');
     });
   });
 
-  // Close dropdown when clicking outside
   document.addEventListener('click', function(e) {
     if (!e.target.closest('.nav-dropdown')) {
       document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
@@ -480,7 +489,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Close dropdown when pressing Escape
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
       document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
@@ -489,7 +497,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Close dropdown on link click (so navigation is clean)
   document.querySelectorAll('.dropdown-menu a').forEach(function(link) {
     link.addEventListener('click', function() {
       document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
@@ -498,6 +505,91 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
+/* ============================================================
+   预设提醒逻辑 (已整合)
+   ============================================================ */
+function checkPresetReminders() {
+    // 1. 从 localStorage 读取全局变量
+    let scriptUrl = localStorage.getItem('payrollScriptUrl');
+    if (!scriptUrl) return;
+
+    // 2. 检查是否在2小时冷却期内
+    const lastCloseTime = localStorage.getItem('presetToastClosedAt');
+    if (lastCloseTime) {
+        const hoursDiff = (new Date().getTime() - parseInt(lastCloseTime)) / (1000 * 60 * 60);
+        if (hoursDiff < 2) {
+            return; // 2小时内不再提醒
+        }
+    }
+
+    // 3. 获取最新数据
+    fetch(`${scriptUrl}?action=getData&_t=${Date.now()}`)
+        .then(res => res.json())
+        .then(result => {
+            if (result.result !== 'success' || !result.data) return;
+            
+            const now = new Date().getTime();
+            const overdueStaff = [];
+
+            result.data.forEach(staff => {
+                if (staff.PresetDateTime && staff.PresetSituation && staff.IsPresetApplied !== 'TRUE') {
+                    let presetTime = new Date(staff.PresetDateTime).getTime();
+                    if (isNaN(presetTime)) {
+                        presetTime = new Date(staff.PresetDateTime.replace(' ', 'T')).getTime();
+                    }
+                    if (!isNaN(presetTime) && now >= presetTime) {
+                        overdueStaff.push(staff);
+                    }
+                }
+            });
+
+            if (overdueStaff.length > 0) {
+                showReminderToast(overdueStaff);
+            }
+        })
+        .catch(console.error);
+}
+
+function showReminderToast(staffList) {
+    const toast = document.getElementById('reminderToast');
+    const body = document.getElementById('reminderBody');
+    if(!toast || !body) return;
+    
+    let html = '';
+    staffList.forEach(s => {
+        let dateStr = s.PresetDateTime;
+        try {
+            const d = new Date(s.PresetDateTime);
+            if (!isNaN(d.getTime())) dateStr = d.toLocaleString();
+        } catch(e) {}
+        
+        html += `
+            <div class="reminder-item">
+                <strong>${s.Name} (${s.Code})</strong><br>
+                预设已到期: <span class="time">${dateStr}</span><br>
+                应改为: <strong>${s.PresetSituation}</strong> (目前: ${s.Situation})
+            </div>
+        `;
+    });
+    
+    body.innerHTML = html;
+    toast.style.display = 'block';
+}
+
+function closeReminderToast() {
+    document.getElementById('reminderToast').style.display = 'none';
+    localStorage.setItem('presetToastClosedAt', new Date().getTime().toString());
+}
+
+// 初始化检查
+document.addEventListener('DOMContentLoaded', () => {
+    // 延迟 1 秒检查，避免与页面主数据加载冲突
+    setTimeout(checkPresetReminders, 1000);
+    // 每 10 分钟检查一次
+    setInterval(checkPresetReminders, 10 * 60 * 1000);
+});
+
 
 /* ============================================================
    ORIGINAL PAYROLL LOGIC (unchanged from here)
