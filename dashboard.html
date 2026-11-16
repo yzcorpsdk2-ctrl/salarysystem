@@ -228,7 +228,126 @@
     cursor: pointer; transition: 0.15s; white-space: nowrap;
   }
   .url-box button:hover { background: #15406f; }
-  .container { max-width: 1400px; margin: 0 auto; padding: 1.5rem 1.75rem 3rem; }
+
+  /* ============================================================
+     布局调整：添加左侧布告栏
+     ============================================================ */
+  .main-layout {
+    display: flex;
+    align-items: flex-start;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1.5rem 1.75rem 3rem;
+    gap: 20px;
+  }
+  
+  .content-area {
+    flex: 1;
+    min-width: 0; /* 防止内容溢出 */
+  }
+
+  /* 左侧布告栏 - 固定定位 */
+  .notice-board {
+    position: sticky;
+    top: calc(var(--nav-h) + 70px); /* 导航栏 + 工具栏的高度 */
+    width: 300px;
+    flex-shrink: 0;
+    background: #ffffff;
+    border: 1px solid var(--epf-border);
+    border-radius: 10px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - var(--nav-h) - 90px);
+  }
+
+  .notice-header {
+    background: #fef2f2;
+    border-bottom: 1px solid #fecaca;
+    padding: 0.8rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #991b1b;
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+  .notice-header .count-badge {
+    background: #ef4444;
+    color: #fff;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: auto;
+  }
+
+  .notice-list {
+    overflow-y: auto;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .notice-list::-webkit-scrollbar { width: 6px; }
+  .notice-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+  .notice-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #ef4444;
+    border-radius: 6px;
+    padding: 0.7rem;
+    font-size: 0.78rem;
+    transition: 0.15s;
+  }
+  .notice-item:hover {
+    background: #fff;
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+  .notice-name {
+    font-weight: 700;
+    color: var(--epf-blue);
+    margin-bottom: 0.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .notice-code {
+    font-size: 0.65rem;
+    background: var(--epf-blue-soft);
+    color: var(--epf-muted);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+  .notice-info {
+    color: var(--epf-muted);
+    margin-bottom: 0.2rem;
+  }
+  .notice-info span { color: #c53030; font-weight: 600; }
+  .notice-target {
+    font-size: 0.72rem;
+    background: #fefcbf;
+    color: #975a16;
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-top: 0.3rem;
+    font-weight: 600;
+  }
+
+  .notice-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--epf-muted);
+    font-size: 0.8rem;
+  }
+  .notice-empty .icon { font-size: 2rem; display: block; margin-bottom: 0.5rem; color: #cbd5e1; }
+
+  .container { display: none; } /* 隐藏旧容器 */
+
   .page-header {
     background: #ffffff; border: 1px solid var(--epf-border); border-radius: 8px;
     padding: 1.4rem 1.75rem; margin-bottom: 1.5rem;
@@ -238,9 +357,10 @@
   .page-header .info { flex: 1; min-width: 240px; }
   .page-header h1 { font-size: 1.45rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--epf-blue); letter-spacing: -0.015em; }
   .page-header p { font-size: 0.85rem; color: var(--epf-muted); line-height: 1.6; }
+  
   .employee-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 16px;
   }
   .employee-card {
@@ -298,19 +418,19 @@
   }
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-  /* ==================== 预设提醒弹窗 ==================== */
-  .reminder-toast { position: fixed; top: 70px; right: 20px; width: 350px; background: #fff; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border-left: 5px solid #dd6b20; z-index: 9999; display: none; animation: slideInRight 0.3s ease; }
-  @keyframes slideInRight { from { transform: translateX(120%); } to { transform: translateX(0); } }
-  .reminder-header { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 1rem; border-bottom: 1px solid #edf2f7; background: #fdf8ec; border-radius: 8px 8px 0 0; }
-  .reminder-header h4 { margin: 0; font-size: 0.9rem; color: #7a5a12; }
-  .reminder-close { cursor: pointer; font-weight: bold; color: #a0aec0; font-size: 1.2rem; }
-  .reminder-close:hover { color: #e53e3e; }
-  .reminder-body { padding: 1rem; max-height: 250px; overflow-y: auto; }
-  .reminder-item { font-size: 0.8rem; padding: 0.5rem 0; border-bottom: 1px dashed #e2e8f0; }
-  .reminder-item:last-child { border-bottom: none; }
-  .reminder-item strong { color: #1a4f8a; }
-  .reminder-item .time { color: #c53030; font-weight: 600; }
-
+  @media (max-width: 1024px) {
+    .notice-board { width: 250px; }
+  }
+  @media (max-width: 900px) {
+    .main-layout { flex-direction: column; }
+    .notice-board { 
+      position: relative; 
+      top: 0; 
+      width: 100%; 
+      max-height: 300px; 
+      margin-bottom: 1rem;
+    }
+  }
   @media (max-width: 768px) {
     .navbar { padding: 0 0.5rem; }
     .navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
@@ -318,25 +438,15 @@
     .nav-item { padding: 0 0.6rem; font-size: 0.68rem; }
     .nav-chat { padding: 0.45rem 0.75rem; font-size: 0.66rem; }
     .topbar { padding: 0.6rem 1rem; }
-    .container { padding: 1rem; }
+    .main-layout { padding: 1rem; }
     .page-header { padding: 1.2rem; }
     .page-header h1 { font-size: 1.2rem; }
     .employee-grid { grid-template-columns: 1fr; }
     .url-box { max-width: 100%; flex: 1 1 100%; }
-    .reminder-toast { width: 90%; right: 5%; top: 60px; }
   }
 </style>
 </head>
 <body>
-
-<!-- ========== 预设提醒弹窗 ========== -->
-<div class="reminder-toast" id="reminderToast">
-    <div class="reminder-header">
-        <h4>⏰ Situation 预设提醒</h4>
-        <span class="reminder-close" onclick="closeReminderToast()">×</span>
-    </div>
-    <div class="reminder-body" id="reminderBody"></div>
-</div>
 
 <!-- ========== NAVBAR ========== -->
 <nav class="navbar">
@@ -433,26 +543,45 @@
   </button>
 </div>
 
-<!-- ========== MAIN CONTAINER ========== -->
-<div class="container">
-  <div class="page-header">
-    <div class="info">
-      <h1>📊 Dashboard Pekerja</h1>
-      <p>Klik pada kad pekerja untuk membuka halaman detail &amp; sunting gaji.</p>
+<!-- ========== 主布局 (左侧布告栏 + 右侧内容) ========== -->
+<div class="main-layout">
+  
+  <!-- 左侧固定布告栏 -->
+  <div class="notice-board">
+    <div class="notice-header">
+      <i class="fas fa-exclamation-triangle"></i> 预设超时提醒
+      <span class="count-badge" id="noticeCount">0</span>
     </div>
-    <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
-      <div class="sync-badge" id="countBadge">
-        <span class="dot ok"></span><span id="countText">Memuatkan...</span>
+    <div class="notice-list" id="noticeList">
+      <div class="notice-empty">
+        <span class="icon">✅</span>
+        暂无超时未处理的预设
       </div>
     </div>
   </div>
 
-  <div class="employee-grid" id="employeeGrid">
-    <div class="empty-state">
-      <span class="icon">⏳</span>
-      Memuatkan data pekerja...
+  <!-- 右侧原有内容 -->
+  <div class="content-area">
+    <div class="page-header">
+      <div class="info">
+        <h1>📊 Dashboard Pekerja</h1>
+        <p>Klik pada kad pekerja untuk membuka halaman detail &amp; sunting gaji.</p>
+      </div>
+      <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+        <div class="sync-badge" id="countBadge">
+          <span class="dot ok"></span><span id="countText">Memuatkan...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="employee-grid" id="employeeGrid">
+      <div class="empty-state">
+        <span class="icon">⏳</span>
+        Memuatkan data pekerja...
+      </div>
     </div>
   </div>
+
 </div>
 
 <script>
@@ -507,92 +636,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /* ============================================================
-   预设提醒逻辑 (已整合)
-   ============================================================ */
-function checkPresetReminders() {
-    // 1. 从 localStorage 读取全局变量
-    let scriptUrl = localStorage.getItem('payrollScriptUrl');
-    if (!scriptUrl) return;
-
-    // 2. 检查是否在2小时冷却期内
-    const lastCloseTime = localStorage.getItem('presetToastClosedAt');
-    if (lastCloseTime) {
-        const hoursDiff = (new Date().getTime() - parseInt(lastCloseTime)) / (1000 * 60 * 60);
-        if (hoursDiff < 2) {
-            return; // 2小时内不再提醒
-        }
-    }
-
-    // 3. 获取最新数据
-    fetch(`${scriptUrl}?action=getData&_t=${Date.now()}`)
-        .then(res => res.json())
-        .then(result => {
-            if (result.result !== 'success' || !result.data) return;
-            
-            const now = new Date().getTime();
-            const overdueStaff = [];
-
-            result.data.forEach(staff => {
-                if (staff.PresetDateTime && staff.PresetSituation && staff.IsPresetApplied !== 'TRUE') {
-                    let presetTime = new Date(staff.PresetDateTime).getTime();
-                    if (isNaN(presetTime)) {
-                        presetTime = new Date(staff.PresetDateTime.replace(' ', 'T')).getTime();
-                    }
-                    if (!isNaN(presetTime) && now >= presetTime) {
-                        overdueStaff.push(staff);
-                    }
-                }
-            });
-
-            if (overdueStaff.length > 0) {
-                showReminderToast(overdueStaff);
-            }
-        })
-        .catch(console.error);
-}
-
-function showReminderToast(staffList) {
-    const toast = document.getElementById('reminderToast');
-    const body = document.getElementById('reminderBody');
-    if(!toast || !body) return;
-    
-    let html = '';
-    staffList.forEach(s => {
-        let dateStr = s.PresetDateTime;
-        try {
-            const d = new Date(s.PresetDateTime);
-            if (!isNaN(d.getTime())) dateStr = d.toLocaleString();
-        } catch(e) {}
-        
-        html += `
-            <div class="reminder-item">
-                <strong>${s.Name} (${s.Code})</strong><br>
-                预设已到期: <span class="time">${dateStr}</span><br>
-                应改为: <strong>${s.PresetSituation}</strong> (目前: ${s.Situation})
-            </div>
-        `;
-    });
-    
-    body.innerHTML = html;
-    toast.style.display = 'block';
-}
-
-function closeReminderToast() {
-    document.getElementById('reminderToast').style.display = 'none';
-    localStorage.setItem('presetToastClosedAt', new Date().getTime().toString());
-}
-
-// 初始化检查
-document.addEventListener('DOMContentLoaded', () => {
-    // 延迟 1 秒检查，避免与页面主数据加载冲突
-    setTimeout(checkPresetReminders, 1000);
-    // 每 10 分钟检查一次
-    setInterval(checkPresetReminders, 10 * 60 * 1000);
-});
-
-
-/* ============================================================
-   ORIGINAL PAYROLL LOGIC (unchanged from here)
+   ORIGINAL PAYROLL LOGIC
    ============================================================ */
 const URL_KEY = 'payrollScriptUrl';
 const STORAGE_KEY = 'payrollEmployees';
@@ -669,6 +713,7 @@ function applyUrl() {
     SCRIPT_URL = url;
     setSyncBadge('ok', 'URL disimpan');
     loadData();
+    loadNoticeBoard(); // 重新加载布告栏
   } catch (e) { alert('Gagal menyimpan URL.'); }
 }
 
@@ -738,6 +783,10 @@ async function loadData() {
     renderCards();
     setSyncBadge('ok', 'Data dimuat (' + allEmployees.length + ' pekerja)');
     document.getElementById('countText').textContent = allEmployees.length + ' pekerja aktif';
+    
+    // 加载数据后同时刷新布告栏
+    loadNoticeBoard(staffRaw);
+
   } catch (err) {
     console.error('Load error:', err);
     setSyncBadge('err', 'Gagal muat data');
@@ -760,6 +809,104 @@ async function loadData() {
         <br><br>
         <button class="btn" onclick="loadData()">🔄 Cuba Lagi</button>
       </div>`;
+  }
+}
+
+/* ============================================================
+   新增：左侧布告栏逻辑
+   ============================================================ */
+async function loadNoticeBoard(providedData = null) {
+  const listEl = document.getElementById('noticeList');
+  const countEl = document.getElementById('noticeCount');
+
+  if (!SCRIPT_URL) {
+    listEl.innerHTML = '<div class="notice-empty"><span class="icon">🔗</span>请先设置 URL</div>';
+    countEl.textContent = '0';
+    return;
+  }
+
+  listEl.innerHTML = '<div class="notice-empty"><span class="spinner"></span> 加载中...</div>';
+
+  try {
+    let staffRaw = providedData;
+    
+    // 如果没有提供数据，则独立发起请求获取完整数据
+    if (!staffRaw) {
+      const res = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
+      const data = await res.json();
+      if (data && data.result === 'success' && Array.isArray(data.data)) staffRaw = data.data;
+      else if (Array.isArray(data)) staffRaw = data;
+      else staffRaw = [];
+    }
+
+    const now = new Date().getTime();
+    const overdueStaff = [];
+
+    staffRaw.forEach(row => {
+      const presetTimeStr = String(row.PresetDateTime || '').trim();
+      const presetSituation = String(row.PresetSituation || '').trim().toUpperCase();
+      const isApplied = String(row.IsPresetApplied || 'FALSE').trim().toUpperCase();
+
+      // 必须有预设时间、预设状态，且未完成
+      if (presetTimeStr && presetSituation && isApplied !== 'TRUE') {
+        let presetTime = new Date(presetTimeStr).getTime();
+        // 兼容处理格式问题（例如带空格）
+        if (isNaN(presetTime)) {
+          presetTime = new Date(presetTimeStr.replace(' ', 'T')).getTime();
+        }
+        
+        if (!isNaN(presetTime) && now >= presetTime) {
+          overdueStaff.push({
+            Code: String(row.Code || '').trim(),
+            Name: String(row.Name || '').trim(),
+            Situation: String(row.Situation || 'Unknown').trim(),
+            PresetSituation: presetSituation,
+            PresetDateTime: presetTimeStr
+          });
+        }
+      }
+    });
+
+    if (overdueStaff.length === 0) {
+      listEl.innerHTML = `
+        <div class="notice-empty">
+          <span class="icon">✅</span>
+          暂无超时未处理的预设
+        </div>`;
+      countEl.textContent = '0';
+      return;
+    }
+
+    countEl.textContent = overdueStaff.length;
+    let html = '';
+    overdueStaff.forEach(s => {
+      // 美化时间显示
+      let displayTime = s.PresetDateTime;
+      try {
+        const d = new Date(s.PresetDateTime.replace(' ', 'T'));
+        if (!isNaN(d.getTime())) {
+          displayTime = d.toLocaleString('zh-CN', { hour12: false });
+        }
+      } catch(e) {}
+
+      html += `
+        <div class="notice-item">
+          <div class="notice-name">
+            ${escapeHtml(s.Name)}
+            <span class="notice-code">${escapeHtml(s.Code)}</span>
+          </div>
+          <div class="notice-info">原状态: ${escapeHtml(s.Situation)}</div>
+          <div class="notice-info">到期时间: <span>${escapeHtml(displayTime)}</span></div>
+          <div class="notice-target">需设为: ${escapeHtml(s.PresetSituation)}</div>
+        </div>
+      `;
+    });
+    listEl.innerHTML = html;
+
+  } catch (err) {
+    console.error('Notice board error:', err);
+    listEl.innerHTML = '<div class="notice-empty"><span class="icon">⚠️</span>加载失败</div>';
+    countEl.textContent = '0';
   }
 }
 
@@ -825,7 +972,7 @@ function openDetail(code) {
 window.addEventListener('DOMContentLoaded', () => {
   loadSavedUrl();
   if (SCRIPT_URL) {
-    loadData();
+    loadData(); // 这个函数内部会调用 loadNoticeBoard
   } else {
     document.getElementById('employeeGrid').innerHTML = `
       <div class="empty-state">
@@ -834,6 +981,7 @@ window.addEventListener('DOMContentLoaded', () => {
       </div>`;
     setSyncBadge('err', 'URL belum ditetapkan');
     document.getElementById('countText').textContent = '0 pekerja';
+    loadNoticeBoard(); // 尝试加载布告栏（会提示先设置URL）
   }
 });
 
