@@ -785,7 +785,7 @@ async function loadData() {
     document.getElementById('countText').textContent = allEmployees.length + ' pekerja aktif';
     
     // 加载数据后同时刷新布告栏
-    loadNoticeBoard(staffRaw);
+    loadNoticeBoard();
 
   } catch (err) {
     console.error('Load error:', err);
@@ -813,9 +813,9 @@ async function loadData() {
 }
 
 /* ============================================================
-   新增：左侧布告栏逻辑
+   新增：左侧布告栏逻辑 (直接调用后端专用接口)
    ============================================================ */
-async function loadNoticeBoard(providedData = null) {
+async function loadNoticeBoard() {
   const listEl = document.getElementById('noticeList');
   const countEl = document.getElementById('noticeCount');
 
@@ -828,44 +828,15 @@ async function loadNoticeBoard(providedData = null) {
   listEl.innerHTML = '<div class="notice-empty"><span class="spinner"></span> 加载中...</div>';
 
   try {
-    let staffRaw = providedData;
-    
-    // 如果没有提供数据，则独立发起请求获取完整数据
-    if (!staffRaw) {
-      const res = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
-      const data = await res.json();
-      if (data && data.result === 'success' && Array.isArray(data.data)) staffRaw = data.data;
-      else if (Array.isArray(data)) staffRaw = data;
-      else staffRaw = [];
+    // 直接请求后端专门处理过期预设的接口
+    const res = await fetch(`${SCRIPT_URL}?action=getOverduePresets&_t=${Date.now()}`);
+    const result = await res.json();
+
+    if (result.status !== 'success') {
+      throw new Error(result.message || '请求失败');
     }
 
-    const now = new Date().getTime();
-    const overdueStaff = [];
-
-    staffRaw.forEach(row => {
-      const presetTimeStr = String(row.PresetDateTime || '').trim();
-      const presetSituation = String(row.PresetSituation || '').trim().toUpperCase();
-      const isApplied = String(row.IsPresetApplied || 'FALSE').trim().toUpperCase();
-
-      // 必须有预设时间、预设状态，且未完成
-      if (presetTimeStr && presetSituation && isApplied !== 'TRUE') {
-        let presetTime = new Date(presetTimeStr).getTime();
-        // 兼容处理格式问题（例如带空格）
-        if (isNaN(presetTime)) {
-          presetTime = new Date(presetTimeStr.replace(' ', 'T')).getTime();
-        }
-        
-        if (!isNaN(presetTime) && now >= presetTime) {
-          overdueStaff.push({
-            Code: String(row.Code || '').trim(),
-            Name: String(row.Name || '').trim(),
-            Situation: String(row.Situation || 'Unknown').trim(),
-            PresetSituation: presetSituation,
-            PresetDateTime: presetTimeStr
-          });
-        }
-      }
-    });
+    const overdueStaff = result.data || [];
 
     if (overdueStaff.length === 0) {
       listEl.innerHTML = `
@@ -883,7 +854,7 @@ async function loadNoticeBoard(providedData = null) {
       // 美化时间显示
       let displayTime = s.PresetDateTime;
       try {
-        const d = new Date(s.PresetDateTime.replace(' ', 'T'));
+        const d = new Date(s.PresetDateTime);
         if (!isNaN(d.getTime())) {
           displayTime = d.toLocaleString('zh-CN', { hour12: false });
         }
@@ -905,7 +876,7 @@ async function loadNoticeBoard(providedData = null) {
 
   } catch (err) {
     console.error('Notice board error:', err);
-    listEl.innerHTML = '<div class="notice-empty"><span class="icon">⚠️</span>加载失败</div>';
+    listEl.innerHTML = '<div class="notice-empty"><span class="icon">⚠️</span>加载失败，请检查网络或后端部署</div>';
     countEl.textContent = '0';
   }
 }
