@@ -1,1 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>Overtime 加班计算</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+         background: #f4f6f9; color: #333; }
 
+  /* ===== 顶部（与 dashboard 一致风格） ===== */
+  .topbar {
+    background: linear-gradient(135deg, #1e3a8a, #1e40af);
+    color: #fff; padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+  .topbar .logo { font-size: 20px; font-weight: 700; letter-spacing: 1px; }
+  .topbar nav a { color: #fff; text-decoration: none; margin-left: 20px;
+                  font-size: 14px; opacity: .9; }
+  .topbar nav a:hover { opacity: 1; text-decoration: underline; }
+
+  .container { max-width: 1400px; margin: 24px auto; padding: 0 20px; }
+  .card { background: #fff; border-radius: 10px; padding: 20px;
+          margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .card h2 { font-size: 16px; color: #1e3a8a; margin-bottom: 14px;
+             padding-bottom: 10px; border-bottom: 2px solid #e8f0fa;
+             display: flex; align-items: center; justify-content: space-between; }
+
+  .info-grid { display: grid; grid-template-columns: repeat(4, 1fr);
+               gap: 12px; margin-bottom: 16px; }
+  .info-item { background: #f8fafc; padding: 12px; border-radius: 8px;
+               border-left: 4px solid #94a3b8; }
+  .info-item .label { font-size: 12px; color: #64748b; margin-bottom: 4px; }
+  .info-item .value { font-size: 16px; font-weight: 600; color: #1e3a8a; }
+  .info-item.highlight { background: #eff6ff; border-left-color: #3b82f6; }
+  .info-item.highlight .value { color: #1d4ed8; font-size: 18px; }
+
+  .toolbar { display: flex; gap: 12px; align-items: center;
+             flex-wrap: wrap; margin-bottom: 12px; }
+  .toolbar select, .toolbar input[type="month"] {
+    padding: 8px 12px; border: 1px solid #cbd5e1;
+    border-radius: 6px; font-size: 14px; }
+  .btn { padding: 8px 16px; background: #1e40af; color: #fff; border: none;
+         border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; }
+  .btn:hover { background: #1e3a8a; }
+  .btn.small { padding: 4px 12px; font-size: 12px; }
+  .btn.light { background: #e2e8f0; color: #334155; }
+  .btn.light:hover { background: #cbd5e1; }
+
+  /* ===== 日历 ===== */
+  .calendar-wrap { padding: 16px; background: #f8fafc; border-radius: 8px; }
+  .calendar-header { display: flex; justify-content: space-between;
+                     align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+  .calendar-header .month-label { font-size: 16px; font-weight: 600; color: #1e3a8a; }
+  .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .cal-dow { text-align: center; font-size: 12px; font-weight: 600;
+             color: #64748b; padding: 4px; }
+  .cal-day { text-align: center; padding: 10px 4px; border-radius: 6px;
+             cursor: pointer; background: #fff; border: 1px solid #e2e8f0;
+             transition: all .15s; font-size: 14px; user-select: none; }
+  .cal-day:hover { background: #eff6ff; border-color: #3b82f6; }
+  .cal-day.selected { background: #1e40af; color: #fff; border-color: #1e40af; }
+  .cal-day.empty { background: transparent; border: none; cursor: default; }
+  .cal-day.no-data { opacity: .35; cursor: not-allowed; }
+  .cal-day.has-ot { box-shadow: inset 0 0 0 2px #f59e0b; }
+
+  /* ===== 表格 ===== */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { padding: 10px 12px; text-align: right; border-bottom: 1px solid #e2e8f0; }
+  th:first-child, td:first-child { text-align: left; }
+  thead th { background: #f1f5f9; color: #475569; font-weight: 600;
+             font-size: 13px; text-transform: uppercase; }
+  tfoot td, tfoot th { background: #eff6ff; font-weight: 700; color: #1e3a8a;
+                       border-top: 2px solid #cbd5e1; }
+
+  .actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 16px; }
+  .note { font-size: 12px; color: #64748b; margin-top: 8px; font-style: italic; }
+
+  /* ===== 弹窗 ===== */
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,.5);
+           display: flex; align-items: center; justify-content: center; z-index: 100; }
+  .modal.hidden { display: none; }
+  .modal-content { background: #fff; padding: 24px; border-radius: 10px;
+                   width: 420px; max-width: 92vw; max-height: 90vh; overflow-y: auto; }
+  .modal-content h2 { font-size: 16px; color: #1e3a8a; margin-bottom: 16px; }
+  .modal-content label { display: block; margin-bottom: 12px;
+                         font-size: 14px; color: #475569; }
+  .modal-content input { width: 100%; padding: 8px; border: 1px solid #cbd5e1;
+                         border-radius: 6px; margin-top: 4px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+
+  @media (max-width: 768px) {
+    .info-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== 顶部（沿用 dashboard 风格） ===== -->
+<header class="topbar">
+  <div class="logo">PAYROLL SYSTEM</div>
+  <nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="leave.html">Leave</a>
+    <a href="overtime.html">Overtime</a>
+    <a href="staffinfo.html">Staff Info</a>
+  </nav>
+</header>
+
+<div class="container">
+
+  <!-- ===== 员工基础信息 ===== -->
+  <section class="card">
+    <h2>员工基础信息</h2>
+    <div class="toolbar">
+      <label>选择员工：</label>
+      <select id="staffSelect">
+        <option value="">-- 请选择 --</option>
+      </select>
+    </div>
+    <div class="info-grid">
+      <div class="info-item"><div class="label">员工代码</div><div class="value" id="empCode">-</div></div>
+      <div class="info-item"><div class="label">姓名</div><div class="value" id="empName">-</div></div>
+      <div class="info-item"><div class="label">分店</div><div class="value" id="empGroup">-</div></div>
+      <div class="info-item"><div class="label">基础薪资 (RM)</div><div class="value" id="empSalary">-</div></div>
+    </div>
+    <div class="info-grid">
+      <div class="info-item highlight"><div class="label">日薪 (RM)</div><div class="value" id="dailyRate">-</div></div>
+      <div class="info-item highlight"><div class="label">时薪 (RM)</div><div class="value" id="hourlyRate">-</div></div>
+      <div class="info-item highlight"><div class="label">当月总工作时长</div><div class="value" id="monthlyWorkTime">-</div></div>
+      <div class="info-item highlight"><div class="label">当月总加班时长</div><div class="value" id="monthlyOtTime">-</div></div>
+    </div>
+    <p class="note">参考标准：每天工作 7.5 小时，每月 26 天（可在「设置」中修改）</p>
+  </section>
+
+  <!-- ===== 加班日期选择 ===== -->
+  <section class="card">
+    <h2>
+      加班日期选择
+      <button class="btn small" id="openSettings">⚙ 设置</button>
+    </h2>
+    <div class="toolbar">
+      <label>月份：</label>
+      <input type="month" id="monthPicker">
+    </div>
+    <div class="calendar-wrap">
+      <div class="calendar-header">
+        <span class="month-label" id="calLabel">-</span>
+        <span class="note">点击日期多选；有加班数据的日期用橙框标记，灰显表示无记录</span>
+      </div>
+      <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+  </section>
+
+  <!-- ===== 加班补贴计算表 ===== -->
+  <section class="card">
+    <h2>加班补贴计算表</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>日期</th>
+          <th>工作时长</th>
+          <th>加班时长</th>
+          <th>×1.0 (RM)</th>
+          <th>×1.5 (RM)</th>
+          <th>×2.0 (RM)</th>
+          <th>×3.0 (RM)</th>
+        </tr>
+      </thead>
+      <tbody id="calcBody">
+        <tr><td colspan="7" style="text-align:center;color:#94a3b8;">请选择员工与日期</td></tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th>合计</th>
+          <th id="sumWork">00:00:00</th>
+          <th id="sumOT">00:00:00</th>
+          <th id="sum10">RM 0.00</th>
+          <th id="sum15">RM 0.00</th>
+          <th id="sum20">RM 0.00</th>
+          <th id="sum30">RM 0.00</th>
+        </tr>
+      </tfoot>
+    </table>
+    <div class="actions">
+      <button class="btn" id="saveBtn">💾 保存加班记录</button>
+    </div>
+  </section>
+
+</div>
+
+<!-- ===== 设置弹窗 ===== -->
+<div class="modal hidden" id="settingsModal">
+  <div class="modal-content">
+    <h2>设置</h2>
+    <label>日薪计算天数 <input type="number" id="setDays" min="1" step="1" value="26"></label>
+    <label>时薪计算小时 <input type="number" id="setHours" min="0.1" step="0.1" value="7.5"></label>
+    <label>×1.0 倍率 <input type="number" id="setRate10" step="0.1" value="1.0"></label>
+    <label>×1.5 倍率 <input type="number" id="setRate15" step="0.1" value="1.5"></label>
+    <label>×2.0 倍率 <input type="number" id="setRate20" step="0.1" value="2.0"></label>
+    <label>×3.0 倍率 <input type="number" id="setRate30" step="0.1" value="3.0"></label>
+    <div class="modal-actions">
+      <button class="btn light" id="cancelSettings">取消</button>
+      <button class="btn" id="applySettings">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  配置
+// ============================================================
+const params     = new URLSearchParams(location.search);
+const API_URL    = params.get('url') || '';
+const LS_SETTINGS = 'overtime_settings_v1';
+const LS_STAFF    = 'overtime_staffcache_v1';
+const LS_SHEET    = 'overtime_sheetcache_v1';
+const CACHE_TTL   = 5 * 60 * 1000;
+
+// ============================================================
+//  状态
+// ============================================================
+let allStaff = [];
+let allSheetData = [];
+let currentStaff = null;
+let currentMonth = '';         // YYYY-MM
+let selectedDates = new Set(); // YYYY-MM-DD
+let settings = {
+  daysPerMonth: 26,
+  hoursPerDay: 7.5,
+  rate10: 1.0,
+  rate15: 1.5,
+  rate20: 2.0,
+  rate30: 3.0
+};
+
+// ============================================================
+//  工具
+// ============================================================
+function fmtHHMMSS(h) {
+  if (!h || h <= 0) return '00:00:00';
+  const t = Math.round(h * 3600);
+  return [Math.floor(t / 3600), Math.floor((t % 3600) / 60), t % 60]
+    .map(n => String(n).padStart(2, '0')).join(':');
+}
+function fmtRM(v) { return 'RM ' + (Number(v) || 0).toFixed(2); }
+function parseH(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
+
+// ============================================================
+//  设置
+// ============================================================
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem(LS_SETTINGS));
+    if (s) settings = Object.assign(settings, s);
+  } catch (e) {}
+  ['setDays','setHours','setRate10','setRate15','setRate20','setRate30'].forEach((id, i) => {
+    const v = [settings.daysPerMonth, settings.hoursPerDay,
+               settings.rate10, settings.rate15, settings.rate20, settings.rate30][i];
+    document.getElementById(id).value = v;
+  });
+}
+function applySettings() {
+  settings.daysPerMonth = parseFloat(document.getElementById('setDays').value)  || 26;
+  settings.hoursPerDay  = parseFloat(document.getElementById('setHours').value) || 7.5;
+  settings.rate10 = parseFloat(document.getElementById('setRate10').value) || 1.0;
+  settings.rate15 = parseFloat(document.getElementById('setRate15').value) || 1.5;
+  settings.rate20 = parseFloat(document.getElementById('setRate20').value) || 2.0;
+  settings.rate30 = parseFloat(document.getElementById('setRate30').value) || 3.0;
+  localStorage.setItem(LS_SETTINGS, JSON.stringify(settings));
+  closeSettings();
+  if (currentStaff) onStaffChange(); // 重新计算
+}
+
+// ============================================================
+//  API
+// ============================================================
+async function apiGet(action) {
+  if (!API_URL) throw new Error('缺少 API URL（请使用 ?url=... 打开）');
+  const res = await fetch(API_URL + '?' + new URLSearchParams({ action }));
+  return await res.json();
+}
+async function apiPost(body) {
+  if (!API_URL) throw new Error('缺少 API URL');
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(body)
+  });
+  return await res.json();
+}
+
+// ============================================================
+//  载入数据
+// ============================================================
+async function loadStaffList() {
+  let data = null;
+  try {
+    const c = JSON.parse(localStorage.getItem(LS_STAFF) || 'null');
+    if (c && Date.now() - c.ts < CACHE_TTL) data = c.data;
+  } catch (e) {}
+  if (!data) {
+    const res = await apiGet('getData'); // STAFF LOGIN RECORD
+    data = res.data || res.result || [];
+    localStorage.setItem(LS_STAFF, JSON.stringify({ ts: Date.now(), data }));
+  }
+  allStaff = data;
+
+  const select = document.getElementById('staffSelect');
+  select.innerHTML = '<option value="">-- 请选择 --</option>';
+  data.forEach(s => {
+    const code = String(s.Code || s['ID KOD'] || '').trim();
+    const name = String(s.Name || '').trim();
+    if (!code) return;
+    const opt = document.createElement('option');
+    opt.value = code;
+    opt.textContent = `${code} - ${name}`;
+    opt.dataset.name   = name;
+    opt.dataset.group  = String(s.GroupName || s['GROUP'] || '').trim();
+    opt.dataset.salary = parseH(s.Salary || s['GAJI'] || 0);
+    select.appendChild(opt);
+  });
+}
+
+async function loadSheetData() {
+  let data = null;
+  try {
+    const c = JSON.parse(localStorage.getItem(LS_SHEET) || 'null');
+    if (c && Date.now() - c.ts < CACHE_TTL) data = c.data;
+  } catch (e) {}
+  if (!data) {
+    const res = await apiGet('getSheetData'); // SHEET
+    data = res.data || [];
+    localStorage.setItem(LS_SHEET, JSON.stringify({ ts: Date.now(), data }));
+  }
+  allSheetData = data;
+}
+
+// ============================================================
+//  员工信息
+// ============================================================
+function onStaffChange() {
+  const code = document.getElementById('staffSelect').value;
+  if (!code) { currentStaff = null; resetStaffInfo(); return; }
+  const opt = document.querySelector(`#staffSelect option[value="${code}"]`);
+  currentStaff = {
+    code,
+    name:   opt.dataset.name   || '',
+    group:  opt.dataset.group  || '',
+    salary: parseFloat(opt.dataset.salary) || 0
+  };
+
+  document.getElementById('empCode').textContent   = currentStaff.code;
+  document.getElementById('empName').textContent   = currentStaff.name;
+  document.getElementById('empGroup').textContent  = currentStaff.group;
+  document.getElementById('empSalary').textContent = fmtRM(currentStaff.salary);
+
+  const daily  = settings.daysPerMonth > 0 ? currentStaff.salary / settings.daysPerMonth : 0;
+  const hourly = settings.hoursPerDay  > 0 ? daily / settings.hoursPerDay            : 0;
+  document.getElementById('dailyRate').textContent  = fmtRM(daily);
+  document.getElementById('hourlyRate').textContent = fmtRM(hourly);
+
+  refreshMonthlySummary();
+  renderCalendar();
+  renderTable();
+}
+
+function resetStaffInfo() {
+  ['empCode','empName','empGroup','empSalary',
+   'dailyRate','hourlyRate','monthlyWorkTime','monthlyOtTime']
+    .forEach(id => document.getElementById(id).textContent = '-');
+  document.getElementById('calendarGrid').innerHTML = '';
+  document.getElementById('calcBody').innerHTML =
+    '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">请选择员工与日期</td></tr>';
+  resetTotals();
+}
+
+// ============================================================
+//  行访问 & 月度汇总
+// ============================================================
+function getMonthRows() {
+  if (!currentStaff || !currentMonth) return [];
+  return allSheetData.filter(r =>
+    String(r['ID KOD'] || '').trim() === currentStaff.code &&
+    String(r['Date']    || '').startsWith(currentMonth + '-')
+  );
+}
+function getDateRow(dateStr) {
+  if (!currentStaff) return null;
+  return allSheetData.find(r =>
+    String(r['ID KOD'] || '').trim() === currentStaff.code &&
+    String(r['Date']    || '') === dateStr
+  ) || null;
+}
+function getRowOT(row)   { return row ? Math.max(0, parseH(row['Total Over/Less Time (h)'])) : 0; }
+function getRowWork(row) { return row ? Math.max(0, parseH(row['Total Work Time(h)']))       : 0; }
+
+function refreshMonthlySummary() {
+  if (!currentStaff || !currentMonth) {
+    document.getElementById('monthlyWorkTime').textContent = '-';
+    document.getElementById('monthlyOtTime').textContent   = '-';
+    return;
+  }
+  const rows = getMonthRows();
+  const w = rows.reduce((s, r) => s + getRowWork(r), 0);
+  const o = rows.reduce((s, r) => s + getRowOT(r),   0);
+  document.getElementById('monthlyWorkTime').textContent = fmtHHMMSS(w);
+  document.getElementById('monthlyOtTime').textContent   = fmtHHMMSS(o);
+}
+
+// ============================================================
+//  日历
+// ============================================================
+function renderCalendar() {
+  const grid  = document.getElementById('calendarGrid');
+  const label = document.getElementById('calLabel');
+  grid.innerHTML = '';
+
+  if (!currentMonth) { label.textContent = '-'; return; }
+  const [y, m] = currentMonth.split('-').map(Number);
+  label.textContent = `${y} 年 ${m} 月`;
+
+  ['日','一','二','三','四','五','六'].forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-dow';
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  const firstDay = new Date(y, m - 1, 1).getDay();
+  const daysInMonth = new Date(y, m, 0).getDate();
+
+  for (let i = 0; i < firstDay; i++) {
+    const el = document.createElement('div');
+    el.className = 'cal-day empty';
+    grid.appendChild(el);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const row = getDateRow(dateStr);
+    const ot  = getRowOT(row);
+
+    const el = document.createElement('div');
+    el.className = 'cal-day';
+    el.textContent = d;
+    el.dataset.date = dateStr;
+    if (!row)        el.classList.add('no-data');
+    else if (ot > 0) el.classList.add('has-ot');
+    if (selectedDates.has(dateStr)) el.classList.add('selected');
+
+    el.addEventListener('click', () => {
+      if (!row) { alert('该日期没有此员工的工作记录'); return; }
+      if (selectedDates.has(dateStr)) selectedDates.delete(dateStr);
+      else                            selectedDates.add(dateStr);
+      renderCalendar();
+      renderTable();
+    });
+    grid.appendChild(el);
+  }
+}
+
+// ============================================================
+//  计算表
+// ============================================================
+function currentRates() {
+  const daily  = settings.daysPerMonth > 0 ? (currentStaff.salary / settings.daysPerMonth) : 0;
+  const hourly = settings.hoursPerDay  > 0 ? (daily / settings.hoursPerDay)               : 0;
+  return { daily, hourly };
+}
+
+function renderTable() {
+  const tbody = document.getElementById('calcBody');
+  tbody.innerHTML = '';
+
+  if (!currentStaff) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">请选择员工与日期</td></tr>';
+    resetTotals(); return;
+  }
+  if (selectedDates.size === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">请在日历中选择日期</td></tr>';
+    resetTotals(); return;
+  }
+
+  const { hourly } = currentRates();
+  const sorted = [...selectedDates].sort();
+  let sumW = 0, sumOT = 0, sum10 = 0, sum15 = 0, sum20 = 0, sum30 = 0;
+
+  sorted.forEach(dateStr => {
+    const row = getDateRow(dateStr);
+    if (!row) return;
+    const work = getRowWork(row);
+    const ot   = getRowOT(row);
+    const a10  = ot * hourly * settings.rate10;
+    const a15  = ot * hourly * settings.rate15;
+    const a20  = ot * hourly * settings.rate20;
+    const a30  = ot * hourly * settings.rate30;
+
+    sumW += work; sumOT += ot;
+    sum10 += a10; sum15 += a15; sum20 += a20; sum30 += a30;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${dateStr}</td>
+      <td>${fmtHHMMSS(work)}</td>
+      <td>${ot > 0 ? fmtHHMMSS(ot) : '—'}</td>
+      <td>${fmtRM(a10)}</td>
+      <td>${fmtRM(a15)}</td>
+      <td>${fmtRM(a20)}</td>
+      <td>${fmtRM(a30)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('sumWork').textContent = fmtHHMMSS(sumW);
+  document.getElementById('sumOT').textContent   = fmtHHMMSS(sumOT);
+  document.getElementById('sum10').textContent   = fmtRM(sum10);
+  document.getElementById('sum15').textContent   = fmtRM(sum15);
+  document.getElementById('sum20').textContent   = fmtRM(sum20);
+  document.getElementById('sum30').textContent   = fmtRM(sum30);
+}
+
+function resetTotals() {
+  ['sumWork','sumOT'].forEach(id => document.getElementById(id).textContent = '00:00:00');
+  ['sum10','sum15','sum20','sum30'].forEach(id => document.getElementById(id).textContent = 'RM 0.00');
+}
+
+// ============================================================
+//  保存
+// ============================================================
+async function onSave() {
+  if (!currentStaff)          { alert('请先选择员工'); return; }
+  if (!currentMonth)          { alert('请选择月份');   return; }
+  if (selectedDates.size === 0) { alert('请先选择日期'); return; }
+
+  const { daily, hourly } = currentRates();
+  const sorted = [...selectedDates].sort();
+
+  const details = [];
+  let sumW = 0, sumOT = 0, sum10 = 0, sum15 = 0, sum20 = 0, sum30 = 0;
+
+  sorted.forEach(dateStr => {
+    const row = getDateRow(dateStr);
+    if (!row) return;
+    const work = getRowWork(row);
+    const ot   = getRowOT(row);
+    const a10  = ot * hourly * settings.rate10;
+    const a15  = ot * hourly * settings.rate15;
+    const a20  = ot * hourly * settings.rate20;
+    const a30  = ot * hourly * settings.rate30;
+
+    details.push({ date: dateStr, workHours: work, otHours: ot, a10, a15, a20, a30 });
+    sumW += work; sumOT += ot;
+    sum10 += a10; sum15 += a15; sum20 += a20; sum30 += a30;
+  });
+
+  const payload = {
+    action: 'saveOvertimeRecord',
+    code: currentStaff.code,
+    name: currentStaff.name,
+    month: currentMonth,
+    totalWorkTime: sumW,
+    totalOtTime:   sumOT,
+    dailyRate:  daily,
+    hourlyRate: hourly,
+    amount10: sum10, amount15: sum15, amount20: sum20, amount30: sum30,
+    totalAmount: sum15,   // 默认以 1.5× 作为 payroll 参考值（后续加"加班类型"后可按类型取）
+    details
+  };
+
+  try {
+    const res = await apiPost(payload);
+    if (res.status === 'success') {
+      // 更新缓存
+      try {
+        const c = JSON.parse(localStorage.getItem(LS_SHEET) || 'null');
+        if (c) { c.ts = 0; localStorage.setItem(LS_SHEET, JSON.stringify(c)); }
+      } catch (e) {}
+      alert('✅ 加班记录已保存');
+    } else {
+      alert('保存失败：' + (res.message || '未知错误'));
+    }
+  } catch (err) {
+    alert('保存失败：' + err.message);
+  }
+}
+
+// ============================================================
+//  弹窗
+// ============================================================
+function openSettings()  { document.getElementById('settingsModal').classList.remove('hidden'); }
+function closeSettings() { document.getElementById('settingsModal').classList.add('hidden'); }
+
+// ============================================================
+//  初始化
+// ============================================================
+async function init() {
+  loadSettings();
+
+  const today = new Date();
+  const ym = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+  document.getElementById('monthPicker').value = ym;
+  currentMonth = ym;
+
+  try {
+    await Promise.all([loadStaffList(), loadSheetData()]);
+  } catch (err) {
+    console.error(err);
+    alert('加载失败：' + err.message);
+  }
+
+  document.getElementById('staffSelect').addEventListener('change', onStaffChange);
+  document.getElementById('monthPicker').addEventListener('change', e => {
+    currentMonth = e.target.value;
+    selectedDates.clear();
+    refreshMonthlySummary();
+    renderCalendar();
+    renderTable();
+  });
+  document.getElementById('openSettings').addEventListener('click', openSettings);
+  document.getElementById('cancelSettings').addEventListener('click', closeSettings);
+  document.getElementById('applySettings').addEventListener('click', applySettings);
+  document.getElementById('saveBtn').addEventListener('click', onSave);
+}
+
+init();
+</script>
+</body>
+</html>
