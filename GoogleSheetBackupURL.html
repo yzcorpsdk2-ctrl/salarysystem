@@ -25,7 +25,8 @@
     min-height: 100vh; line-height: 1.5; font-size: 14px;
     -webkit-font-smoothing: antialiased;
   }
-  /* NAVBAR */
+
+  /* ---------- NAVBAR ---------- */
   .navbar {
     position: sticky; top: 0; z-index: 200;
     display: flex; align-items: stretch; flex-wrap: wrap;
@@ -57,7 +58,8 @@
     font-family: inherit; font-size: 0.73rem; font-weight: 700;
     letter-spacing: 0.06em; text-transform: uppercase;
     background: transparent; border: none; cursor: pointer;
-    white-space: nowrap; transition: background 0.15s, color 0.15s; position: relative;
+    white-space: nowrap; transition: background 0.15s, color 0.15s;
+    position: relative;
   }
   .nav-item:hover, .nav-item.active { background: var(--nav-hover); color: #fff; }
   .nav-item::after {
@@ -69,8 +71,8 @@
   .nav-back {
     display: inline-flex; align-items: center; justify-content: center;
     min-width: 44px; padding: 0 0.6rem;
-    color: var(--nav-text); background: transparent; border: none;
-    cursor: pointer; font-size: 1.1rem; transition: background 0.15s, color 0.15s;
+    color: var(--nav-text); background: transparent; border: none; cursor: pointer;
+    font-size: 1.1rem; transition: background 0.15s, color 0.15s;
   }
   .nav-back:hover { background: var(--nav-hover); color: #fff; }
   .nav-dropdown { position: relative; display: inline-flex; align-items: stretch; }
@@ -90,9 +92,8 @@
   }
   .dropdown-menu a {
     display: flex; align-items: center; gap: 0.5rem;
-    padding: 0.5rem 1rem; color: var(--epf-text);
-    text-decoration: none; font-size: 0.78rem; font-weight: 500;
-    transition: background 0.12s; white-space: nowrap;
+    padding: 0.5rem 1rem; color: var(--epf-text); text-decoration: none;
+    font-size: 0.78rem; font-weight: 500; transition: background 0.12s; white-space: nowrap;
   }
   .dropdown-menu a:hover { background: var(--epf-blue-soft); color: var(--epf-blue); }
   .dropdown-menu .divider { height: 1px; background: var(--epf-border-soft); margin: 0.3rem 0.5rem; }
@@ -117,7 +118,8 @@
     70% { box-shadow: 0 0 0 7px rgba(110,240,168,0); }
     100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); }
   }
-  /* TOPBAR */
+
+  /* ---------- TOPBAR ---------- */
   .topbar {
     position: sticky; top: var(--nav-h); z-index: 100; background: #ffffff;
     border-bottom: 1px solid var(--epf-border); padding: 0.65rem 1.75rem;
@@ -144,11 +146,11 @@
   .btn:hover { background: var(--epf-blue-soft); border-color: #b8cfe8; }
   .btn-success { background: #0f7a54; border: 1px solid #0f7a54; color: #fff; }
   .btn-success:hover { background: #0c6a48; border-color: #0c6a48; }
-  .btn-danger { background: #dc2626; border: 1px solid #dc2626; color: #fff; }
-  .btn-danger:hover { background: #b91c1c; border-color: #b91c1c; }
   .btn-ghost { background: #fff; color: var(--epf-muted); }
   .btn-ghost:hover { color: var(--epf-blue); }
-  .btn-sm { padding: 0.28rem 0.6rem; font-size: 0.7rem; }
+  .btn-mini {
+    padding: 0.25rem 0.5rem; font-size: 0.7rem; border-radius: 4px;
+  }
   .sync-badge {
     display: inline-flex; align-items: center; gap: 0.35rem;
     background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft);
@@ -160,7 +162,8 @@
   .sync-badge.ok .dot { background: #22c55e; }
   .sync-badge.busy .dot { background: #f59e0b; animation: pulse 1s infinite; }
   .sync-badge.err .dot { background: #ef4444; }
-  /* MAIN */
+
+  /* ---------- MAIN ---------- */
   .main-container { max-width: 1200px; margin: 0 auto; padding: 1.5rem 1.75rem 3rem; }
   .page-header {
     background: #ffffff; border: 1px solid var(--epf-border); border-radius: 8px;
@@ -172,74 +175,91 @@
   .page-header h1 { font-size: 1.45rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--epf-blue); letter-spacing: -0.015em; }
   .page-header p { font-size: 0.85rem; color: var(--epf-muted); line-height: 1.6; }
 
-  /* GROUP TABS */
-  .group-tabs {
-    display: flex; flex-wrap: wrap; gap: 0.4rem;
-    padding: 0.8rem 1rem;
-    background: #fafcff;
-    border-bottom: 1px solid var(--epf-border-soft);
-    align-items: center;
+  /* ---------- GROUP MANAGER ---------- */
+  .group-manager {
+    background: #ffffff; border: 1px solid var(--epf-border); border-radius: 10px;
+    box-shadow: var(--shadow-sm); padding: 1rem 1.25rem; margin-bottom: 1.5rem;
   }
-  .group-tab {
-    display: inline-flex; align-items: center; gap: 0.35rem;
-    padding: 0.35rem 0.75rem;
-    border-radius: 20px;
-    background: #fff;
-    border: 1px solid var(--epf-border);
-    color: var(--epf-muted);
-    font-size: 0.72rem; font-weight: 700;
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-  .group-tab:hover { border-color: var(--epf-blue); color: var(--epf-blue); }
-  .group-tab.active { background: var(--epf-blue); border-color: var(--epf-blue); color: #fff; }
-  .group-tab .count {
-    font-size: 0.62rem; opacity: 0.75;
-    background: rgba(0,0,0,0.08);
-    padding: 0.05rem 0.35rem; border-radius: 10px;
-  }
-  .group-tab.active .count { background: rgba(255,255,255,0.25); }
-  .group-tab .del-x {
-    opacity: 0.5; cursor: pointer; font-size: 0.6rem;
-    padding: 0 0.15rem;
-  }
-  .group-tab .del-x:hover { opacity: 1; color: #dc2626; }
-  .group-tab.active .del-x:hover { color: #fecaca; }
-
-  .group-actions { margin-left: auto; display: flex; gap: 0.35rem; }
-
-  .url-table-wrapper {
-    background: #ffffff; border: 1px solid var(--epf-border);
-    border-radius: 10px; box-shadow: var(--shadow-sm); overflow: hidden;
-  }
-  .url-table-header {
+  .group-manager .gm-header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 1rem 1.25rem; border-bottom: 1px solid var(--epf-border-soft);
-    background: #fafcff; gap: 0.75rem; flex-wrap: wrap;
+    gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.75rem;
   }
-  .url-table-header h2 {
+  .group-manager .gm-header h2 {
     font-size: 0.95rem; font-weight: 700; color: var(--epf-blue);
     display: flex; align-items: center; gap: 0.5rem;
   }
+  .group-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .group-chip {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: var(--epf-blue-soft); border: 1px solid var(--epf-border);
+    border-radius: 20px; padding: 0.3rem 0.4rem 0.3rem 0.75rem;
+    font-size: 0.75rem; font-weight: 600; color: var(--epf-blue);
+    white-space: nowrap;
+  }
+  .group-chip .chip-actions { display: inline-flex; gap: 2px; margin-left: 0.25rem; }
+  .group-chip button {
+    background: #fff; border: 1px solid var(--epf-border-soft); border-radius: 12px;
+    width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; cursor: pointer; color: var(--epf-muted); transition: 0.15s;
+  }
+  .group-chip button:hover { color: var(--epf-blue); border-color: #b8cfe8; }
+  .group-chip button.danger:hover { color: #dc2626; border-color: #fca5a5; }
+  .group-chip button:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* ---------- GROUP CARD ---------- */
+  .group-card {
+    background: #ffffff; border: 1px solid var(--epf-border);
+    border-radius: 10px; box-shadow: var(--shadow-sm);
+    margin-bottom: 1.25rem; overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .group-card:hover { box-shadow: var(--shadow-md); }
+  .group-card .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.75rem; flex-wrap: wrap;
+    padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--epf-border-soft);
+    background: linear-gradient(180deg, #fafcff 0%, #f4f8fd 100%);
+  }
+  .group-card .card-title {
+    display: flex; align-items: center; gap: 0.6rem;
+    font-size: 0.95rem; font-weight: 700; color: var(--epf-blue);
+  }
+  .group-card .card-title .icon {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: var(--epf-blue-light); color: var(--epf-blue);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 0.85rem;
+  }
+  .group-card .card-title .sheet-tag {
+    font-size: 0.65rem; font-weight: 600; color: var(--epf-muted);
+    background: #fff; border: 1px dashed var(--epf-border);
+    padding: 0.1rem 0.45rem; border-radius: 10px;
+    font-family: 'SFMono-Regular', Consolas, monospace;
+  }
+  .group-card .card-actions { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+  .group-card .card-body { padding: 0; }
+  .group-card .empty-state {
+    text-align: center; padding: 2rem 1rem; color: #a7b7c9; font-size: 0.85rem;
+  }
+  .group-card .empty-state .icon { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+
+  /* ---------- TABLE ---------- */
   .url-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
   .url-table th {
-    text-align: left; padding: 0.75rem 1rem;
+    text-align: left; padding: 0.6rem 1rem;
     background: var(--epf-blue-soft); color: var(--epf-blue);
-    font-weight: 700; font-size: 0.72rem;
-    letter-spacing: 0.04em; text-transform: uppercase;
-    border-bottom: 1px solid var(--epf-border); white-space: nowrap;
+    font-weight: 700; font-size: 0.7rem; letter-spacing: 0.04em;
+    text-transform: uppercase; border-bottom: 1px solid var(--epf-border);
+    white-space: nowrap;
   }
-  .url-table td { padding: 0.65rem 1rem; border-bottom: 1px solid var(--epf-border-soft); vertical-align: middle; }
+  .url-table td {
+    padding: 0.55rem 1rem; border-bottom: 1px solid var(--epf-border-soft);
+    vertical-align: middle;
+  }
   .url-table tr:last-child td { border-bottom: none; }
   .url-table tr:hover td { background: #fbfdff; }
-  .url-table .group-badge {
-    display: inline-block; padding: 0.15rem 0.6rem; border-radius: 20px;
-    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.03em;
-    background: var(--epf-blue-light); color: var(--epf-blue); white-space: nowrap;
-  }
   .url-table .url-cell {
-    max-width: 350px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    max-width: 380px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     color: #2c5f8a; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 0.72rem;
   }
   .url-table .url-cell a { color: #2c5f8a; text-decoration: none; }
@@ -252,47 +272,45 @@
   .url-table .actions-cell button:hover { color: var(--epf-blue); }
   .url-table .actions-cell button.delete:hover { color: #dc2626; }
 
-  .empty-state { text-align: center; padding: 3rem 1rem; color: #a7b7c9; font-size: 0.85rem; }
-  .empty-state .icon { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; }
-  .spinner {
-    display: inline-block; width: 16px; height: 16px;
-    border: 2px solid rgba(26,79,138,0.2); border-top: 2px solid var(--epf-blue);
-    border-radius: 50%; animation: spin 0.8s linear infinite;
-    margin-right: 6px; vertical-align: middle;
-  }
-  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
+  /* ---------- ADD FORM (per card) ---------- */
   .add-form {
     display: flex; flex-wrap: wrap; gap: 0.75rem;
-    padding: 1rem 1.25rem; background: #f9fbfe;
-    border-top: 1px solid var(--epf-border-soft); align-items: flex-end;
+    padding: 0.85rem 1.25rem;
+    background: #f9fbfe; border-top: 1px solid var(--epf-border-soft);
+    align-items: flex-end;
   }
   .add-form .field { display: flex; flex-direction: column; gap: 0.3rem; flex: 1; min-width: 140px; }
   .add-form .field label {
-    font-size: 0.68rem; font-weight: 700; color: var(--epf-muted);
+    font-size: 0.65rem; font-weight: 700; color: var(--epf-muted);
     text-transform: uppercase; letter-spacing: 0.04em;
   }
-  .add-form .field input,
-  .add-form .field select {
-    padding: 0.45rem 0.65rem; border: 1px solid var(--epf-border);
-    border-radius: 5px; font-size: 0.8rem; font-family: inherit;
-    color: var(--epf-text); transition: 0.15s;
+  .add-form .field input {
+    padding: 0.45rem 0.65rem; border: 1px solid var(--epf-border); border-radius: 5px;
+    font-size: 0.8rem; font-family: inherit; color: var(--epf-text); transition: 0.15s;
+    background: #fff;
   }
-  .add-form .field input:focus,
-  .add-form .field select:focus {
+  .add-form .field input:focus {
     outline: none; border-color: var(--epf-blue);
     box-shadow: 0 0 0 2px rgba(26,79,138,0.10);
   }
+
   .endpoint-pill {
     display: inline-flex; align-items: center; gap: 0.45rem;
     background: #fff; border: 1px dashed #b8cfe8;
     padding: 0.3rem 0.6rem; border-radius: 6px;
     font-family: 'SFMono-Regular', Consolas, monospace;
     font-size: 0.68rem; color: #2c5f8a;
-    max-width: 380px; overflow: hidden;
-    text-overflow: ellipsis; white-space: nowrap;
+    max-width: 380px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
   .endpoint-pill i { color: #0f7a54; }
+
+  .spinner {
+    display: inline-block; width: 14px; height: 14px;
+    border: 2px solid rgba(26,79,138,0.2); border-top: 2px solid var(--epf-blue);
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+    margin-right: 6px; vertical-align: middle;
+  }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
   @media (max-width: 900px) {
     .url-table { font-size: 0.75rem; }
@@ -312,11 +330,13 @@
     .main-container { padding: 1rem; }
     .page-header { padding: 1.2rem; }
     .page-header h1 { font-size: 1.2rem; }
+    .group-manager { padding: 0.85rem; }
   }
 </style>
 </head>
 <body>
 
+<!-- ========== NAVBAR ========== -->
 <nav class="navbar">
   <div class="nav-brand">
     <span class="logo">Y</span>
@@ -338,6 +358,9 @@
         <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
         <div class="divider"></div>
         <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+        <a href="121.html">📄 121</a>
+        <a href="122.html">📄 122</a>
+        <a href="123.html">📄 123</a>
         <a href="GoogleSheetBackupURL.html">📄 Google Sheet Backup URL</a>
       </div>
     </div>
@@ -347,8 +370,10 @@
     <div class="nav-dropdown" id="carumanDropdown">
       <button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
       <div class="dropdown-menu">
-        <a href="epf.html">🏦 EPF</a><a href="socso.html">🛡️ SOCSO</a>
-        <a href="eis.html">📋 EIS</a><a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+        <a href="epf.html">🏦 EPF</a>
+        <a href="socso.html">🛡️ SOCSO</a>
+        <a href="eis.html">📋 EIS</a>
+        <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
       </div>
     </div>
     <a class="nav-item" href="companysetting.html">SETTING</a>
@@ -357,6 +382,9 @@
       <div class="dropdown-menu">
         <a href="companysetting.html">⚙️ COMPANY SETTING</a>
         <div class="divider"></div>
+        <a href="121.html">📄 121</a>
+        <a href="122.html">📄 122</a>
+        <a href="123.html">📄 123</a>
         <a href="GoogleSheetBackupURL.html">📄 Google Sheet Backup URL</a>
       </div>
     </div>
@@ -366,68 +394,52 @@
   </button>
 </nav>
 
+<!-- ========== TOPBAR ========== -->
 <div class="topbar">
   <div class="brand"><div class="logo">B</div> Google Sheet Backup URL</div>
   <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
   <span class="sync-badge" id="syncBadge">
     <span class="dot"></span><span id="syncBadgeText">Sedia</span>
   </span>
-  <span class="endpoint-pill" id="endpointPill" title="URL Apps Script Backup 已固定，不可更改">
-    <i class="fas fa-lock"></i><span id="endpointText">Memuatkan...</span>
+  <span class="endpoint-pill" id="endpointPill" title="URL Apps Script Backup 已固定">
+    <i class="fas fa-lock"></i><span id="endpointText">…</span>
   </span>
   <span style="flex:1;"></span>
   <button class="btn btn-ghost" onclick="copyEndpointUrl()" title="Salin URL Apps Script">
     <i class="fas fa-copy"></i> Salin URL
   </button>
-  <button class="btn btn-success" onclick="loadGroupsAndData()">
+  <button class="btn btn-success" onclick="refreshAll()">
     <i class="fas fa-sync-alt"></i> Muat Semula
   </button>
 </div>
 
+<!-- ========== MAIN ========== -->
 <div class="main-container">
   <div class="page-header">
     <div class="info">
       <h1>🔗 Google Sheet Backup URL</h1>
-      <p>Setiap分组 = 一个独立 Sheet 工作表。可自由新增/删除分组，数据自动记录到对应 Sheet。</p>
+      <p>Setiap <strong>kumpulan</strong> disimpan dalam <strong>worksheet berasingan</strong> dalam Google Sheet. Kumpulan boleh ditambah, dipadam dan disusun. Data disimpan melalui Apps Script Backup yang tetap.</p>
     </div>
   </div>
 
-  <div class="url-table-wrapper">
-    <!-- GROUP TABS -->
-    <div class="group-tabs" id="groupTabs">
-      <span class="spinner"></span> Memuatkan分组...
+  <!-- 分组管理栏 -->
+  <div class="group-manager">
+    <div class="gm-header">
+      <h2><i class="fas fa-layer-group"></i> Kumpulan (分组)</h2>
+      <button class="btn" onclick="promptAddGroup()">
+        <i class="fas fa-plus"></i> Tambah Kumpulan
+      </button>
     </div>
-
-    <div class="url-table-header">
-      <h2><i class="fas fa-list"></i> Senarai URL <span id="currentGroupLabel" style="color:var(--epf-muted);font-weight:500;">—</span></h2>
-      <span class="sync-badge" id="countBadge">
-        <span class="dot ok"></span><span id="countText">Memuatkan...</span>
-      </span>
+    <div class="group-chips" id="groupChips">
+      <span class="sync-badge"><span class="spinner"></span> Memuatkan kumpulan…</span>
     </div>
+  </div>
 
-    <div id="urlListContainer">
-      <div class="empty-state"><span class="icon">⏳</span>Memuatkan data URL...</div>
-    </div>
-
-    <!-- Add new URL form -->
-    <div class="add-form" id="addForm">
-      <div class="field">
-        <label>Kumpulan (Group)</label>
-        <select id="inputGroup"></select>
-      </div>
-      <div class="field">
-        <label>Nama / Keterangan</label>
-        <input type="text" id="inputName" placeholder="Contoh: Backup Sheet Jan 2025" />
-      </div>
-      <div class="field" style="flex:2;">
-        <label>URL</label>
-        <input type="text" id="inputUrl" placeholder="https://..." />
-      </div>
-      <div class="field" style="flex:0 0 auto;">
-        <label>&nbsp;</label>
-        <button class="btn btn-success" onclick="addUrl()" style="padding:0.45rem 1.2rem;">
-          <i class="fas fa-plus"></i> Tambah
-        </button>
+  <!-- 分组卡片容器 -->
+  <div id="groupsContainer">
+    <div class="group-card">
+      <div class="empty-state">
+        <span class="icon">⏳</span> Memuatkan data…
       </div>
     </div>
   </div>
@@ -435,46 +447,49 @@
 
 <script>
 /* ============================================================
-   NAVBAR DROPDOWN & BACK
+   NAVBAR 交互
    ============================================================ */
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   const backBtn = document.getElementById('backBtn');
-  if (backBtn) backBtn.addEventListener('click', function(e) { e.preventDefault(); window.history.back(); });
-  const dropdownToggles = document.querySelectorAll('[data-dropdown-toggle]');
-  dropdownToggles.forEach(function(toggle) {
-    toggle.addEventListener('click', function(e) {
+  if (backBtn) backBtn.addEventListener('click', e => { e.preventDefault(); window.history.back(); });
+
+  document.querySelectorAll('[data-dropdown-toggle]').forEach(function (toggle) {
+    toggle.addEventListener('click', function (e) {
       e.stopPropagation();
-      const dropdownId = this.getAttribute('data-dropdown-toggle');
-      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
-        if (dd.id !== dropdownId + 'Dropdown') dd.classList.remove('open');
+      const id = this.getAttribute('data-dropdown-toggle');
+      document.querySelectorAll('.nav-dropdown.open').forEach(dd => {
+        if (dd.id !== id + 'Dropdown') dd.classList.remove('open');
       });
-      const wrapper = this.closest('.nav-dropdown');
-      if (wrapper) wrapper.classList.toggle('open');
+      const wrap = this.closest('.nav-dropdown');
+      if (wrap) wrap.classList.toggle('open');
     });
   });
-  document.addEventListener('click', function(e) {
+  document.addEventListener('click', function (e) {
     if (!e.target.closest('.nav-dropdown')) {
-      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); });
+      document.querySelectorAll('.nav-dropdown.open').forEach(dd => dd.classList.remove('open'));
     }
   });
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); });
-    }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') document.querySelectorAll('.nav-dropdown.open').forEach(dd => dd.classList.remove('open'));
+  });
+  document.querySelectorAll('.dropdown-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+      document.querySelectorAll('.nav-dropdown.open').forEach(dd => dd.classList.remove('open'));
+    });
   });
 });
 
 /* ============================================================
-   固定 URL（永久锁定）
+   ✅ 固定独立 Apps Script URL
    ============================================================ */
 const DEFAULT_BACKUP_SCRIPT_URL =
-  'https://script.google.com/macros/s/AKfycbwC7RjTe3pucW973p8pMqM1D_fn-7QL_5LKMq1ad70ndHJRYbazISi2Ge2WK3Qa7yg5/exec';
-const BACKUP_SCRIPT_URL_KEY = 'payrollBackupScriptUrlFixed_v2';
+  'https://script.google.com/macros/s/AKfycbzujEx2uMG1wGRuf1pxoz7zUkq-CH2J5EbhWIDSN8hWK1eshThEpQZK0Q9nVs5sflYU/exec';
+const BACKUP_SCRIPT_URL_KEY = 'payrollBackupScriptUrlFixed';
+const URL_CACHE_KEY = 'payrollBackupUrlsMultiGroup'; // 离线缓存
 
 let SCRIPT_URL = DEFAULT_BACKUP_SCRIPT_URL;
-let groups = [];          // 所有分组（Sheet 名）
-let currentGroup = '';    // 当前选中分组
-let allUrls = [];         // 当前分组的数据
+let groups = [];                 // [{ name, sheetName, order }]
+let itemsByGroup = {};           // { 'GroupName': [{id,name,url,timestamp}] }
 
 function setSyncBadge(state, text) {
   const badge = document.getElementById('syncBadge');
@@ -486,19 +501,21 @@ function setSyncBadge(state, text) {
 
 function initFixedScriptUrl() {
   try {
-    const stored = localStorage.getItem(BACKUP_SCRIPT_URL_KEY);
-    if (stored !== DEFAULT_BACKUP_SCRIPT_URL) {
+    if (localStorage.getItem(BACKUP_SCRIPT_URL_KEY) !== DEFAULT_BACKUP_SCRIPT_URL) {
       localStorage.setItem(BACKUP_SCRIPT_URL_KEY, DEFAULT_BACKUP_SCRIPT_URL);
     }
   } catch (e) {}
   SCRIPT_URL = DEFAULT_BACKUP_SCRIPT_URL;
+  renderEndpointPill();
+}
+
+function renderEndpointPill() {
   const el = document.getElementById('endpointText');
-  if (el) {
-    const short = SCRIPT_URL.length > 52
-      ? SCRIPT_URL.substring(0, 40) + '…' + SCRIPT_URL.slice(-10)
-      : SCRIPT_URL;
-    el.textContent = short;
-  }
+  if (!el) return;
+  const short = SCRIPT_URL.length > 52
+    ? SCRIPT_URL.substring(0, 40) + '…' + SCRIPT_URL.slice(-10)
+    : SCRIPT_URL;
+  el.textContent = short;
   const pill = document.getElementById('endpointPill');
   if (pill) pill.title = SCRIPT_URL;
 }
@@ -507,146 +524,304 @@ function copyEndpointUrl() {
   navigator.clipboard.writeText(SCRIPT_URL).then(() => {
     setSyncBadge('ok', 'URL disalin');
     setTimeout(() => setSyncBadge('ok', 'Sedia'), 1200);
-  }).catch(() => alert('Gagal menyalin:\n' + SCRIPT_URL));
+  }).catch(() => alert('Gagal menyalin. Sila salin manual:\n' + SCRIPT_URL));
 }
 
 /* ============================================================
-   加载分组 + 当前分组数据
+   API 调用
    ============================================================ */
-async function loadGroupsAndData() {
-  setSyncBadge('busy', 'Memuatkan分组...');
-  document.getElementById('groupTabs').innerHTML = '<span class="spinner"></span> Memuatkan分组...';
+async function apiGet(action, params = {}) {
+  const qs = new URLSearchParams({ action, _t: Date.now(), ...params }).toString();
+  const res = await fetch(`${SCRIPT_URL}?${qs}`);
+  const json = await res.json();
+  if (json.status !== 'success') throw new Error(json.message || 'API error');
+  return json;
+}
+
+async function apiPost(action, data) {
+  const res = await fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action, data })
+  });
+  const json = await res.json();
+  if (json.status !== 'success') throw new Error(json.message || 'API error');
+  return json;
+}
+
+/* ============================================================
+   加载全部
+   ============================================================ */
+async function refreshAll() {
+  setSyncBadge('busy', 'Memuatkan…');
+  document.getElementById('groupsContainer').innerHTML =
+    `<div class="group-card"><div class="empty-state"><span class="spinner"></span> Memuatkan data…</div></div>`;
 
   try {
-    const res = await fetch(`${SCRIPT_URL}?action=getGroups&_t=${Date.now()}`);
-    const result = await res.json();
-    if (result.status !== 'success') throw new Error(result.message || 'Gagal');
-
-    groups = (result.data || []).sort();
-    if (groups.length === 0) {
-      document.getElementById('groupTabs').innerHTML =
-        '<span style="color:#a7b7c9;font-size:0.8rem;">Tiada分组。Klik ➕ untuk tambah.</span>' +
-        '<div class="group-actions"><button class="btn btn-sm btn-success" onclick="promptCreateGroup()"><i class="fas fa-plus"></i> Tambah分组</button></div>';
-      document.getElementById('urlListContainer').innerHTML =
-        '<div class="empty-state"><span class="icon">📭</span>Sila tambah分组 terlebih dahulu.</div>';
-      setSyncBadge('ok', 'Tiada分组');
-      return;
-    }
-
-    // 保持当前分组，若失效则选第一个
-    if (!currentGroup || groups.indexOf(currentGroup) === -1) currentGroup = groups[0];
-
-    renderGroupTabs();
-    updateGroupSelect();
-    await loadUrlDataForGroup(currentGroup);
-
+    const g = await apiGet('getGroups');
+    groups = g.data || [];
+    await loadAllGroupItems();
+    renderGroupChips();
+    renderGroupCards();
+    cacheToLocalStorage();
+    setSyncBadge('ok', 'Data dimuat (' + groups.length + ' kumpulan)');
   } catch (err) {
-    console.error('loadGroups error:', err);
-    setSyncBadge('err', 'Gagal muat分组');
-    document.getElementById('groupTabs').innerHTML =
-      '<span style="color:#dc2626;font-size:0.8rem;">❌ ' + escapeHtml(err.message) + '</span>';
+    console.error(err);
+    loadFromLocalStorage();
+    renderGroupChips();
+    renderGroupCards();
+    setSyncBadge('err', 'Gagal muat (fallback local)');
   }
 }
 
-function renderGroupTabs() {
-  const container = document.getElementById('groupTabs');
-  let html = '';
-  groups.forEach(g => {
-    const active = g === currentGroup ? ' active' : '';
-    html += `<div class="group-tab${active}" onclick="switchGroup('${escapeAttr(g)}')" title="Sheet: ${escapeAttr(g)}">
-      <span>📁 ${escapeHtml(g)}</span>
-      <span class="count" id="cnt-${escapeAttr(g)}">-</span>
-      <span class="del-x" onclick="event.stopPropagation(); promptDeleteGroup('${escapeAttr(g)}')" title="Padam分组">✕</span>
-    </div>`;
-  });
-  html += `<div class="group-actions">
-    <button class="btn btn-sm btn-success" onclick="promptCreateGroup()" title="Tambah分组"><i class="fas fa-plus"></i> 分组</button>
-    <button class="btn btn-sm" onclick="promptRenameGroup()" title="Rename当前分组"><i class="fas fa-pen"></i> Rename</button>
-  </div>`;
-  container.innerHTML = html;
+async function loadAllGroupItems() {
+  // 逐个分组并行请求，避免单次负载过大
+  itemsByGroup = {};
+  await Promise.all(groups.map(async (grp) => {
+    try {
+      const res = await apiGet('getBackupUrls', { group: grp.name });
+      itemsByGroup[grp.name] = (res.data || []).map(row => ({
+        id: String(row.ID || row.id || ''),
+        name: String(row.Name || row.name || ''),
+        url: String(row.URL || row.url || ''),
+        timestamp: row.Timestamp || row.timestamp || ''
+      }));
+    } catch (e) {
+      console.warn('Load group failed:', grp.name, e);
+      itemsByGroup[grp.name] = [];
+    }
+  }));
 }
 
-function updateGroupSelect() {
-  const sel = document.getElementById('inputGroup');
-  sel.innerHTML = groups.map(g =>
-    `<option value="${escapeAttr(g)}" ${g === currentGroup ? 'selected' : ''}>${escapeHtml(g)}</option>`
-  ).join('');
+/* ============================================================
+   渲染分组 chips
+   ============================================================ */
+function renderGroupChips() {
+  const container = document.getElementById('groupChips');
+  if (!groups.length) {
+    container.innerHTML = `<span class="sync-badge err"><span class="dot err"></span>Tiada kumpulan</span>`;
+    return;
+  }
+  container.innerHTML = groups.map((g, idx) => `
+    <span class="group-chip">
+      <i class="fas fa-folder"></i> ${escapeHtml(g.name)}
+      <span class="chip-actions">
+        <button title="Naik" ${idx === 0 ? 'disabled' : ''} onclick="moveGroup('${escapeAttr(g.name)}','up')"><i class="fas fa-arrow-up"></i></button>
+        <button title="Turun" ${idx === groups.length - 1 ? 'disabled' : ''} onclick="moveGroup('${escapeAttr(g.name)}','down')"><i class="fas fa-arrow-down"></i></button>
+        <button class="danger" title="Padam" onclick="removeGroup('${escapeAttr(g.name)}')"><i class="fas fa-trash-alt"></i></button>
+      </span>
+    </span>
+  `).join('');
 }
 
-function switchGroup(g) {
-  if (g === currentGroup) return;
-  currentGroup = g;
-  renderGroupTabs();
-  updateGroupSelect();
-  loadUrlDataForGroup(g);
+/* ============================================================
+   渲染分组卡片
+   ============================================================ */
+function renderGroupCards() {
+  const container = document.getElementById('groupsContainer');
+  if (!groups.length) {
+    container.innerHTML = `<div class="group-card"><div class="empty-state"><span class="icon">📂</span>Tiada kumpulan. Klik "Tambah Kumpulan".</div></div>`;
+    return;
+  }
+
+  container.innerHTML = groups.map(g => {
+    const items = itemsByGroup[g.name] || [];
+    const gid = 'group_' + safeId(g.name);
+    return `
+      <div class="group-card" id="${gid}">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="icon"><i class="fas fa-folder-open"></i></span>
+            ${escapeHtml(g.name)}
+            <span class="sheet-tag"><i class="fas fa-table"></i> ${escapeHtml(g.sheetName || '')}</span>
+          </div>
+          <div class="card-actions">
+            <span class="sync-badge"><span class="dot ok"></span>${items.length} item</span>
+          </div>
+        </div>
+        <div class="card-body">
+          ${renderItemsTable(g.name, items)}
+        </div>
+        ${renderAddForm(g.name)}
+      </div>
+    `;
+  }).join('');
 }
 
-async function loadUrlDataForGroup(group) {
-  document.getElementById('currentGroupLabel').textContent = '— ' + group;
-  document.getElementById('urlListContainer').innerHTML =
-    '<div class="empty-state"><span class="spinner"></span>Memuatkan ' + escapeHtml(group) + '...</div>';
-  setSyncBadge('busy', 'Memuatkan ' + group + '...');
+function renderItemsTable(groupName, items) {
+  if (!items.length) {
+    return `<div class="empty-state"><span class="icon">📭</span>Tiada URL dalam kumpulan ini.</div>`;
+  }
+  let rows = items.map((it, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td>${escapeHtml(it.name || '-')}</td>
+      <td class="url-cell">
+        <a href="${escapeAttr(it.url)}" target="_blank" rel="noopener noreferrer" title="${escapeAttr(it.url)}">
+          ${escapeHtml(truncateUrl(it.url, 60))}
+        </a>
+      </td>
+      <td class="actions-cell">
+        <button title="Salin" onclick="copyUrl('${escapeAttr(it.url)}')"><i class="fas fa-copy"></i></button>
+        <button class="delete" title="Padam" onclick="removeItem('${escapeAttr(groupName)}','${escapeAttr(it.id)}','${escapeAttr(it.timestamp)}')"><i class="fas fa-trash-alt"></i></button>
+      </td>
+    </tr>
+  `).join('');
 
+  return `
+    <table class="url-table">
+      <thead>
+        <tr>
+          <th style="width:40px;">#</th>
+          <th>Nama</th>
+          <th>URL</th>
+          <th style="width:70px; text-align:right;">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+function renderAddForm(groupName) {
+  const gid = safeId(groupName);
+  return `
+    <div class="add-form">
+      <div class="field">
+        <label>Nama / Keterangan</label>
+        <input type="text" id="name_${gid}" placeholder="Contoh: Backup Jan 2025" />
+      </div>
+      <div class="field" style="flex:2;">
+        <label>URL</label>
+        <input type="text" id="url_${gid}" placeholder="https://..." />
+      </div>
+      <div class="field" style="flex:0 0 auto;">
+        <label>&nbsp;</label>
+        <button class="btn btn-success" onclick="addItem('${escapeAttr(groupName)}')" style="padding:0.45rem 1.2rem;">
+          <i class="fas fa-plus"></i> Tambah
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   增删：分组
+   ============================================================ */
+async function promptAddGroup() {
+  const name = prompt('Nama kumpulan baru (akan jadi nama worksheet):');
+  if (!name) return;
+  const trimmed = name.trim();
+  if (!trimmed) return;
+  setSyncBadge('busy', 'Menambah kumpulan…');
   try {
-    const res = await fetch(`${SCRIPT_URL}?action=getBackupUrls&group=${encodeURIComponent(group)}&_t=${Date.now()}`);
-    const result = await res.json();
-    if (result.status !== 'success') throw new Error(result.message || 'Gagal');
+    await apiPost('addGroup', { name: trimmed });
+    setSyncBadge('ok', 'Kumpulan ditambah');
+    await refreshAll();
+  } catch (err) {
+    setSyncBadge('err', 'Gagal tambah kumpulan');
+    alert('❌ ' + err.message);
+  }
+}
 
-    allUrls = (result.data || []).map((row, i) => ({
-      id: String(row.ID || row.id || i + 1),
-      group: String(row.Group || row.group || group),
+async function removeGroup(name) {
+  if (!confirm(`Padam kumpulan "${name}"?\n\n⚠️ Worksheet berkaitan akan dipadam sekali.`)) return;
+  setSyncBadge('busy', 'Memadam kumpulan…');
+  try {
+    await apiPost('deleteGroup', { name });
+    setSyncBadge('ok', 'Kumpulan dipadam');
+    await refreshAll();
+  } catch (err) {
+    setSyncBadge('err', 'Gagal padam kumpulan');
+    alert('❌ ' + err.message);
+  }
+}
+
+async function moveGroup(name, direction) {
+  setSyncBadge('busy', 'Menyusun…');
+  try {
+    await apiPost('moveGroup', { name, direction });
+    setSyncBadge('ok', 'Susunan dikemas kini');
+    await refreshAll();
+  } catch (err) {
+    setSyncBadge('err', 'Gagal susun');
+    alert('❌ ' + err.message);
+  }
+}
+
+/* ============================================================
+   增删：分组内的 URL
+   ============================================================ */
+async function addItem(groupName) {
+  const gid = safeId(groupName);
+  const nameEl = document.getElementById('name_' + gid);
+  const urlEl = document.getElementById('url_' + gid);
+  const name = (nameEl.value || '').trim();
+  const url = (urlEl.value || '').trim();
+
+  if (!name) { alert('Sila masukkan Nama.'); nameEl.focus(); return; }
+  if (!url) { alert('Sila masukkan URL.'); urlEl.focus(); return; }
+  if (!/^https?:\/\//i.test(url)) { alert('URL mesti bermula http:// atau https://'); return; }
+
+  setSyncBadge('busy', 'Menyimpan…');
+  try {
+    await apiPost('saveBackupUrl', { group: groupName, name, url });
+    setSyncBadge('ok', 'URL disimpan');
+    nameEl.value = ''; urlEl.value = '';
+    // 仅刷新这个分组
+    await refreshOneGroup(groupName);
+    renderGroupCards();
+    renderGroupChips();
+    cacheToLocalStorage();
+  } catch (err) {
+    setSyncBadge('err', 'Gagal simpan');
+    alert('❌ ' + err.message);
+  }
+}
+
+async function removeItem(groupName, id, timestamp) {
+  if (!confirm('Padam URL ini?')) return;
+  setSyncBadge('busy', 'Memadam…');
+  try {
+    await apiPost('deleteBackupUrl', { group: groupName, id, timestamp });
+    setSyncBadge('ok', 'URL dipadam');
+    await refreshOneGroup(groupName);
+    renderGroupCards();
+    renderGroupChips();
+    cacheToLocalStorage();
+  } catch (err) {
+    setSyncBadge('err', 'Gagal padam');
+    alert('❌ ' + err.message);
+  }
+}
+
+async function refreshOneGroup(groupName) {
+  try {
+    const res = await apiGet('getBackupUrls', { group: groupName });
+    itemsByGroup[groupName] = (res.data || []).map(row => ({
+      id: String(row.ID || row.id || ''),
       name: String(row.Name || row.name || ''),
       url: String(row.URL || row.url || ''),
       timestamp: row.Timestamp || row.timestamp || ''
     }));
-
-    renderUrlTable();
-    updateCountForGroup(group, allUrls.length);
-    setSyncBadge('ok', group + ' (' + allUrls.length + ' URL)');
-  } catch (err) {
-    console.error('load group error:', err);
-    document.getElementById('urlListContainer').innerHTML =
-      '<div class="empty-state"><span class="icon">⚠️</span>Gagal muat: ' + escapeHtml(err.message) + '</div>';
-    setSyncBadge('err', 'Gagal muat ' + group);
+  } catch (e) {
+    console.warn('refreshOneGroup failed', e);
   }
 }
 
-function updateCountForGroup(group, count) {
-  const el = document.getElementById('cnt-' + cssSafe(group));
-  if (el) el.textContent = count;
-  document.getElementById('countText').textContent = count + ' URL';
-  document.getElementById('countBadge').className = 'sync-badge ok';
+/* ============================================================
+   复制
+   ============================================================ */
+function copyUrl(url) {
+  navigator.clipboard.writeText(url).then(() => {
+    setSyncBadge('ok', 'URL disalin');
+    setTimeout(() => setSyncBadge('ok', 'Sedia'), 1200);
+  }).catch(() => alert('Gagal menyalin: ' + url));
 }
 
-function renderUrlTable() {
-  const container = document.getElementById('urlListContainer');
-  if (!allUrls || allUrls.length === 0) {
-    container.innerHTML = `<div class="empty-state">
-      <span class="icon">📭</span>
-      Tiada URL dalam分组 <strong>${escapeHtml(currentGroup)}</strong>. Tambah di bawah.
-    </div>`;
-    return;
-  }
-  let html = `<table class="url-table"><thead><tr>
-    <th style="width:40px;">#</th><th style="width:140px;">Kumpulan</th>
-    <th>Nama / Keterangan</th><th>URL</th>
-    <th style="width:80px;text-align:right;">Aksi</th></tr></thead><tbody>`;
-  allUrls.forEach((item, index) => {
-    html += `<tr>
-      <td>${index + 1}</td>
-      <td><span class="group-badge">${escapeHtml(item.group || 'Lain-lain')}</span></td>
-      <td>${escapeHtml(item.name || '-')}</td>
-      <td class="url-cell"><a href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer" title="${escapeAttr(item.url)}">${escapeHtml(truncateUrl(item.url, 60))}</a></td>
-      <td class="actions-cell">
-        <button class="copy" title="Salin URL" onclick="copyUrl('${escapeAttr(item.url)}')"><i class="fas fa-copy"></i></button>
-        <button class="delete" title="Padam" onclick="deleteUrl('${escapeAttr(item.id)}','${escapeAttr(item.timestamp)}')"><i class="fas fa-trash-alt"></i></button>
-      </td>
-    </tr>`;
-  });
-  html += `</tbody></table>`;
-  container.innerHTML = html;
-}
-
+/* ============================================================
+   工具
+   ============================================================ */
 function truncateUrl(url, max) {
   if (!url) return '';
   return url.length > max ? url.substring(0, max) + '…' : url;
@@ -655,189 +830,39 @@ function escapeHtml(s) {
   if (s === null || s === undefined) return '';
   return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
-function escapeAttr(s) { return escapeHtml(s).replace(/'/g, '&#39;'); }
-function cssSafe(s) { return String(s).replace(/[^\w\-]/g, '_'); }
+function escapeAttr(s) {
+  return escapeHtml(s).replace(/\\/g, '\\\\');
+}
+function safeId(s) {
+  return String(s || '').replace(/[^a-zA-Z0-9_-]/g, '_');
+}
 
 /* ============================================================
-   Add URL
+   本地缓存（离线回退）
    ============================================================ */
-async function addUrl() {
-  const group = document.getElementById('inputGroup').value;
-  const name = document.getElementById('inputName').value.trim();
-  const url = document.getElementById('inputUrl').value.trim();
-
-  if (!group) { alert('Sila pilih分组.'); return; }
-  if (!name) { alert('Sila masukkan Nama / Keterangan.'); return; }
-  if (!url) { alert('Sila masukkan URL.'); return; }
-  if (!/^https?:\/\//i.test(url)) { alert('URL mesti bermula dengan http:// atau https://'); return; }
-
-  const newItem = {
-    id: Date.now().toString(),
-    group: group,
-    name: name,
-    url: url,
-    timestamp: new Date().toISOString()
-  };
-
-  setSyncBadge('busy', 'Menyimpan...');
+function cacheToLocalStorage() {
   try {
-    const res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'saveBackupUrl', data: newItem })
-    });
-    const result = await res.json();
-    if (result.status !== 'success') throw new Error(result.message || 'Gagal');
-    if (result.id) newItem.id = result.id;
-    setSyncBadge('ok', 'Disimpan ke ' + group);
-  } catch (err) {
-    console.error('save error:', err);
-    setSyncBadge('err', 'Gagal simpan');
-    alert('❌ ' + err.message);
-    return;
-  }
-
-  // 若当前分组就是目标分组，直接刷新
-  if (group === currentGroup) {
-    await loadUrlDataForGroup(currentGroup);
-  } else {
-    // 切换到目标分组并刷新
-    currentGroup = group;
-    renderGroupTabs();
-    updateGroupSelect();
-    await loadUrlDataForGroup(currentGroup);
-  }
-
-  document.getElementById('inputName').value = '';
-  document.getElementById('inputUrl').value = '';
-  document.getElementById('inputName').focus();
+    localStorage.setItem(URL_CACHE_KEY, JSON.stringify({ groups, itemsByGroup }));
+  } catch (e) {}
 }
-
-/* ============================================================
-   Delete URL
-   ============================================================ */
-async function deleteUrl(id, timestamp) {
-  if (!confirm('Padam URL ini dari分组 ' + currentGroup + '?')) return;
-
-  setSyncBadge('busy', 'Memadam...');
+function loadFromLocalStorage() {
   try {
-    const res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({
-        action: 'deleteBackupUrl',
-        data: { group: currentGroup, id: id, timestamp: timestamp }
-      })
-    });
-    const result = await res.json();
-    if (result.status !== 'success') throw new Error(result.message || 'Gagal');
-    setSyncBadge('ok', 'Dipadam');
-  } catch (err) {
-    console.error('delete error:', err);
-    setSyncBadge('err', 'Gagal padam');
-    alert('❌ ' + err.message);
-    return;
-  }
-
-  await loadUrlDataForGroup(currentGroup);
-}
-
-/* ============================================================
-   Group CRUD
-   ============================================================ */
-async function promptCreateGroup() {
-  const name = prompt('Nama分组 baru (akan jadi nama Sheet):');
-  if (!name) return;
-  const trimmed = name.trim();
-  if (!trimmed) return;
-
-  setSyncBadge('busy', 'Mencipta分组...');
-  try {
-    const res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'createGroup', data: { group: trimmed } })
-    });
-    const result = await res.json();
-    if (result.status !== 'success') throw new Error(result.message || 'Gagal');
-    setSyncBadge('ok', '分组 dicipta');
-    currentGroup = result.group || trimmed;
-    await loadGroupsAndData();
-  } catch (err) {
-    console.error('create group error:', err);
-    setSyncBadge('err', 'Gagal cipta分组');
-    alert('❌ ' + err.message);
-  }
-}
-
-async function promptDeleteGroup(group) {
-  if (!confirm('⚠️ Padam分组 "' + group + '"?\n\nSemua URL dalam Sheet ini akan HILANG. Ini tidak boleh undo.')) return;
-
-  setSyncBadge('busy', 'Memadam分组...');
-  try {
-    const res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'deleteGroup', data: { group: group } })
-    });
-    const result = await res.json();
-    if (result.status !== 'success') throw new Error(result.message || 'Gagal');
-    setSyncBadge('ok', '分组 dipadam');
-    if (currentGroup === group) currentGroup = '';
-    await loadGroupsAndData();
-  } catch (err) {
-    console.error('delete group error:', err);
-    setSyncBadge('err', 'Gagal padam分组');
-    alert('❌ ' + err.message);
-  }
-}
-
-async function promptRenameGroup() {
-  if (!currentGroup) return alert('Tiada分组 dipilih');
-  const newName = prompt('Nama baru untuk分组 "' + currentGroup + '":', currentGroup);
-  if (!newName) return;
-  const trimmed = newName.trim();
-  if (!trimmed || trimmed === currentGroup) return;
-
-  setSyncBadge('busy', 'Menamakan semula...');
-  try {
-    const res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'renameGroup', data: { oldGroup: currentGroup, newGroup: trimmed } })
-    });
-    const result = await res.json();
-    if (result.status !== 'success') throw new Error(result.message || 'Gagal');
-    setSyncBadge('ok', '分组 dinamakan semula');
-    currentGroup = result.group || trimmed;
-    await loadGroupsAndData();
-  } catch (err) {
-    console.error('rename group error:', err);
-    setSyncBadge('err', 'Gagal rename');
-    alert('❌ ' + err.message);
+    const raw = localStorage.getItem(URL_CACHE_KEY);
+    if (!raw) { groups = []; itemsByGroup = {}; return; }
+    const data = JSON.parse(raw);
+    groups = Array.isArray(data.groups) ? data.groups : [];
+    itemsByGroup = data.itemsByGroup || {};
+  } catch (e) {
+    groups = []; itemsByGroup = {};
   }
 }
 
 /* ============================================================
-   Copy
-   ============================================================ */
-function copyUrl(url) {
-  navigator.clipboard.writeText(url).then(() => {
-    const btn = event.target.closest('button');
-    if (btn) {
-      const original = btn.innerHTML;
-      btn.innerHTML = '<i class="fas fa-check" style="color:#0f7a54;"></i>';
-      setTimeout(() => { btn.innerHTML = original; }, 1500);
-    }
-  }).catch(() => alert('Gagal menyalin: ' + url));
-}
-
-/* ============================================================
-   Init
+   初始化
    ============================================================ */
 window.addEventListener('DOMContentLoaded', () => {
   initFixedScriptUrl();
-  loadGroupsAndData();
+  refreshAll();
 });
 </script>
 </body>
