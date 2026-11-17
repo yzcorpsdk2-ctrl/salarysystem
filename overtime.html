@@ -704,7 +704,37 @@ function fmtHHMMSS(h) {
     .map(n => String(n).padStart(2, '0')).join(':');
 }
 function fmtRM(v) { return 'RM ' + (Number(v) || 0).toFixed(2); }
-function parseH(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
+
+// 【关键修复】兼容各种时间格式解析（包括 ISO 字符串、HH:MM:SS 和纯数字）
+function parseH(v) {
+  if (v === undefined || v === null || v === '') return 0;
+  if (typeof v === 'number') return v;
+  
+  let str = String(v).trim();
+  
+  // 1. 兼容 ISO Date 字符串 (如 "1899-12-30T02:30:00.000Z")
+  if (str.includes('T') && str.includes(':')) {
+    const match = str.match(/T(\d{2}):(\d{2})(?::(\d{2}))?/);
+    if (match) {
+      return (parseInt(match[1], 10) || 0) + (parseInt(match[2], 10) || 0)/60 + (parseInt(match[3], 10) || 0)/3600;
+    }
+  }
+  
+  // 2. 兼容 "02:30:00" 或者 "2:30" 这种标准时间字符串
+  if (str.includes(':')) {
+    const parts = str.split(':');
+    return (parseFloat(parts[0]) || 0) + (parseFloat(parts[1]) || 0)/60 + (parseFloat(parts[2]) || 0)/3600;
+  }
+  
+  // 3. 兼容 "2.5h" 或者纯数字字符串 "2.5"
+  if (str.toLowerCase().endsWith('h')) {
+    return parseFloat(str) || 0;
+  }
+  
+  const n = parseFloat(str);
+  return isNaN(n) ? 0 : n;
+}
+
 function escapeHtml(s) {
   if (s == null) return '';
   return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
