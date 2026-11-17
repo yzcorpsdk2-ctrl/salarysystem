@@ -168,6 +168,8 @@
   .btn:hover { background: var(--epf-blue-soft); border-color: #b8cfe8; }
   .btn-success { background: #0f7a54; border: 1px solid #0f7a54; color: #fff; }
   .btn-success:hover { background: #0c6a48; border-color: #0c6a48; }
+  .btn-ghost { background: #fff; color: var(--epf-muted); }
+  .btn-ghost:hover { color: var(--epf-blue); }
   .sync-badge {
     display: inline-flex; align-items: center; gap: 0.35rem;
     background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft);
@@ -213,6 +215,8 @@
     padding: 1rem 1.25rem;
     border-bottom: 1px solid var(--epf-border-soft);
     background: #fafcff;
+    gap: 0.75rem;
+    flex-wrap: wrap;
   }
   .url-table-header h2 {
     font-size: 0.95rem;
@@ -340,12 +344,25 @@
     box-shadow: 0 0 0 2px rgba(26,79,138,0.10);
   }
 
+  /* Endpoint pill (read-only, fixed URL) */
+  .endpoint-pill {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    background: #fff; border: 1px dashed #b8cfe8;
+    padding: 0.3rem 0.6rem; border-radius: 6px;
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 0.68rem; color: #2c5f8a;
+    max-width: 380px; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+  }
+  .endpoint-pill i { color: #0f7a54; }
+
   @media (max-width: 900px) {
     .url-table { font-size: 0.75rem; }
     .url-table th, .url-table td { padding: 0.5rem 0.6rem; }
     .url-table .url-cell { max-width: 160px; }
     .add-form { flex-direction: column; }
     .add-form .field { min-width: 100%; }
+    .endpoint-pill { max-width: 100%; }
   }
   @media (max-width: 768px) {
     .navbar { padding: 0 0.5rem; }
@@ -434,10 +451,17 @@
   <span class="sync-badge" id="syncBadge">
     <span class="dot"></span><span id="syncBadgeText">Sedia</span>
   </span>
+
+  <!-- ✅ 固定的独立 Apps Script URL 显示（只读） -->
+  <span class="endpoint-pill" id="endpointPill" title="URL Apps Script Backup 已固定，不可更改">
+    <i class="fas fa-lock"></i>
+    <span id="endpointText">Memuatkan...</span>
+  </span>
+
   <span style="flex:1;"></span>
-  <!-- ✅ 独立的 URL 设置按钮 -->
-  <button class="btn" onclick="setBackupScriptUrl()" title="Set URL Apps Script Backup (sekali sahaja, kekal)">
-    🔧 Set URL
+
+  <button class="btn btn-ghost" onclick="copyEndpointUrl()" title="Salin URL Apps Script Backup">
+    <i class="fas fa-copy"></i> Salin URL
   </button>
   <button class="btn btn-success" onclick="loadUrlData()">
     <i class="fas fa-sync-alt"></i> Muat Semula
@@ -449,7 +473,7 @@
   <div class="page-header">
     <div class="info">
       <h1>🔗 Google Sheet Backup URL</h1>
-      <p>Simpan dan urus semua URL penting (Google Sheet, Apps Script, dll.) di satu tempat. Data disimpan dalam Google Sheet berasingan.</p>
+      <p>Simpan dan urus semua URL penting (Google Sheet, Apps Script, dll.) di satu tempat. Data disimpan dalam Google Sheet berasingan melalui Apps Script Backup yang <strong>独立且永久固定</strong>。</p>
     </div>
   </div>
 
@@ -546,13 +570,21 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /* ============================================================
-   ✅ 独立的 Backup URL 逻辑（与 dashboard 分开）
+   ✅ 独立的 Backup URL 逻辑（与 dashboard 完全分开）
+   ------------------------------------------------------------
+   1) BACKUP_SCRIPT_URL 已硬编码为永久固定的独立 Apps Script URL
+   2) localStorage 仅作为"记忆 + 离线回退"，且会被强制覆盖为固定 URL
+   3) 不读取、不监听、不依赖 dashboard 的任何 URL 键
    ============================================================ */
-const URL_STORAGE_KEY = 'payrollBackupUrls';
-// ✅ 独立的存储键，与 dashboard 的 payrollScriptUrl 完全分开
-const BACKUP_SCRIPT_URL_KEY = 'payrollBackupScriptUrl';
+const DEFAULT_BACKUP_SCRIPT_URL =
+  'https://script.google.com/macros/s/AKfycbzujEx2uMG1wGRuf1pxoz7zUkq-CH2J5EbhWIDSN8hWK1eshThEpQZK0Q9nVs5sflYU/exec';
 
-let SCRIPT_URL = '';
+const URL_STORAGE_KEY = 'payrollBackupUrls';
+// 独立存储键，与 dashboard 的 payrollScriptUrl 完全分开
+const BACKUP_SCRIPT_URL_KEY = 'payrollBackupScriptUrlFixed';
+
+// 运行时使用的固定 URL（初始化时会被强制设为 DEFAULT）
+let SCRIPT_URL = DEFAULT_BACKUP_SCRIPT_URL;
 let allUrls = [];
 
 function setSyncBadge(state, text) {
@@ -563,50 +595,46 @@ function setSyncBadge(state, text) {
   txt.textContent = text;
 }
 
-/* ---------- 独立 URL 的加载与设置 ---------- */
-function loadSavedDeployUrl() {
-  try {
-    const saved = localStorage.getItem(BACKUP_SCRIPT_URL_KEY);
-    if (saved) {
-      SCRIPT_URL = saved;
-    } else {
-      SCRIPT_URL = '';
-    }
-  } catch (e) { SCRIPT_URL = ''; }
+function renderEndpointPill() {
+  const el = document.getElementById('endpointText');
+  if (!el) return;
+  // 简短显示，完整 URL 放在 title 与复制按钮
+  const short = SCRIPT_URL.length > 52
+    ? SCRIPT_URL.substring(0, 40) + '…' + SCRIPT_URL.slice(-10)
+    : SCRIPT_URL;
+  el.textContent = short;
+  const pill = document.getElementById('endpointPill');
+  if (pill) pill.title = SCRIPT_URL;
 }
 
-/* 第一次设置独立 URL（填入后永久固定在 localStorage） */
-function setBackupScriptUrl() {
-  const current = SCRIPT_URL || '';
-  const url = prompt(
-    'Masukkan URL Web App Google Apps Script (Backup URL 专用):\n\n' +
-    'Contoh: https://script.google.com/macros/s/XXXXX/exec\n\n' +
-    '⚠️ URL ini akan disimpan kekal dan TIDAK sama dengan dashboard.',
-    current
-  );
-  if (url === null) return; // 用户取消
-  const trimmed = url.trim();
-  if (!trimmed) {
-    // 允许清空（重置）
-    try { localStorage.removeItem(BACKUP_SCRIPT_URL_KEY); } catch (e) {}
-    SCRIPT_URL = '';
-    allUrls = [];
-    renderUrlTable();
-    setSyncBadge('', 'URL belum ditetapkan');
-    return;
-  }
-  if (!trimmed.startsWith('https://script.google.com/')) {
-    alert('URL tidak sah. Sila masukkan URL Web App Apps Script yang betul.');
-    return;
-  }
+/* ---------- 固定 URL 初始化（永久锁定） ---------- */
+function initFixedScriptUrl() {
+  // 无论 localStorage 里是什么，都强制写回硬编码的固定 URL
   try {
-    localStorage.setItem(BACKUP_SCRIPT_URL_KEY, trimmed);
-    SCRIPT_URL = trimmed;
-    setSyncBadge('ok', 'URL disimpan');
-    loadUrlData();
+    const stored = localStorage.getItem(BACKUP_SCRIPT_URL_KEY);
+    if (stored !== DEFAULT_BACKUP_SCRIPT_URL) {
+      localStorage.setItem(BACKUP_SCRIPT_URL_KEY, DEFAULT_BACKUP_SCRIPT_URL);
+    }
   } catch (e) {
-    alert('Gagal menyimpan URL.');
+    // localStorage 不可用时忽略，仍使用内存中的 DEFAULT
   }
+  SCRIPT_URL = DEFAULT_BACKUP_SCRIPT_URL;
+  renderEndpointPill();
+}
+
+/* ---------- 复制固定 URL ---------- */
+function copyEndpointUrl() {
+  navigator.clipboard.writeText(SCRIPT_URL).then(() => {
+    setSyncBadge('ok', 'URL disalin');
+    setTimeout(() => {
+      // 不覆盖正在加载的状态
+      if (!document.querySelector('.spinner')) {
+        setSyncBadge('ok', 'Sedia');
+      }
+    }, 1200);
+  }).catch(() => {
+    alert('Gagal menyalin. Sila salin manual:\n' + SCRIPT_URL);
+  });
 }
 
 /* ---------- Render table ---------- */
@@ -673,16 +701,15 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
 
-/* ---------- Load data from Google Sheet via Apps Script ---------- */
+/* ---------- Load data from fixed Google Sheet via Apps Script ---------- */
 async function loadUrlData() {
   if (!SCRIPT_URL) {
     document.getElementById('urlListContainer').innerHTML = `
       <div class="empty-state">
-        <span class="icon">🔗</span>
-        Sila klik <strong>🔧 Set URL</strong> di toolbar untuk menetapkan URL Apps Script Backup (kekal).<br><br>
-        <small>URL ini berasingan dan tidak sama dengan dashboard.</small>
+        <span class="icon">⚠️</span>
+        URL Apps Script Backup tidak ditetapkan. Sila semak kod.
       </div>`;
-    setSyncBadge('err', 'URL belum ditetapkan');
+    setSyncBadge('err', 'URL tidak sah');
     document.getElementById('countText').textContent = '0 URL';
     return;
   }
@@ -705,8 +732,11 @@ async function loadUrlData() {
         url: String(row.URL || row.url || ''),
         timestamp: row.Timestamp || row.timestamp || ''
       }));
+      // 缓存到本地，供离线查看
+      saveToLocalStorage();
     } else {
       loadFromLocalStorage();
+      setSyncBadge('err', 'Respons tidak sah (fallback local)');
     }
   } catch (err) {
     console.error('Load URL data error:', err);
@@ -747,10 +777,6 @@ async function addUrl() {
   if (!url) { alert('Sila masukkan URL.'); return; }
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
     alert('URL mesti bermula dengan http:// atau https://');
-    return;
-  }
-  if (!SCRIPT_URL) {
-    alert('Sila tetapkan URL Apps Script Backup terlebih dahulu (klik 🔧 Set URL).');
     return;
   }
 
@@ -800,28 +826,26 @@ async function deleteUrl(id) {
 
   const deletedItem = allUrls[index];
 
-  if (SCRIPT_URL) {
-    setSyncBadge('busy', 'Memadam...');
-    try {
-      const res = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'deleteBackupUrl',
-          data: { id: id, timestamp: deletedItem.timestamp }
-        })
-      });
-      const result = await res.json();
-      if (result.status !== 'success') {
-        throw new Error(result.message || 'Gagal memadam');
-      }
-      setSyncBadge('ok', 'URL dipadam');
-    } catch (err) {
-      console.error('Delete error:', err);
-      setSyncBadge('err', 'Gagal padam dari sheet');
-      alert('❌ Gagal memadam dari Google Sheet: ' + err.message);
-      return;
+  setSyncBadge('busy', 'Memadam...');
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'deleteBackupUrl',
+        data: { id: id, timestamp: deletedItem.timestamp }
+      })
+    });
+    const result = await res.json();
+    if (result.status !== 'success') {
+      throw new Error(result.message || 'Gagal memadam');
     }
+    setSyncBadge('ok', 'URL dipadam');
+  } catch (err) {
+    console.error('Delete error:', err);
+    setSyncBadge('err', 'Gagal padam dari sheet');
+    alert('❌ Gagal memadam dari Google Sheet: ' + err.message);
+    return;
   }
 
   allUrls.splice(index, 1);
@@ -851,23 +875,11 @@ function saveToLocalStorage() {
 
 /* ---------- Initialize ---------- */
 window.addEventListener('DOMContentLoaded', () => {
-  loadSavedDeployUrl();
-  if (SCRIPT_URL) {
-    loadUrlData();
-  } else {
-    loadFromLocalStorage();
-    renderUrlTable();
-    setSyncBadge('', 'Sedia (local sahaja)');
-    document.getElementById('urlListContainer').innerHTML = `
-      <div class="empty-state">
-        <span class="icon">🔗</span>
-        Sila klik <strong>🔧 Set URL</strong> di toolbar untuk menetapkan URL Apps Script Backup (kekal).<br><br>
-        <small>URL ini berasingan dan tidak sama dengan dashboard.</small>
-      </div>`;
-  }
+  // 永久固定独立 URL
+  initFixedScriptUrl();
+  // 立即加载
+  loadUrlData();
 });
-
-/* ✅ 不再监听 dashboard 的 DEPLOY_URL_KEY，彻底独立 */
 </script>
 </body>
 </html>
