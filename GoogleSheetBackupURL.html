@@ -1,1 +1,873 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Sheet Backup URL · YZ Payroll</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --epf-blue: #1a4f8a; --epf-blue-light: #e8f0fa; --epf-blue-soft: #f4f8fd;
+    --epf-border: #d4e0ee; --epf-border-soft: #e6eef7;
+    --epf-text: #1f2d3d; --epf-muted: #64748b; --epf-bg: #f7fafd;
+    --nav-h: 52px;
+    --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover: #16345c;
+    --nav-text: #cbd9ea; --nav-accent: #4d9fff;
+    --shadow-sm: 0 1px 2px rgba(16,32,56,.05), 0 2px 10px rgba(16,32,56,.05);
+    --shadow-md: 0 8px 24px rgba(16,32,56,.10);
+    --dropdown-bg: #ffffff;
+    --dropdown-shadow: 0 8px 24px rgba(16,32,56,.15);
+  }
+  body {
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--epf-bg); color: var(--epf-text);
+    min-height: 100vh; line-height: 1.5; font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
 
+  /* ---------- NAVBAR ---------- */
+  .navbar {
+    position: sticky; top: 0; z-index: 200;
+    display: flex; align-items: stretch; flex-wrap: wrap;
+    background: linear-gradient(90deg, var(--nav-bg-1) 0%, var(--nav-bg-2) 100%);
+    padding: 0 1rem; min-height: var(--nav-h);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    border-bottom: 1px solid rgba(77,159,255,0.18);
+  }
+  .navbar .nav-brand {
+    display: flex; align-items: center; gap: 0.55rem;
+    color: #fff; font-weight: 800; font-size: 0.78rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding-right: 1.1rem; margin-right: 0.5rem;
+    border-right: 1px solid rgba(255,255,255,0.12);
+    white-space: nowrap;
+  }
+  .navbar .nav-brand .logo {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: linear-gradient(135deg, #4d9fff, #1a4f8a);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 0.85rem; font-weight: 800;
+    box-shadow: 0 2px 6px rgba(77,159,255,0.35);
+  }
+  .nav-links {
+    display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px;
+    position: relative;
+  }
+  .nav-item {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    padding: 0 0.85rem; min-height: var(--nav-h);
+    color: var(--nav-text); text-decoration: none;
+    font-family: inherit; font-size: 0.73rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    background: transparent; border: none; cursor: pointer;
+    white-space: nowrap; transition: background 0.15s, color 0.15s;
+    position: relative;
+  }
+  .nav-item:hover, .nav-item.active { background: var(--nav-hover); color: #fff; }
+  .nav-item::after {
+    content: ''; position: absolute; left: 0.85rem; right: 0.85rem; bottom: 0;
+    height: 2px; background: var(--nav-accent); transform: scaleX(0);
+    transform-origin: left; transition: transform 0.2s;
+  }
+  .nav-item:hover::after, .nav-item.active::after { transform: scaleX(1); }
+  .nav-back {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 44px; padding: 0 0.6rem;
+    color: var(--nav-text);
+    background: transparent; border: none; cursor: pointer;
+    font-size: 1.1rem; transition: background 0.15s, color 0.15s;
+  }
+  .nav-back:hover { background: var(--nav-hover); color: #fff; }
+  .nav-dropdown {
+    position: relative;
+    display: inline-flex;
+    align-items: stretch;
+  }
+  .nav-dropdown > .nav-item { padding-right: 0.55rem; }
+  .nav-dropdown > .nav-item .fa-caret-down { font-size: 0.6rem; margin-left: 0.2rem; opacity: 0.7; }
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 200px;
+    background: var(--dropdown-bg);
+    border-radius: 8px;
+    box-shadow: var(--dropdown-shadow);
+    padding: 0.4rem 0;
+    z-index: 300;
+    border: 1px solid var(--epf-border);
+    animation: fadeSlide 0.15s ease;
+  }
+  .nav-dropdown.open .dropdown-menu { display: block; }
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .dropdown-menu a {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    color: var(--epf-text);
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 500;
+    transition: background 0.12s;
+    white-space: nowrap;
+  }
+  .dropdown-menu a:hover { background: var(--epf-blue-soft); color: var(--epf-blue); }
+  .dropdown-menu .divider {
+    height: 1px; background: var(--epf-border-soft); margin: 0.3rem 0.5rem;
+  }
+  .nav-chat {
+    margin-left: auto; align-self: center;
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    padding: 0.5rem 1rem; border: none; border-radius: 20px;
+    background: linear-gradient(135deg, #2f7fe0 0%, #1a4f8a 100%);
+    color: #fff; font-family: inherit; font-size: 0.73rem;
+    font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer; white-space: nowrap;
+    box-shadow: 0 3px 12px rgba(47,127,224,0.4);
+    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+  }
+  .nav-chat:hover { filter: brightness(1.12); transform: translateY(-1px); }
+  .nav-chat .pulse {
+    width: 7px; height: 7px; border-radius: 50%; background: #6ef0a8;
+    box-shadow: 0 0 0 0 rgba(110,240,168,0.75); animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(110,240,168,0.7); }
+    70% { box-shadow: 0 0 0 7px rgba(110,240,168,0); }
+    100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); }
+  }
+
+  /* ---------- TOPBAR ---------- */
+  .topbar {
+    position: sticky; top: var(--nav-h); z-index: 100; background: #ffffff;
+    border-bottom: 1px solid var(--epf-border); padding: 0.65rem 1.75rem;
+    display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+    box-shadow: 0 1px 2px rgba(26,79,138,0.04);
+  }
+  .topbar .brand {
+    font-weight: 700; font-size: 0.95rem; color: var(--epf-blue);
+    display: flex; align-items: center; gap: 0.6rem;
+    margin-right: 0.5rem; letter-spacing: -0.01em;
+  }
+  .topbar .brand .logo {
+    width: 32px; height: 32px; background: var(--epf-blue); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 0.95rem; font-weight: 800;
+  }
+  .btn {
+    background: #ffffff; border: 1px solid var(--epf-border);
+    padding: 0.42rem 0.9rem; border-radius: 5px; font-size: 0.78rem;
+    font-weight: 500; cursor: pointer; color: var(--epf-blue);
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    transition: all 0.15s ease; white-space: nowrap; font-family: inherit;
+  }
+  .btn:hover { background: var(--epf-blue-soft); border-color: #b8cfe8; }
+  .btn-success { background: #0f7a54; border: 1px solid #0f7a54; color: #fff; }
+  .btn-success:hover { background: #0c6a48; border-color: #0c6a48; }
+  .sync-badge {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft);
+    padding: 0.3rem 0.7rem; border-radius: 20px;
+    font-size: 0.68rem; font-weight: 600; color: var(--epf-muted);
+    white-space: nowrap;
+  }
+  .sync-badge .dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #9db8d2;
+    transition: background 0.2s;
+  }
+  .sync-badge.ok .dot { background: #22c55e; }
+  .sync-badge.busy .dot { background: #f59e0b; animation: pulse 1s infinite; }
+  .sync-badge.err .dot { background: #ef4444; }
+
+  /* ---------- MAIN ---------- */
+  .main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem 1.75rem 3rem;
+  }
+  .page-header {
+    background: #ffffff; border: 1px solid var(--epf-border); border-radius: 8px;
+    padding: 1.4rem 1.75rem; margin-bottom: 1.5rem;
+    display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
+    justify-content: space-between; box-shadow: 0 1px 3px rgba(26,79,138,0.04);
+  }
+  .page-header .info { flex: 1; min-width: 240px; }
+  .page-header h1 { font-size: 1.45rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--epf-blue); letter-spacing: -0.015em; }
+  .page-header p { font-size: 0.85rem; color: var(--epf-muted); line-height: 1.6; }
+
+  .url-table-wrapper {
+    background: #ffffff;
+    border: 1px solid var(--epf-border);
+    border-radius: 10px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+  .url-table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--epf-border-soft);
+    background: #fafcff;
+  }
+  .url-table-header h2 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--epf-blue);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .url-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+  }
+  .url-table th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    background: var(--epf-blue-soft);
+    color: var(--epf-blue);
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--epf-border);
+    white-space: nowrap;
+  }
+  .url-table td {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid var(--epf-border-soft);
+    vertical-align: middle;
+  }
+  .url-table tr:last-child td { border-bottom: none; }
+  .url-table tr:hover td { background: #fbfdff; }
+  .url-table .group-badge {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    background: var(--epf-blue-light);
+    color: var(--epf-blue);
+    white-space: nowrap;
+  }
+  .url-table .url-cell {
+    max-width: 350px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #2c5f8a;
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 0.72rem;
+  }
+  .url-table .url-cell a {
+    color: #2c5f8a;
+    text-decoration: none;
+  }
+  .url-table .url-cell a:hover { text-decoration: underline; }
+  .url-table .actions-cell { text-align: right; white-space: nowrap; }
+  .url-table .actions-cell button {
+    background: transparent;
+    border: none;
+    color: var(--epf-muted);
+    cursor: pointer;
+    padding: 0.2rem 0.35rem;
+    font-size: 0.8rem;
+    transition: 0.15s;
+  }
+  .url-table .actions-cell button:hover { color: var(--epf-blue); }
+  .url-table .actions-cell button.delete:hover { color: #dc2626; }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #a7b7c9;
+    font-size: 0.85rem;
+  }
+  .empty-state .icon { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; }
+
+  .spinner {
+    display: inline-block; width: 16px; height: 16px;
+    border: 2px solid rgba(26,79,138,0.2); border-top: 2px solid var(--epf-blue);
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+    margin-right: 6px; vertical-align: middle;
+  }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+  .add-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: #f9fbfe;
+    border-top: 1px solid var(--epf-border-soft);
+    align-items: flex-end;
+  }
+  .add-form .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex: 1;
+    min-width: 140px;
+  }
+  .add-form .field label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--epf-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .add-form .field input,
+  .add-form .field select {
+    padding: 0.45rem 0.65rem;
+    border: 1px solid var(--epf-border);
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-family: inherit;
+    color: var(--epf-text);
+    transition: 0.15s;
+  }
+  .add-form .field input:focus,
+  .add-form .field select:focus {
+    outline: none;
+    border-color: var(--epf-blue);
+    box-shadow: 0 0 0 2px rgba(26,79,138,0.10);
+  }
+
+  @media (max-width: 900px) {
+    .url-table { font-size: 0.75rem; }
+    .url-table th, .url-table td { padding: 0.5rem 0.6rem; }
+    .url-table .url-cell { max-width: 160px; }
+    .add-form { flex-direction: column; }
+    .add-form .field { min-width: 100%; }
+  }
+  @media (max-width: 768px) {
+    .navbar { padding: 0 0.5rem; }
+    .navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
+    .navbar .nav-brand .brand-text { display: none; }
+    .nav-item { padding: 0 0.6rem; font-size: 0.68rem; }
+    .nav-chat { padding: 0.45rem 0.75rem; font-size: 0.66rem; }
+    .topbar { padding: 0.6rem 1rem; }
+    .main-container { padding: 1rem; }
+    .page-header { padding: 1.2rem; }
+    .page-header h1 { font-size: 1.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== NAVBAR ========== -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <span class="logo">Y</span>
+    <span class="brand-text">YZ Payroll</span>
+  </div>
+
+  <div class="nav-links" id="navLinks">
+    <button class="nav-back" id="backBtn" title="Kembali ke halaman sebelumnya">⏎</button>
+
+    <div class="nav-dropdown" id="filesDropdown">
+      <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
+      <div class="dropdown-menu">
+        <a href="dashboard.html">📊 DASHBOARD</a>
+        <a href="staffinfo.html">👥 EMPLOYEES</a>
+        <a href="leave.html">📅 TIMECARD REPORT</a>
+        <a href="overtime.html">⏱️ OVERTIME SHEET</a>
+        <div class="divider"></div>
+        <a href="epf.html">🏦 EPF</a>
+        <a href="socso.html">🛡️ SOCSO</a>
+        <a href="eis.html">📋 EIS</a>
+        <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+        <div class="divider"></div>
+        <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+        <a href="121.html">📄 121</a>
+        <a href="122.html">📄 122</a>
+        <a href="123.html">📄 123</a>
+        <a href="GoogleSheetBackupURL.html">📄 Google Sheet Backup URL</a>
+      </div>
+    </div>
+
+    <a class="nav-item" href="dashboard.html">DASHBOARD</a>
+    <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
+    <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
+
+    <div class="nav-dropdown" id="carumanDropdown">
+      <button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
+      <div class="dropdown-menu">
+        <a href="epf.html">🏦 EPF</a>
+        <a href="socso.html">🛡️ SOCSO</a>
+        <a href="eis.html">📋 EIS</a>
+        <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+      </div>
+    </div>
+
+    <a class="nav-item" href="companysetting.html">SETTING</a>
+
+    <div class="nav-dropdown" id="othersDropdown">
+      <button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
+      <div class="dropdown-menu">
+        <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+        <div class="divider"></div>
+        <a href="121.html">📄 121</a>
+        <a href="122.html">📄 122</a>
+        <a href="123.html">📄 123</a>
+        <a href="GoogleSheetBackupURL.html">📄 Google Sheet Backup URL</a>
+      </div>
+    </div>
+  </div>
+
+  <button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')">
+    <span class="pulse"></span> 💬 Request Chat
+  </button>
+</nav>
+
+<!-- ========== TOPBAR ========== -->
+<div class="topbar">
+  <div class="brand"><div class="logo">B</div> Google Sheet Backup URL</div>
+  <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
+  <span class="sync-badge" id="syncBadge">
+    <span class="dot"></span><span id="syncBadgeText">Sedia</span>
+  </span>
+  <span style="flex:1;"></span>
+  <!-- ✅ 独立的 URL 设置按钮 -->
+  <button class="btn" onclick="setBackupScriptUrl()" title="Set URL Apps Script Backup (sekali sahaja, kekal)">
+    🔧 Set URL
+  </button>
+  <button class="btn btn-success" onclick="loadUrlData()">
+    <i class="fas fa-sync-alt"></i> Muat Semula
+  </button>
+</div>
+
+<!-- ========== MAIN ========== -->
+<div class="main-container">
+  <div class="page-header">
+    <div class="info">
+      <h1>🔗 Google Sheet Backup URL</h1>
+      <p>Simpan dan urus semua URL penting (Google Sheet, Apps Script, dll.) di satu tempat. Data disimpan dalam Google Sheet berasingan.</p>
+    </div>
+  </div>
+
+  <div class="url-table-wrapper">
+    <div class="url-table-header">
+      <h2><i class="fas fa-list"></i> Senarai URL</h2>
+      <span class="sync-badge" id="countBadge">
+        <span class="dot ok"></span><span id="countText">Memuatkan...</span>
+      </span>
+    </div>
+
+    <div id="urlListContainer">
+      <div class="empty-state">
+        <span class="icon">⏳</span>
+        Memuatkan data URL...
+      </div>
+    </div>
+
+    <!-- Add new URL form -->
+    <div class="add-form" id="addForm">
+      <div class="field">
+        <label>Kumpulan (Group)</label>
+        <select id="inputGroup">
+          <option value="Google Sheet">Google Sheet</option>
+          <option value="App Script">App Script</option>
+          <option value="Dashboard">Dashboard</option>
+          <option value="API">API</option>
+          <option value="Lain-lain">Lain-lain</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Nama / Keterangan</label>
+        <input type="text" id="inputName" placeholder="Contoh: Backup Sheet Jan 2025" />
+      </div>
+      <div class="field" style="flex:2;">
+        <label>URL</label>
+        <input type="text" id="inputUrl" placeholder="https://..." />
+      </div>
+      <div class="field" style="flex:0 0 auto;">
+        <label>&nbsp;</label>
+        <button class="btn btn-success" onclick="addUrl()" style="padding:0.45rem 1.2rem;">
+          <i class="fas fa-plus"></i> Tambah
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   NAVBAR DROPDOWN & BACK BUTTON LOGIC
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function() {
+  const backBtn = document.getElementById('backBtn');
+  if (backBtn) {
+    backBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.history.back();
+    });
+  }
+  const dropdownToggles = document.querySelectorAll('[data-dropdown-toggle]');
+  dropdownToggles.forEach(function(toggle) {
+    toggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const dropdownId = this.getAttribute('data-dropdown-toggle');
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        if (dd.id !== dropdownId + 'Dropdown') dd.classList.remove('open');
+      });
+      const wrapper = this.closest('.nav-dropdown');
+      if (wrapper) wrapper.classList.toggle('open');
+    });
+  });
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.nav-dropdown')) {
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        dd.classList.remove('open');
+      });
+    }
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        dd.classList.remove('open');
+      });
+    }
+  });
+  document.querySelectorAll('.dropdown-menu a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        dd.classList.remove('open');
+      });
+    });
+  });
+});
+
+/* ============================================================
+   ✅ 独立的 Backup URL 逻辑（与 dashboard 分开）
+   ============================================================ */
+const URL_STORAGE_KEY = 'payrollBackupUrls';
+// ✅ 独立的存储键，与 dashboard 的 payrollScriptUrl 完全分开
+const BACKUP_SCRIPT_URL_KEY = 'payrollBackupScriptUrl';
+
+let SCRIPT_URL = '';
+let allUrls = [];
+
+function setSyncBadge(state, text) {
+  const badge = document.getElementById('syncBadge');
+  const txt = document.getElementById('syncBadgeText');
+  if (!badge || !txt) return;
+  badge.className = 'sync-badge ' + (state || '');
+  txt.textContent = text;
+}
+
+/* ---------- 独立 URL 的加载与设置 ---------- */
+function loadSavedDeployUrl() {
+  try {
+    const saved = localStorage.getItem(BACKUP_SCRIPT_URL_KEY);
+    if (saved) {
+      SCRIPT_URL = saved;
+    } else {
+      SCRIPT_URL = '';
+    }
+  } catch (e) { SCRIPT_URL = ''; }
+}
+
+/* 第一次设置独立 URL（填入后永久固定在 localStorage） */
+function setBackupScriptUrl() {
+  const current = SCRIPT_URL || '';
+  const url = prompt(
+    'Masukkan URL Web App Google Apps Script (Backup URL 专用):\n\n' +
+    'Contoh: https://script.google.com/macros/s/XXXXX/exec\n\n' +
+    '⚠️ URL ini akan disimpan kekal dan TIDAK sama dengan dashboard.',
+    current
+  );
+  if (url === null) return; // 用户取消
+  const trimmed = url.trim();
+  if (!trimmed) {
+    // 允许清空（重置）
+    try { localStorage.removeItem(BACKUP_SCRIPT_URL_KEY); } catch (e) {}
+    SCRIPT_URL = '';
+    allUrls = [];
+    renderUrlTable();
+    setSyncBadge('', 'URL belum ditetapkan');
+    return;
+  }
+  if (!trimmed.startsWith('https://script.google.com/')) {
+    alert('URL tidak sah. Sila masukkan URL Web App Apps Script yang betul.');
+    return;
+  }
+  try {
+    localStorage.setItem(BACKUP_SCRIPT_URL_KEY, trimmed);
+    SCRIPT_URL = trimmed;
+    setSyncBadge('ok', 'URL disimpan');
+    loadUrlData();
+  } catch (e) {
+    alert('Gagal menyimpan URL.');
+  }
+}
+
+/* ---------- Render table ---------- */
+function renderUrlTable() {
+  const container = document.getElementById('urlListContainer');
+  const countText = document.getElementById('countText');
+  const countBadge = document.getElementById('countBadge');
+
+  if (!allUrls || allUrls.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <span class="icon">📭</span>
+        Tiada URL disimpan. Tambah URL pertama anda di bawah.
+      </div>`;
+    countText.textContent = '0 URL';
+    countBadge.className = 'sync-badge';
+    return;
+  }
+
+  let html = `
+    <table class="url-table">
+      <thead>
+        <tr>
+          <th style="width:40px;">#</th>
+          <th style="width:120px;">Kumpulan</th>
+          <th>Nama / Keterangan</th>
+          <th>URL</th>
+          <th style="width:70px; text-align:right;">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>`;
+
+  allUrls.forEach((item, index) => {
+    html += `
+      <tr>
+        <td>${index + 1}</td>
+        <td><span class="group-badge">${escapeHtml(item.group || 'Lain-lain')}</span></td>
+        <td>${escapeHtml(item.name || '-')}</td>
+        <td class="url-cell">
+          <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(item.url)}">
+            ${escapeHtml(truncateUrl(item.url, 60))}
+          </a>
+        </td>
+        <td class="actions-cell">
+          <button class="copy" title="Salin URL" onclick="copyUrl('${escapeHtml(item.url)}')"><i class="fas fa-copy"></i></button>
+          <button class="delete" title="Padam" onclick="deleteUrl('${escapeHtml(item.id || index)}')"><i class="fas fa-trash-alt"></i></button>
+        </td>
+      </tr>`;
+  });
+
+  html += `</tbody></table>`;
+  container.innerHTML = html;
+  countText.textContent = allUrls.length + ' URL';
+  countBadge.className = 'sync-badge ok';
+}
+
+function truncateUrl(url, max) {
+  if (!url) return '';
+  return url.length > max ? url.substring(0, max) + '…' : url;
+}
+
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+
+/* ---------- Load data from Google Sheet via Apps Script ---------- */
+async function loadUrlData() {
+  if (!SCRIPT_URL) {
+    document.getElementById('urlListContainer').innerHTML = `
+      <div class="empty-state">
+        <span class="icon">🔗</span>
+        Sila klik <strong>🔧 Set URL</strong> di toolbar untuk menetapkan URL Apps Script Backup (kekal).<br><br>
+        <small>URL ini berasingan dan tidak sama dengan dashboard.</small>
+      </div>`;
+    setSyncBadge('err', 'URL belum ditetapkan');
+    document.getElementById('countText').textContent = '0 URL';
+    return;
+  }
+
+  setSyncBadge('busy', 'Memuatkan data...');
+  document.getElementById('urlListContainer').innerHTML = `
+    <div class="empty-state">
+      <span class="spinner"></span> Memuatkan data URL...
+    </div>`;
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=getBackupUrls&_t=${Date.now()}`);
+    const result = await res.json();
+
+    if (result.status === 'success' && Array.isArray(result.data)) {
+      allUrls = result.data.map((row, i) => ({
+        id: String(row.ID || row.id || i + 1),
+        group: String(row.Group || row.group || 'Lain-lain'),
+        name: String(row.Name || row.name || ''),
+        url: String(row.URL || row.url || ''),
+        timestamp: row.Timestamp || row.timestamp || ''
+      }));
+    } else {
+      loadFromLocalStorage();
+    }
+  } catch (err) {
+    console.error('Load URL data error:', err);
+    loadFromLocalStorage();
+    setSyncBadge('err', 'Gagal muat (fallback local)');
+    renderUrlTable();
+    return;
+  }
+
+  renderUrlTable();
+  if (allUrls.length > 0) {
+    setSyncBadge('ok', 'Data dimuat (' + allUrls.length + ' URL)');
+  } else {
+    setSyncBadge('ok', 'Tiada URL dalam sheet');
+  }
+}
+
+function loadFromLocalStorage() {
+  try {
+    const stored = localStorage.getItem(URL_STORAGE_KEY);
+    if (stored) {
+      allUrls = JSON.parse(stored) || [];
+    } else {
+      allUrls = [];
+    }
+  } catch (e) {
+    allUrls = [];
+  }
+}
+
+/* ---------- Add URL ---------- */
+async function addUrl() {
+  const group = document.getElementById('inputGroup').value;
+  const name = document.getElementById('inputName').value.trim();
+  const url = document.getElementById('inputUrl').value.trim();
+
+  if (!name) { alert('Sila masukkan Nama / Keterangan.'); return; }
+  if (!url) { alert('Sila masukkan URL.'); return; }
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    alert('URL mesti bermula dengan http:// atau https://');
+    return;
+  }
+  if (!SCRIPT_URL) {
+    alert('Sila tetapkan URL Apps Script Backup terlebih dahulu (klik 🔧 Set URL).');
+    return;
+  }
+
+  const newItem = {
+    id: Date.now().toString(),
+    group: group,
+    name: name,
+    url: url,
+    timestamp: new Date().toISOString()
+  };
+
+  setSyncBadge('busy', 'Menyimpan ke Google Sheet...');
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'saveBackupUrl', data: newItem })
+    });
+    const result = await res.json();
+    if (result.status !== 'success') {
+      throw new Error(result.message || 'Gagal menyimpan');
+    }
+    if (result.id) newItem.id = result.id;
+    setSyncBadge('ok', 'URL disimpan');
+  } catch (err) {
+    console.error('Save error:', err);
+    setSyncBadge('err', 'Gagal simpan ke sheet');
+    alert('❌ Gagal menyimpan ke Google Sheet: ' + err.message);
+    return;
+  }
+
+  allUrls.unshift(newItem);
+  saveToLocalStorage();
+  renderUrlTable();
+
+  document.getElementById('inputName').value = '';
+  document.getElementById('inputUrl').value = '';
+  document.getElementById('inputName').focus();
+}
+
+/* ---------- Delete URL ---------- */
+async function deleteUrl(id) {
+  if (!confirm('Padam URL ini?')) return;
+
+  const index = allUrls.findIndex(u => u.id === id);
+  if (index === -1) return;
+
+  const deletedItem = allUrls[index];
+
+  if (SCRIPT_URL) {
+    setSyncBadge('busy', 'Memadam...');
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'deleteBackupUrl',
+          data: { id: id, timestamp: deletedItem.timestamp }
+        })
+      });
+      const result = await res.json();
+      if (result.status !== 'success') {
+        throw new Error(result.message || 'Gagal memadam');
+      }
+      setSyncBadge('ok', 'URL dipadam');
+    } catch (err) {
+      console.error('Delete error:', err);
+      setSyncBadge('err', 'Gagal padam dari sheet');
+      alert('❌ Gagal memadam dari Google Sheet: ' + err.message);
+      return;
+    }
+  }
+
+  allUrls.splice(index, 1);
+  saveToLocalStorage();
+  renderUrlTable();
+}
+
+/* ---------- Copy URL ---------- */
+function copyUrl(url) {
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = event.target.closest('button');
+    if (btn) {
+      const original = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-check" style="color:#0f7a54;"></i>';
+      setTimeout(() => { btn.innerHTML = original; }, 1500);
+    }
+  }).catch(() => {
+    alert('Gagal menyalin. Sila salin manual: ' + url);
+  });
+}
+
+function saveToLocalStorage() {
+  try {
+    localStorage.setItem(URL_STORAGE_KEY, JSON.stringify(allUrls));
+  } catch (e) {}
+}
+
+/* ---------- Initialize ---------- */
+window.addEventListener('DOMContentLoaded', () => {
+  loadSavedDeployUrl();
+  if (SCRIPT_URL) {
+    loadUrlData();
+  } else {
+    loadFromLocalStorage();
+    renderUrlTable();
+    setSyncBadge('', 'Sedia (local sahaja)');
+    document.getElementById('urlListContainer').innerHTML = `
+      <div class="empty-state">
+        <span class="icon">🔗</span>
+        Sila klik <strong>🔧 Set URL</strong> di toolbar untuk menetapkan URL Apps Script Backup (kekal).<br><br>
+        <small>URL ini berasingan dan tidak sama dengan dashboard.</small>
+      </div>`;
+  }
+});
+
+/* ✅ 不再监听 dashboard 的 DEPLOY_URL_KEY，彻底独立 */
+</script>
+</body>
+</html>
