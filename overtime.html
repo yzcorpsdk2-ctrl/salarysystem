@@ -2,117 +2,537 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8">
-<title>Overtime 加班计算</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Overtime · 加班计算</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-         background: #f4f6f9; color: #333; }
-
-  /* ===== 顶部（与 dashboard 一致风格） ===== */
-  .topbar {
-    background: linear-gradient(135deg, #1e3a8a, #1e40af);
-    color: #fff; padding: 14px 24px;
-    display: flex; align-items: center; justify-content: space-between;
-    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  :root {
+    --epf-blue: #1a4f8a; --epf-blue-light: #e8f0fa; --epf-blue-soft: #f4f8fd;
+    --epf-border: #d4e0ee; --epf-border-soft: #e6eef7;
+    --epf-text: #1f2d3d; --epf-muted: #64748b; --epf-bg: #f7fafd;
+    --nav-h: 52px;
+    --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover: #16345c;
+    --nav-text: #cbd9ea; --nav-accent: #4d9fff;
+    --shadow-sm: 0 1px 2px rgba(16,32,56,.05), 0 2px 10px rgba(16,32,56,.05);
+    --shadow-md: 0 8px 24px rgba(16,32,56,.10);
+    --dropdown-bg: #ffffff;
+    --dropdown-shadow: 0 8px 24px rgba(16,32,56,.15);
   }
-  .topbar .logo { font-size: 20px; font-weight: 700; letter-spacing: 1px; }
-  .topbar nav a { color: #fff; text-decoration: none; margin-left: 20px;
-                  font-size: 14px; opacity: .9; }
-  .topbar nav a:hover { opacity: 1; text-decoration: underline; }
+  body {
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--epf-bg); color: var(--epf-text);
+    min-height: 100vh; line-height: 1.5; font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
 
-  .container { max-width: 1400px; margin: 24px auto; padding: 0 20px; }
-  .card { background: #fff; border-radius: 10px; padding: 20px;
-          margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
-  .card h2 { font-size: 16px; color: #1e3a8a; margin-bottom: 14px;
-             padding-bottom: 10px; border-bottom: 2px solid #e8f0fa;
-             display: flex; align-items: center; justify-content: space-between; }
+  /* ---------- NAVBAR (与 dashboard 完全一致) ---------- */
+  .navbar {
+    position: sticky; top: 0; z-index: 200;
+    display: flex; align-items: stretch; flex-wrap: wrap;
+    background: linear-gradient(90deg, var(--nav-bg-1) 0%, var(--nav-bg-2) 100%);
+    padding: 0 1rem; min-height: var(--nav-h);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    border-bottom: 1px solid rgba(77,159,255,0.18);
+  }
+  .navbar .nav-brand {
+    display: flex; align-items: center; gap: 0.55rem;
+    color: #fff; font-weight: 800; font-size: 0.78rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding-right: 1.1rem; margin-right: 0.5rem;
+    border-right: 1px solid rgba(255,255,255,0.12);
+    white-space: nowrap;
+  }
+  .navbar .nav-brand .logo {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: linear-gradient(135deg, #4d9fff, #1a4f8a);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 0.85rem; font-weight: 800;
+    box-shadow: 0 2px 6px rgba(77,159,255,0.35);
+  }
+  .nav-links {
+    display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px;
+    position: relative;
+  }
+  .nav-item {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    padding: 0 0.85rem; min-height: var(--nav-h);
+    color: var(--nav-text); text-decoration: none;
+    font-family: inherit; font-size: 0.73rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    background: transparent; border: none; cursor: pointer;
+    white-space: nowrap; transition: background 0.15s, color 0.15s;
+    position: relative;
+  }
+  .nav-item:hover, .nav-item.active { background: var(--nav-hover); color: #fff; }
+  .nav-item::after {
+    content: ''; position: absolute; left: 0.85rem; right: 0.85rem; bottom: 0;
+    height: 2px; background: var(--nav-accent); transform: scaleX(0);
+    transform-origin: left; transition: transform 0.2s;
+  }
+  .nav-item:hover::after, .nav-item.active::after { transform: scaleX(1); }
+  .nav-back {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 44px; padding: 0 0.6rem;
+    color: var(--nav-text);
+    background: transparent; border: none; cursor: pointer;
+    font-size: 1.1rem; transition: background 0.15s, color 0.15s;
+  }
+  .nav-back:hover { background: var(--nav-hover); color: #fff; }
+  .nav-dropdown { position: relative; display: inline-flex; align-items: stretch; }
+  .nav-dropdown > .nav-item { padding-right: 0.55rem; }
+  .nav-dropdown > .nav-item .fa-caret-down { font-size: 0.6rem; margin-left: 0.2rem; opacity: 0.7; }
+  .dropdown-menu {
+    display: none; position: absolute; top: 100%; left: 0;
+    min-width: 180px; background: var(--dropdown-bg);
+    border-radius: 8px; box-shadow: var(--dropdown-shadow);
+    padding: 0.4rem 0; z-index: 300;
+    border: 1px solid var(--epf-border);
+    animation: fadeSlide 0.15s ease;
+  }
+  .nav-dropdown.open .dropdown-menu { display: block; }
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .dropdown-menu a {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.5rem 1rem; color: var(--epf-text);
+    text-decoration: none; font-size: 0.78rem; font-weight: 500;
+    transition: background 0.12s; white-space: nowrap;
+  }
+  .dropdown-menu a:hover { background: var(--epf-blue-soft); color: var(--epf-blue); }
+  .dropdown-menu .divider {
+    height: 1px; background: var(--epf-border-soft); margin: 0.3rem 0.5rem;
+  }
+  .nav-chat {
+    margin-left: auto; align-self: center;
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    padding: 0.5rem 1rem; border: none; border-radius: 20px;
+    background: linear-gradient(135deg, #2f7fe0 0%, #1a4f8a 100%);
+    color: #fff; font-family: inherit; font-size: 0.73rem;
+    font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer; white-space: nowrap;
+    box-shadow: 0 3px 12px rgba(47,127,224,0.4);
+    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+  }
+  .nav-chat:hover { filter: brightness(1.12); transform: translateY(-1px); }
+  .nav-chat .pulse {
+    width: 7px; height: 7px; border-radius: 50%; background: #6ef0a8;
+    box-shadow: 0 0 0 0 rgba(110,240,168,0.75); animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(110,240,168,0.7); }
+    70% { box-shadow: 0 0 0 7px rgba(110,240,168,0); }
+    100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); }
+  }
 
-  .info-grid { display: grid; grid-template-columns: repeat(4, 1fr);
-               gap: 12px; margin-bottom: 16px; }
-  .info-item { background: #f8fafc; padding: 12px; border-radius: 8px;
-               border-left: 4px solid #94a3b8; }
-  .info-item .label { font-size: 12px; color: #64748b; margin-bottom: 4px; }
-  .info-item .value { font-size: 16px; font-weight: 600; color: #1e3a8a; }
-  .info-item.highlight { background: #eff6ff; border-left-color: #3b82f6; }
-  .info-item.highlight .value { color: #1d4ed8; font-size: 18px; }
+  /* ---------- TOPBAR (与 dashboard 完全一致) ---------- */
+  .topbar {
+    position: sticky; top: var(--nav-h); z-index: 100; background: #ffffff;
+    border-bottom: 1px solid var(--epf-border); padding: 0.65rem 1.75rem;
+    display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+    box-shadow: 0 1px 2px rgba(26,79,138,0.04);
+  }
+  .topbar .brand {
+    font-weight: 700; font-size: 0.95rem; color: var(--epf-blue);
+    display: flex; align-items: center; gap: 0.6rem;
+    margin-right: 0.5rem; letter-spacing: -0.01em;
+  }
+  .topbar .brand .logo {
+    width: 32px; height: 32px; background: var(--epf-blue); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 0.95rem; font-weight: 800;
+  }
+  .search-box { flex: 1; max-width: 320px; position: relative; }
+  .search-box input {
+    width: 100%; padding: 0.5rem 0.85rem 0.5rem 2.2rem;
+    border: 1px solid var(--epf-border); border-radius: 6px;
+    font-size: 0.82rem; font-family: inherit; color: var(--epf-text);
+    transition: 0.15s;
+  }
+  .search-box input:focus {
+    outline: none; border-color: var(--epf-blue);
+    box-shadow: 0 0 0 2px rgba(26,79,138,0.10);
+  }
+  .search-box i {
+    position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%);
+    color: var(--epf-muted); font-size: 0.8rem;
+  }
+  .btn {
+    background: #ffffff; border: 1px solid var(--epf-border);
+    padding: 0.42rem 0.9rem; border-radius: 5px; font-size: 0.78rem;
+    font-weight: 500; cursor: pointer; color: var(--epf-blue);
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    transition: all 0.15s ease; white-space: nowrap; font-family: inherit;
+  }
+  .btn:hover { background: var(--epf-blue-soft); border-color: #b8cfe8; }
+  .btn-success { background: #0f7a54; border: 1px solid #0f7a54; color: #fff; }
+  .btn-success:hover { background: #0c6a48; border-color: #0c6a48; }
+  .btn-sm { padding: 0.25rem 0.7rem; font-size: 0.72rem; border-radius: 4px; }
+  .sync-badge {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft);
+    padding: 0.3rem 0.7rem; border-radius: 20px;
+    font-size: 0.68rem; font-weight: 600; color: var(--epf-muted);
+    white-space: nowrap;
+  }
+  .sync-badge .dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #9db8d2;
+    transition: background 0.2s;
+  }
+  .sync-badge.ok .dot { background: #22c55e; }
+  .sync-badge.busy .dot { background: #f59e0b; animation: pulse 1s infinite; }
+  .sync-badge.err .dot { background: #ef4444; }
+  .url-box {
+    display: flex; align-items: center; gap: 0.4rem; flex: 1; max-width: 420px;
+    background: #f4f8fd; border: 1px solid var(--epf-border);
+    border-radius: 6px; padding: 2px;
+  }
+  .url-box input {
+    flex: 1; border: none; background: transparent; padding: 0.4rem 0.6rem;
+    font-size: 0.78rem; font-family: inherit; color: var(--epf-text); outline: none;
+  }
+  .url-box input::placeholder { color: #a7b7c9; }
+  .url-box button {
+    padding: 0.3rem 0.8rem; border-radius: 4px; border: none;
+    background: var(--epf-blue); color: #fff; font-size: 0.72rem; font-weight: 600;
+    cursor: pointer; transition: 0.15s; white-space: nowrap;
+  }
+  .url-box button:hover { background: #15406f; }
 
-  .toolbar { display: flex; gap: 12px; align-items: center;
-             flex-wrap: wrap; margin-bottom: 12px; }
+  /* ---------- CONTENT ---------- */
+  .content-wrap {
+    max-width: 1400px; margin: 0 auto;
+    padding: 1.5rem 1.75rem 3rem;
+  }
+  .page-header {
+    background: #ffffff; border: 1px solid var(--epf-border); border-radius: 8px;
+    padding: 1.4rem 1.75rem; margin-bottom: 1.5rem;
+    display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
+    justify-content: space-between; box-shadow: 0 1px 3px rgba(26,79,138,0.04);
+  }
+  .page-header .info { flex: 1; min-width: 240px; }
+  .page-header h1 {
+    font-size: 1.45rem; font-weight: 700; margin-bottom: 0.35rem;
+    color: var(--epf-blue); letter-spacing: -0.015em;
+  }
+  .page-header p { font-size: 0.85rem; color: var(--epf-muted); line-height: 1.6; }
+
+  .ot-card {
+    background: #ffffff; border: 1px solid var(--epf-border);
+    border-radius: 10px; padding: 1.4rem 1.5rem;
+    margin-bottom: 1.2rem; box-shadow: var(--shadow-sm);
+  }
+  .ot-card h2 {
+    font-size: 1rem; color: var(--epf-blue); font-weight: 700;
+    margin-bottom: 1rem; padding-bottom: 0.7rem;
+    border-bottom: 1px solid var(--epf-border-soft);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .toolbar {
+    display: flex; gap: 0.8rem; align-items: center;
+    flex-wrap: wrap; margin-bottom: 1rem;
+  }
+  .toolbar label {
+    font-size: 0.8rem; color: var(--epf-muted); font-weight: 600;
+  }
   .toolbar select, .toolbar input[type="month"] {
-    padding: 8px 12px; border: 1px solid #cbd5e1;
-    border-radius: 6px; font-size: 14px; }
-  .btn { padding: 8px 16px; background: #1e40af; color: #fff; border: none;
-         border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; }
-  .btn:hover { background: #1e3a8a; }
-  .btn.small { padding: 4px 12px; font-size: 12px; }
-  .btn.light { background: #e2e8f0; color: #334155; }
-  .btn.light:hover { background: #cbd5e1; }
+    padding: 0.45rem 0.75rem;
+    border: 1px solid var(--epf-border); border-radius: 6px;
+    font-size: 0.82rem; font-family: inherit; color: var(--epf-text);
+    background: #fff; min-width: 200px;
+  }
+  .toolbar select:focus, .toolbar input[type="month"]:focus {
+    outline: none; border-color: var(--epf-blue);
+    box-shadow: 0 0 0 2px rgba(26,79,138,0.10);
+  }
 
-  /* ===== 日历 ===== */
-  .calendar-wrap { padding: 16px; background: #f8fafc; border-radius: 8px; }
-  .calendar-header { display: flex; justify-content: space-between;
-                     align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
-  .calendar-header .month-label { font-size: 16px; font-weight: 600; color: #1e3a8a; }
-  .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-  .cal-dow { text-align: center; font-size: 12px; font-weight: 600;
-             color: #64748b; padding: 4px; }
-  .cal-day { text-align: center; padding: 10px 4px; border-radius: 6px;
-             cursor: pointer; background: #fff; border: 1px solid #e2e8f0;
-             transition: all .15s; font-size: 14px; user-select: none; }
-  .cal-day:hover { background: #eff6ff; border-color: #3b82f6; }
-  .cal-day.selected { background: #1e40af; color: #fff; border-color: #1e40af; }
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px; margin-bottom: 12px;
+  }
+  .info-grid:last-child { margin-bottom: 0; }
+  .info-item {
+    background: var(--epf-blue-soft);
+    padding: 0.75rem 0.9rem;
+    border-radius: 8px;
+    border-left: 3px solid var(--epf-border);
+  }
+  .info-item .label {
+    font-size: 0.7rem; color: var(--epf-muted);
+    text-transform: uppercase; letter-spacing: 0.04em;
+    font-weight: 600; margin-bottom: 4px;
+  }
+  .info-item .value {
+    font-size: 0.95rem; font-weight: 700; color: var(--epf-text);
+    font-variant-numeric: tabular-nums;
+    word-break: break-word;
+  }
+  .info-item.highlight {
+    background: var(--epf-blue-light);
+    border-left-color: var(--epf-blue);
+  }
+  .info-item.highlight .value { color: var(--epf-blue); font-size: 1rem; }
+
+  /* 日历 */
+  .calendar-wrap {
+    background: var(--epf-blue-soft);
+    border: 1px solid var(--epf-border-soft);
+    border-radius: 8px; padding: 1rem;
+  }
+  .calendar-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 0.8rem; flex-wrap: wrap; gap: 8px;
+  }
+  .calendar-header .month-label {
+    font-size: 0.92rem; font-weight: 700; color: var(--epf-blue);
+  }
+  .calendar-header .hint {
+    font-size: 0.7rem; color: var(--epf-muted); font-style: italic;
+  }
+  .calendar-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;
+  }
+  .cal-dow {
+    text-align: center; font-size: 0.68rem; font-weight: 700;
+    color: var(--epf-muted); padding: 4px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .cal-day {
+    text-align: center; padding: 9px 4px; border-radius: 6px;
+    cursor: pointer; background: #fff;
+    border: 1px solid var(--epf-border-soft);
+    font-size: 0.82rem; font-weight: 500; color: var(--epf-text);
+    user-select: none; transition: 0.15s;
+  }
+  .cal-day:hover {
+    background: var(--epf-blue-light);
+    border-color: var(--epf-blue); color: var(--epf-blue);
+  }
+  .cal-day.selected {
+    background: var(--epf-blue); color: #fff;
+    border-color: var(--epf-blue); font-weight: 700;
+  }
   .cal-day.empty { background: transparent; border: none; cursor: default; }
-  .cal-day.no-data { opacity: .35; cursor: not-allowed; }
+  .cal-day.no-data { opacity: 0.35; cursor: not-allowed; }
   .cal-day.has-ot { box-shadow: inset 0 0 0 2px #f59e0b; }
+  .cal-day.selected.has-ot { box-shadow: inset 0 0 0 2px #fbbf24; }
 
-  /* ===== 表格 ===== */
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th, td { padding: 10px 12px; text-align: right; border-bottom: 1px solid #e2e8f0; }
-  th:first-child, td:first-child { text-align: left; }
-  thead th { background: #f1f5f9; color: #475569; font-weight: 600;
-             font-size: 13px; text-transform: uppercase; }
-  tfoot td, tfoot th { background: #eff6ff; font-weight: 700; color: #1e3a8a;
-                       border-top: 2px solid #cbd5e1; }
+  /* 表格 */
+  .ot-table {
+    width: 100%; border-collapse: collapse; font-size: 0.82rem;
+  }
+  .ot-table th, .ot-table td {
+    padding: 0.65rem 0.7rem; text-align: right;
+    border-bottom: 1px solid var(--epf-border-soft);
+  }
+  .ot-table th:first-child, .ot-table td:first-child { text-align: left; }
+  .ot-table thead th {
+    background: var(--epf-blue-soft); color: var(--epf-blue);
+    font-weight: 700; font-size: 0.7rem;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--epf-border);
+  }
+  .ot-table tfoot th, .ot-table tfoot td {
+    background: var(--epf-blue-light);
+    color: var(--epf-blue); font-weight: 800;
+    border-top: 2px solid var(--epf-border);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.85rem;
+  }
+  .ot-table td { font-variant-numeric: tabular-nums; }
+  .empty-row td {
+    text-align: center !important;
+    color: var(--epf-muted);
+    padding: 1.5rem !important;
+    font-style: italic;
+  }
 
-  .actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 16px; }
-  .note { font-size: 12px; color: #64748b; margin-top: 8px; font-style: italic; }
+  .note {
+    font-size: 0.72rem; color: var(--epf-muted);
+    margin-top: 0.6rem; font-style: italic;
+  }
 
-  /* ===== 弹窗 ===== */
-  .modal { position: fixed; inset: 0; background: rgba(0,0,0,.5);
-           display: flex; align-items: center; justify-content: center; z-index: 100; }
-  .modal.hidden { display: none; }
-  .modal-content { background: #fff; padding: 24px; border-radius: 10px;
-                   width: 420px; max-width: 92vw; max-height: 90vh; overflow-y: auto; }
-  .modal-content h2 { font-size: 16px; color: #1e3a8a; margin-bottom: 16px; }
-  .modal-content label { display: block; margin-bottom: 12px;
-                         font-size: 14px; color: #475569; }
-  .modal-content input { width: 100%; padding: 8px; border: 1px solid #cbd5e1;
-                         border-radius: 6px; margin-top: 4px; }
-  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+  .actions-row {
+    display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 1.2rem;
+    padding-top: 1rem; border-top: 1px solid var(--epf-border-soft);
+  }
+
+  /* 弹窗 */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(11,27,48,0.55);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 500; backdrop-filter: blur(2px);
+  }
+  .modal-backdrop.hidden { display: none; }
+  .modal-content {
+    background: #fff; border-radius: 10px; padding: 1.5rem;
+    width: 460px; max-width: 92vw; max-height: 88vh; overflow-y: auto;
+    box-shadow: var(--shadow-md);
+  }
+  .modal-content h2 {
+    font-size: 1rem; color: var(--epf-blue); font-weight: 700;
+    margin-bottom: 1rem; padding-bottom: 0.7rem;
+    border-bottom: 1px solid var(--epf-border-soft);
+  }
+  .modal-content label {
+    display: block; margin-bottom: 0.8rem;
+    font-size: 0.8rem; color: var(--epf-text); font-weight: 600;
+  }
+  .modal-content label .hint {
+    display: block; font-size: 0.7rem; color: var(--epf-muted);
+    font-weight: 400; margin-top: 2px;
+  }
+  .modal-content input {
+    width: 100%; padding: 0.5rem 0.7rem;
+    border: 1px solid var(--epf-border); border-radius: 6px;
+    margin-top: 4px; font-size: 0.82rem; font-family: inherit;
+    color: var(--epf-text);
+  }
+  .modal-content input:focus {
+    outline: none; border-color: var(--epf-blue);
+    box-shadow: 0 0 0 2px rgba(26,79,138,0.10);
+  }
+  .modal-actions {
+    display: flex; gap: 0.6rem; justify-content: flex-end;
+    margin-top: 1.2rem; padding-top: 1rem;
+    border-top: 1px solid var(--epf-border-soft);
+  }
 
   @media (max-width: 768px) {
+    .navbar { padding: 0 0.5rem; }
+    .navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
+    .navbar .nav-brand .brand-text { display: none; }
+    .nav-item { padding: 0 0.6rem; font-size: 0.68rem; }
+    .nav-chat { padding: 0.45rem 0.75rem; font-size: 0.66rem; }
+    .topbar { padding: 0.6rem 1rem; }
+    .content-wrap { padding: 1rem; }
     .info-grid { grid-template-columns: repeat(2, 1fr); }
+    .url-box { max-width: 100%; flex: 1 1 100%; }
   }
 </style>
 </head>
 <body>
 
-<!-- ===== 顶部（沿用 dashboard 风格） ===== -->
-<header class="topbar">
-  <div class="logo">PAYROLL SYSTEM</div>
-  <nav>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="leave.html">Leave</a>
-    <a href="overtime.html">Overtime</a>
-    <a href="staffinfo.html">Staff Info</a>
-  </nav>
-</header>
+<!-- ========== NAVBAR ========== -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <span class="logo">Y</span>
+    <span class="brand-text">YZ Payroll</span>
+  </div>
 
-<div class="container">
+  <div class="nav-links" id="navLinks">
+    <button class="nav-back" id="backBtn" title="返回上一页">⏎</button>
 
-  <!-- ===== 员工基础信息 ===== -->
-  <section class="card">
-    <h2>员工基础信息</h2>
+    <div class="nav-dropdown" id="filesDropdown">
+      <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
+      <div class="dropdown-menu">
+        <a href="dashboard.html">📊 DASHBOARD</a>
+        <a href="staffinfo.html">👥 EMPLOYEES</a>
+        <a href="leave.html">📅 TIMECARD REPORT</a>
+        <a href="overtime.html">⏱️ OVERTIME SHEET</a>
+        <div class="divider"></div>
+        <a href="epf.html">🏦 EPF</a>
+        <a href="socso.html">🛡️ SOCSO</a>
+        <a href="eis.html">📋 EIS</a>
+        <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+        <div class="divider"></div>
+        <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+        <a href="121.html">📄 121</a>
+        <a href="122.html">📄 122</a>
+        <a href="123.html">📄 123</a>
+        <a href="GoogleSheetBackupURL.html">📄 Google Sheet Backup URL</a>
+      </div>
+    </div>
+
+    <a class="nav-item" href="dashboard.html">DASHBOARD</a>
+    <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
+    <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
+    <a class="nav-item active" href="overtime.html">OVERTIME</a>
+
+    <div class="nav-dropdown" id="carumanDropdown">
+      <button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
+      <div class="dropdown-menu">
+        <a href="epf.html">🏦 EPF</a>
+        <a href="socso.html">🛡️ SOCSO</a>
+        <a href="eis.html">📋 EIS</a>
+        <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+      </div>
+    </div>
+
+    <a class="nav-item" href="companysetting.html">SETTING</a>
+
+    <div class="nav-dropdown" id="othersDropdown">
+      <button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
+      <div class="dropdown-menu">
+        <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+        <div class="divider"></div>
+        <a href="121.html">📄 121</a>
+        <a href="122.html">📄 122</a>
+        <a href="123.html">📄 123</a>
+        <a href="GoogleSheetBackupURL.html">📄 Google Sheet Backup URL</a>
+      </div>
+    </div>
+  </div>
+
+  <button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')">
+    <span class="pulse"></span> 💬 Request Chat
+  </button>
+</nav>
+
+<!-- ========== TOPBAR ========== -->
+<div class="topbar">
+  <div class="brand"><div class="logo">⏱</div> Payroll Overtime</div>
+  <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
+
+  <div class="search-box">
+    <i class="fas fa-search"></i>
+    <input type="text" id="searchInput" placeholder="Cari Nama / Kod pekerja..." oninput="filterStaffOptions()">
+  </div>
+
+  <span class="spacer" style="flex:1;"></span>
+
+  <div class="url-box">
+    <input type="text" id="deployUrlInput" placeholder="Paste Deploy URL di sini..." onkeydown="if(event.key==='Enter') applyUrl()">
+    <button onclick="applyUrl()">🔗 Apply</button>
+  </div>
+
+  <span class="sync-badge" id="syncBadge">
+    <span class="dot"></span><span id="syncBadgeText">Sedia</span>
+  </span>
+
+  <button class="btn btn-success" onclick="loadAllData()">
+    <i class="fas fa-sync-alt"></i> Muat Semula
+  </button>
+</div>
+
+<!-- ========== CONTENT ========== -->
+<div class="content-wrap">
+
+  <div class="page-header">
+    <div class="info">
+      <h1>⏱ Overtime 加班计算</h1>
+      <p>选择员工 → 选择月份 → 点日历多选加班日期 → 系统自动从 TIMECARD REPORT (SHEET) 读取工作时长与加班时长，并计算 1.0 / 1.5 / 2.0 / 3.0 倍补贴。</p>
+    </div>
+    <div>
+      <span class="sync-badge" id="countBadge">
+        <span class="dot ok"></span><span id="countText">准备中...</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- 员工基础信息 -->
+  <section class="ot-card">
+    <h2>
+      员工基础信息
+      <button class="btn btn-sm" id="openSettings">
+        <i class="fas fa-cog"></i> 设置
+      </button>
+    </h2>
     <div class="toolbar">
       <label>选择员工：</label>
       <select id="staffSelect">
@@ -134,12 +554,9 @@
     <p class="note">参考标准：每天工作 7.5 小时，每月 26 天（可在「设置」中修改）</p>
   </section>
 
-  <!-- ===== 加班日期选择 ===== -->
-  <section class="card">
-    <h2>
-      加班日期选择
-      <button class="btn small" id="openSettings">⚙ 设置</button>
-    </h2>
+  <!-- 加班日期选择 -->
+  <section class="ot-card">
+    <h2>加班日期选择</h2>
     <div class="toolbar">
       <label>月份：</label>
       <input type="month" id="monthPicker">
@@ -147,16 +564,16 @@
     <div class="calendar-wrap">
       <div class="calendar-header">
         <span class="month-label" id="calLabel">-</span>
-        <span class="note">点击日期多选；有加班数据的日期用橙框标记，灰显表示无记录</span>
+        <span class="hint">点击日期多选；橙框 = 当天有加班；灰显 = 当天无工作记录</span>
       </div>
       <div class="calendar-grid" id="calendarGrid"></div>
     </div>
   </section>
 
-  <!-- ===== 加班补贴计算表 ===== -->
-  <section class="card">
+  <!-- 加班补贴计算表 -->
+  <section class="ot-card">
     <h2>加班补贴计算表</h2>
-    <table>
+    <table class="ot-table">
       <thead>
         <tr>
           <th>日期</th>
@@ -169,7 +586,7 @@
         </tr>
       </thead>
       <tbody id="calcBody">
-        <tr><td colspan="7" style="text-align:center;color:#94a3b8;">请选择员工与日期</td></tr>
+        <tr class="empty-row"><td colspan="7">请选择员工与日期</td></tr>
       </tbody>
       <tfoot>
         <tr>
@@ -183,61 +600,103 @@
         </tr>
       </tfoot>
     </table>
-    <div class="actions">
-      <button class="btn" id="saveBtn">💾 保存加班记录</button>
+    <div class="actions-row">
+      <button class="btn btn-success" id="saveBtn">
+        <i class="fas fa-save"></i> 保存加班记录
+      </button>
     </div>
   </section>
 
 </div>
 
-<!-- ===== 设置弹窗 ===== -->
-<div class="modal hidden" id="settingsModal">
+<!-- ========== 设置弹窗 ========== -->
+<div class="modal-backdrop hidden" id="settingsModal">
   <div class="modal-content">
-    <h2>设置</h2>
-    <label>日薪计算天数 <input type="number" id="setDays" min="1" step="1" value="26"></label>
-    <label>时薪计算小时 <input type="number" id="setHours" min="0.1" step="0.1" value="7.5"></label>
-    <label>×1.0 倍率 <input type="number" id="setRate10" step="0.1" value="1.0"></label>
-    <label>×1.5 倍率 <input type="number" id="setRate15" step="0.1" value="1.5"></label>
-    <label>×2.0 倍率 <input type="number" id="setRate20" step="0.1" value="2.0"></label>
-    <label>×3.0 倍率 <input type="number" id="setRate30" step="0.1" value="3.0"></label>
+    <h2>⚙ 设置</h2>
+    <label>日薪计算天数
+      <span class="hint">日薪 = 基础薪资 ÷ 天数（默认 26）</span>
+      <input type="number" id="setDays" min="1" step="1" value="26">
+    </label>
+    <label>时薪计算小时
+      <span class="hint">时薪 = 日薪 ÷ 小时（默认 7.5）</span>
+      <input type="number" id="setHours" min="0.1" step="0.1" value="7.5">
+    </label>
+    <label>×1.0 倍率
+      <span class="hint">时薪 × 1.0（不乘额外倍数）</span>
+      <input type="number" id="setRate10" step="0.1" value="1.0">
+    </label>
+    <label>×1.5 倍率
+      <span class="hint">普通加班倍率</span>
+      <input type="number" id="setRate15" step="0.1" value="1.5">
+    </label>
+    <label>×2.0 倍率
+      <span class="hint">休息日加班倍率</span>
+      <input type="number" id="setRate20" step="0.1" value="2.0">
+    </label>
+    <label>×3.0 倍率
+      <span class="hint">公共假期加班倍率</span>
+      <input type="number" id="setRate30" step="0.1" value="3.0">
+    </label>
     <div class="modal-actions">
-      <button class="btn light" id="cancelSettings">取消</button>
-      <button class="btn" id="applySettings">保存</button>
+      <button class="btn" id="cancelSettings">取消</button>
+      <button class="btn btn-success" id="applySettings">保存设置</button>
     </div>
   </div>
 </div>
 
 <script>
-// ============================================================
-//  配置
-// ============================================================
-const params     = new URLSearchParams(location.search);
-const API_URL    = params.get('url') || '';
-const LS_SETTINGS = 'overtime_settings_v1';
-const LS_STAFF    = 'overtime_staffcache_v1';
-const LS_SHEET    = 'overtime_sheetcache_v1';
-const CACHE_TTL   = 5 * 60 * 1000;
+/* ============================================================
+   NAVBAR 下拉 & 返回
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function() {
+  const backBtn = document.getElementById('backBtn');
+  if (backBtn) backBtn.addEventListener('click', e => { e.preventDefault(); history.back(); });
 
-// ============================================================
-//  状态
-// ============================================================
-let allStaff = [];
-let allSheetData = [];
-let currentStaff = null;
-let currentMonth = '';         // YYYY-MM
-let selectedDates = new Set(); // YYYY-MM-DD
-let settings = {
-  daysPerMonth: 26,
-  hoursPerDay: 7.5,
-  rate10: 1.0,
-  rate15: 1.5,
-  rate20: 2.0,
-  rate30: 3.0
+  document.querySelectorAll('[data-dropdown-toggle]').forEach(toggle => {
+    toggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const id = this.getAttribute('data-dropdown-toggle');
+      document.querySelectorAll('.nav-dropdown.open').forEach(dd => {
+        if (dd.id !== id + 'Dropdown') dd.classList.remove('open');
+      });
+      this.closest('.nav-dropdown')?.classList.toggle('open');
+    });
+  });
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.nav-dropdown')) {
+      document.querySelectorAll('.nav-dropdown.open').forEach(dd => dd.classList.remove('open'));
+    }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.querySelectorAll('.nav-dropdown.open').forEach(dd => dd.classList.remove('open'));
+  });
+  document.querySelectorAll('.dropdown-menu a').forEach(a => {
+    a.addEventListener('click', () => document.querySelectorAll('.nav-dropdown.open').forEach(dd => dd.classList.remove('open')));
+  });
+});
+
+/* ============================================================
+   OVERTIME LOGIC
+   ============================================================ */
+const URL_KEY      = 'payrollScriptUrl';         // 和 dashboard 共用同一个 key
+const LS_SETTINGS  = 'overtime_settings_v1';
+const LS_STAFF     = 'overtime_staffcache_v1';
+const LS_SHEET     = 'overtime_sheetcache_v1';
+const CACHE_TTL    = 5 * 60 * 1000;
+
+let SCRIPT_URL     = '';
+let allStaff       = [];
+let allSheetData   = [];
+let currentStaff   = null;
+let currentMonth   = '';
+let selectedDates  = new Set();
+let settings       = {
+  daysPerMonth: 26, hoursPerDay: 7.5,
+  rate10: 1.0, rate15: 1.5, rate20: 2.0, rate30: 3.0
 };
 
-// ============================================================
-//  工具
-// ============================================================
+/* ---------- 工具 ---------- */
 function fmtHHMMSS(h) {
   if (!h || h <= 0) return '00:00:00';
   const t = Math.round(h * 3600);
@@ -246,44 +705,49 @@ function fmtHHMMSS(h) {
 }
 function fmtRM(v) { return 'RM ' + (Number(v) || 0).toFixed(2); }
 function parseH(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+function setSyncBadge(state, text) {
+  const b = document.getElementById('syncBadge');
+  const t = document.getElementById('syncBadgeText');
+  if (!b || !t) return;
+  b.className = 'sync-badge ' + (state || '');
+  t.textContent = text;
+}
+function setCountBadge(text) {
+  const t = document.getElementById('countText');
+  if (t) t.textContent = text;
+}
 
-// ============================================================
-//  设置
-// ============================================================
-function loadSettings() {
+/* ---------- URL ---------- */
+function loadSavedUrl() {
   try {
-    const s = JSON.parse(localStorage.getItem(LS_SETTINGS));
-    if (s) settings = Object.assign(settings, s);
-  } catch (e) {}
-  ['setDays','setHours','setRate10','setRate15','setRate20','setRate30'].forEach((id, i) => {
-    const v = [settings.daysPerMonth, settings.hoursPerDay,
-               settings.rate10, settings.rate15, settings.rate20, settings.rate30][i];
-    document.getElementById(id).value = v;
-  });
+    SCRIPT_URL = localStorage.getItem(URL_KEY) || '';
+    document.getElementById('deployUrlInput').value = SCRIPT_URL;
+    if (SCRIPT_URL) setSyncBadge('ok', 'URL 已就绪');
+    else            setSyncBadge('err', 'URL 未设置');
+  } catch (e) { SCRIPT_URL = ''; }
 }
-function applySettings() {
-  settings.daysPerMonth = parseFloat(document.getElementById('setDays').value)  || 26;
-  settings.hoursPerDay  = parseFloat(document.getElementById('setHours').value) || 7.5;
-  settings.rate10 = parseFloat(document.getElementById('setRate10').value) || 1.0;
-  settings.rate15 = parseFloat(document.getElementById('setRate15').value) || 1.5;
-  settings.rate20 = parseFloat(document.getElementById('setRate20').value) || 2.0;
-  settings.rate30 = parseFloat(document.getElementById('setRate30').value) || 3.0;
-  localStorage.setItem(LS_SETTINGS, JSON.stringify(settings));
-  closeSettings();
-  if (currentStaff) onStaffChange(); // 重新计算
+function applyUrl() {
+  const url = document.getElementById('deployUrlInput').value.trim();
+  if (!url) { alert('请先输入 Deploy URL'); return; }
+  localStorage.setItem(URL_KEY, url);
+  SCRIPT_URL = url;
+  setSyncBadge('ok', 'URL 已保存');
+  loadAllData();
 }
 
-// ============================================================
-//  API
-// ============================================================
+/* ---------- API ---------- */
 async function apiGet(action) {
-  if (!API_URL) throw new Error('缺少 API URL（请使用 ?url=... 打开）');
-  const res = await fetch(API_URL + '?' + new URLSearchParams({ action }));
+  if (!SCRIPT_URL) throw new Error('未设置 Deploy URL');
+  const res = await fetch(`${SCRIPT_URL}?${new URLSearchParams({ action, _t: Date.now() })}`);
   return await res.json();
 }
 async function apiPost(body) {
-  if (!API_URL) throw new Error('缺少 API URL');
-  const res = await fetch(API_URL, {
+  if (!SCRIPT_URL) throw new Error('未设置 Deploy URL');
+  const res = await fetch(SCRIPT_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify(body)
@@ -291,9 +755,26 @@ async function apiPost(body) {
   return await res.json();
 }
 
-// ============================================================
-//  载入数据
-// ============================================================
+/* ---------- 数据加载 ---------- */
+async function loadAllData() {
+  if (!SCRIPT_URL) {
+    setSyncBadge('err', 'URL 未设置');
+    return;
+  }
+  setSyncBadge('busy', '加载中...');
+  setCountBadge('加载中...');
+  try {
+    await Promise.all([loadStaffList(), loadSheetData()]);
+    setSyncBadge('ok', `数据已加载 (${allStaff.length} 员工)`);
+    setCountBadge(`${allStaff.length} 员工 · ${allSheetData.length} 条工作记录`);
+  } catch (err) {
+    console.error(err);
+    setSyncBadge('err', '加载失败');
+    setCountBadge('加载失败');
+    alert('加载失败：' + err.message);
+  }
+}
+
 async function loadStaffList() {
   let data = null;
   try {
@@ -302,7 +783,11 @@ async function loadStaffList() {
   } catch (e) {}
   if (!data) {
     const res = await apiGet('getData'); // STAFF LOGIN RECORD
-    data = res.data || res.result || [];
+    let raw = [];
+    if (res && res.result === 'success' && Array.isArray(res.data)) raw = res.data;
+    else if (Array.isArray(res))                                    raw = res;
+    else if (res && Array.isArray(res.data))                        raw = res.data;
+    data = raw;
     localStorage.setItem(LS_STAFF, JSON.stringify({ ts: Date.now(), data }));
   }
   allStaff = data;
@@ -337,9 +822,18 @@ async function loadSheetData() {
   allSheetData = data;
 }
 
-// ============================================================
-//  员工信息
-// ============================================================
+/* ---------- 搜索过滤员工下拉 ---------- */
+function filterStaffOptions() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const select = document.getElementById('staffSelect');
+  Array.from(select.options).forEach((opt, i) => {
+    if (i === 0) return;
+    const txt = (opt.textContent || '').toLowerCase();
+    opt.style.display = (!q || txt.includes(q)) ? '' : 'none';
+  });
+}
+
+/* ---------- 员工信息 ---------- */
 function onStaffChange() {
   const code = document.getElementById('staffSelect').value;
   if (!code) { currentStaff = null; resetStaffInfo(); return; }
@@ -356,8 +850,7 @@ function onStaffChange() {
   document.getElementById('empGroup').textContent  = currentStaff.group;
   document.getElementById('empSalary').textContent = fmtRM(currentStaff.salary);
 
-  const daily  = settings.daysPerMonth > 0 ? currentStaff.salary / settings.daysPerMonth : 0;
-  const hourly = settings.hoursPerDay  > 0 ? daily / settings.hoursPerDay            : 0;
+  const { daily, hourly } = currentRates();
   document.getElementById('dailyRate').textContent  = fmtRM(daily);
   document.getElementById('hourlyRate').textContent = fmtRM(hourly);
 
@@ -372,13 +865,18 @@ function resetStaffInfo() {
     .forEach(id => document.getElementById(id).textContent = '-');
   document.getElementById('calendarGrid').innerHTML = '';
   document.getElementById('calcBody').innerHTML =
-    '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">请选择员工与日期</td></tr>';
+    '<tr class="empty-row"><td colspan="7">请选择员工与日期</td></tr>';
   resetTotals();
 }
 
-// ============================================================
-//  行访问 & 月度汇总
-// ============================================================
+function currentRates() {
+  if (!currentStaff) return { daily: 0, hourly: 0 };
+  const daily  = settings.daysPerMonth > 0 ? (currentStaff.salary / settings.daysPerMonth) : 0;
+  const hourly = settings.hoursPerDay  > 0 ? (daily / settings.hoursPerDay)               : 0;
+  return { daily, hourly };
+}
+
+/* ---------- 读取 SHEET 行 ---------- */
 function getMonthRows() {
   if (!currentStaff || !currentMonth) return [];
   return allSheetData.filter(r =>
@@ -409,9 +907,7 @@ function refreshMonthlySummary() {
   document.getElementById('monthlyOtTime').textContent   = fmtHHMMSS(o);
 }
 
-// ============================================================
-//  日历
-// ============================================================
+/* ---------- 日历 ---------- */
 function renderCalendar() {
   const grid  = document.getElementById('calendarGrid');
   const label = document.getElementById('calLabel');
@@ -428,8 +924,8 @@ function renderCalendar() {
     grid.appendChild(el);
   });
 
-  const firstDay = new Date(y, m - 1, 1).getDay();
-  const daysInMonth = new Date(y, m, 0).getDate();
+  const firstDay     = new Date(y, m - 1, 1).getDay();
+  const daysInMonth  = new Date(y, m, 0).getDate();
 
   for (let i = 0; i < firstDay; i++) {
     const el = document.createElement('div');
@@ -461,25 +957,17 @@ function renderCalendar() {
   }
 }
 
-// ============================================================
-//  计算表
-// ============================================================
-function currentRates() {
-  const daily  = settings.daysPerMonth > 0 ? (currentStaff.salary / settings.daysPerMonth) : 0;
-  const hourly = settings.hoursPerDay  > 0 ? (daily / settings.hoursPerDay)               : 0;
-  return { daily, hourly };
-}
-
+/* ---------- 计算表 ---------- */
 function renderTable() {
   const tbody = document.getElementById('calcBody');
   tbody.innerHTML = '';
 
   if (!currentStaff) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">请选择员工与日期</td></tr>';
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="7">请选择员工与日期</td></tr>';
     resetTotals(); return;
   }
   if (selectedDates.size === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">请在日历中选择日期</td></tr>';
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="7">请在日历中选择日期</td></tr>';
     resetTotals(); return;
   }
 
@@ -502,7 +990,7 @@ function renderTable() {
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${dateStr}</td>
+      <td>${escapeHtml(dateStr)}</td>
       <td>${fmtHHMMSS(work)}</td>
       <td>${ot > 0 ? fmtHHMMSS(ot) : '—'}</td>
       <td>${fmtRM(a10)}</td>
@@ -526,12 +1014,37 @@ function resetTotals() {
   ['sum10','sum15','sum20','sum30'].forEach(id => document.getElementById(id).textContent = 'RM 0.00');
 }
 
-// ============================================================
-//  保存
-// ============================================================
+/* ---------- 设置 ---------- */
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem(LS_SETTINGS));
+    if (s) settings = Object.assign(settings, s);
+  } catch (e) {}
+  document.getElementById('setDays').value   = settings.daysPerMonth;
+  document.getElementById('setHours').value  = settings.hoursPerDay;
+  document.getElementById('setRate10').value = settings.rate10;
+  document.getElementById('setRate15').value = settings.rate15;
+  document.getElementById('setRate20').value = settings.rate20;
+  document.getElementById('setRate30').value = settings.rate30;
+}
+function applySettings() {
+  settings.daysPerMonth = parseFloat(document.getElementById('setDays').value)   || 26;
+  settings.hoursPerDay  = parseFloat(document.getElementById('setHours').value)  || 7.5;
+  settings.rate10 = parseFloat(document.getElementById('setRate10').value) || 1.0;
+  settings.rate15 = parseFloat(document.getElementById('setRate15').value) || 1.5;
+  settings.rate20 = parseFloat(document.getElementById('setRate20').value) || 2.0;
+  settings.rate30 = parseFloat(document.getElementById('setRate30').value) || 3.0;
+  localStorage.setItem(LS_SETTINGS, JSON.stringify(settings));
+  closeSettings();
+  if (currentStaff) onStaffChange();
+}
+function openSettings()  { document.getElementById('settingsModal').classList.remove('hidden'); }
+function closeSettings() { document.getElementById('settingsModal').classList.add('hidden'); }
+
+/* ---------- 保存 ---------- */
 async function onSave() {
-  if (!currentStaff)          { alert('请先选择员工'); return; }
-  if (!currentMonth)          { alert('请选择月份');   return; }
+  if (!currentStaff)            { alert('请先选择员工'); return; }
+  if (!currentMonth)            { alert('请选择月份');   return; }
   if (selectedDates.size === 0) { alert('请先选择日期'); return; }
 
   const { daily, hourly } = currentRates();
@@ -565,14 +1078,13 @@ async function onSave() {
     dailyRate:  daily,
     hourlyRate: hourly,
     amount10: sum10, amount15: sum15, amount20: sum20, amount30: sum30,
-    totalAmount: sum15,   // 默认以 1.5× 作为 payroll 参考值（后续加"加班类型"后可按类型取）
+    totalAmount: sum15,
     details
   };
 
   try {
     const res = await apiPost(payload);
     if (res.status === 'success') {
-      // 更新缓存
       try {
         const c = JSON.parse(localStorage.getItem(LS_SHEET) || 'null');
         if (c) { c.ts = 0; localStorage.setItem(LS_SHEET, JSON.stringify(c)); }
@@ -586,29 +1098,15 @@ async function onSave() {
   }
 }
 
-// ============================================================
-//  弹窗
-// ============================================================
-function openSettings()  { document.getElementById('settingsModal').classList.remove('hidden'); }
-function closeSettings() { document.getElementById('settingsModal').classList.add('hidden'); }
-
-// ============================================================
-//  初始化
-// ============================================================
+/* ---------- 初始化 ---------- */
 async function init() {
   loadSettings();
+  loadSavedUrl();
 
   const today = new Date();
   const ym = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
   document.getElementById('monthPicker').value = ym;
   currentMonth = ym;
-
-  try {
-    await Promise.all([loadStaffList(), loadSheetData()]);
-  } catch (err) {
-    console.error(err);
-    alert('加载失败：' + err.message);
-  }
 
   document.getElementById('staffSelect').addEventListener('change', onStaffChange);
   document.getElementById('monthPicker').addEventListener('change', e => {
@@ -622,6 +1120,13 @@ async function init() {
   document.getElementById('cancelSettings').addEventListener('click', closeSettings);
   document.getElementById('applySettings').addEventListener('click', applySettings);
   document.getElementById('saveBtn').addEventListener('click', onSave);
+
+  if (SCRIPT_URL) {
+    await loadAllData();
+  } else {
+    setSyncBadge('err', 'URL 未设置');
+    setCountBadge('请先在顶部 Apply URL');
+  }
 }
 
 init();
