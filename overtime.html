@@ -239,7 +239,7 @@ border-bottom: 1px solid var(--epf-border-soft);
 }
 .sidebar-list { display: flex; flex-direction: column; gap: 8px; }
 
-/* 【新增】侧边栏卡片布局及 OT 颜色 */
+/* 【修改】侧边栏卡片布局及 OT 颜色 */
 .sidebar-item {
 background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft);
 padding: 0.75rem; border-radius: 6px; cursor: pointer;
@@ -281,21 +281,22 @@ transition: 0.15s; flex-shrink: 0; line-height: 1;
 }
 .sidebar-item-menu-btn:hover { background: rgba(0,0,0,0.08); color: var(--epf-text); }
 
-/* OT 下拉菜单 */
+/* 【修改】OT 下拉菜单 - 改为 fixed 定位，不挤在卡片内 */
 .ot-dropdown {
-display: none; position: absolute; right: 8px; top: 100%;
+display: none; 
+position: fixed; /* 改为 fixed，脱离文档流 */
 background: #fff; border: 1px solid var(--epf-border);
-border-radius: 6px; box-shadow: var(--dropdown-shadow);
-z-index: 400; min-width: 120px; padding: 4px 0; margin-top: 4px;
+border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+z-index: 9999; min-width: 140px; padding: 6px 0;
 }
-.ot-dropdown.open { display: block; }
+.ot-dropdown.open { display: block; animation: fadeSlide 0.15s ease; }
 .ot-dropdown-item {
-padding: 8px 12px; font-size: 0.8rem; font-weight: 600;
-cursor: pointer; display: flex; align-items: center; gap: 8px;
+padding: 10px 16px; font-size: 0.85rem; font-weight: 600;
+cursor: pointer; display: flex; align-items: center; gap: 10px;
 transition: 0.15s; color: var(--epf-text);
 }
 .ot-dropdown-item:hover { background: var(--epf-blue-soft); }
-.ot-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.ot-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
 .ot-dot.c10 { background: #22c55e; }
 .ot-dot.c15 { background: #eab308; }
 .ot-dot.c20 { background: #3b82f6; }
@@ -417,6 +418,15 @@ box-shadow: var(--shadow-md);
 .modal-content input { width: 100%; padding: 0.5rem 0.7rem; border: 1px solid var(--epf-border); border-radius: 6px; margin-top: 4px; font-size: 0.82rem; font-family: inherit; color: var(--epf-text); }
 .modal-content input:focus { outline: none; border-color: var(--epf-blue); box-shadow: 0 0 0 2px rgba(26,79,138,0.10); }
 .modal-actions { display: flex; gap: 0.6rem; justify-content: flex-end; margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid var(--epf-border-soft); }
+
+/* 新手引导 Modal 特殊样式 */
+.guide-content { width: 600px; }
+.guide-content h2 { font-size: 1.2rem; margin-bottom: 1.2rem; }
+.guide-step { margin-bottom: 1rem; line-height: 1.6; }
+.guide-step strong { color: var(--epf-blue); font-size: 0.95rem; }
+.guide-step p { font-size: 0.88rem; color: #475569; margin-top: 4px; padding-left: 10px; border-left: 3px solid var(--epf-border-soft); }
+.guide-color-box { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: middle; margin-right: 4px; }
+
 @media (max-width: 1024px) {
 .content-wrap { flex-direction: column; }
 .left-sidebar { width: 100%; position: static; max-height: 300px; }
@@ -464,7 +474,8 @@ box-shadow: var(--shadow-md);
 <div class="dropdown-menu"><a href="companysetting.html">⚙️ COMPANY SETTING</a><div class="divider"></div><a href="121.html">📄 121</a><a href="122.html">📄 122</a><a href="123.html">📄 123</a><a href="GoogleSheetBackupURL.html">📄 Google Sheet Backup URL</a></div>
 </div>
 </div>
-<button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')"><span class="pulse"></span> 💬 Request Chat</button>
+<!-- 【修改】Request Chat 改为 新手引导 -->
+<button class="nav-chat" type="button" id="guideBtn"><span class="pulse"></span> 📘 新手引导</button>
 </nav>
 <div class="topbar">
 <div class="brand"><div class="logo">⏱</div> Payroll Overtime</div>
@@ -550,6 +561,8 @@ box-shadow: var(--shadow-md);
 </section>
 </div>
 </div>
+
+<!-- 设置 Modal -->
 <div class="modal-backdrop hidden" id="settingsModal">
 <div class="modal-content">
 <h2>⚙ 设置</h2>
@@ -565,6 +578,49 @@ box-shadow: var(--shadow-md);
 </div>
 </div>
 </div>
+
+<!-- 【新增】新手引导 Modal -->
+<div class="modal-backdrop hidden" id="guideModal">
+<div class="modal-content guide-content">
+<h2>📘 欢迎使用加班计算系统</h2>
+<div style="line-height: 1.6; font-size: 0.9rem; color: #334155;">
+<div class="guide-step">
+<strong>1. 连接数据源</strong>
+<p>在顶部导航栏下方的输入框中，粘贴您的 Google Apps Script 部署 URL，然后点击“🔗 Apply”按钮。</p>
+</div>
+<div class="guide-step">
+<strong>2. 选择员工</strong>
+<p>在右侧“员工基础信息”区域，使用搜索框或下拉菜单选择需要计算加班的员工。</p>
+</div>
+<div class="guide-step">
+<strong>3. 选择加班日期</strong>
+<p>在“加班日期选择”区域，先选择月份，然后点击日历中的具体日期。<br>
+<span class="guide-color-box" style="background:#f59e0b;"></span> 橙色边框表示该日有加班记录；<span class="guide-color-box" style="background:#cbd5e1;"></span> 灰色表示无记录。</p>
+</div>
+<div class="guide-step">
+<strong>4. 查看与保存</strong>
+<p>下方表格会自动计算加班费。确认无误后，点击右下角的“✅ 手动保存加班记录”。</p>
+</div>
+<div class="guide-step">
+<strong>5. 历史记录与倍率</strong>
+<p>左侧栏显示已保存的记录。点击可快速加载。<br>
+点击记录右侧的“⋮”按钮，可选择 OT 倍率，卡片颜色会随之变化：<br>
+<span class="guide-color-box" style="background:#22c55e;"></span> x1.0 (绿) &nbsp; 
+<span class="guide-color-box" style="background:#eab308;"></span> x1.5 (黄) &nbsp; 
+<span class="guide-color-box" style="background:#3b82f6;"></span> x2.0 (蓝) &nbsp; 
+<span class="guide-color-box" style="background:#a855f7;"></span> x3.0 (紫)</p>
+</div>
+<div class="guide-step">
+<strong>6. 系统设置</strong>
+<p>点击“员工基础信息”旁的“⚙ 设置”按钮，可调整日薪/时薪计算天数及加班倍率。</p>
+</div>
+</div>
+<div class="modal-actions">
+<button class="btn btn-success" id="closeGuide" style="padding: 0.5rem 1.5rem;">我知道了</button>
+</div>
+</div>
+</div>
+
 <script>
 /* ============================================================
 NAVBAR 交互逻辑
@@ -598,6 +654,27 @@ if (!e.target.closest('.sidebar-item-menu-btn') && !e.target.closest('.ot-dropdo
 document.querySelectorAll('.ot-dropdown.open').forEach(m => m.classList.remove('open'));
 }
 });
+
+// 【新增】新手引导按钮事件
+const guideBtn = document.getElementById('guideBtn');
+const guideModal = document.getElementById('guideModal');
+const closeGuideBtn = document.getElementById('closeGuide');
+if (guideBtn) {
+guideBtn.addEventListener('click', () => {
+guideModal.classList.remove('hidden');
+});
+}
+if (closeGuideBtn) {
+closeGuideBtn.addEventListener('click', () => {
+guideModal.classList.add('hidden');
+});
+}
+// 点击背景关闭
+if (guideModal) {
+guideModal.addEventListener('click', (e) => {
+if (e.target === guideModal) guideModal.classList.add('hidden');
+});
+}
 });
 
 /* ============================================================
@@ -792,7 +869,6 @@ const month = normalizeMonth(item['MONTH']);
 const otH = parseH(item['TOTAL_OT_TIME_H']);
 const updated = formatUpdatedAt(item['UPDATED_AT']);
 
-// 获取 OT 类型并决定颜色
 const otType = String(item['OT_TYPE'] || '1.5').trim();
 let colorClass = '';
 if (otType === '1.0') colorClass = 'ot-10';
@@ -803,7 +879,6 @@ else if (otType === '3.0') colorClass = 'ot-30';
 const div = document.createElement('div');
 div.className = `sidebar-item ${colorClass} ${activeSidebarIndex === index ? 'active' : ''}`;
 
-// 内容区域 (绑定点击加载事件)
 const contentDiv = document.createElement('div');
 contentDiv.className = 'sidebar-item-content';
 contentDiv.innerHTML = `
@@ -816,14 +891,12 @@ contentDiv.innerHTML = `
 `;
 contentDiv.addEventListener('click', () => loadFromSidebar(item, index));
 
-// 三个点菜单按钮
 const menuBtn = document.createElement('button');
 menuBtn.className = 'sidebar-item-menu-btn';
 menuBtn.innerHTML = '⋮';
 menuBtn.title = '选择 OT 倍率';
 menuBtn.addEventListener('click', (e) => toggleOtMenu(e, index));
 
-// 下拉菜单
 const dropdown = document.createElement('div');
 dropdown.className = 'ot-dropdown';
 dropdown.id = `otMenu-${index}`;
@@ -844,13 +917,25 @@ list.appendChild(div);
 });
 }
 
-/* ---------- OT 菜单交互 ---------- */
+/* ---------- OT 菜单交互 (改为 Fixed 定位) ---------- */
 function toggleOtMenu(e, index) {
 e.stopPropagation();
+const btn = e.currentTarget;
+const rect = btn.getBoundingClientRect();
+const menu = document.getElementById(`otMenu-${index}`);
+
+// 关闭其他菜单
 document.querySelectorAll('.ot-dropdown.open').forEach(m => {
 if (m.id !== `otMenu-${index}`) m.classList.remove('open');
 });
-document.getElementById(`otMenu-${index}`).classList.toggle('open');
+
+// 计算位置：出现在按钮右侧，垂直居中
+const topPos = rect.top - 10; // 稍微往上一点
+const leftPos = rect.right + 8; // 出现在按钮右边
+
+menu.style.top = `${topPos}px`;
+menu.style.left = `${leftPos}px`;
+menu.classList.toggle('open');
 }
 
 async function selectOtType(e, index, type) {
@@ -881,12 +966,11 @@ setSyncBadge('ok', '数据已加载');
 }
 }
 
-/* ---------- 【修复】从侧边栏点击 → 确保能正确加载 ---------- */
+/* ---------- 从侧边栏点击 → 确保能正确加载 ---------- */
 function loadFromSidebar(item, index) {
 const code = String(item['ID KOD'] || '').trim();
 const sel = document.getElementById('staffSelect');
     
-// 清空搜索框，确保 option 可见
 document.getElementById('searchInput').value = '';
 filterStaffOptions();
     
@@ -908,7 +992,7 @@ opt.style.display = (!q || (opt.textContent || '').toLowerCase().includes(q)) ? 
 });
 }
 
-/* ---------- 【修复】员工切换 + 自动载入 + 重置逻辑 ---------- */
+/* ---------- 员工切换 + 自动载入 + 重置逻辑 ---------- */
 function onStaffChange() {
 const code = document.getElementById('staffSelect').value;
 if (!code) {
@@ -967,7 +1051,6 @@ showToast(
 );
 } else {
 activeSidebarIndex = -1;
-// 【需求2】切换员工时，如果没有历史记录，重置日历选择
 selectedDates.clear(); 
 }
 
@@ -1119,7 +1202,6 @@ details.push({ date: dateStr, workHours: work, otHours: ot, a10, a15, a20, a30 }
 sumW += work; sumOT += ot; sum10 += a10; sum15 += a15; sum20 += a20; sum30 += a30;
 });
 
-// 获取当前员工的 OT 类型，如果没有则默认 1.5
 const existing = allOvertimeData.find(i => String(i['ID KOD'] || '').trim() === currentStaff.code);
 const currentOtType = existing ? String(existing['OT_TYPE'] || '1.5').trim() : '1.5';
 
@@ -1127,7 +1209,7 @@ const payload = {
 action: 'saveOvertimeRecord', code: currentStaff.code, name: currentStaff.name, month: currentMonth,
 totalWorkTime: sumW, totalOtTime: sumOT, dailyRate: daily, hourlyRate: hourly,
 amount10: sum10, amount15: sum15, amount20: sum20, amount30: sum30, totalAmount: sum15, 
-otType: currentOtType, // 传递 OT_TYPE
+otType: currentOtType,
 details 
 };
 try {
