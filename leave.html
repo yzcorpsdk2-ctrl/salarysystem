@@ -1,1 +1,1621 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leave · Timecard System</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue: #1a4f8a; --blue-soft: #f4f8fd; --border: #d4e0ee;
+    --text: #1f2d3d; --muted: #64748b; --bg: #f7fafd;
+    --nav-dark: #1a2b4c; --nav-hover: #243a66;
 
+    /* NAVBAR VARS (aligned with dashboard.html) */
+    --nav-h: 52px;
+    --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover2: #16345c;
+    --nav-text: #cbd9ea; --nav-accent: #4d9fff;
+    --dropdown-bg: #ffffff;
+    --dropdown-shadow: 0 8px 24px rgba(16,32,56,.15);
+    --line: #dbe3ec;
+    --line-soft: #e8eef6;
+    --navy: #1e3a5f;
+    --navy-soft: #eaf0f7;
+  }
+  body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); font-size: 13px; min-height: 100vh; padding-bottom: 50px; }
+
+  /* ============================================================
+     NEW NAVBAR (adapted from dashboard.html)
+     ============================================================ */
+  .navbar {
+    position: sticky; top: 0; z-index: 200;
+    display: flex; align-items: stretch; flex-wrap: wrap;
+    background: linear-gradient(90deg, var(--nav-bg-1) 0%, var(--nav-bg-2) 100%);
+    padding: 0 1rem; min-height: var(--nav-h);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    border-bottom: 1px solid rgba(77,159,255,0.18);
+    margin-bottom: 0;
+    width: 100%;
+  }
+  .navbar .nav-brand {
+    display: flex; align-items: center; gap: 0.55rem;
+    color: #fff; font-weight: 800; font-size: 0.78rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding-right: 1.1rem; margin-right: 0.5rem;
+    border-right: 1px solid rgba(255,255,255,0.12);
+    white-space: nowrap;
+  }
+  .navbar .nav-brand .logo {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: linear-gradient(135deg, #4d9fff, #1a4f8a);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 0.85rem; font-weight: 800;
+    box-shadow: 0 2px 6px rgba(77,159,255,0.35);
+  }
+
+  .nav-links {
+    display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px;
+    position: relative;
+  }
+
+  .nav-item {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    padding: 0 0.85rem; min-height: var(--nav-h);
+    color: var(--nav-text); text-decoration: none;
+    font-family: inherit; font-size: 0.73rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    background: transparent; border: none; cursor: pointer;
+    white-space: nowrap; transition: background 0.15s, color 0.15s;
+    position: relative;
+  }
+  .nav-item:hover, .nav-item.active { background: var(--nav-hover2); color: #fff; }
+  .nav-item::after {
+    content: ''; position: absolute; left: 0.85rem; right: 0.85rem; bottom: 0;
+    height: 2px; background: var(--nav-accent); transform: scaleX(0);
+    transform-origin: left; transition: transform 0.2s;
+  }
+  .nav-item:hover::after, .nav-item.active::after { transform: scaleX(1); }
+
+  .nav-back {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 44px; padding: 0 0.6rem;
+    color: var(--nav-text);
+    background: transparent; border: none; cursor: pointer;
+    font-size: 1.1rem; transition: background 0.15s, color 0.15s;
+  }
+  .nav-back:hover { background: var(--nav-hover2); color: #fff; }
+
+  .nav-dropdown {
+    position: relative;
+    display: inline-flex;
+    align-items: stretch;
+  }
+  .nav-dropdown > .nav-item { padding-right: 0.55rem; }
+  .nav-dropdown > .nav-item .fa-caret-down { font-size: 0.6rem; margin-left: 0.2rem; opacity: 0.7; }
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 180px;
+    background: var(--dropdown-bg);
+    border-radius: 8px;
+    box-shadow: var(--dropdown-shadow);
+    padding: 0.4rem 0;
+    z-index: 300;
+    border: 1px solid var(--line);
+    animation: fadeSlide 0.15s ease;
+  }
+  .nav-dropdown.open .dropdown-menu { display: block; }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .dropdown-menu a {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    color: #1e293b;
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 500;
+    transition: background 0.12s;
+    white-space: nowrap;
+  }
+  .dropdown-menu a:hover { background: var(--navy-soft); color: var(--navy); }
+  .dropdown-menu .divider {
+    height: 1px; background: var(--line-soft); margin: 0.3rem 0.5rem;
+  }
+
+  /* 将 Request Chat 改为 Tips 按钮样式，但保持原本的外形结构 */
+  .nav-chat {
+    margin-left: auto; align-self: center;
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    padding: 0.5rem 1rem; border: none; border-radius: 20px;
+    background: linear-gradient(135deg, #2f7fe0 0%, #1a4f8a 100%);
+    color: #fff; font-family: inherit; font-size: 0.73rem;
+    font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer; white-space: nowrap;
+    box-shadow: 0 3px 12px rgba(47,127,224,0.4);
+    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+  }
+  .nav-chat:hover { filter: brightness(1.12); transform: translateY(-1px); }
+  .nav-chat .pulse {
+    width: 7px; height: 7px; border-radius: 50%; background: #6ef0a8;
+    box-shadow: 0 0 0 0 rgba(110,240,168,0.75); animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(110,240,168,0.7); }
+    70% { box-shadow: 0 0 0 7px rgba(110,240,168,0); }
+    100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); }
+  }
+
+  /* ====== 浅色工具栏 ====== */
+  .toolbar { background: #fff; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 8px 20px; gap: 15px; box-shadow: 0 1px 3px rgba(26,79,138,.04); }
+  .toolbar-left { display: flex; align-items: center; gap: 16px; flex: 1; }
+  .toolbar-brand { display: flex; align-items: center; gap: 8px; color: var(--nav-dark); font-weight: 800; font-size: 15px; }
+  .toolbar-brand .logo { background: #007bff; color: #fff; width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .toolbar-search { display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; width: 320px; gap: 6px; }
+  .toolbar-search input { border: none; background: transparent; outline: none; font-size: 12px; flex: 1; color: var(--text); }
+  .toolbar-search span { color: var(--muted); font-size: 14px; }
+
+  .toolbar-right { display: flex; align-items: center; gap: 10px; }
+  .url-box { display: flex; align-items: center; gap: 4px; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 2px; }
+  .url-box input { border: none; background: transparent; padding: 6px 8px; font-size: 12px; outline: none; width: 260px; }
+  .url-box button { padding: 5px 12px; border-radius: 4px; border: none; background: var(--blue); color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; }
+  .btn-outline { background: #fff; border: 1px solid var(--border); padding: 6px 12px; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; color: var(--text); display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s; }
+  .btn-outline:hover { background: var(--blue-soft); color: var(--blue); }
+  .btn-success { background: #16a34a; color: #fff; border-color: #16a34a; }
+  .btn-success:hover { background: #15803d; color: #fff; }
+  .btn-setting { background: #f1f5f9; color: #0f172a; border-color: #cbd5e1; }
+  .btn-setting:hover { background: #e2e8f0; color: #000; }
+  .btn-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .btn-primary:hover { background: #163f6e; color: #fff; }
+  .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+
+  .sync-badge { display: inline-flex; align-items: center; gap: 5px; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; color: #047857; }
+  .sync-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; }
+
+  /* ====== 仪表盘等主体内容 ====== */
+  .container { max-width: 100%; padding: 14px 20px; }
+  .dashboard-panel { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(15,23,42,.03); display: flex; flex-wrap: wrap; gap: 16px; }
+  .dash-group { flex: 1 1 auto; background: var(--blue-soft); border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 10px; min-width: 260px; }
+  .dash-group-title { font-size: 11px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 4px; }
+  .dash-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .dash-item { display: flex; flex-direction: column; gap: 2px; min-width: 0; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 6px 8px; }
+  .dash-item label { font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dash-item span { font-size: 14px; font-weight: 800; color: var(--blue); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dash-item.search-wrap { position: relative; padding: 0; background: transparent; border: none; }
+  .dash-item.search-wrap label { margin-bottom: 2px; }
+  .dash-item.search-wrap input { font-size: 13px; font-weight: 600; color: var(--text); padding: 4px 6px; width: 100%; border: 1px solid var(--border); border-radius: 4px; background: #fff; outline: none; }
+  .dash-item.search-wrap input:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(26,79,138,.12); }
+
+  /* 搜索下拉 */
+  .search-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,.1); max-height: 250px; overflow-y: auto; z-index: 50; display: none; }
+  .search-dropdown.show { display: block; }
+  .sd-item { padding: 8px 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
+  .sd-item:hover { background: var(--blue-soft); color: var(--blue); }
+  .sd-item.all-item { font-weight: 700; background: #eef4fb; color: var(--blue); border-bottom: 2px solid #dbe6f2; }
+
+  /* 表格 */
+  .table-wrap { overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: #fff; max-height: calc(100vh - 320px); position: relative; }
+  table { border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; font-size: 11.5px; }
+  thead th { position: sticky; top: 0; z-index: 3; background: #eef4fb; color: #334155; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; padding: 8px 5px; border-right: 1px solid #dbe6f2; border-bottom: 2px solid #cbd9ea; white-space: nowrap; text-align: center; }
+  thead th .th-inner { display: flex; align-items: center; justify-content: center; gap: 4px; }
+  .filter-btn { border: none; background: transparent; cursor: pointer; font-size: 9px; color: #94a3b8; padding: 2px 4px; border-radius: 4px; }
+  .filter-btn:hover { background: #dbeafe; color: #2563eb; }
+  .filter-btn.active { color: #2563eb; background: #bfdbfe; }
+  tbody td { padding: 3px 4px; border-bottom: 1px solid #eef3f9; border-right: 1px solid #f2f6fb; text-align: center; white-space: nowrap; height: 34px; }
+  .ro { color: #334155; font-weight: 600; }
+  .calc { background: #f6f9ff; font-weight: 700; color: #0f172a; }
+  input.cell, select.cell { width: 100%; min-width: 54px; padding: 4px 4px; font-size: 11.5px; text-align: center; border: 1px solid transparent; border-radius: 5px; background: transparent; color: #0f172a; transition: all 0.15s; }
+  input.cell:hover, select.cell:hover { border-color: #cbd5e1; background: #fff; }
+  input.cell:focus, select.cell:focus { outline: none; border-color: var(--blue); background: #fff; box-shadow: 0 0 0 2px rgba(26,79,138,.12); }
+  input.cell:disabled, select.cell:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
+  input.cell.wide { min-width: 120px; text-align: left; }
+
+  /* 其它组件 */
+  .filter-panel { position: fixed; z-index: 1000; background: #fff; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 10px 30px rgba(15,23,42,.15); padding: 10px; width: 220px; max-height: 300px; display: none; flex-direction: column; font-size: 12px; }
+  .filter-panel.show { display: flex; }
+  .fp-head { margin-bottom: 8px; }
+  .fp-head input { width: 100%; padding: 5px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 11px; }
+  .fp-actions { display: flex; gap: 5px; margin-bottom: 6px; }
+  .fp-actions button { flex: 1; padding: 4px; font-size: 10.5px; border: 1px solid var(--border); background: #f8fafc; border-radius: 4px; cursor: pointer; }
+  .fp-list { overflow-y: auto; flex: 1; }
+  .fp-item { display: flex; align-items: center; gap: 6px; padding: 4px 5px; border-radius: 4px; cursor: pointer; }
+  .fp-item:hover { background: #f1f5f9; }
+  .fp-item span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .fp-footer { display: flex; justify-content: flex-end; gap: 6px; margin-top: 8px; border-top: 1px solid #eef2f7; padding-top: 8px; }
+  .fp-footer button { padding: 4px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; border: 1px solid var(--border); background: #fff; }
+  .fp-footer button.apply { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+  /* Modal */
+  .modal-mask { position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 9999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+  .modal-mask.show { display: flex; }
+  .modal { background: #fff; border-radius: 12px; padding: 22px 24px; width: 420px; max-width: 92vw; box-shadow: 0 20px 60px rgba(15,23,42,.35); text-align: center; }
+  .modal h3 { font-size: 16px; color: var(--nav-dark); margin-bottom: 8px; }
+  .modal p { font-size: 12.5px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+  .modal .countdown { font-size: 26px; font-weight: 800; color: #dc2626; margin: 6px 0 12px; }
+  .modal .actions { display: flex; gap: 8px; justify-content: center; }
+  .modal .actions button { padding: 8px 18px; border-radius: 6px; font-size: 12.5px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: #fff; color: var(--text); }
+  .modal .actions button.confirm { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+  /* Setting Center 专用 */
+  .setting-modal { width: 600px; text-align: left; }
+  .setting-modal h3 { text-align: center; }
+  .setting-input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; margin-bottom: 12px; outline: none; }
+  .setting-textarea { width: 100%; height: 200px; padding: 10px; font-family: monospace; font-size: 12px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 12px; resize: vertical; outline: none; background: #f8fafc; }
+  .setting-textarea:focus { border-color: var(--blue); background: #fff; }
+
+  /* ====== TIPS 浮窗/弹窗专用 ====== */
+  .tips-modal { width: 650px; max-width: 95vw; text-align: left; padding: 24px 30px; }
+  .tips-modal h3 { font-size: 20px; color: var(--nav-dark); margin-bottom: 12px; text-align: center; }
+  .tips-modal p.subtitle { text-align: center; margin-bottom: 20px; color: var(--muted); font-size: 13px; }
+  .tips-section { margin-bottom: 18px; border-left: 4px solid #007bff; padding-left: 12px; background: #f8fafc; padding: 10px 12px; border-radius: 0 6px 6px 0; }
+  .tips-section h4 { font-size: 14px; color: #1a4f8a; margin-bottom: 6px; font-weight: 800; }
+  .tips-section ul { list-style-type: none; margin-left: 0; }
+  .tips-section li { font-size: 12.5px; color: #334155; margin-bottom: 4px; line-height: 1.5; }
+  .tips-section li strong { color: #0f172a; }
+  .tips-actions { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+  .tips-actions button { padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: transform 0.1s; }
+  .tips-actions button:active { transform: scale(0.98); }
+  .tips-actions .btn-tour { background: #007bff; color: #fff; }
+  .tips-actions .btn-detail { background: #e2e8f0; color: #0f172a; }
+  .tips-actions .btn-close { background: transparent; color: var(--muted); font-weight: 600; }
+
+  /* 遮罩与高亮浮窗 (Walkthrough) - 已修复白块遮挡问题 */
+  .tour-mask { position: fixed; inset: 0; z-index: 10000; display: none; cursor: pointer; }
+  .tour-mask.show { display: block; }
+  .tour-highlight { 
+    position: absolute; 
+    background: transparent; 
+    outline: 9999px solid rgba(0,0,0,0.6); /* 使用 outline 替代 box-shadow 避免白块覆盖 */
+    border-radius: 8px; 
+    z-index: 10001; 
+    display: none; 
+    transition: all 0.3s ease; 
+    pointer-events: none; 
+  }
+  .tour-highlight.show { display: block; }
+  .tour-tooltip { position: absolute; background: #fff; border-radius: 8px; padding: 16px; width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 10002; display: none; flex-direction: column; gap: 8px; border-top: 4px solid #007bff; }
+  .tour-tooltip.show { display: flex; }
+  .tour-tooltip h4 { font-size: 15px; color: #007bff; font-weight: 800; }
+  .tour-tooltip p { font-size: 12.5px; color: #334155; line-height: 1.5; }
+  .tour-tooltip .tour-hint { font-size: 11px; color: #94a3b8; font-style: italic; margin-top: 6px; }
+
+  /* ===== RESPONSIVE NAVBAR ===== */
+  @media (max-width: 768px) {
+    .navbar { padding: 0 0.5rem; }
+    .navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
+    .navbar .nav-brand .brand-text { display: none; }
+    .nav-item { padding: 0 0.6rem; font-size: 0.68rem; }
+    .nav-chat { padding: 0.45rem 0.75rem; font-size: 0.66rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== NEW NAVBAR ========== -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <span class="logo">Y</span>
+    <span class="brand-text">YZ Payroll</span>
+  </div>
+
+  <div class="nav-links" id="navLinks">
+    <button class="nav-back" id="backBtn" title="Kembali ke halaman sebelumnya">⏎</button>
+
+    <div class="nav-dropdown" id="filesDropdown">
+      <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
+      <div class="dropdown-menu">
+        <a href="dashboard.html">📊 DASHBOARD</a>
+        <a href="staffinfo.html">👥 EMPLOYEES</a>
+        <a href="leave.html">📅 TIMECARD REPORT</a>
+        <a href="overtime.html">⏱️ OVERTIME SHEET</a>
+        <div class="divider"></div>
+        <a href="epf.html">🏦 EPF</a>
+        <a href="socso.html">🛡️ SOCSO</a>
+        <a href="eis.html">📋 EIS</a>
+        <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+        <div class="divider"></div>
+        <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+        <a href="121.html">📄 121</a>
+        <a href="122.html">📄 122</a>
+        <a href="123.html">📄 123</a>
+        <a href="124.html">📄 124</a>
+      </div>
+    </div>
+
+    <a class="nav-item" href="dashboard.html">DASHBOARD</a>
+    <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
+    <a class="nav-item active" href="leave.html">TIMECARD REPORT</a>
+
+    <div class="nav-dropdown" id="carumanDropdown">
+      <button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
+      <div class="dropdown-menu">
+        <a href="epf.html">🏦 EPF</a>
+        <a href="socso.html">🛡️ SOCSO</a>
+        <a href="eis.html">📋 EIS</a>
+        <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+      </div>
+    </div>
+
+    <a class="nav-item" href="companysetting.html">SETTING</a>
+
+    <div class="nav-dropdown" id="othersDropdown">
+      <button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
+      <div class="dropdown-menu">
+        <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+        <div class="divider"></div>
+        <a href="121.html">📄 121</a>
+        <a href="122.html">📄 122</a>
+        <a href="123.html">📄 123</a>
+        <a href="124.html">📄 124</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 将原本的 Request Chat 改为 TIPS 按钮，功能转移至此 -->
+  <button class="nav-chat" type="button" onclick="openTipsChoice()">
+    <span class="pulse"></span> ❓ TIPS
+  </button>
+</nav>
+
+<!-- ====== 浅色工具栏 ====== -->
+<div class="toolbar" id="tour-toolbar">
+  <div class="toolbar-left">
+    <div class="toolbar-brand"><div class="logo">P</div> Payroll Dashboard</div>
+    <div class="toolbar-search">
+      <span>🔍</span>
+      <input type="text" id="globalSearchInput" placeholder="Cari Nama / Kod / Kumpulan...">
+    </div>
+  </div>
+  <div class="toolbar-right">
+    <div class="url-box">
+      <input type="text" id="deployUrlInput" placeholder="Apps Script URL...">
+      <button onclick="applyUrl()">🔗 Apply</button>
+    </div>
+    <button class="btn-outline" onclick="openSettingCenter()">⚙️ SETTING</button>
+    <button class="btn-outline btn-primary" id="manualSaveBtn" onclick="manualSave()">💾 Simpan</button>
+    <span class="sync-badge" id="syncBadge"><span class="dot"></span><span id="syncText">Sedia</span></span>
+    <button class="btn-outline btn-success" onclick="loadData()">🔄 Muat Semula</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="dashboard-panel" id="dashboardPanel">
+    <div class="dash-group" id="tour-basic-info" style="flex: 1.2;">
+      <div class="dash-group-title">MAKLUMAT ASAS</div>
+      <div class="dash-row">
+        <div class="dash-item search-wrap">
+          <label>CARI KOD / NAME</label>
+          <input type="text" id="searchEmpInput" placeholder="Taip ID atau Nama..." autocomplete="off">
+          <div class="search-dropdown" id="empDropdown"></div>
+        </div>
+        <div class="dash-item search-wrap">
+          <label>KUMPULAN</label>
+          <input type="text" id="searchGroupInput" placeholder="Taip Kumpulan..." autocomplete="off">
+          <div class="search-dropdown" id="groupDropdown"></div>
+        </div>
+      </div>
+      <div class="dash-row">
+        <div class="dash-item">
+          <label>SITUATION</label>
+          <span id="dpSituation">-</span>
+        </div>
+        <div class="dash-item">
+          <label>GAJI (RM)</label>
+          <span id="dpGaji">0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-group" id="tour-picked-month" style="flex: 1.5;">
+      <div class="dash-group-title">PICKED THIS MONTH</div>
+      <div class="dash-row" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="dash-item"><label>AL</label><span id="dpPickedAL">0</span></div>
+        <div class="dash-item"><label>SL</label><span id="dpPickedSL">0</span></div>
+        <div class="dash-item"><label>UNPL</label><span id="dpPickedUNPL">0</span></div>
+        <div class="dash-item"><label>OFF</label><span id="dpPickedOFF">0</span></div>
+        <div class="dash-item"><label>HALF</label><span id="dpPickedHALF">0</span></div>
+        <div class="dash-item"><label>UNDD</label><span id="dpPickedUNDD">0</span></div>
+        <div class="dash-item"><label>MTNT</label><span id="dpPickedMTNT">0</span></div>
+      </div>
+    </div>
+
+    <div class="dash-group" id="tour-baki-cuti" style="flex: 1;">
+      <div class="dash-group-title">BAKI CUTI</div>
+      <div class="dash-row">
+        <div class="dash-item" style="background:#fff3e0;"><label>LAST AL</label><span id="dpLastAL">0</span></div>
+        <div class="dash-item" style="background:#e8f5e9;"><label>LAST SL</label><span id="dpLastSL">0</span></div>
+      </div>
+      <div class="dash-row">
+        <div class="dash-item" style="background:#d1fae5; border-color:#6ee7b7;"><label>THIS AL</label><span id="dpThisAL">0</span></div>
+        <div class="dash-item" style="background:#d1fae5; border-color:#6ee7b7;"><label>THIS SL</label><span id="dpThisSL">0</span></div>
+      </div>
+      <div class="dash-row">
+        <div class="dash-item" style="background:#e0f2fe; border-color:#7dd3fc;"><label>REMAIN AL</label><span id="dpRemainAL">0</span></div>
+        <div class="dash-item" style="background:#e0f2fe; border-color:#7dd3fc;"><label>REMAIN SL</label><span id="dpRemainSL">0</span></div>
+      </div>
+    </div>
+
+    <div class="dash-group" id="tour-total-leave" style="flex: 1;">
+      <div class="dash-group-title">TOTAL PICKED LEAVE</div>
+      <div class="dash-row">
+        <div class="dash-item" style="grid-column: span 2; background:#e0f2fe; border-color:#7dd3fc;">
+          <label>TOTAL PICKED LEAVE (HARI:JAM:MIN)</label>
+          <span id="dpTotalPickedLeave" style="font-size: 13px; color: #0369a1;">0 DAYS 0 HOURS 0 MIN</span>
+        </div>
+      </div>
+      <div class="dash-row" style="margin-top: 4px;">
+        <div class="dash-item" style="grid-column: span 2; background:#fecaca; border-color:#f87171;">
+          <label>TOTAL DEDUCTION (RM)</label>
+          <span id="dpTotalDeduct">0.00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-wrap" id="tour-table">
+    <table id="mainTable">
+      <thead><tr id="headerRow"></tr></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ====== Filter Panel ====== -->
+<div class="filter-panel" id="filterPanel">
+  <div class="fp-head"><input type="text" id="fpSearch" placeholder="Cari nilai..."></div>
+  <div class="fp-actions">
+    <button onclick="fpSelectAll()">Select All</button>
+    <button onclick="fpClearAll()">Clear</button>
+  </div>
+  <div class="fp-list" id="fpList"></div>
+  <div class="fp-footer">
+    <button onclick="fpClose()">Cancel</button>
+    <button class="apply" onclick="fpApply()">Apply</button>
+  </div>
+</div>
+
+<!-- ====== Autosave Modal ====== -->
+<div class="modal-mask" id="autoSaveModal">
+  <div class="modal">
+    <h3>⏰ Autosave</h3>
+    <p>Perubahan akan disimpan secara automatik.</p>
+    <div class="countdown" id="countdownNum">10</div>
+    <div class="actions">
+      <button onclick="autoSaveCancel()">Cancel</button>
+      <button class="confirm" onclick="autoSaveConfirm()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SETTING Center Modal ====== -->
+<div class="modal-mask" id="settingModal">
+  <div class="modal setting-modal">
+    <h3>⚙️ SETTING CENTER</h3>
+    <p id="settingDesc">Masukkan kata laluan untuk mengakses tetapan kod.</p>
+
+    <div id="settingStep1">
+      <input type="password" id="settingPasswordInput" class="setting-input" placeholder="Kata Laluan (Password)...">
+      <div class="actions" style="margin-top: 16px;">
+        <button onclick="closeSettingCenter()">Cancel</button>
+        <button class="confirm" onclick="verifyPassword()">Buka Kunci</button>
+      </div>
+    </div>
+
+    <div id="settingStep2" style="display: none;">
+      <p style="margin-bottom: 8px; font-size: 12px; text-align: left;">Edit core logic ( <code>overLessMin</code> calculation ).</p>
+      <textarea id="settingCodeInput" class="setting-textarea"></textarea>
+      <div class="actions" style="justify-content: flex-end;">
+        <button onclick="resetDefaultCode()">Reset Default</button>
+        <button class="confirm" onclick="saveCustomCode()">Simpan & Apply</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== TIPS 选择弹窗 ====== -->
+<div class="modal-mask" id="tipsChoiceModal">
+  <div class="modal" style="width: 400px;">
+    <h3 style="color: #007bff;">❓ BANTUAN & PANDUAN</h3>
+    <p>Pilih jenis panduan yang anda mahukan.</p>
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+      <button class="btn-outline" style="padding: 12px; justify-content: center; font-size: 14px;" onclick="startTour()">✨ Panduan Visual (Walkthrough)</button>
+      <button class="btn-outline" style="padding: 12px; justify-content: center; font-size: 14px;" onclick="openTipsModal()">📖 Panduan Terperinci (Baca Teks)</button>
+    </div>
+    <div class="actions" style="margin-top: 20px;">
+      <button onclick="closeTipsChoice()">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== TIPS 详细弹窗 (Modal) ====== -->
+<div class="modal-mask" id="tipsDetailModal">
+  <div class="modal tips-modal">
+    <h3>📖 PANDUAN SISTEM PAYROLL</h3>
+    <p class="subtitle">Ketahui fungsi setiap bahagian di dashboard ini.</p>
+
+    <div class="tips-section">
+      <h4>1. Toolbar Atas (Top Bar)</h4>
+      <ul>
+        <li><strong>URL Box:</strong> Memasukkan link Apps Script untuk sambung ke Google Sheet.</li>
+        <li><strong>SETTING:</strong> Tempat ubah formula kiraan (Perlu kata laluan).</li>
+        <li><strong>Simpan / Muat Semula:</strong> Simpan ke Sheet atau ambil data terbaru.</li>
+      </ul>
+    </div>
+
+    <div class="tips-section">
+      <h4>2. Maklumat Asas & Cuti</h4>
+      <ul>
+        <li><strong>CARI KOD / KUMPULAN:</strong> Tapis pekerja ikut nama atau kumpulan.</li>
+        <li><strong>PICKED THIS MONTH:</strong> Jumlah cuti yang diambil bulan ini (AL, SL, dll).</li>
+        <li><strong>BAKI CUTI:</strong> Baki cuti tahun lepas (LAST), cuti diambil bulan ini (THIS), dan baki semasa (REMAIN). Jika merah, cuti telah <em>overdraft</em>.</li>
+      </ul>
+    </div>
+
+    <div class="tips-section">
+      <h4>3. Jadual Kehadiran (Table)</h4>
+      <ul>
+        <li><strong>Total Work Time:</strong> Masa bekerja selepas tolak rehat 1 jam.</li>
+        <li><strong>Over/Less Time:</strong> Hijau jika lebih 7.5 jam, Merah jika kurang.</li>
+        <li><strong>STATUS:</strong> Pilih jenis cuti (Contoh: Annual Leave, Half Day).</li>
+        <li><strong>TOTAL DEDUCTION:</strong> Potongan gaji automatik jika ambil cuti tanpa gaji.</li>
+      </ul>
+    </div>
+
+    <div class="tips-actions">
+      <button class="btn-close" onclick="closeTipsModal()">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== TIPS 浮窗 (Walkthrough) ====== -->
+<div class="tour-mask" id="tourMask" onclick="nextTourStep()"></div>
+<div class="tour-highlight" id="tourHighlight"></div>
+<div class="tour-tooltip" id="tourTooltip">
+  <h4 id="tourTitle">Title</h4>
+  <p id="tourDesc">Description</p>
+  <div class="tour-hint">Klik di mana-mana untuk teruskan ➔</div>
+</div>
+
+
+<script>
+/* ============================================================
+   NAVBAR LOGIC (dropdowns & back button)
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function() {
+  const backBtn = document.getElementById('backBtn');
+  if (backBtn) {
+    backBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.history.back();
+    });
+  }
+
+  const dropdownToggles = document.querySelectorAll('[data-dropdown-toggle]');
+  dropdownToggles.forEach(function(toggle) {
+    toggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const dropdownId = this.getAttribute('data-dropdown-toggle');
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        if (dd.id !== dropdownId + 'Dropdown') dd.classList.remove('open');
+      });
+      const wrapper = this.closest('.nav-dropdown');
+      if (wrapper) wrapper.classList.toggle('open');
+    });
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.nav-dropdown')) {
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        dd.classList.remove('open');
+      });
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        dd.classList.remove('open');
+      });
+    }
+  });
+
+  document.querySelectorAll('.dropdown-menu a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        dd.classList.remove('open');
+      });
+    });
+  });
+});
+
+/* ============================================================
+   ORIGINAL PAYROLL LOGIC (unchanged)
+   ============================================================ */
+const URL_KEY = 'payrollScriptUrl';
+const CODE_KEY = 'payrollCustomCalcCode';
+
+const DEFAULT_CALC_CODE = `
+const standardMinutes = 7.5 * 60; 
+return workMin - standardMinutes;
+`;
+
+let customCalcFunction = null;
+
+const SHEET_HEADERS = [
+  'ID KOD','SITUATION','GROUP','NAME','SHIF','GAJI','Date',
+  'Clock In 01','Clock Out 01','Clock Time(h) 01',
+  'Clock In 02','Clock Out 02','Clock Time(h) 02',
+  'Clock In 03','Clock Out 03','Clock Time(h) 03',
+  'Total Break Time(h)','Total Work Time(h)','Total Over/Less Time (h)',
+  'SITUATION WORK TIME','STATUS','HALF TT JAM','HALF TT MIN',
+  'TOTAL DEDUCTION(RM)','THIS AL REMAIN','THIS SL REMAIN','REMARK'
+];
+
+const READONLY_COLS = ['ID KOD','SITUATION','GROUP','NAME','SHIF','GAJI',
+  'Clock Time(h) 01','Clock Time(h) 02','Clock Time(h) 03',
+  'Total Break Time(h)','Total Work Time(h)','Total Over/Less Time (h)',
+  'SITUATION WORK TIME','TOTAL DEDUCTION(RM)','THIS AL REMAIN','THIS SL REMAIN'];
+
+const STATUS_OPTIONS = ['', 'ANNUAL LEAVE','UNPAID LEAVE','HALF DAY LEAVE','SICK LEAVE','OFF DAY','UNDEDUCTION LEAVE','MATERNITY LEAVE'];
+
+const STATUS_COLORS = {
+  'ANNUAL LEAVE': { bg: '#fca5a5', color: '#7f1d1d' },
+  'UNPAID LEAVE': { bg: '#bbf7d0', color: '#14532d' },
+  'HALF DAY LEAVE': { bg: '#bae6fd', color: '#0c4a6e' },
+  'SICK LEAVE': { bg: '#fef08a', color: '#713f12' },
+  'OFF DAY': { bg: '#1e3a8a', color: '#ffffff' },
+  'UNDEDUCTION LEAVE': { bg: '#c7d2fe', color: '#312e81' },
+  'MATERNITY LEAVE': { bg: '#fbcfe8', color: '#831843' }
+};
+const SITUATION_COLORS = {
+  'ACTIVE': { bg: '#86efac', color: '#000000' },
+  'PENDING': { bg: '#fcd34d', color: '#000000' },
+  'INACTIVE': { bg: '#fca5a5', color: '#000000' }
+};
+const ROW_HL_COLORS = {
+  'hl-red': '#ffe4e6',
+  'hl-green': '#dcfce7',
+  'hl-yellow': '#fef9c3'
+};
+
+let SCRIPT_URL = '';
+let allRows = [];
+let filteredRows = [];
+let staffList = [];
+let alslData = [];
+
+let currentSelectedCode = 'ALL';
+let currentGroupFilter = '';
+let filters = {};
+let currentFilterCol = null;
+let tempCheckedValues = new Set();
+
+let dirty = false;
+let idleTimer = null;
+let countdownTimer = null;
+let countdownLeft = 10;
+let modalOpen = false;
+
+// ====== TIPS 走马灯状态 ======
+let tourStepIndex = -1;
+const tourSteps = [
+  { elementId: 'tour-toolbar', title: 'Toolbar Utama', desc: 'Di sini anda boleh masukkan URL Apps Script, buka tetapan formula (SETTING), dan simpan/muat semula data dari Google Sheet.' },
+  { elementId: 'tour-basic-info', title: 'Maklumat Asas', desc: 'Gunakan kotak carian ini untuk tapis pekerja mengikut Nama/Kod atau Kumpulan. Anda juga boleh lihat status semasa dan gaji asas mereka.' },
+  { elementId: 'tour-picked-month', title: 'Cuti Bulan Ini', desc: 'Menunjukkan jumlah cuti yang telah diambil oleh pekerja pada bulan semasa (Annual, Sick, Off Day, dll).' },
+  { elementId: 'tour-baki-cuti', title: 'Baki Cuti', desc: 'LAST: Baki tahun lepas. THIS: Diambil bulan ini. REMAIN: Baki semasa (Jika merah, bermaksud cuti telah overdraft).' },
+  { elementId: 'tour-total-leave', title: 'Jumlah Cuti & Potongan', desc: 'Ringkasan jumlah cuti diambil dan jumlah potongan gaji (RM) untuk bulan ini.' },
+  { elementId: 'tour-table', title: 'Jadual Kehadiran', desc: 'Senarai penuh rekod harian. Anda boleh ubah STATUS cuti, lihat Total Over/Less Time, dan sistem akan kira potongan secara automatik.' }
+];
+
+function initCalcFunction() {
+  let code = localStorage.getItem(CODE_KEY) || DEFAULT_CALC_CODE;
+  try {
+    customCalcFunction = new Function('workMin', code);
+    customCalcFunction(450);
+  } catch (e) {
+    console.error("Custom code error, fallback to default.", e);
+    customCalcFunction = new Function('workMin', DEFAULT_CALC_CODE);
+  }
+}
+initCalcFunction();
+
+function getAllGroups() {
+  return Array.from(new Set(staffList.map(s => String(s.GroupName || '').trim()).filter(g => g)));
+}
+
+function loadSavedUrl() {
+  SCRIPT_URL = localStorage.getItem(URL_KEY) || '';
+  document.getElementById('deployUrlInput').value = SCRIPT_URL;
+}
+
+function applyUrl() {
+  const url = document.getElementById('deployUrlInput').value.trim();
+  if (!url) { alert('Masukkan URL terlebih dahulu.'); return; }
+  localStorage.setItem(URL_KEY, url);
+  SCRIPT_URL = url;
+  loadData();
+}
+
+window.addEventListener('storage', e => {
+  if (e.key === URL_KEY && e.newValue) {
+    SCRIPT_URL = e.newValue;
+    document.getElementById('deployUrlInput').value = e.newValue;
+    loadData();
+  }
+});
+
+function setSync(state, text) {
+  const b = document.getElementById('syncBadge');
+  b.className = 'sync-badge ' + (state || '');
+  document.getElementById('syncText').textContent = text;
+}
+
+document.getElementById('globalSearchInput').addEventListener('input', function(e) {
+  document.getElementById('searchEmpInput').value = e.target.value;
+  document.getElementById('searchEmpInput').dispatchEvent(new Event('input'));
+});
+
+// ====== TIPS 控制逻辑 ======
+function openTipsChoice() {
+  document.getElementById('tipsChoiceModal').classList.add('show');
+}
+
+function closeTipsChoice() {
+  document.getElementById('tipsChoiceModal').classList.remove('show');
+}
+
+function openTipsModal() {
+  closeTipsChoice();
+  document.getElementById('tipsDetailModal').classList.add('show');
+}
+
+function closeTipsModal() {
+  document.getElementById('tipsDetailModal').classList.remove('show');
+}
+
+function startTour() {
+  closeTipsChoice();
+  tourStepIndex = -1;
+  document.getElementById('tourMask').classList.add('show');
+  nextTourStep();
+}
+
+function nextTourStep() {
+  tourStepIndex++;
+
+  // 如果结束了
+  if (tourStepIndex >= tourSteps.length) {
+    endTour();
+    return;
+  }
+
+  const step = tourSteps[tourStepIndex];
+  const el = document.getElementById(step.elementId);
+  const highlight = document.getElementById('tourHighlight');
+  const tooltip = document.getElementById('tourTooltip');
+  const mask = document.getElementById('tourMask');
+
+  if (!el) {
+    nextTourStep();
+    return;
+  }
+
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  setTimeout(() => {
+    const rect = el.getBoundingClientRect();
+
+    // 因为 highlighter 使用了 outline，这里不需要再给 top 加上 scroll 偏移，只需对照视口位置即可
+    highlight.style.left = rect.left + 'px';
+    highlight.style.top = rect.top + 'px';
+    highlight.style.width = rect.width + 'px';
+    highlight.style.height = rect.height + 'px';
+    highlight.classList.add('show');
+
+    let tooltipTop = rect.bottom + 15;
+    let tooltipLeft = rect.left;
+
+    if (tooltipTop + 150 > window.innerHeight) {
+      tooltipTop = rect.top - 160;
+    }
+
+    if (tooltipLeft + 300 > window.innerWidth) {
+      tooltipLeft = window.innerWidth - 320;
+    }
+
+    tooltip.style.top = tooltipTop + 'px';
+    tooltip.style.left = tooltipLeft + 'px';
+    tooltip.classList.add('show');
+
+    document.getElementById('tourTitle').textContent = step.title;
+    document.getElementById('tourDesc').textContent = step.desc;
+  }, 300);
+}
+
+function endTour() {
+  document.getElementById('tourMask').classList.remove('show');
+  document.getElementById('tourHighlight').classList.remove('show');
+  document.getElementById('tourTooltip').classList.remove('show');
+  tourStepIndex = -1;
+}
+
+// ====== 修复后的 Setting Center 逻辑 ======
+function getObfuscatedPass() {
+  const parts = [49, 49, 49, 49];
+  return String.fromCharCode(...parts.map(p => p - 1));
+}
+
+function openSettingCenter() {
+  document.getElementById('settingModal').classList.add('show');
+  document.getElementById('settingStep1').style.display = 'block';
+  document.getElementById('settingStep2').style.display = 'none';
+  document.getElementById('settingPasswordInput').value = '';
+  document.getElementById('settingDesc').textContent = 'Masukkan kata laluan untuk mengakses tetapan kod.';
+}
+
+function closeSettingCenter() {
+  document.getElementById('settingModal').classList.remove('show');
+}
+
+function verifyPassword() {
+  const pwd = document.getElementById('settingPasswordInput').value;
+  const realPwd = getObfuscatedPass();
+
+  if (pwd === realPwd) {
+    document.getElementById('settingStep1').style.display = 'none';
+    document.getElementById('settingStep2').style.display = 'block';
+    document.getElementById('settingDesc').textContent = 'Edit formula di bawah (Guna pembolehubah: workMin).';
+
+    const savedCode = localStorage.getItem(CODE_KEY) || DEFAULT_CALC_CODE;
+    document.getElementById('settingCodeInput').value = savedCode.trim();
+  } else {
+    alert('❌ Kata laluan salah!');
+    document.getElementById('settingPasswordInput').value = '';
+  }
+}
+
+function resetDefaultCode() {
+  if(confirm('Pastikan anda mahu menetapkan semula kepada kod asal (7.5 Jam)?')) {
+    document.getElementById('settingCodeInput').value = DEFAULT_CALC_CODE.trim();
+  }
+}
+
+function saveCustomCode() {
+  const newCode = document.getElementById('settingCodeInput').value;
+  try {
+    const testFn = new Function('workMin', newCode);
+    testFn(400);
+
+    localStorage.setItem(CODE_KEY, newCode);
+    customCalcFunction = testFn;
+    closeSettingCenter();
+    alert('✅ Kod berjaya disimpan & digunakan!');
+
+    applyFiltersAndRender();
+  } catch (err) {
+    alert('❌ Ralat sintaks kod: \n' + err.message);
+  }
+}
+
+// ====== 核心业务逻辑 ======
+async function loadData() {
+  if (!SCRIPT_URL) { setSync('err', 'URL belum ditetapkan'); return; }
+  setSync('busy', 'Memuatkan...');
+  try {
+    const [resSheet, resStaff, resALSL] = await Promise.all([
+      fetch(`${SCRIPT_URL}?action=getSheetData&_t=${Date.now()}`).then(r=>r.json()),
+      fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`).then(r=>r.json()),
+      fetch(`${SCRIPT_URL}?action=getALSLData&_t=${Date.now()}`).then(r=>r.json())
+    ]);
+
+    if (resSheet.status !== 'success') throw new Error('Gagal load SHEET');
+
+    allRows = (resSheet.data || []).map(r => {
+      const o = {};
+      SHEET_HEADERS.forEach(h => {
+        let v = r[h];
+        if (v === undefined || v === null) v = '';
+        if (h === 'Date') v = normalizeDate(v);
+        o[h] = v;
+      });
+      return o;
+    });
+
+    if (resStaff.result === 'success') staffList = resStaff.data || [];
+    if (resALSL.status === 'success') alslData = resALSL.data || [];
+
+    document.getElementById('searchEmpInput').value = '';
+    document.getElementById('searchGroupInput').value = '';
+    selectEmployee('ALL');
+
+    setSync('ok', 'Data dimuat');
+  } catch (err) {
+    console.error(err);
+    setSync('err', 'Gagal muat: ' + err.message);
+  }
+}
+
+function pad2(n){ return String(n).padStart(2,'0'); }
+function normalizeDate(v) {
+  if (!v) return '';
+  if (v instanceof Date) return `${v.getFullYear()}-${pad2(v.getMonth()+1)}-${pad2(v.getDate())}`;
+  let s = String(v).trim();
+  let m = s.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})$/);
+  if (m) return `${m[1]}-${pad2(m[2])}-${pad2(m[3])}`;
+  m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);
+  if (m) return `${m[3]}-${pad2(m[2])}-${pad2(m[1])}`;
+  return s;
+}
+
+function timeToMin(s) {
+  if (!s) return null;
+  const str = String(s).trim();
+
+  const match12 = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i);
+  if (match12) {
+    let h = parseInt(match12[1], 10);
+    const m = parseInt(match12[2], 10);
+    const ampm = match12[4].toUpperCase();
+    if (ampm === 'PM' && h < 12) h += 12;
+    if (ampm === 'AM' && h === 12) h = 0;
+    return h * 60 + m;
+  }
+
+  const match24 = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+  if (match24) {
+    const h = parseInt(match24[1], 10), m = parseInt(match24[2], 10);
+    if (h <= 23 && m <= 59) return h * 60 + m;
+  }
+
+  const matchFallback = str.match(/(\d{1,2}):(\d{2}):(\d{2})/);
+  if (matchFallback) {
+    const h = parseInt(matchFallback[1], 10), m = parseInt(matchFallback[2], 10);
+    if (h <= 23 && m <= 59) return h * 60 + m;
+  }
+
+  return null;
+}
+
+function formatDuration(totalMinutes) {
+  if (!totalMinutes || totalMinutes <= 0) return '00:00:00';
+  const totalSeconds = Math.round(totalMinutes * 60);
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+function formatOverLessTime(totalMinutes) {
+  if (totalMinutes === 0) return '00:00:00';
+  const isNegative = totalMinutes < 0;
+  const absMinutes = Math.abs(totalMinutes);
+  const totalSeconds = Math.round(absMinutes * 60);
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+  const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  return isNegative ? `-${timeStr}` : timeStr;
+}
+
+function computeRow(r) {
+  const segs = [
+    [timeToMin(r['Clock In 01']), timeToMin(r['Clock Out 01'])],
+    [timeToMin(r['Clock In 02']), timeToMin(r['Clock Out 02'])],
+    [timeToMin(r['Clock In 03']), timeToMin(r['Clock Out 03'])]
+  ];
+  const segH = segs.map(([a,b]) => (a!==null && b!==null && b>=a) ? b-a : 0);
+  const hasAnyIn = segs.some(([a])=>a!==null);
+  const missingOut = segs.some(([a,b]) => a!==null && b===null);
+
+  const totalSegMin = segH[0]+segH[1]+segH[2];
+  const workMin = hasAnyIn ? Math.max(0, totalSegMin - 60) : 0;
+
+  let overLessMin = 0;
+  if (hasAnyIn) {
+    try {
+      overLessMin = customCalcFunction(workMin);
+    } catch (e) {
+      console.error("Calc Error:", e);
+      overLessMin = workMin - 450;
+    }
+  }
+
+  let swt = '', hl = '';
+  if (!hasAnyIn) { swt = '未存在打卡记录'; }
+  else if (missingOut) { swt = '缺少打卡记录'; hl = 'hl-red'; }
+  else if (overLessMin > 0) { swt = '超时工作'; hl = 'hl-green'; }
+  else { swt = '工时不足'; hl = 'hl-yellow'; }
+
+  const gaji = parseFloat(r['GAJI']) || 0;
+  const status = (r['STATUS'] || '').toUpperCase();
+  let deduct = 0;
+  if (status === 'UNPAID LEAVE') {
+    deduct = gaji / 30;
+  } else if (status === 'HALF DAY LEAVE') {
+    const j = parseFloat(r['HALF TT JAM']) || 0;
+    const m = parseFloat(r['HALF TT MIN']) || 0;
+    const hrs = j + m/60;
+    const hourly = (gaji/30)/7.5;
+    deduct = hourly * hrs;
+  }
+
+  return { segH, workMin, otMin: overLessMin, swt, hl, deduct };
+}
+
+const searchEmpInput = document.getElementById('searchEmpInput');
+const empDropdown = document.getElementById('empDropdown');
+
+searchEmpInput.addEventListener('input', () => {
+  const q = searchEmpInput.value.trim().toLowerCase();
+  if (!q) { empDropdown.classList.remove('show'); return; }
+
+  const matchStaff = staffList.filter(s =>
+    String(s.Name || '').toLowerCase().includes(q) ||
+    String(s.Code || '').toLowerCase().includes(q)
+  ).slice(0, 15);
+
+  let html = `
+    <div class="sd-item all-item" onclick="selectEmployee('ALL')">
+      🌐 ALL (SEMUA PEKERJA)
+    </div>
+  `;
+
+  if (matchStaff.length > 0) {
+    html += matchStaff.map(m => `
+      <div class="sd-item" onclick="selectEmployee('${m.Code}')">
+        <b>${m.Code}</b> - ${m.Name}
+      </div>
+    `).join('');
+  }
+
+  empDropdown.innerHTML = html;
+  empDropdown.classList.add('show');
+});
+
+document.addEventListener('click', (e) => {
+  if (!searchEmpInput.contains(e.target) && !empDropdown.contains(e.target)) {
+    empDropdown.classList.remove('show');
+  }
+});
+
+const searchGroupInput = document.getElementById('searchGroupInput');
+const groupDropdown = document.getElementById('groupDropdown');
+
+searchGroupInput.addEventListener('input', () => {
+  const q = searchGroupInput.value.trim().toLowerCase();
+  if (!q) { groupDropdown.classList.remove('show'); return; }
+
+  const allGroups = getAllGroups();
+  const matchGroups = allGroups.filter(g => g.toLowerCase().includes(q)).slice(0, 15);
+
+  let html = `
+    <div class="sd-item all-item" onclick="selectEmployee('ALL')">
+      🌐 ALL (SEMUA KUMPULAN)
+    </div>
+  `;
+
+  if (matchGroups.length > 0) {
+    html += matchGroups.map(g => `
+      <div class="sd-item" onclick="selectGroup('${g.replace(/'/g, "\\'")}')">
+        🏢 SEMUA KUMPULAN: <b>${g}</b>
+      </div>
+    `).join('');
+  }
+
+  groupDropdown.innerHTML = html;
+  groupDropdown.classList.add('show');
+});
+
+document.addEventListener('click', (e) => {
+  if (!searchGroupInput.contains(e.target) && !groupDropdown.contains(e.target)) {
+    groupDropdown.classList.remove('show');
+  }
+});
+
+function selectEmployee(code) {
+  currentSelectedCode = code;
+  currentGroupFilter = '';
+
+  if (code === 'ALL') {
+    searchEmpInput.value = 'ALL (SEMUA PEKERJA)';
+    searchGroupInput.value = 'SEMUA KUMPULAN';
+    document.getElementById('dpSituation').textContent = 'SEMUA STATUS';
+    document.getElementById('dpGaji').textContent = 'JUMLAH SEMUA';
+  } else {
+    const staff = staffList.find(s => String(s.Code) === String(code));
+    if (staff) {
+      searchEmpInput.value = `${staff.Code} - ${staff.Name}`;
+      searchGroupInput.value = staff.GroupName || '-';
+      document.getElementById('dpSituation').textContent = staff.Situation || '-';
+      document.getElementById('dpGaji').textContent = parseFloat(staff.Salary || 0).toFixed(2);
+    }
+  }
+
+  empDropdown.classList.remove('show');
+  groupDropdown.classList.remove('show');
+  updateDashboardStats();
+  applyFiltersAndRender();
+}
+
+function selectGroup(groupName) {
+  currentSelectedCode = 'ALL';
+  currentGroupFilter = groupName;
+
+  searchEmpInput.value = `ALL (${groupName})`;
+  searchGroupInput.value = groupName;
+
+  document.getElementById('dpSituation').textContent = 'SEMUA STATUS';
+  document.getElementById('dpGaji').textContent = 'JUMLAH KUMPULAN';
+
+  empDropdown.classList.remove('show');
+  groupDropdown.classList.remove('show');
+  updateDashboardStats();
+  applyFiltersAndRender();
+}
+
+function updateDashboardStats() {
+  let targetCodes = [];
+  if (currentGroupFilter) {
+    targetCodes = staffList.filter(s => String(s.GroupName) === currentGroupFilter).map(s => String(s.Code));
+  } else if (currentSelectedCode === 'ALL') {
+    targetCodes = staffList.map(s => String(s.Code));
+  } else {
+    targetCodes = [String(currentSelectedCode)];
+  }
+
+  const empRows = allRows.filter(r => targetCodes.includes(String(r['ID KOD'])));
+
+  let lastAL = 0, lastSL = 0;
+  alslData.forEach(a => {
+    if (targetCodes.includes(String(a['ID KOD']))) {
+      lastAL += parseFloat(a['LASTAL']) || 0;
+      lastSL += parseFloat(a['LASTSL']) || 0;
+    }
+  });
+
+  document.getElementById('dpLastAL').textContent = lastAL.toFixed(2);
+  document.getElementById('dpLastSL').textContent = lastSL.toFixed(2);
+
+  let targetMonth = '';
+  if (empRows.length > 0) {
+    const dates = empRows.map(r => r['Date']).filter(d => d).sort();
+    if (dates.length > 0) targetMonth = dates[dates.length - 1].substring(0, 7);
+  }
+
+  let countAL = 0, countSL = 0, countUNPL = 0, countOFF = 0, countHALF = 0, countUNDD = 0, countMTNT = 0;
+  let totalDeduct = 0;
+
+  let totalDays = 0;
+  let totalHours = 0;
+  let totalMinutes = 0;
+
+  empRows.forEach(r => {
+    if (targetMonth && r['Date'] && r['Date'].startsWith(targetMonth)) {
+      const s = (r['STATUS'] || '').toUpperCase();
+      if (s === 'ANNUAL LEAVE') countAL++;
+      if (s === 'SICK LEAVE') countSL++;
+      if (s === 'UNPAID LEAVE') countUNPL++;
+      if (s === 'OFF DAY') countOFF++;
+      if (s === 'HALF DAY LEAVE') countHALF++;
+      if (s === 'UNDEDUCTION LEAVE') countUNDD++;
+      if (s === 'MATERNITY LEAVE') countMTNT++;
+
+      if (s && s !== 'OFF DAY') {
+        if (s === 'HALF DAY LEAVE') {
+          totalDays += 0.5;
+          const j = parseFloat(r['HALF TT JAM']) || 0;
+          const m = parseFloat(r['HALF TT MIN']) || 0;
+          totalHours += j;
+          totalMinutes += m;
+        } else {
+          totalDays += 1;
+        }
+      }
+    }
+    const c = computeRow(r);
+    totalDeduct += c.deduct;
+  });
+
+  totalHours += Math.floor(totalMinutes / 60);
+  totalMinutes = totalMinutes % 60;
+  totalDays += Math.floor(totalHours / 24);
+  totalHours = totalHours % 24;
+
+  const totalPickedLeaveStr = `${Math.floor(totalDays)} DAYS ${Math.floor(totalHours)} HOURS ${Math.floor(totalMinutes)} MIN`;
+  document.getElementById('dpTotalPickedLeave').textContent = totalPickedLeaveStr;
+
+  const thisAL = countAL;
+  const thisSL = countSL;
+
+  const remainAL = lastAL - thisAL;
+  const remainSL = lastSL - thisSL;
+
+  document.getElementById('dpPickedAL').textContent = countAL;
+  document.getElementById('dpPickedSL').textContent = countSL;
+  document.getElementById('dpPickedUNPL').textContent = countUNPL;
+  document.getElementById('dpPickedOFF').textContent = countOFF;
+  document.getElementById('dpPickedHALF').textContent = countHALF;
+  document.getElementById('dpPickedUNDD').textContent = countUNDD;
+  document.getElementById('dpPickedMTNT').textContent = countMTNT;
+
+  document.getElementById('dpThisAL').textContent = thisAL.toFixed(2);
+  document.getElementById('dpThisSL').textContent = thisSL.toFixed(2);
+
+  document.getElementById('dpRemainAL').textContent = remainAL.toFixed(2);
+  document.getElementById('dpRemainSL').textContent = remainSL.toFixed(2);
+
+  document.getElementById('dpTotalDeduct').textContent = totalDeduct.toFixed(2);
+}
+
+function applyFiltersAndRender() {
+  let baseRows = allRows;
+
+  if (currentGroupFilter) {
+    const codes = staffList.filter(s => String(s.GroupName) === currentGroupFilter).map(s => String(s.Code));
+    baseRows = allRows.filter(r => codes.includes(String(r['ID KOD'])));
+  } else if (currentSelectedCode !== 'ALL') {
+    baseRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
+  }
+
+  filteredRows = baseRows.filter(r => {
+    for (const col in filters) {
+      const set = filters[col];
+      if (set && set.size > 0) {
+        let val = r[col] ? String(r[col]).trim() : '';
+        if (!set.has(val)) return false;
+      }
+    }
+    return true;
+  });
+  render();
+}
+
+function render() {
+  const hdr = document.getElementById('headerRow');
+  let hHtml = '<th>#</th>';
+  SHEET_HEADERS.forEach(h => {
+    const isActive = filters[h] && filters[h].size > 0 ? 'active' : '';
+    hHtml += `<th><div class="th-inner"><span>${h}</span><button class="filter-btn ${isActive}" onclick="openFilter('${h}', event)">▼</button></div></th>`;
+  });
+  hdr.innerHTML = hHtml;
+
+  const tb = document.getElementById('tableBody');
+  if (!filteredRows.length) {
+    tb.innerHTML = `<tr><td colspan="${SHEET_HEADERS.length+1}"><div class="empty">Tiada data atau tiada baris sepadan.</div></td></tr>`;
+    return;
+  }
+  const frag = document.createDocumentFragment();
+  filteredRows.forEach((r, i) => frag.appendChild(buildRow(r, i)));
+  tb.innerHTML = ''; tb.appendChild(frag);
+}
+
+function buildRow(r, i) {
+  const c = computeRow(r);
+  const tr = document.createElement('tr');
+
+  let baseBg = '';
+  if (c.hl) baseBg = ROW_HL_COLORS[c.hl] || '';
+
+  const situation = (r['SITUATION'] || '').toUpperCase();
+  if (situation === 'INACTIVE') baseBg = '#ffe4e6';
+
+  const tdIdx = document.createElement('td');
+  tdIdx.className = 'col-idx';
+  tdIdx.textContent = i+1;
+  if (baseBg) tdIdx.style.backgroundColor = baseBg;
+  tr.appendChild(tdIdx);
+
+  SHEET_HEADERS.forEach(h => {
+    const td = document.createElement('td');
+
+    const isCodeOrName = (h === 'ID KOD' || h === 'NAME');
+    const statusVal = (r['STATUS'] || '').toUpperCase();
+
+    if (baseBg) td.style.backgroundColor = baseBg;
+
+    if (isCodeOrName && statusVal && STATUS_COLORS[statusVal]) {
+      td.style.backgroundColor = STATUS_COLORS[statusVal].bg;
+      td.style.color = STATUS_COLORS[statusVal].color;
+      td.style.fontWeight = '700';
+    }
+
+    if (h === 'SITUATION WORK TIME') {
+      td.className = 'calc';
+      td.textContent = c.swt;
+      if (baseBg) td.style.backgroundColor = baseBg;
+    }
+    else if (h === 'Clock Time(h) 01' || h === 'Clock Time(h) 02' || h === 'Clock Time(h) 03') {
+      const k = h.endsWith('01') ? 0 : h.endsWith('02') ? 1 : 2;
+      td.className = 'calc'; td.textContent = formatDuration(c.segH[k]);
+    }
+    else if (h === 'Total Break Time(h)') {
+      td.className = 'calc'; td.textContent = c.workMin > 0 ? '01:00:00' : '00:00:00';
+    }
+    else if (h === 'Total Work Time(h)') {
+      td.className = 'calc'; td.textContent = formatDuration(c.workMin);
+    }
+    else if (h === 'Total Over/Less Time (h)') {
+      td.className = 'calc';
+      td.textContent = formatOverLessTime(c.otMin);
+      if (c.otMin < 0) td.style.color = '#dc2626';
+      else if (c.otMin > 0) td.style.color = '#16a34a';
+    }
+    else if (h === 'TOTAL DEDUCTION(RM)') {
+      td.className = 'calc'; td.textContent = c.deduct ? c.deduct.toFixed(2) : '0.00';
+    }
+    else if (h === 'THIS AL REMAIN' || h === 'THIS SL REMAIN') {
+      td.className = 'calc';
+      td.textContent = (!currentGroupFilter && currentSelectedCode !== 'ALL')
+        ? (h === 'THIS AL REMAIN' ? document.getElementById('dpRemainAL').textContent : document.getElementById('dpRemainSL').textContent)
+        : '';
+    }
+    else if (h === 'SITUATION') {
+      td.textContent = r[h] || '';
+      if (SITUATION_COLORS[situation]) {
+        td.style.backgroundColor = SITUATION_COLORS[situation].bg;
+        td.style.color = SITUATION_COLORS[situation].color;
+        td.style.fontWeight = '700';
+        td.style.borderRadius = '4px';
+      }
+    }
+    else if (h === 'STATUS') {
+      const sel = document.createElement('select'); sel.className = 'cell';
+      STATUS_OPTIONS.forEach(o => {
+        const opt = document.createElement('option'); opt.value = o; opt.textContent = o || '— Pilih —';
+        if ((r[h]||'').toUpperCase() === o) opt.selected = true;
+        sel.appendChild(opt);
+      });
+
+      if (statusVal && STATUS_COLORS[statusVal]) {
+        sel.style.backgroundColor = STATUS_COLORS[statusVal].bg;
+        sel.style.color = STATUS_COLORS[statusVal].color;
+        sel.style.fontWeight = '700';
+        sel.style.borderColor = 'transparent';
+      } else {
+        sel.style.backgroundColor = 'transparent';
+      }
+
+      sel.addEventListener('change', () => {
+        r[h] = sel.value; markDirty();
+        updateDashboardStats();
+        if (filters[h]) applyFiltersAndRender();
+        else {
+           const idx = filteredRows.indexOf(r);
+           if (idx !== -1) { const newTr = buildRow(r, idx); tr.replaceWith(newTr); }
+        }
+      });
+      td.appendChild(sel);
+    }
+    else if (READONLY_COLS.includes(h)) {
+      td.className = 'ro'; td.textContent = r[h] || '';
+    }
+    else {
+      const inp = document.createElement('input');
+      inp.className = 'cell' + (h === 'REMARK' ? ' wide' : '');
+      inp.value = r[h] || '';
+      inp.placeholder = '';
+
+      if ((h === 'HALF TT JAM' || h === 'HALF TT MIN') && statusVal !== 'HALF DAY LEAVE') {
+        inp.disabled = true;
+      }
+      inp.addEventListener('input', () => {
+        r[h] = h === 'Date' ? normalizeDate(inp.value) : inp.value.trim();
+        markDirty();
+      });
+      inp.addEventListener('change', () => {
+        if (h === 'Date') inp.value = normalizeDate(inp.value);
+        updateDashboardStats();
+        const idx = filteredRows.indexOf(r);
+        if (idx !== -1) { const newTr = buildRow(r, idx); tr.replaceWith(newTr); }
+      });
+      td.appendChild(inp);
+    }
+    tr.appendChild(td);
+  });
+  return tr;
+}
+
+function openFilter(col, e) {
+  e.stopPropagation();
+  currentFilterCol = col;
+  const panel = document.getElementById('filterPanel');
+  const rect = e.target.getBoundingClientRect();
+
+  const valSet = new Set();
+  let baseRows = allRows;
+  if (currentGroupFilter) {
+    const codes = staffList.filter(s => String(s.GroupName) === currentGroupFilter).map(s => String(s.Code));
+    baseRows = allRows.filter(r => codes.includes(String(r['ID KOD'])));
+  } else if (currentSelectedCode !== 'ALL') {
+    baseRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
+  }
+
+  baseRows.forEach(r => valSet.add(r[col] ? String(r[col]).trim() : ''));
+  const vals = Array.from(valSet).sort((a,b) => {
+    if (a === '') return -1;
+    if (b === '') return 1;
+    return a.localeCompare(b, undefined, {numeric: true});
+  });
+
+  tempCheckedValues = filters[col] ? new Set(filters[col]) : new Set(vals);
+  const listEl = document.getElementById('fpList');
+  const searchEl = document.getElementById('fpSearch');
+  searchEl.value = '';
+
+  const renderList = (kw) => {
+    kw = (kw||'').toLowerCase();
+    const shown = vals.filter(v => {
+      if (!kw) return true;
+      if (v === '') return '(empty)'.includes(kw) || 'kosong'.includes(kw);
+      return v.toLowerCase().includes(kw);
+    });
+    listEl.innerHTML = shown.map(v => {
+      const checked = tempCheckedValues.has(v) ? 'checked' : '';
+      const lbl = v === '' ? '<span style="color:#94a3b8;font-style:italic;">(Empty)</span>' : v;
+      return `<label class="fp-item"><input type="checkbox" value="${v}" ${checked} onchange="fpToggle(this)"><span>${lbl}</span></label>`;
+    }).join('');
+  };
+  renderList('');
+
+  searchEl.oninput = () => renderList(searchEl.value);
+
+  panel.style.left = Math.min(rect.left, window.innerWidth - 240) + 'px';
+  panel.style.top = (rect.bottom + 5) + 'px';
+  panel.classList.add('show');
+
+  document.addEventListener('mousedown', closeFilterOnClickOutside);
+}
+
+function fpToggle(cb) {
+  if (cb.checked) tempCheckedValues.add(cb.value);
+  else tempCheckedValues.delete(cb.value);
+}
+function fpSelectAll() {
+  const cbs = document.querySelectorAll('#fpList input[type="checkbox"]');
+  cbs.forEach(cb => { cb.checked = true; tempCheckedValues.add(cb.value); });
+}
+function fpClearAll() {
+  const cbs = document.querySelectorAll('#fpList input[type="checkbox"]');
+  cbs.forEach(cb => { cb.checked = false; });
+  tempCheckedValues.clear();
+}
+function fpApply() {
+  let baseRows = allRows;
+  if (currentGroupFilter) {
+    const codes = staffList.filter(s => String(s.GroupName) === currentGroupFilter).map(s => String(s.Code));
+    baseRows = allRows.filter(r => codes.includes(String(r['ID KOD'])));
+  } else if (currentSelectedCode !== 'ALL') {
+    baseRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
+  }
+
+  const allVals = new Set();
+  baseRows.forEach(r => allVals.add(r[currentFilterCol] ? String(r[currentFilterCol]).trim() : ''));
+
+  if (tempCheckedValues.size === allVals.size) {
+    delete filters[currentFilterCol];
+  } else {
+    filters[currentFilterCol] = new Set(tempCheckedValues);
+  }
+  fpClose();
+  applyFiltersAndRender();
+}
+function fpClose() {
+  document.getElementById('filterPanel').classList.remove('show');
+  document.removeEventListener('mousedown', closeFilterOnClickOutside);
+}
+function closeFilterOnClickOutside(e) {
+  const p = document.getElementById('filterPanel');
+  if (!p.contains(e.target) && !e.target.classList.contains('filter-btn')) fpClose();
+}
+
+function markDirty() {
+  dirty = true;
+  setSync('busy', 'Perubahan belum disimpan');
+  if (idleTimer) clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => { if (dirty && !modalOpen) startAutoSaveCountdown(); }, 15000);
+}
+
+function startAutoSaveCountdown() {
+  modalOpen = true;
+  countdownLeft = 10;
+  document.getElementById('countdownNum').textContent = countdownLeft;
+  document.getElementById('autoSaveModal').classList.add('show');
+  countdownTimer = setInterval(() => {
+    countdownLeft--;
+    document.getElementById('countdownNum').textContent = countdownLeft;
+    if (countdownLeft <= 0) { clearInterval(countdownTimer); countdownTimer=null; closeModal(); doSave(); }
+  }, 1000);
+}
+
+function closeModal() {
+  modalOpen = false;
+  document.getElementById('autoSaveModal').classList.remove('show');
+  if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+}
+
+function autoSaveCancel() { closeModal(); }
+function autoSaveConfirm() { closeModal(); doSave(); }
+
+async function manualSave() {
+  if (!SCRIPT_URL) { alert('URL belum ditetapkan.'); return; }
+  if (!allRows.length) { alert('Tiada data untuk disimpan.'); return; }
+  const btn = document.getElementById('manualSaveBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Menyimpan...'; }
+  try {
+    await doSave();
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '💾 Simpan'; }
+  }
+}
+
+async function doSave() {
+  if (!SCRIPT_URL) { alert('URL belum ditetapkan.'); return; }
+  setSync('busy', 'Menyimpan...');
+  try {
+    const payload = allRows.map(r => {
+      const c = computeRow(r);   // 每行重新计算一次
+      const o = {};
+      SHEET_HEADERS.forEach(h => {
+        let v;
+
+        // --- 计算列：用 computeRow 结果写回 ---
+        if (h === 'Clock Time(h) 01')         v = formatDuration(c.segH[0]);
+        else if (h === 'Clock Time(h) 02')    v = formatDuration(c.segH[1]);
+        else if (h === 'Clock Time(h) 03')    v = formatDuration(c.segH[2]);
+        else if (h === 'Total Break Time(h)') v = c.workMin > 0 ? '01:00:00' : '00:00:00';
+        else if (h === 'Total Work Time(h)')  v = formatDuration(c.workMin);
+        else if (h === 'Total Over/Less Time (h)') v = formatOverLessTime(c.otMin);
+        else if (h === 'SITUATION WORK TIME') v = c.swt;
+        else if (h === 'TOTAL DEDUCTION(RM)') v = c.deduct ? c.deduct.toFixed(2) : '0.00';
+
+        // --- 这两个保留原有逻辑（依据是否单人选）---
+        else if (h === 'THIS AL REMAIN' || h === 'THIS SL REMAIN') {
+          if (!currentGroupFilter && currentSelectedCode !== 'ALL'
+              && String(r['ID KOD']) === currentSelectedCode) {
+            v = h === 'THIS AL REMAIN'
+                ? document.getElementById('dpRemainAL').textContent
+                : document.getElementById('dpRemainSL').textContent;
+          } else {
+            v = r[h] || '';
+          }
+        }
+        else {
+          v = r[h] === undefined || r[h] === null ? '' : r[h];
+        }
+        o[h] = v;
+      });
+      return o;
+    });
+
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'saveSheetData', rows: payload })
+    });
+    const json = await res.json();
+    if (json.status !== 'success') throw new Error(json.message || 'Gagal');
+    dirty = false;
+    setSync('ok', 'Disimpan (' + payload.length + ' baris)');
+  } catch (err) {
+    console.error(err);
+    setSync('err', 'Gagal simpan: ' + err.message);
+    alert('❌ Gagal simpan: ' + err.message);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  loadSavedUrl();
+  if (SCRIPT_URL) loadData();
+  else setSync('err', 'URL belum ditetapkan');
+});
+window.addEventListener('beforeunload', e => {
+  if (dirty) { e.preventDefault(); e.returnValue = ''; }
+});
+</script>
+</body>
+</html>
