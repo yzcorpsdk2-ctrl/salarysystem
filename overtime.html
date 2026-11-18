@@ -25,393 +25,138 @@ background: var(--epf-bg); color: var(--epf-text);
 min-height: 100vh; line-height: 1.5; font-size: 14px;
 -webkit-font-smoothing: antialiased;
 }
-/* ---------- TOAST 提示样式 ---------- */
-.toast-container {
-position: fixed; bottom: 24px; right: 24px; z-index: 9999;
-display: flex; flex-direction: column; gap: 10px;
-}
-.toast {
-background: #fff; border-left: 4px solid var(--epf-blue);
-padding: 12px 20px; border-radius: 8px;
-box-shadow: 0 4px 16px rgba(16,32,56,.15);
-color: var(--epf-text); font-size: 0.85rem; font-weight: 600;
-display: flex; align-items: center; gap: 10px;
-animation: slideIn 0.3s ease-out;
-min-width: 240px;
-}
+/* ---------- TOAST ---------- */
+.toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+.toast { background: #fff; border-left: 4px solid var(--epf-blue); padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 16px rgba(16,32,56,.15); color: var(--epf-text); font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease-out; min-width: 240px; }
 .toast.info { border-left-color: var(--epf-blue); }
 .toast.success { border-left-color: #22c55e; }
 .toast.error { border-left-color: #ef4444; }
 @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 /* ---------- NAVBAR ---------- */
-.navbar {
-position: sticky; top: 0; z-index: 200;
-display: flex; align-items: stretch; flex-wrap: wrap;
-background: linear-gradient(90deg, var(--nav-bg-1) 0%, var(--nav-bg-2) 100%);
-padding: 0 1rem; min-height: var(--nav-h);
-box-shadow: 0 2px 12px rgba(0,0,0,0.25);
-border-bottom: 1px solid rgba(77,159,255,0.18);
-}
-.navbar .nav-brand {
-display: flex; align-items: center; gap: 0.55rem;
-color: #fff; font-weight: 800; font-size: 0.78rem;
-letter-spacing: 0.1em; text-transform: uppercase;
-padding-right: 1.1rem; margin-right: 0.5rem;
-border-right: 1px solid rgba(255,255,255,0.12);
-white-space: nowrap;
-}
-.navbar .nav-brand .logo {
-width: 28px; height: 28px; border-radius: 7px;
-background: linear-gradient(135deg, #4d9fff, #1a4f8a);
-display: flex; align-items: center; justify-content: center;
-color: #fff; font-size: 0.85rem; font-weight: 800;
-box-shadow: 0 2px 6px rgba(77,159,255,0.35);
-}
-.nav-links {
-display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px;
-position: relative;
-}
-.nav-item {
-display: inline-flex; align-items: center; gap: 0.35rem;
-padding: 0 0.85rem; min-height: var(--nav-h);
-color: var(--nav-text); text-decoration: none;
-font-family: inherit; font-size: 0.73rem; font-weight: 700;
-letter-spacing: 0.06em; text-transform: uppercase;
-background: transparent; border: none; cursor: pointer;
-white-space: nowrap; transition: background 0.15s, color 0.15s;
-position: relative;
-}
+.navbar { position: sticky; top: 0; z-index: 200; display: flex; align-items: stretch; flex-wrap: wrap; background: linear-gradient(90deg, var(--nav-bg-1) 0%, var(--nav-bg-2) 100%); padding: 0 1rem; min-height: var(--nav-h); box-shadow: 0 2px 12px rgba(0,0,0,0.25); border-bottom: 1px solid rgba(77,159,255,0.18); }
+.navbar .nav-brand { display: flex; align-items: center; gap: 0.55rem; color: #fff; font-weight: 800; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; padding-right: 1.1rem; margin-right: 0.5rem; border-right: 1px solid rgba(255,255,255,0.12); white-space: nowrap; }
+.navbar .nav-brand .logo { width: 28px; height: 28px; border-radius: 7px; background: linear-gradient(135deg, #4d9fff, #1a4f8a); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.85rem; font-weight: 800; box-shadow: 0 2px 6px rgba(77,159,255,0.35); }
+.nav-links { display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px; position: relative; }
+.nav-item { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0 0.85rem; min-height: var(--nav-h); color: var(--nav-text); text-decoration: none; font-family: inherit; font-size: 0.73rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: transparent; border: none; cursor: pointer; white-space: nowrap; transition: background 0.15s, color 0.15s; position: relative; }
 .nav-item:hover, .nav-item.active { background: var(--nav-hover); color: #fff; }
-.nav-item::after {
-content: ''; position: absolute; left: 0.85rem; right: 0.85rem; bottom: 0;
-height: 2px; background: var(--nav-accent); transform: scaleX(0);
-transform-origin: left; transition: transform 0.2s;
-}
+.nav-item::after { content: ''; position: absolute; left: 0.85rem; right: 0.85rem; bottom: 0; height: 2px; background: var(--nav-accent); transform: scaleX(0); transform-origin: left; transition: transform 0.2s; }
 .nav-item:hover::after, .nav-item.active::after { transform: scaleX(1); }
-.nav-back {
-display: inline-flex; align-items: center; justify-content: center;
-min-width: 44px; padding: 0 0.6rem;
-color: var(--nav-text);
-background: transparent; border: none; cursor: pointer;
-font-size: 1.1rem; transition: background 0.15s, color 0.15s;
-}
+.nav-back { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; padding: 0 0.6rem; color: var(--nav-text); background: transparent; border: none; cursor: pointer; font-size: 1.1rem; transition: background 0.15s, color 0.15s; }
 .nav-back:hover { background: var(--nav-hover); color: #fff; }
 .nav-dropdown { position: relative; display: inline-flex; align-items: stretch; }
 .nav-dropdown > .nav-item { padding-right: 0.55rem; }
 .nav-dropdown > .nav-item .fa-caret-down { font-size: 0.6rem; margin-left: 0.2rem; opacity: 0.7; }
-.dropdown-menu {
-display: none; position: absolute; top: 100%; left: 0;
-min-width: 180px; background: var(--dropdown-bg);
-border-radius: 8px; box-shadow: var(--dropdown-shadow);
-padding: 0.4rem 0; z-index: 300;
-border: 1px solid var(--epf-border);
-animation: fadeSlide 0.15s ease;
-}
+.dropdown-menu { display: none; position: absolute; top: 100%; left: 0; min-width: 180px; background: var(--dropdown-bg); border-radius: 8px; box-shadow: var(--dropdown-shadow); padding: 0.4rem 0; z-index: 300; border: 1px solid var(--epf-border); animation: fadeSlide 0.15s ease; }
 .nav-dropdown.open .dropdown-menu { display: block; }
-@keyframes fadeSlide {
-from { opacity: 0; transform: translateY(-6px); }
-to   { opacity: 1; transform: translateY(0); }
-}
-.dropdown-menu a {
-display: flex; align-items: center; gap: 0.5rem;
-padding: 0.5rem 1rem; color: var(--epf-text);
-text-decoration: none; font-size: 0.78rem; font-weight: 500;
-transition: background 0.12s; white-space: nowrap;
-}
+@keyframes fadeSlide { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+.dropdown-menu a { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; color: var(--epf-text); text-decoration: none; font-size: 0.78rem; font-weight: 500; transition: background 0.12s; white-space: nowrap; }
 .dropdown-menu a:hover { background: var(--epf-blue-soft); color: var(--epf-blue); }
-.dropdown-menu .divider {
-height: 1px; background: var(--epf-border-soft); margin: 0.3rem 0.5rem;
-}
-.nav-chat {
-margin-left: auto; align-self: center;
-display: inline-flex; align-items: center; gap: 0.45rem;
-padding: 0.5rem 1rem; border: none; border-radius: 20px;
-background: linear-gradient(135deg, #2f7fe0 0%, #1a4f8a 100%);
-color: #fff; font-family: inherit; font-size: 0.73rem;
-font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-cursor: pointer; white-space: nowrap;
-box-shadow: 0 3px 12px rgba(47,127,224,0.4);
-transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
-}
+.dropdown-menu .divider { height: 1px; background: var(--epf-border-soft); margin: 0.3rem 0.5rem; }
+.nav-chat { margin-left: auto; align-self: center; display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.5rem 1rem; border: none; border-radius: 20px; background: linear-gradient(135deg, #2f7fe0 0%, #1a4f8a 100%); color: #fff; font-family: inherit; font-size: 0.73rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; white-space: nowrap; box-shadow: 0 3px 12px rgba(47,127,224,0.4); transition: transform 0.15s, box-shadow 0.15s, filter 0.15s; }
 .nav-chat:hover { filter: brightness(1.12); transform: translateY(-1px); }
-.nav-chat .pulse {
-width: 7px; height: 7px; border-radius: 50%; background: #6ef0a8;
-box-shadow: 0 0 0 0 rgba(110,240,168,0.75); animation: pulse 2s infinite;
-}
-@keyframes pulse {
-0% { box-shadow: 0 0 0 0 rgba(110,240,168,0.7); }
-70% { box-shadow: 0 0 0 7px rgba(110,240,168,0); }
-100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); }
-}
+.nav-chat .pulse { width: 7px; height: 7px; border-radius: 50%; background: #6ef0a8; box-shadow: 0 0 0 0 rgba(110,240,168,0.75); animation: pulse 2s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(110,240,168,0.7); } 70% { box-shadow: 0 0 0 7px rgba(110,240,168,0); } 100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); } }
 /* ---------- TOPBAR ---------- */
-.topbar {
-position: sticky; top: var(--nav-h); z-index: 100; background: #ffffff;
-border-bottom: 1px solid var(--epf-border); padding: 0.65rem 1.75rem;
-display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
-box-shadow: 0 1px 2px rgba(26,79,138,0.04);
-}
-.topbar .brand {
-font-weight: 700; font-size: 0.95rem; color: var(--epf-blue);
-display: flex; align-items: center; gap: 0.6rem;
-margin-right: 0.5rem; letter-spacing: -0.01em;
-}
-.topbar .brand .logo {
-width: 32px; height: 32px; background: var(--epf-blue); border-radius: 6px;
-display: flex; align-items: center; justify-content: center;
-color: #fff; font-size: 0.95rem; font-weight: 800;
-}
+.topbar { position: sticky; top: var(--nav-h); z-index: 100; background: #ffffff; border-bottom: 1px solid var(--epf-border); padding: 0.65rem 1.75rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; box-shadow: 0 1px 2px rgba(26,79,138,0.04); }
+.topbar .brand { font-weight: 700; font-size: 0.95rem; color: var(--epf-blue); display: flex; align-items: center; gap: 0.6rem; margin-right: 0.5rem; letter-spacing: -0.01em; }
+.topbar .brand .logo { width: 32px; height: 32px; background: var(--epf-blue); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.95rem; font-weight: 800; }
 .search-box { flex: 1; max-width: 320px; position: relative; }
-.search-box input {
-width: 100%; padding: 0.5rem 0.85rem 0.5rem 2.2rem;
-border: 1px solid var(--epf-border); border-radius: 6px;
-font-size: 0.82rem; font-family: inherit; color: var(--epf-text);
-transition: 0.15s;
-}
-.search-box input:focus {
-outline: none; border-color: var(--epf-blue);
-box-shadow: 0 0 0 2px rgba(26,79,138,0.10);
-}
-.search-box i {
-position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%);
-color: var(--epf-muted); font-size: 0.8rem;
-}
-.btn {
-background: #ffffff; border: 1px solid var(--epf-border);
-padding: 0.42rem 0.9rem; border-radius: 5px; font-size: 0.78rem;
-font-weight: 500; cursor: pointer; color: var(--epf-blue);
-display: inline-flex; align-items: center; gap: 0.4rem;
-transition: all 0.15s ease; white-space: nowrap; font-family: inherit;
-}
+.search-box input { width: 100%; padding: 0.5rem 0.85rem 0.5rem 2.2rem; border: 1px solid var(--epf-border); border-radius: 6px; font-size: 0.82rem; font-family: inherit; color: var(--epf-text); transition: 0.15s; }
+.search-box input:focus { outline: none; border-color: var(--epf-blue); box-shadow: 0 0 0 2px rgba(26,79,138,0.10); }
+.search-box i { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--epf-muted); font-size: 0.8rem; }
+.btn { background: #ffffff; border: 1px solid var(--epf-border); padding: 0.42rem 0.9rem; border-radius: 5px; font-size: 0.78rem; font-weight: 500; cursor: pointer; color: var(--epf-blue); display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.15s ease; white-space: nowrap; font-family: inherit; }
 .btn:hover { background: var(--epf-blue-soft); border-color: #b8cfe8; }
 .btn-success { background: #0f7a54; border: 1px solid #0f7a54; color: #fff; }
 .btn-success:hover { background: #0c6a48; border-color: #0c6a48; }
 .btn-sm { padding: 0.25rem 0.7rem; font-size: 0.72rem; border-radius: 4px; }
-.sync-badge {
-display: inline-flex; align-items: center; gap: 0.35rem;
-background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft);
-padding: 0.3rem 0.7rem; border-radius: 20px;
-font-size: 0.68rem; font-weight: 600; color: var(--epf-muted);
-white-space: nowrap;
-}
-.sync-badge .dot {
-width: 7px; height: 7px; border-radius: 50%; background: #9db8d2;
-transition: background 0.2s;
-}
+.sync-badge { display: inline-flex; align-items: center; gap: 0.35rem; background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft); padding: 0.3rem 0.7rem; border-radius: 20px; font-size: 0.68rem; font-weight: 600; color: var(--epf-muted); white-space: nowrap; }
+.sync-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: #9db8d2; transition: background 0.2s; }
 .sync-badge.ok .dot { background: #22c55e; }
 .sync-badge.busy .dot { background: #f59e0b; animation: pulse 1s infinite; }
 .sync-badge.err .dot { background: #ef4444; }
-.url-box {
-display: flex; align-items: center; gap: 0.4rem; flex: 1; max-width: 420px;
-background: #f4f8fd; border: 1px solid var(--epf-border);
-border-radius: 6px; padding: 2px;
-}
-.url-box input {
-flex: 1; border: none; background: transparent; padding: 0.4rem 0.6rem;
-font-size: 0.78rem; font-family: inherit; color: var(--epf-text); outline: none;
-}
+.url-box { display: flex; align-items: center; gap: 0.4rem; flex: 1; max-width: 420px; background: #f4f8fd; border: 1px solid var(--epf-border); border-radius: 6px; padding: 2px; }
+.url-box input { flex: 1; border: none; background: transparent; padding: 0.4rem 0.6rem; font-size: 0.78rem; font-family: inherit; color: var(--epf-text); outline: none; }
 .url-box input::placeholder { color: #a7b7c9; }
-.url-box button {
-padding: 0.3rem 0.8rem; border-radius: 4px; border: none;
-background: var(--epf-blue); color: #fff; font-size: 0.72rem; font-weight: 600;
-cursor: pointer; transition: 0.15s; white-space: nowrap;
-}
+.url-box button { padding: 0.3rem 0.8rem; border-radius: 4px; border: none; background: var(--epf-blue); color: #fff; font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: 0.15s; white-space: nowrap; }
 .url-box button:hover { background: #15406f; }
-/* ---------- CONTENT 分栏布局 ---------- */
-.content-wrap {
-max-width: 1600px; margin: 0 auto; padding: 1.5rem 1.75rem 3rem;
-display: flex; gap: 1.5rem; align-items: flex-start;
-}
-/* 左侧栏 - 历史记录 */
-.left-sidebar {
-width: 320px; flex-shrink: 0;
-background: #ffffff; border: 1px solid var(--epf-border);
-border-radius: 8px; padding: 1rem;
-box-shadow: 0 1px 3px rgba(26,79,138,0.04);
-position: sticky; top: calc(var(--nav-h) + 60px);
-max-height: calc(100vh - var(--nav-h) - 80px);
-overflow-y: auto; display: flex; flex-direction: column;
-}
-.left-sidebar h2 {
-font-size: 0.95rem; color: var(--epf-blue); font-weight: 700;
-margin-bottom: 1rem; padding-bottom: 0.7rem;
-border-bottom: 1px solid var(--epf-border-soft);
-}
+/* ---------- CONTENT ---------- */
+.content-wrap { max-width: 1600px; margin: 0 auto; padding: 1.5rem 1.75rem 3rem; display: flex; gap: 1.5rem; align-items: flex-start; }
+.left-sidebar { width: 320px; flex-shrink: 0; background: #ffffff; border: 1px solid var(--epf-border); border-radius: 8px; padding: 1rem; box-shadow: 0 1px 3px rgba(26,79,138,0.04); position: sticky; top: calc(var(--nav-h) + 60px); max-height: calc(100vh - var(--nav-h) - 80px); overflow-y: auto; display: flex; flex-direction: column; }
+.left-sidebar h2 { font-size: 0.95rem; color: var(--epf-blue); font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.7rem; border-bottom: 1px solid var(--epf-border-soft); }
 .sidebar-list { display: flex; flex-direction: column; gap: 8px; }
-
-/* 【修改】侧边栏卡片布局及 OT 颜色 */
-.sidebar-item {
-background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft);
-padding: 0.75rem; border-radius: 6px; cursor: pointer;
-transition: all 0.15s;
-display: flex; justify-content: space-between; align-items: center;
-position: relative;
-}
+.sidebar-item { background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft); padding: 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.15s; display: flex; justify-content: space-between; align-items: center; }
 .sidebar-item:hover { filter: brightness(0.97); border-color: var(--epf-blue); }
 .sidebar-item.active { border-left: 3px solid var(--epf-blue); filter: brightness(0.95); }
-
-/* OT 颜色类 */
 .sidebar-item.ot-10 { background: #dcfce7; border-color: #bbf7d0; }
-.sidebar-item.ot-10:hover { background: #bbf7d0; border-color: #86efac; }
-.sidebar-item.ot-10.active { background: #86efac; border-left-color: #16a34a; }
-
+.sidebar-item.ot-10.active { background: #bbf7d0; border-left-color: #16a34a; }
 .sidebar-item.ot-15 { background: #fef9c3; border-color: #fef08a; }
-.sidebar-item.ot-15:hover { background: #fef08a; border-color: #fde047; }
-.sidebar-item.ot-15.active { background: #fde047; border-left-color: #ca8a04; }
-
+.sidebar-item.ot-15.active { background: #fef08a; border-left-color: #ca8a04; }
 .sidebar-item.ot-20 { background: #dbeafe; border-color: #bfdbfe; }
-.sidebar-item.ot-20:hover { background: #bfdbfe; border-color: #93c5fd; }
-.sidebar-item.ot-20.active { background: #93c5fd; border-left-color: #2563eb; }
-
+.sidebar-item.ot-20.active { background: #bfdbfe; border-left-color: #2563eb; }
 .sidebar-item.ot-30 { background: #f3e8ff; border-color: #e9d5ff; }
-.sidebar-item.ot-30:hover { background: #e9d5ff; border-color: #d8b4fe; }
-.sidebar-item.ot-30.active { background: #d8b4fe; border-left-color: #9333ea; }
-
+.sidebar-item.ot-30.active { background: #e9d5ff; border-left-color: #9333ea; }
 .sidebar-item-content { flex: 1; min-width: 0; }
 .sidebar-item .item-name { font-weight: 700; font-size: 0.85rem; color: var(--epf-blue); margin-bottom: 4px; }
 .sidebar-item .item-info { font-size: 0.75rem; color: var(--epf-muted); display: flex; justify-content: space-between; }
 .sidebar-item .item-ot { font-weight: 700; color: #d97706; }
 .sidebar-item .item-time { font-size: 0.68rem; color: #94a3b8; margin-top: 4px; display: block; }
-
-/* 三个点菜单按钮 */
-.sidebar-item-menu-btn {
-background: transparent; border: none; color: var(--epf-muted);
-font-size: 1.3rem; cursor: pointer; padding: 4px 8px; border-radius: 4px;
-transition: 0.15s; flex-shrink: 0; line-height: 1;
-}
+.sidebar-item-menu-btn { background: transparent; border: none; color: var(--epf-muted); font-size: 1.3rem; cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: 0.15s; flex-shrink: 0; line-height: 1; }
 .sidebar-item-menu-btn:hover { background: rgba(0,0,0,0.08); color: var(--epf-text); }
 
-/* 【修改】OT 下拉菜单 - 改为 fixed 定位，不挤在卡片内 */
-.ot-dropdown {
-display: none; 
-position: fixed; /* 改为 fixed，脱离文档流 */
-background: #fff; border: 1px solid var(--epf-border);
-border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-z-index: 9999; min-width: 140px; padding: 6px 0;
-}
-.ot-dropdown.open { display: block; animation: fadeSlide 0.15s ease; }
-.ot-dropdown-item {
-padding: 10px 16px; font-size: 0.85rem; font-weight: 600;
-cursor: pointer; display: flex; align-items: center; gap: 10px;
-transition: 0.15s; color: var(--epf-text);
-}
-.ot-dropdown-item:hover { background: var(--epf-blue-soft); }
-.ot-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
-.ot-dot.c10 { background: #22c55e; }
-.ot-dot.c15 { background: #eab308; }
-.ot-dot.c20 { background: #3b82f6; }
-.ot-dot.c30 { background: #a855f7; }
+/* 【修改】OT 倍率菜单改为全局 fixed 浮动面板，不再被侧栏 overflow 裁剪 */
+.ot-menu-panel { position: fixed; z-index: 1000; background: #fff; border: 1px solid var(--epf-border); border-radius: 8px; box-shadow: 0 10px 30px rgba(15,23,42,.18); padding: 6px; width: 160px; display: none; }
+.ot-menu-panel.show { display: block; }
+.ot-menu-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; font-size: 0.8rem; font-weight: 600; color: var(--epf-text); border-radius: 6px; cursor: pointer; transition: background 0.12s; }
+.ot-menu-item:hover { background: var(--epf-blue-soft); }
+.ot-menu-item.current { background: var(--epf-blue-light); }
+.ot-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.ot-dot.c10 { background: #22c55e; } .ot-dot.c15 { background: #eab308; } .ot-dot.c20 { background: #3b82f6; } .ot-dot.c30 { background: #a855f7; }
+.ot-menu-title { font-size: 0.68rem; color: var(--epf-muted); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 2px 10px 6px; border-bottom: 1px solid var(--epf-border-soft); margin-bottom: 4px; }
 
-/* 右侧主内容 */
 .right-content { flex: 1; min-width: 0; }
-.page-header {
-background: #ffffff; border: 1px solid var(--epf-border); border-radius: 8px;
-padding: 1.4rem 1.75rem; margin-bottom: 1.5rem;
-display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
-justify-content: space-between; box-shadow: 0 1px 3px rgba(26,79,138,0.04);
-}
+.page-header { background: #ffffff; border: 1px solid var(--epf-border); border-radius: 8px; padding: 1.4rem 1.75rem; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(26,79,138,0.04); }
 .page-header .info { flex: 1; min-width: 240px; }
-.page-header h1 {
-font-size: 1.45rem; font-weight: 700; margin-bottom: 0.35rem;
-color: var(--epf-blue); letter-spacing: -0.015em;
-}
+.page-header h1 { font-size: 1.45rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--epf-blue); letter-spacing: -0.015em; }
 .page-header p { font-size: 0.85rem; color: var(--epf-muted); line-height: 1.6; }
-.ot-card {
-background: #ffffff; border: 1px solid var(--epf-border);
-border-radius: 10px; padding: 1.4rem 1.5rem;
-margin-bottom: 1.2rem; box-shadow: var(--shadow-sm);
-}
-.ot-card h2 {
-font-size: 1rem; color: var(--epf-blue); font-weight: 700;
-margin-bottom: 1rem; padding-bottom: 0.7rem;
-border-bottom: 1px solid var(--epf-border-soft);
-display: flex; align-items: center; justify-content: space-between;
-gap: 0.5rem;
-}
-.toolbar {
-display: flex; gap: 0.8rem; align-items: center;
-flex-wrap: wrap; margin-bottom: 1rem;
-}
-.toolbar label {
-font-size: 0.8rem; color: var(--epf-muted); font-weight: 600;
-}
-.toolbar select, .toolbar input[type="month"] {
-padding: 0.45rem 0.75rem;
-border: 1px solid var(--epf-border); border-radius: 6px;
-font-size: 0.82rem; font-family: inherit; color: var(--epf-text);
-background: #fff; min-width: 200px;
-}
-.toolbar select:focus, .toolbar input[type="month"]:focus {
-outline: none; border-color: var(--epf-blue);
-box-shadow: 0 0 0 2px rgba(26,79,138,0.10);
-}
-.info-grid {
-display: grid; grid-template-columns: repeat(4, 1fr);
-gap: 12px; margin-bottom: 12px;
-}
+.ot-card { background: #ffffff; border: 1px solid var(--epf-border); border-radius: 10px; padding: 1.4rem 1.5rem; margin-bottom: 1.2rem; box-shadow: var(--shadow-sm); }
+.ot-card h2 { font-size: 1rem; color: var(--epf-blue); font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.7rem; border-bottom: 1px solid var(--epf-border-soft); display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.toolbar { display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
+.toolbar label { font-size: 0.8rem; color: var(--epf-muted); font-weight: 600; }
+.toolbar select, .toolbar input[type="month"] { padding: 0.45rem 0.75rem; border: 1px solid var(--epf-border); border-radius: 6px; font-size: 0.82rem; font-family: inherit; color: var(--epf-text); background: #fff; min-width: 200px; }
+.toolbar select:focus, .toolbar input[type="month"]:focus { outline: none; border-color: var(--epf-blue); box-shadow: 0 0 0 2px rgba(26,79,138,0.10); }
+.info-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 12px; }
 .info-grid:last-child { margin-bottom: 0; }
-.info-item {
-background: var(--epf-blue-soft); padding: 0.75rem 0.9rem;
-border-radius: 8px; border-left: 3px solid var(--epf-border);
-}
-.info-item .label {
-font-size: 0.7rem; color: var(--epf-muted);
-text-transform: uppercase; letter-spacing: 0.04em;
-font-weight: 600; margin-bottom: 4px;
-}
-.info-item .value {
-font-size: 0.95rem; font-weight: 700; color: var(--epf-text);
-font-variant-numeric: tabular-nums; word-break: break-word;
-}
+.info-item { background: var(--epf-blue-soft); padding: 0.75rem 0.9rem; border-radius: 8px; border-left: 3px solid var(--epf-border); }
+.info-item .label { font-size: 0.7rem; color: var(--epf-muted); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; margin-bottom: 4px; }
+.info-item .value { font-size: 0.95rem; font-weight: 700; color: var(--epf-text); font-variant-numeric: tabular-nums; word-break: break-word; }
 .info-item.highlight { background: var(--epf-blue-light); border-left-color: var(--epf-blue); }
 .info-item.highlight .value { color: var(--epf-blue); font-size: 1rem; }
-/* 日历 */
 .calendar-wrap { background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft); border-radius: 8px; padding: 1rem; }
 .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 8px; }
 .calendar-header .month-label { font-size: 0.92rem; font-weight: 700; color: var(--epf-blue); }
 .calendar-header .hint { font-size: 0.7rem; color: var(--epf-muted); font-style: italic; }
 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
 .cal-dow { text-align: center; font-size: 0.68rem; font-weight: 700; color: var(--epf-muted); padding: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
-.cal-day {
-text-align: center; padding: 9px 4px; border-radius: 6px; cursor: pointer;
-background: #fff; border: 1px solid var(--epf-border-soft);
-font-size: 0.82rem; font-weight: 500; color: var(--epf-text);
-user-select: none; transition: 0.15s;
-}
+.cal-day { text-align: center; padding: 9px 4px; border-radius: 6px; cursor: pointer; background: #fff; border: 1px solid var(--epf-border-soft); font-size: 0.82rem; font-weight: 500; color: var(--epf-text); user-select: none; transition: 0.15s; }
 .cal-day:hover { background: var(--epf-blue-light); border-color: var(--epf-blue); color: var(--epf-blue); }
 .cal-day.selected { background: var(--epf-blue); color: #fff; border-color: var(--epf-blue); font-weight: 700; }
 .cal-day.empty { background: transparent; border: none; cursor: default; }
 .cal-day.no-data { opacity: 0.35; cursor: not-allowed; }
 .cal-day.has-ot { box-shadow: inset 0 0 0 2px #f59e0b; }
 .cal-day.selected.has-ot { box-shadow: inset 0 0 0 2px #fbbf24; }
-/* 表格 */
 .ot-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
 .ot-table th, .ot-table td { padding: 0.65rem 0.7rem; text-align: right; border-bottom: 1px solid var(--epf-border-soft); }
 .ot-table th:first-child, .ot-table td:first-child { text-align: left; }
-.ot-table thead th {
-background: var(--epf-blue-soft); color: var(--epf-blue); font-weight: 700; font-size: 0.7rem;
-text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--epf-border);
-}
-.ot-table tfoot th, .ot-table tfoot td {
-background: var(--epf-blue-light); color: var(--epf-blue); font-weight: 800;
-border-top: 2px solid var(--epf-border); font-variant-numeric: tabular-nums; font-size: 0.85rem;
-}
+.ot-table thead th { background: var(--epf-blue-soft); color: var(--epf-blue); font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--epf-border); }
+.ot-table tfoot th, .ot-table tfoot td { background: var(--epf-blue-light); color: var(--epf-blue); font-weight: 800; border-top: 2px solid var(--epf-border); font-variant-numeric: tabular-nums; font-size: 0.85rem; }
 .ot-table td { font-variant-numeric: tabular-nums; }
 .empty-row td { text-align: center !important; color: var(--epf-muted); padding: 1.5rem !important; font-style: italic; }
 .note { font-size: 0.72rem; color: var(--epf-muted); margin-top: 0.6rem; font-style: italic; }
 .actions-row { display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid var(--epf-border-soft); }
-/* 弹窗 */
-.modal-backdrop {
-position: fixed; inset: 0; background: rgba(11,27,48,0.55);
-display: flex; align-items: center; justify-content: center;
-z-index: 500; backdrop-filter: blur(2px);
-}
+.modal-backdrop { position: fixed; inset: 0; background: rgba(11,27,48,0.55); display: flex; align-items: center; justify-content: center; z-index: 500; backdrop-filter: blur(2px); }
 .modal-backdrop.hidden { display: none; }
-.modal-content {
-background: #fff; border-radius: 10px; padding: 1.5rem;
-width: 460px; max-width: 92vw; max-height: 88vh; overflow-y: auto;
-box-shadow: var(--shadow-md);
-}
+.modal-content { background: #fff; border-radius: 10px; padding: 1.5rem; width: 460px; max-width: 92vw; max-height: 88vh; overflow-y: auto; box-shadow: var(--shadow-md); }
 .modal-content h2 { font-size: 1rem; color: var(--epf-blue); font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.7rem; border-bottom: 1px solid var(--epf-border-soft); }
 .modal-content label { display: block; margin-bottom: 0.8rem; font-size: 0.8rem; color: var(--epf-text); font-weight: 600; }
 .modal-content label .hint { display: block; font-size: 0.7rem; color: var(--epf-muted); font-weight: 400; margin-top: 2px; }
@@ -419,18 +164,43 @@ box-shadow: var(--shadow-md);
 .modal-content input:focus { outline: none; border-color: var(--epf-blue); box-shadow: 0 0 0 2px rgba(26,79,138,0.10); }
 .modal-actions { display: flex; gap: 0.6rem; justify-content: flex-end; margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid var(--epf-border-soft); }
 
-/* 新手引导 Modal 特殊样式 */
-.guide-content { width: 600px; }
-.guide-content h2 { font-size: 1.2rem; margin-bottom: 1.2rem; }
-.guide-step { margin-bottom: 1rem; line-height: 1.6; }
-.guide-step strong { color: var(--epf-blue); font-size: 0.95rem; }
-.guide-step p { font-size: 0.88rem; color: #475569; margin-top: 4px; padding-left: 10px; border-left: 3px solid var(--epf-border-soft); }
-.guide-color-box { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: middle; margin-right: 4px; }
+/* ====== TIPS 新手引导专用样式（参考 leave.html） ====== */
+.modal-mask { position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 9999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+.modal-mask.show { display: flex; }
+.tips-modal-box { background: #fff; border-radius: 12px; padding: 22px 24px; width: 420px; max-width: 92vw; box-shadow: 0 20px 60px rgba(15,23,42,.35); text-align: center; }
+.tips-modal-box h3 { font-size: 16px; color: #0b1b30; margin-bottom: 8px; }
+.tips-modal-box p { font-size: 12.5px; color: var(--epf-muted); line-height: 1.6; margin-bottom: 16px; }
+.tips-modal-box .actions { display: flex; gap: 8px; justify-content: center; }
+.tips-modal-box .actions button { padding: 8px 18px; border-radius: 6px; font-size: 12.5px; font-weight: 600; cursor: pointer; border: 1px solid var(--epf-border); background: #fff; color: var(--epf-text); }
+.tips-modal-box .actions button.confirm { background: var(--epf-blue); color: #fff; border-color: var(--epf-blue); }
+.tips-choice-btn { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--epf-border); background: #fff; font-size: 14px; font-weight: 600; color: var(--epf-text); cursor: pointer; transition: 0.15s; }
+.tips-choice-btn:hover { background: var(--epf-blue-soft); border-color: var(--epf-blue); color: var(--epf-blue); }
 
-@media (max-width: 1024px) {
-.content-wrap { flex-direction: column; }
-.left-sidebar { width: 100%; position: static; max-height: 300px; }
-}
+.tips-modal { width: 650px; max-width: 95vw; text-align: left; padding: 24px 30px; }
+.tips-modal h3 { font-size: 20px; color: #0b1b30; margin-bottom: 12px; text-align: center; }
+.tips-modal p.subtitle { text-align: center; margin-bottom: 20px; color: var(--epf-muted); font-size: 13px; }
+.tips-section { margin-bottom: 18px; border-left: 4px solid var(--epf-blue); padding: 10px 12px; background: #f8fafc; border-radius: 0 6px 6px 0; }
+.tips-section h4 { font-size: 14px; color: var(--epf-blue); margin-bottom: 6px; font-weight: 800; }
+.tips-section ul { list-style-type: none; }
+.tips-section li { font-size: 12.5px; color: #334155; margin-bottom: 4px; line-height: 1.6; }
+.tips-section li strong { color: #0f172a; }
+.tips-actions { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+.tips-actions button { padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: transform 0.1s; }
+.tips-actions button:active { transform: scale(0.98); }
+.tips-actions .btn-close { background: transparent; color: var(--epf-muted); font-weight: 600; }
+
+.tour-mask { position: fixed; inset: 0; z-index: 10000; display: none; cursor: pointer; }
+.tour-mask.show { display: block; }
+.tour-highlight { position: absolute; background: transparent; outline: 9999px solid rgba(0,0,0,0.6); border-radius: 8px; z-index: 10001; display: none; transition: all 0.3s ease; pointer-events: none; }
+.tour-highlight.show { display: block; }
+.tour-tooltip { position: absolute; background: #fff; border-radius: 8px; padding: 16px; width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); z-index: 10002; display: none; flex-direction: column; gap: 8px; border-top: 4px solid var(--epf-blue); }
+.tour-tooltip.show { display: flex; }
+.tour-tooltip h4 { font-size: 15px; color: var(--epf-blue); font-weight: 800; }
+.tour-tooltip p { font-size: 12.5px; color: #334155; line-height: 1.6; }
+.tour-tooltip .tour-step { font-size: 11px; color: #94a3b8; font-weight: 700; }
+.tour-tooltip .tour-hint { font-size: 11px; color: #94a3b8; font-style: italic; margin-top: 6px; }
+
+@media (max-width: 1024px) { .content-wrap { flex-direction: column; } .left-sidebar { width: 100%; position: static; max-height: 300px; } }
 @media (max-width: 768px) {
 .navbar { padding: 0 0.5rem; }
 .navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
@@ -474,10 +244,10 @@ box-shadow: var(--shadow-md);
 <div class="dropdown-menu"><a href="companysetting.html">⚙️ COMPANY SETTING</a><div class="divider"></div><a href="121.html">📄 121</a><a href="122.html">📄 122</a><a href="123.html">📄 123</a><a href="GoogleSheetBackupURL.html">📄 Google Sheet Backup URL</a></div>
 </div>
 </div>
-<!-- 【修改】Request Chat 改为 新手引导 -->
-<button class="nav-chat" type="button" id="guideBtn"><span class="pulse"></span> 📘 新手引导</button>
+<!-- 【修改】Request Chat 改为 TIPS 新手引导按钮 -->
+<button class="nav-chat" type="button" onclick="openTipsChoice()"><span class="pulse"></span> ❓ TIPS</button>
 </nav>
-<div class="topbar">
+<div class="topbar" id="tour-toolbar">
 <div class="brand"><div class="logo">⏱</div> Payroll Overtime</div>
 <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
 <div class="search-box">
@@ -493,7 +263,7 @@ box-shadow: var(--shadow-md);
 <button class="btn btn-success" onclick="loadAllData()"><i class="fas fa-sync-alt"></i> Muat Semula</button>
 </div>
 <div class="content-wrap">
-<div class="left-sidebar">
+<div class="left-sidebar" id="tour-sidebar">
 <h2><i class="fas fa-history"></i> 已保存加班记录</h2>
 <div class="sidebar-list" id="sidebarList">
 <div style="text-align:center; font-size:0.8rem; color:#94a3b8; padding: 20px 0;">加载中...</div>
@@ -507,7 +277,7 @@ box-shadow: var(--shadow-md);
 </div>
 <div><span class="sync-badge" id="countBadge"><span class="dot ok"></span><span id="countText">准备中...</span></span></div>
 </div>
-<section class="ot-card">
+<section class="ot-card" id="tour-staff-info">
 <h2>员工基础信息 <button class="btn btn-sm" id="openSettings"><i class="fas fa-cog"></i> 设置</button></h2>
 <div class="toolbar">
 <label>选择员工：</label>
@@ -527,7 +297,7 @@ box-shadow: var(--shadow-md);
 </div>
 <p class="note">参考标准：每天工作 7.5 小时，每月 26 天（可在「设置」中修改）</p>
 </section>
-<section class="ot-card">
+<section class="ot-card" id="tour-calendar">
 <h2>加班日期选择</h2>
 <div class="toolbar">
 <label>月份：</label>
@@ -541,7 +311,7 @@ box-shadow: var(--shadow-md);
 <div class="calendar-grid" id="calendarGrid"></div>
 </div>
 </section>
-<section class="ot-card">
+<section class="ot-card" id="tour-table">
 <h2>加班补贴计算表</h2>
 <table class="ot-table">
 <thead>
@@ -562,7 +332,16 @@ box-shadow: var(--shadow-md);
 </div>
 </div>
 
-<!-- 设置 Modal -->
+<!-- 【新增】OT 倍率全局浮动菜单面板（fixed 定位，不被侧栏裁剪） -->
+<div class="ot-menu-panel" id="otMenuPanel">
+<div class="ot-menu-title">选择 OT 倍率</div>
+<div class="ot-menu-item" data-type="1.0"><span class="ot-dot c10"></span> x1.0（绿）</div>
+<div class="ot-menu-item" data-type="1.5"><span class="ot-dot c15"></span> x1.5（黄）</div>
+<div class="ot-menu-item" data-type="2.0"><span class="ot-dot c20"></span> x2.0（蓝）</div>
+<div class="ot-menu-item" data-type="3.0"><span class="ot-dot c30"></span> x3.0（紫）</div>
+</div>
+
+<!-- 设置弹窗 -->
 <div class="modal-backdrop hidden" id="settingsModal">
 <div class="modal-content">
 <h2>⚙ 设置</h2>
@@ -579,46 +358,77 @@ box-shadow: var(--shadow-md);
 </div>
 </div>
 
-<!-- 【新增】新手引导 Modal -->
-<div class="modal-backdrop hidden" id="guideModal">
-<div class="modal-content guide-content">
-<h2>📘 欢迎使用加班计算系统</h2>
-<div style="line-height: 1.6; font-size: 0.9rem; color: #334155;">
-<div class="guide-step">
-<strong>1. 连接数据源</strong>
-<p>在顶部导航栏下方的输入框中，粘贴您的 Google Apps Script 部署 URL，然后点击“🔗 Apply”按钮。</p>
+<!-- ====== TIPS 选择弹窗 ====== -->
+<div class="modal-mask" id="tipsChoiceModal">
+<div class="tips-modal-box" style="width: 420px;">
+<h3 style="color: var(--epf-blue);">❓ 帮助与指引</h3>
+<p>请选择你需要的指引方式。</p>
+<div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+<button class="tips-choice-btn" onclick="startTour()">✨ 视觉引导（逐步高亮讲解）</button>
+<button class="tips-choice-btn" onclick="openTipsModal()">📖 详细文字指南（阅读说明）</button>
 </div>
-<div class="guide-step">
-<strong>2. 选择员工</strong>
-<p>在右侧“员工基础信息”区域，使用搜索框或下拉菜单选择需要计算加班的员工。</p>
-</div>
-<div class="guide-step">
-<strong>3. 选择加班日期</strong>
-<p>在“加班日期选择”区域，先选择月份，然后点击日历中的具体日期。<br>
-<span class="guide-color-box" style="background:#f59e0b;"></span> 橙色边框表示该日有加班记录；<span class="guide-color-box" style="background:#cbd5e1;"></span> 灰色表示无记录。</p>
-</div>
-<div class="guide-step">
-<strong>4. 查看与保存</strong>
-<p>下方表格会自动计算加班费。确认无误后，点击右下角的“✅ 手动保存加班记录”。</p>
-</div>
-<div class="guide-step">
-<strong>5. 历史记录与倍率</strong>
-<p>左侧栏显示已保存的记录。点击可快速加载。<br>
-点击记录右侧的“⋮”按钮，可选择 OT 倍率，卡片颜色会随之变化：<br>
-<span class="guide-color-box" style="background:#22c55e;"></span> x1.0 (绿) &nbsp; 
-<span class="guide-color-box" style="background:#eab308;"></span> x1.5 (黄) &nbsp; 
-<span class="guide-color-box" style="background:#3b82f6;"></span> x2.0 (蓝) &nbsp; 
-<span class="guide-color-box" style="background:#a855f7;"></span> x3.0 (紫)</p>
-</div>
-<div class="guide-step">
-<strong>6. 系统设置</strong>
-<p>点击“员工基础信息”旁的“⚙ 设置”按钮，可调整日薪/时薪计算天数及加班倍率。</p>
+<div class="actions" style="margin-top: 20px;">
+<button onclick="closeTipsChoice()">关闭</button>
 </div>
 </div>
-<div class="modal-actions">
-<button class="btn btn-success" id="closeGuide" style="padding: 0.5rem 1.5rem;">我知道了</button>
+</div>
+
+<!-- ====== TIPS 详细文字弹窗 ====== -->
+<div class="modal-mask" id="tipsDetailModal">
+<div class="tips-modal-box tips-modal">
+<h3>📖 Overtime 加班系统使用指南</h3>
+<p class="subtitle">了解本页每个区域的功能与操作流程。</p>
+<div class="tips-section">
+<h4>1. 顶部工具栏</h4>
+<ul>
+<li><strong>搜索框：</strong>输入员工姓名或代码可快速筛选下拉列表中的员工。</li>
+<li><strong>URL Box：</strong>粘贴 Apps Script 的 Deploy URL 并点击 Apply，即可连接 Google Sheet。</li>
+<li><strong>Muat Semula：</strong>重新从 Google Sheet 拉取最新的员工、打卡和加班数据。</li>
+</ul>
+</div>
+<div class="tips-section">
+<h4>2. 左侧「已保存加班记录」</h4>
+<ul>
+<li><strong>点击员工卡片：</strong>系统会自动载入该员工已保存的月份与加班日期，无需重新点选。</li>
+<li><strong>点击「⋮」按钮：</strong>可为该员工选择 OT 倍率 x1.0 / x1.5 / x2.0 / x3.0，选择后卡片会变成对应的浅色（绿 / 黄 / 蓝 / 紫），并同步写入 Sheet 的 OT_TYPE 列。</li>
+<li><strong>切换员工时：</strong>若新员工没有历史记录，日历选择会自动重置为未选择状态。</li>
+</ul>
+</div>
+<div class="tips-section">
+<h4>3. 员工基础信息与「设置」</h4>
+<ul>
+<li><strong>选择员工：</strong>选定后自动显示代码、姓名、分店、薪资、日薪、时薪。</li>
+<li><strong>设置按钮：</strong>可修改日薪计算天数（默认 26）、时薪小时（默认 7.5）以及四种加班倍率。</li>
+</ul>
+</div>
+<div class="tips-section">
+<h4>4. 加班日期选择（日历）</h4>
+<ul>
+<li><strong>橙色边框：</strong>该日期有加班记录；<strong>灰色不可点：</strong>当天没有打卡记录。</li>
+<li>点击日期可多选，再次点击取消选择，选完后计算表会实时更新。</li>
+</ul>
+</div>
+<div class="tips-section">
+<h4>5. 加班补贴计算表与保存</h4>
+<ul>
+<li>表格自动列出所选日期的工时、加班时长，以及 x1.0 / x1.5 / x2.0 / x3.0 四种倍率的补贴金额。</li>
+<li>点击「手动保存加班记录」后，数据写入 Google Sheet 的 OVERTIME 表（同一员工再次保存会覆盖更新）。</li>
+</ul>
+</div>
+<div class="tips-actions">
+<button class="btn-close" onclick="closeTipsModal()">关闭</button>
 </div>
 </div>
+</div>
+
+<!-- ====== TIPS 视觉引导（Walkthrough） ====== -->
+<div class="tour-mask" id="tourMask" onclick="nextTourStep()"></div>
+<div class="tour-highlight" id="tourHighlight"></div>
+<div class="tour-tooltip" id="tourTooltip">
+<span class="tour-step" id="tourStepLabel"></span>
+<h4 id="tourTitle">标题</h4>
+<p id="tourDesc">说明</p>
+<div class="tour-hint">点击任意位置继续 ➔</div>
 </div>
 
 <script>
@@ -647,38 +457,10 @@ if (e.key === 'Escape') document.querySelectorAll('.nav-dropdown.open').forEach(
 document.querySelectorAll('.dropdown-menu a').forEach(a => {
 a.addEventListener('click', () => document.querySelectorAll('.nav-dropdown.open').forEach(dd => dd.classList.remove('open')));
 });
-
-// 全局点击关闭 OT 下拉菜单
-document.addEventListener('click', e => {
-if (!e.target.closest('.sidebar-item-menu-btn') && !e.target.closest('.ot-dropdown')) {
-document.querySelectorAll('.ot-dropdown.open').forEach(m => m.classList.remove('open'));
-}
-});
-
-// 【新增】新手引导按钮事件
-const guideBtn = document.getElementById('guideBtn');
-const guideModal = document.getElementById('guideModal');
-const closeGuideBtn = document.getElementById('closeGuide');
-if (guideBtn) {
-guideBtn.addEventListener('click', () => {
-guideModal.classList.remove('hidden');
-});
-}
-if (closeGuideBtn) {
-closeGuideBtn.addEventListener('click', () => {
-guideModal.classList.add('hidden');
-});
-}
-// 点击背景关闭
-if (guideModal) {
-guideModal.addEventListener('click', (e) => {
-if (e.target === guideModal) guideModal.classList.add('hidden');
-});
-}
 });
 
 /* ============================================================
-TOAST 提示
+TOAST
 ============================================================ */
 function showToast(msg, type = 'info', duration = 3000) {
 const container = document.getElementById('toastContainer');
@@ -692,6 +474,62 @@ setTimeout(() => {
 el.style.animation = 'fadeOut 0.3s ease-in forwards';
 setTimeout(() => el.remove(), 300);
 }, duration);
+}
+
+/* ============================================================
+TIPS 新手引导（参考 leave.html 模式，中文解说）
+============================================================ */
+let tourStepIndex = -1;
+const tourSteps = [
+{ elementId: 'tour-toolbar', title: '顶部工具栏', desc: '在这里粘贴 Apps Script 的 Deploy URL 并点击 Apply 连接 Google Sheet；左侧搜索框可按姓名或员工代码快速筛选员工；点击「Muat Semula」可重新加载最新数据。' },
+{ elementId: 'tour-sidebar', title: '已保存加班记录（左侧栏）', desc: '这里列出所有已保存到 Google Sheet 的加班记录。点击某位员工的卡片，系统会自动载入该员工已选的月份和日期；点击卡片右侧的「⋮」按钮，可选择该员工适用的 OT 倍率（x1.0 / x1.5 / x2.0 / x3.0），选择后卡片会变成对应的浅色（绿 / 黄 / 蓝 / 紫），并同步写入 Sheet 的 OT_TYPE 列。' },
+{ elementId: 'tour-staff-info', title: '员工基础信息', desc: '在「选择员工」下拉框中选定员工后，这里会显示员工代码、姓名、分店、基础薪资，以及系统根据设置自动计算的日薪和时薪。点击右上角「设置」按钮可以修改日薪天数、时薪小时数和四种加班倍率。' },
+{ elementId: 'tour-calendar', title: '加班日期选择', desc: '先选择月份，日历会显示该月所有日期。带橙色边框的日期表示当天有加班记录，灰色不可点击的日期表示当天没有打卡记录。点击日期可以多选需要计算加班的日期，再次点击可取消。切换员工时，若没有历史记录，选择会自动重置。' },
+{ elementId: 'tour-table', title: '加班补贴计算表', desc: '系统会自动列出所有已选日期的工作时长、加班时长，以及按 x1.0 / x1.5 / x2.0 / x3.0 四种倍率计算的补贴金额，底部合计行显示当月总额。确认无误后点击「手动保存加班记录」，数据会写入 Google Sheet 的 OVERTIME 表。' }
+];
+function openTipsChoice() { document.getElementById('tipsChoiceModal').classList.add('show'); }
+function closeTipsChoice() { document.getElementById('tipsChoiceModal').classList.remove('show'); }
+function openTipsModal() { closeTipsChoice(); document.getElementById('tipsDetailModal').classList.add('show'); }
+function closeTipsModal() { document.getElementById('tipsDetailModal').classList.remove('show'); }
+function startTour() {
+closeTipsChoice();
+tourStepIndex = -1;
+document.getElementById('tourMask').classList.add('show');
+nextTourStep();
+}
+function nextTourStep() {
+tourStepIndex++;
+if (tourStepIndex >= tourSteps.length) { endTour(); showToast('🎉 引导完成！', 'success'); return; }
+const step = tourSteps[tourStepIndex];
+const el = document.getElementById(step.elementId);
+const highlight = document.getElementById('tourHighlight');
+const tooltip = document.getElementById('tourTooltip');
+if (!el) { nextTourStep(); return; }
+el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+setTimeout(() => {
+const rect = el.getBoundingClientRect();
+highlight.style.left = rect.left + 'px';
+highlight.style.top = rect.top + 'px';
+highlight.style.width = rect.width + 'px';
+highlight.style.height = rect.height + 'px';
+highlight.classList.add('show');
+let tooltipTop = rect.bottom + 15;
+let tooltipLeft = rect.left;
+if (tooltipTop + 180 > window.innerHeight) tooltipTop = Math.max(10, rect.top - 190);
+if (tooltipLeft + 320 > window.innerWidth) tooltipLeft = window.innerWidth - 340;
+tooltip.style.top = tooltipTop + 'px';
+tooltip.style.left = Math.max(10, tooltipLeft) + 'px';
+tooltip.classList.add('show');
+document.getElementById('tourStepLabel').textContent = `步骤 ${tourStepIndex + 1} / ${tourSteps.length}`;
+document.getElementById('tourTitle').textContent = step.title;
+document.getElementById('tourDesc').textContent = step.desc;
+}, 300);
+}
+function endTour() {
+document.getElementById('tourMask').classList.remove('show');
+document.getElementById('tourHighlight').classList.remove('show');
+document.getElementById('tourTooltip').classList.remove('show');
+tourStepIndex = -1;
 }
 
 /* ============================================================
@@ -714,7 +552,6 @@ let isSaving       = false;
 let activeSidebarIndex = -1;
 let settings       = { daysPerMonth: 26, hoursPerDay: 7.5, rate10: 1.0, rate15: 1.5, rate20: 2.0, rate30: 3.0 };
 
-/* ---------- 工具 ---------- */
 function fmtHHMMSS(h) {
 if (!h || h <= 0) return '00:00:00';
 const t = Math.round(h * 3600);
@@ -743,34 +580,26 @@ return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','
 }
 function normalizeMonth(v) {
 if (!v) return '';
-if (v instanceof Date) {
-return `${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,'0')}`;
-}
+if (v instanceof Date) return `${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,'0')}`;
 const s = String(v).trim().replace(/^'/, '');
 const m = s.match(/^(\d{4})[-/](\d{1,2})/);
 if (m) return `${m[1]}-${m[2].padStart(2, '0')}`;
-return ''; 
+return '';
 }
 function formatUpdatedAt(v) {
 if (!v) return '未知';
 try {
 const d = new Date(v);
 if (isNaN(d.getTime())) return String(v);
-return d.toLocaleString('zh-CN', {
-year:'numeric', month:'2-digit', day:'2-digit',
-hour:'2-digit', minute:'2-digit'
-});
+return d.toLocaleString('zh-CN', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
 } catch (e) { return String(v); }
 }
 function setSyncBadge(state, text) {
 const b = document.getElementById('syncBadge'); const t = document.getElementById('syncBadgeText');
 if (!b || !t) return; b.className = 'sync-badge ' + (state || ''); t.textContent = text;
 }
-function setCountBadge(text) {
-const t = document.getElementById('countText'); if (t) t.textContent = text;
-}
+function setCountBadge(text) { const t = document.getElementById('countText'); if (t) t.textContent = text; }
 
-/* ---------- URL & API ---------- */
 function loadSavedUrl() {
 try {
 SCRIPT_URL = localStorage.getItem(URL_KEY) || '';
@@ -795,13 +624,12 @@ const res = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type':
 return await res.json();
 }
 
-/* ---------- 数据加载 ---------- */
 async function loadAllData() {
 if (!SCRIPT_URL) { setSyncBadge('err', 'URL 未设置'); return; }
 setSyncBadge('busy', '加载中...'); setCountBadge('加载中...');
 try {
 await Promise.all([loadStaffList(), loadSheetData(), loadOvertimeData()]);
-setSyncBadge('ok', `数据已加载`);
+setSyncBadge('ok', '数据已加载');
 setCountBadge(`${allStaff.length} 员工 · ${allSheetData.length} 打卡记录 · ${allOvertimeData.length} 已存加班`);
 } catch (err) {
 console.error(err); setSyncBadge('err', '加载失败'); setCountBadge('加载失败'); alert('加载失败：' + err.message);
@@ -812,8 +640,8 @@ let data = null;
 try { const c = JSON.parse(localStorage.getItem(LS_STAFF) || 'null'); if (c && Date.now() - c.ts < CACHE_TTL) data = c.data; } catch (e) {}
 if (!data) {
 const res = await apiGet('getData');
-let raw = (res && res.result === 'success' && Array.isArray(res.data)) ? res.data : (Array.isArray(res) ? res : (res && Array.isArray(res.data) ? res.data : []));
-data = raw; localStorage.setItem(LS_STAFF, JSON.stringify({ ts: Date.now(), data }));
+data = (res && res.result === 'success' && Array.isArray(res.data)) ? res.data : (Array.isArray(res) ? res : (res && Array.isArray(res.data) ? res.data : []));
+localStorage.setItem(LS_STAFF, JSON.stringify({ ts: Date.now(), data }));
 }
 allStaff = data;
 const select = document.getElementById('staffSelect');
@@ -846,15 +674,12 @@ const res = await apiGet('getOvertimeData');
 data = res.data || []; localStorage.setItem(LS_OT_DATA, JSON.stringify({ ts: Date.now(), data }));
 }
 allOvertimeData = data;
-if (currentStaff) {
-activeSidebarIndex = allOvertimeData.findIndex(item => String(item['ID KOD'] || '').trim() === currentStaff.code);
-} else {
-activeSidebarIndex = -1;
-}
+if (currentStaff) activeSidebarIndex = allOvertimeData.findIndex(item => String(item['ID KOD'] || '').trim() === currentStaff.code);
+else activeSidebarIndex = -1;
 renderSidebar();
 }
 
-/* ---------- 渲染左侧栏 (包含 OT 菜单) ---------- */
+/* ---------- 渲染左侧栏 ---------- */
 function renderSidebar() {
 const list = document.getElementById('sidebarList');
 list.innerHTML = '';
@@ -868,7 +693,6 @@ const name = String(item['NAME'] || '').trim();
 const month = normalizeMonth(item['MONTH']);
 const otH = parseH(item['TOTAL_OT_TIME_H']);
 const updated = formatUpdatedAt(item['UPDATED_AT']);
-
 const otType = String(item['OT_TYPE'] || '1.5').trim();
 let colorClass = '';
 if (otType === '1.0') colorClass = 'ot-10';
@@ -895,67 +719,66 @@ const menuBtn = document.createElement('button');
 menuBtn.className = 'sidebar-item-menu-btn';
 menuBtn.innerHTML = '⋮';
 menuBtn.title = '选择 OT 倍率';
-menuBtn.addEventListener('click', (e) => toggleOtMenu(e, index));
-
-const dropdown = document.createElement('div');
-dropdown.className = 'ot-dropdown';
-dropdown.id = `otMenu-${index}`;
-dropdown.innerHTML = `
-<div class="ot-dropdown-item" data-type="1.0"><span class="ot-dot c10"></span> x1.0 (绿)</div>
-<div class="ot-dropdown-item" data-type="1.5"><span class="ot-dot c15"></span> x1.5 (黄)</div>
-<div class="ot-dropdown-item" data-type="2.0"><span class="ot-dot c20"></span> x2.0 (蓝)</div>
-<div class="ot-dropdown-item" data-type="3.0"><span class="ot-dot c30"></span> x3.0 (紫)</div>
-`;
-dropdown.querySelectorAll('.ot-dropdown-item').forEach(itemEl => {
-itemEl.addEventListener('click', (e) => selectOtType(e, index, itemEl.dataset.type));
-});
+menuBtn.addEventListener('click', (e) => openOtMenu(e, index));
 
 div.appendChild(contentDiv);
 div.appendChild(menuBtn);
-div.appendChild(dropdown);
 list.appendChild(div);
 });
 }
 
-/* ---------- OT 菜单交互 (改为 Fixed 定位) ---------- */
-function toggleOtMenu(e, index) {
+/* ---------- 【修改】OT 倍率菜单：全局 fixed 面板，不再挤在侧栏内 ---------- */
+let otMenuTargetIndex = -1;
+function openOtMenu(e, index) {
 e.stopPropagation();
-const btn = e.currentTarget;
-const rect = btn.getBoundingClientRect();
-const menu = document.getElementById(`otMenu-${index}`);
-
-// 关闭其他菜单
-document.querySelectorAll('.ot-dropdown.open').forEach(m => {
-if (m.id !== `otMenu-${index}`) m.classList.remove('open');
+const panel = document.getElementById('otMenuPanel');
+if (otMenuTargetIndex === index && panel.classList.contains('show')) { closeOtMenu(); return; }
+closeOtMenu();
+const rect = e.target.getBoundingClientRect();
+const panelWidth = 160, panelHeight = 190;
+let left = rect.right - panelWidth;
+let top = rect.bottom + 6;
+if (top + panelHeight > window.innerHeight) top = Math.max(10, rect.top - panelHeight - 6);
+if (left < 10) left = 10;
+panel.style.left = left + 'px';
+panel.style.top = top + 'px';
+const currentType = String(allOvertimeData[index]?.['OT_TYPE'] || '').trim();
+panel.querySelectorAll('.ot-menu-item').forEach(it => {
+it.classList.toggle('current', it.dataset.type === currentType);
+});
+panel.classList.add('show');
+otMenuTargetIndex = index;
+}
+function closeOtMenu() {
+document.getElementById('otMenuPanel').classList.remove('show');
+otMenuTargetIndex = -1;
+}
+document.addEventListener('mousedown', e => {
+const panel = document.getElementById('otMenuPanel');
+if (panel.classList.contains('show') && !panel.contains(e.target) && !e.target.closest('.sidebar-item-menu-btn')) closeOtMenu();
+});
+window.addEventListener('scroll', () => closeOtMenu(), true);
+document.querySelectorAll('#otMenuPanel .ot-menu-item').forEach(it => {
+it.addEventListener('click', e => {
+e.stopPropagation();
+if (otMenuTargetIndex >= 0) selectOtType(otMenuTargetIndex, it.dataset.type);
+closeOtMenu();
+});
 });
 
-// 计算位置：出现在按钮右侧，垂直居中
-const topPos = rect.top - 10; // 稍微往上一点
-const leftPos = rect.right + 8; // 出现在按钮右边
-
-menu.style.top = `${topPos}px`;
-menu.style.left = `${leftPos}px`;
-menu.classList.toggle('open');
-}
-
-async function selectOtType(e, index, type) {
-e.stopPropagation();
-document.querySelectorAll('.ot-dropdown.open').forEach(m => m.classList.remove('open'));
-    
+async function selectOtType(index, type) {
 const item = allOvertimeData[index];
 if (!item) return;
-    
 const code = String(item['ID KOD'] || '').trim();
 const oldType = String(item['OT_TYPE'] || '').trim();
-if (oldType === type) return; 
-    
+if (oldType === type) return;
 try {
 setSyncBadge('busy', '更新 OT 类型...');
 const res = await apiPost({ action: 'updateOvertimeType', code: code, otType: type });
 if (res.status === 'success') {
 item['OT_TYPE'] = type;
 showToast(`✅ 已更新 ${item['NAME']} 的 OT 类型为 x${type}`, 'success', 3000);
-renderSidebar(); 
+renderSidebar();
 } else {
 showToast('更新失败：' + (res.message || '未知错误'), 'error', 4000);
 }
@@ -966,23 +789,16 @@ setSyncBadge('ok', '数据已加载');
 }
 }
 
-/* ---------- 从侧边栏点击 → 确保能正确加载 ---------- */
+/* ---------- 从侧边栏点击载入 ---------- */
 function loadFromSidebar(item, index) {
 const code = String(item['ID KOD'] || '').trim();
 const sel = document.getElementById('staffSelect');
-    
 document.getElementById('searchInput').value = '';
 filterStaffOptions();
-    
 sel.value = code;
-if (sel.value !== code) {
-showToast('找不到该员工（Code: ' + code + '）', 'error');
-return;
-}
+if (sel.value !== code) { showToast('找不到该员工（Code: ' + code + '）', 'error'); return; }
 onStaffChange();
 }
-
-/* ---------- 搜索过滤 ---------- */
 function filterStaffOptions() {
 const q = document.getElementById('searchInput').value.trim().toLowerCase();
 const select = document.getElementById('staffSelect');
@@ -992,23 +808,12 @@ opt.style.display = (!q || (opt.textContent || '').toLowerCase().includes(q)) ? 
 });
 }
 
-/* ---------- 员工切换 + 自动载入 + 重置逻辑 ---------- */
+/* ---------- 员工切换 + 载入历史 + 无记录则重置 ---------- */
 function onStaffChange() {
 const code = document.getElementById('staffSelect').value;
-if (!code) {
-currentStaff = null;
-activeSidebarIndex = -1;
-renderSidebar();
-resetStaffInfo();
-return;
-}
+if (!code) { currentStaff = null; activeSidebarIndex = -1; renderSidebar(); resetStaffInfo(); return; }
 const opt = document.querySelector(`#staffSelect option[value="${code}"]`);
-currentStaff = {
-code,
-name: opt.dataset.name || '',
-group: opt.dataset.group || '',
-salary: parseFloat(opt.dataset.salary) || 0
-};
+currentStaff = { code, name: opt.dataset.name || '', group: opt.dataset.group || '', salary: parseFloat(opt.dataset.salary) || 0 };
 document.getElementById('empCode').textContent   = currentStaff.code;
 document.getElementById('empName').textContent   = currentStaff.name;
 document.getElementById('empGroup').textContent  = currentStaff.group;
@@ -1020,49 +825,34 @@ document.getElementById('hourlyRate').textContent = fmtRM(hourly);
 const existing = allOvertimeData.find(item => String(item['ID KOD'] || '').trim() === code);
 if (existing) {
 const month = normalizeMonth(existing['MONTH']);
-if (month && /^\d{4}-\d{2}$/.test(month)) {
-document.getElementById('monthPicker').value = month;
-currentMonth = month;
-}
-        
+if (month && /^\d{4}-\d{2}$/.test(month)) { document.getElementById('monthPicker').value = month; currentMonth = month; }
 selectedDates.clear();
 try {
 let details = existing['DETAILS'];
-if (typeof details === 'string') {
-details = JSON.parse(details);
-}
+if (typeof details === 'string') details = JSON.parse(details);
 if (Array.isArray(details)) {
-details.forEach(d => { 
+details.forEach(d => {
 if (d && d.date) {
 const dateStr = String(d.date).trim();
-if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-selectedDates.add(dateStr); 
-}
+if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) selectedDates.add(dateStr);
 }
 });
 }
 } catch (e) { console.warn('解析历史详情失败', e); }
-        
 activeSidebarIndex = allOvertimeData.indexOf(existing);
 const updatedAt = formatUpdatedAt(existing['UPDATED_AT']);
-showToast(
-`📂 已自动载入 ${existing['NAME']} (${month}) 的保存记录 · 最后更新：${updatedAt}`,
-'info', 6000
-);
+showToast(`📂 已自动载入 ${existing['NAME']} (${month}) 的保存记录 · 最后更新：${updatedAt}`, 'info', 6000);
 } else {
 activeSidebarIndex = -1;
-selectedDates.clear(); 
+selectedDates.clear(); // 切换员工时重置日期选择
 }
-
 renderSidebar();
 refreshMonthlySummary();
 renderCalendar();
 renderTable();
 }
-
 function resetStaffInfo() {
-['empCode','empName','empGroup','empSalary','dailyRate','hourlyRate','monthlyWorkTime','monthlyOtTime']
-.forEach(id => document.getElementById(id).textContent = '-');
+['empCode','empName','empGroup','empSalary','dailyRate','hourlyRate','monthlyWorkTime','monthlyOtTime'].forEach(id => document.getElementById(id).textContent = '-');
 document.getElementById('calendarGrid').innerHTML = '';
 document.getElementById('calcBody').innerHTML = '<tr class="empty-row"><td colspan="7">请选择员工与日期</td></tr>';
 resetTotals();
@@ -1073,8 +863,6 @@ const daily  = settings.daysPerMonth > 0 ? (currentStaff.salary / settings.daysP
 const hourly = settings.hoursPerDay  > 0 ? (daily / settings.hoursPerDay) : 0;
 return { daily, hourly };
 }
-
-/* ---------- 读取 SHEET 行 ---------- */
 function getMonthRows() {
 if (!currentStaff || !currentMonth) return [];
 return allSheetData.filter(r => String(r['ID KOD'] || '').trim() === currentStaff.code && String(r['Date'] || '').startsWith(currentMonth + '-'));
@@ -1093,15 +881,11 @@ return Math.max(0, parseH(otVal));
 }
 function getRowWork(row) { return row ? Math.max(0, parseH(row['Total Work Time(h)'])) : 0; }
 function refreshMonthlySummary() {
-if (!currentStaff || !currentMonth) {
-document.getElementById('monthlyWorkTime').textContent = '-'; document.getElementById('monthlyOtTime').textContent = '-'; return;
-}
+if (!currentStaff || !currentMonth) { document.getElementById('monthlyWorkTime').textContent = '-'; document.getElementById('monthlyOtTime').textContent = '-'; return; }
 const rows = getMonthRows();
 document.getElementById('monthlyWorkTime').textContent = fmtHHMMSS(rows.reduce((s, r) => s + getRowWork(r), 0));
 document.getElementById('monthlyOtTime').textContent   = fmtHHMMSS(rows.reduce((s, r) => s + getRowOT(r),   0));
 }
-
-/* ---------- 日历 ---------- */
 function renderCalendar() {
 const grid = document.getElementById('calendarGrid'); const label = document.getElementById('calLabel');
 grid.innerHTML = ''; if (!currentMonth) { label.textContent = '-'; return; }
@@ -1126,8 +910,6 @@ renderCalendar(); renderTable();
 grid.appendChild(el);
 }
 }
-
-/* ---------- 计算表 ---------- */
 function renderTable() {
 const tbody = document.getElementById('calcBody'); tbody.innerHTML = '';
 if (!currentStaff) { tbody.innerHTML = '<tr class="empty-row"><td colspan="7">请选择员工与日期</td></tr>'; resetTotals(); return; }
@@ -1158,8 +940,6 @@ function resetTotals() {
 ['sumWork','sumOT'].forEach(id => document.getElementById(id).textContent = '00:00:00');
 ['sum10','sum15','sum20','sum30'].forEach(id => document.getElementById(id).textContent = 'RM 0.00');
 }
-
-/* ---------- 设置 ---------- */
 function loadSettings() {
 try { const s = JSON.parse(localStorage.getItem(LS_SETTINGS)); if (s) settings = Object.assign(settings, s); } catch (e) {}
 document.getElementById('setDays').value   = settings.daysPerMonth;
@@ -1181,7 +961,6 @@ localStorage.setItem(LS_SETTINGS, JSON.stringify(settings)); closeSettings(); if
 function openSettings()  { document.getElementById('settingsModal').classList.remove('hidden'); }
 function closeSettings() { document.getElementById('settingsModal').classList.add('hidden'); }
 
-/* ---------- 保存 (携带 OT_TYPE) ---------- */
 async function onSave() {
 if (!currentStaff || !currentMonth || selectedDates.size === 0) {
 if (!currentStaff) alert('请先选择员工');
@@ -1201,16 +980,13 @@ const a20 = ot * hourly * settings.rate20; const a30 = ot * hourly * settings.ra
 details.push({ date: dateStr, workHours: work, otHours: ot, a10, a15, a20, a30 });
 sumW += work; sumOT += ot; sum10 += a10; sum15 += a15; sum20 += a20; sum30 += a30;
 });
-
 const existing = allOvertimeData.find(i => String(i['ID KOD'] || '').trim() === currentStaff.code);
 const currentOtType = existing ? String(existing['OT_TYPE'] || '1.5').trim() : '1.5';
-
 const payload = {
 action: 'saveOvertimeRecord', code: currentStaff.code, name: currentStaff.name, month: currentMonth,
 totalWorkTime: sumW, totalOtTime: sumOT, dailyRate: daily, hourlyRate: hourly,
-amount10: sum10, amount15: sum15, amount20: sum20, amount30: sum30, totalAmount: sum15, 
-otType: currentOtType,
-details 
+amount10: sum10, amount15: sum15, amount20: sum20, amount30: sum30, totalAmount: sum15,
+otType: currentOtType, details
 };
 try {
 const res = await apiPost(payload);
@@ -1232,7 +1008,6 @@ isSaving = false;
 }
 }
 
-/* ---------- 初始化 ---------- */
 async function init() {
 loadSettings(); loadSavedUrl();
 const today = new Date();
