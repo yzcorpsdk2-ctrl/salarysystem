@@ -26,7 +26,27 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* ---------- NAVBAR (与 dashboard 完全一致) ---------- */
+  /* ---------- TOAST 提示样式 ---------- */
+  .toast-container {
+    position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .toast {
+    background: #fff; border-left: 4px solid var(--epf-blue);
+    padding: 12px 20px; border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(16,32,56,.15);
+    color: var(--epf-text); font-size: 0.85rem; font-weight: 600;
+    display: flex; align-items: center; gap: 10px;
+    animation: slideIn 0.3s ease-out;
+    min-width: 240px;
+  }
+  .toast.info { border-left-color: var(--epf-blue); }
+  .toast.success { border-left-color: #22c55e; }
+  .toast.error { border-left-color: #ef4444; }
+  @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+  /* ---------- NAVBAR ---------- */
   .navbar {
     position: sticky; top: 0; z-index: 200;
     display: flex; align-items: stretch; flex-wrap: wrap;
@@ -127,7 +147,7 @@
     100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); }
   }
 
-  /* ---------- TOPBAR (与 dashboard 完全一致) ---------- */
+  /* ---------- TOPBAR ---------- */
   .topbar {
     position: sticky; top: var(--nav-h); z-index: 100; background: #ffffff;
     border-bottom: 1px solid var(--epf-border); padding: 0.65rem 1.75rem;
@@ -418,6 +438,9 @@
 </head>
 <body>
 
+<!-- ========== TOAST 容器 ========== -->
+<div class="toast-container" id="toastContainer"></div>
+
 <!-- ========== NAVBAR ========== -->
 <nav class="navbar">
   <div class="nav-brand">
@@ -602,7 +625,7 @@
     </table>
     <div class="actions-row">
       <button class="btn btn-success" id="saveBtn">
-        <i class="fas fa-save"></i> 保存加班记录
+        <i class="fas fa-save"></i> 手动保存加班记录
       </button>
     </div>
   </section>
@@ -677,9 +700,26 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /* ============================================================
+   TOAST 提示功能
+   ============================================================ */
+function showToast(msg, type = 'info', duration = 3000) {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+  el.innerHTML = `<span>${icon}</span> <span>${escapeHtml(msg)}</span>`;
+  container.appendChild(el);
+  setTimeout(() => {
+    el.style.animation = 'fadeOut 0.3s ease-in forwards';
+    setTimeout(() => el.remove(), 300);
+  }, duration);
+}
+
+/* ============================================================
    OVERTIME LOGIC
    ============================================================ */
-const URL_KEY      = 'payrollScriptUrl';         // 和 dashboard 共用同一个 key
+const URL_KEY      = 'payrollScriptUrl';
 const LS_SETTINGS  = 'overtime_settings_v1';
 const LS_STAFF     = 'overtime_staffcache_v1';
 const LS_SHEET     = 'overtime_sheetcache_v1';
@@ -691,6 +731,7 @@ let allSheetData   = [];
 let currentStaff   = null;
 let currentMonth   = '';
 let selectedDates  = new Set();
+let isSaving       = false; // 防止重复提交的锁
 let settings       = {
   daysPerMonth: 26, hoursPerDay: 7.5,
   rate10: 1.0, rate15: 1.5, rate20: 2.0, rate30: 3.0
@@ -705,32 +746,20 @@ function fmtHHMMSS(h) {
 }
 function fmtRM(v) { return 'RM ' + (Number(v) || 0).toFixed(2); }
 
-// 【关键修复】兼容各种时间格式解析（包括 ISO 字符串、HH:MM:SS 和纯数字）
 function parseH(v) {
   if (v === undefined || v === null || v === '') return 0;
   if (typeof v === 'number') return v;
   
   let str = String(v).trim();
-  
-  // 1. 兼容 ISO Date 字符串 (如 "1899-12-30T02:30:00.000Z")
   if (str.includes('T') && str.includes(':')) {
     const match = str.match(/T(\d{2}):(\d{2})(?::(\d{2}))?/);
-    if (match) {
-      return (parseInt(match[1], 10) || 0) + (parseInt(match[2], 10) || 0)/60 + (parseInt(match[3], 10) || 0)/3600;
-    }
+    if (match) return (parseInt(match[1], 10) || 0) + (parseInt(match[2], 10) || 0)/60 + (parseInt(match[3], 10) || 0)/3600;
   }
-  
-  // 2. 兼容 "02:30:00" 或者 "2:30" 这种标准时间字符串
   if (str.includes(':')) {
     const parts = str.split(':');
     return (parseFloat(parts[0]) || 0) + (parseFloat(parts[1]) || 0)/60 + (parseFloat(parts[2]) || 0)/3600;
   }
-  
-  // 3. 兼容 "2.5h" 或者纯数字字符串 "2.5"
-  if (str.toLowerCase().endsWith('h')) {
-    return parseFloat(str) || 0;
-  }
-  
+  if (str.toLowerCase().endsWith('h')) return parseFloat(str) || 0;
   const n = parseFloat(str);
   return isNaN(n) ? 0 : n;
 }
@@ -812,7 +841,7 @@ async function loadStaffList() {
     if (c && Date.now() - c.ts < CACHE_TTL) data = c.data;
   } catch (e) {}
   if (!data) {
-    const res = await apiGet('getData'); // STAFF LOGIN RECORD
+    const res = await apiGet('getData');
     let raw = [];
     if (res && res.result === 'success' && Array.isArray(res.data)) raw = res.data;
     else if (Array.isArray(res))                                    raw = res;
@@ -845,14 +874,13 @@ async function loadSheetData() {
     if (c && Date.now() - c.ts < CACHE_TTL) data = c.data;
   } catch (e) {}
   if (!data) {
-    const res = await apiGet('getSheetData'); // SHEET
+    const res = await apiGet('getSheetData');
     data = res.data || [];
     localStorage.setItem(LS_SHEET, JSON.stringify({ ts: Date.now(), data }));
   }
   allSheetData = data;
 }
 
-/* ---------- 搜索过滤员工下拉 ---------- */
 function filterStaffOptions() {
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
   const select = document.getElementById('staffSelect');
@@ -921,7 +949,23 @@ function getDateRow(dateStr) {
     String(r['Date']    || '') === dateStr
   ) || null;
 }
-function getRowOT(row)   { return row ? Math.max(0, parseH(row['Total Over/Less Time (h)'])) : 0; }
+
+// 【核心修改点】根据 SITUATION WORK TIME 字段和 "-" 判断加班
+function getRowOT(row) {
+  if (!row) return 0;
+  
+  // 1. 检查 SITUATION WORK TIME 是否为 "超时工作"
+  const situation = String(row['SITUATION WORK TIME'] || '').trim();
+  if (situation !== '超时工作') return 0;
+  
+  // 2. 检查加班时长字段是否包含 "-" (有些系统可能返回 "-" 代表不足工时)
+  const otVal = String(row['Total Over/Less Time (h)'] || '').trim();
+  if (otVal === '-' || otVal === '') return 0;
+
+  // 3. 正常解析
+  return Math.max(0, parseH(otVal));
+}
+
 function getRowWork(row) { return row ? Math.max(0, parseH(row['Total Work Time(h)']))       : 0; }
 
 function refreshMonthlySummary() {
@@ -1071,11 +1115,20 @@ function applySettings() {
 function openSettings()  { document.getElementById('settingsModal').classList.remove('hidden'); }
 function closeSettings() { document.getElementById('settingsModal').classList.add('hidden'); }
 
-/* ---------- 保存 ---------- */
-async function onSave() {
-  if (!currentStaff)            { alert('请先选择员工'); return; }
-  if (!currentMonth)            { alert('请选择月份');   return; }
-  if (selectedDates.size === 0) { alert('请先选择日期'); return; }
+/* ---------- 保存（支持手动与自动） ---------- */
+async function onSave(isAuto = false) {
+  // 自动保存前检查是否有数据可存，如果没有直接跳过
+  if (!currentStaff || !currentMonth || selectedDates.size === 0) {
+    if (!isAuto) {
+      if (!currentStaff) alert('请先选择员工');
+      else if (!currentMonth) alert('请选择月份');
+      else alert('请先选择日期');
+    }
+    return;
+  }
+
+  if (isSaving) return; // 防止并发保存
+  isSaving = true;
 
   const { daily, hourly } = currentRates();
   const sorted = [...selectedDates].sort();
@@ -1115,16 +1168,26 @@ async function onSave() {
   try {
     const res = await apiPost(payload);
     if (res.status === 'success') {
+      // 清除缓存，确保下次刷新能读到最新数据
       try {
         const c = JSON.parse(localStorage.getItem(LS_SHEET) || 'null');
         if (c) { c.ts = 0; localStorage.setItem(LS_SHEET, JSON.stringify(c)); }
       } catch (e) {}
-      alert('✅ 加班记录已保存');
+      
+      if (isAuto) {
+        showToast('✅ 自动保存成功', 'success');
+      } else {
+        alert('✅ 加班记录已保存');
+      }
     } else {
-      alert('保存失败：' + (res.message || '未知错误'));
+      if (isAuto) showToast('自动保存失败：' + (res.message || '未知错误'), 'error');
+      else alert('保存失败：' + (res.message || '未知错误'));
     }
   } catch (err) {
-    alert('保存失败：' + err.message);
+    if (isAuto) showToast('自动保存失败：网络异常', 'error');
+    else alert('保存失败：' + err.message);
+  } finally {
+    isSaving = false;
   }
 }
 
@@ -1149,7 +1212,20 @@ async function init() {
   document.getElementById('openSettings').addEventListener('click', openSettings);
   document.getElementById('cancelSettings').addEventListener('click', closeSettings);
   document.getElementById('applySettings').addEventListener('click', applySettings);
-  document.getElementById('saveBtn').addEventListener('click', onSave);
+  
+  // 手动保存按钮
+  document.getElementById('saveBtn').addEventListener('click', () => onSave(false));
+
+  // 【核心修改点】每 30 秒自动保存一次
+  setInterval(() => {
+    if (currentStaff && currentMonth && selectedDates.size > 0) {
+      showToast('⏳ 即将进行自动保存...', 'info', 2000);
+      // 延迟 1.5 秒执行保存，让用户看到提示
+      setTimeout(() => {
+        onSave(true);
+      }, 1500);
+    }
+  }, 30000);
 
   if (SCRIPT_URL) {
     await loadAllData();
