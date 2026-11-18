@@ -253,6 +253,7 @@
   .sidebar-item .item-name { font-weight: 700; font-size: 0.85rem; color: var(--epf-blue); margin-bottom: 4px; }
   .sidebar-item .item-info { font-size: 0.75rem; color: var(--epf-muted); display: flex; justify-content: space-between; }
   .sidebar-item .item-ot { font-weight: 700; color: #d97706; }
+  .sidebar-item .item-time { font-size: 0.68rem; color: #94a3b8; margin-top: 4px; display: block; }
 
   /* 右侧主内容 */
   .right-content { flex: 1; min-width: 0; }
@@ -398,10 +399,8 @@
 </head>
 <body>
 
-<!-- TOAST 容器 -->
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- NAVBAR (保持不变) -->
 <nav class="navbar">
   <div class="nav-brand"><span class="logo">Y</span><span class="brand-text">YZ Payroll</span></div>
   <div class="nav-links" id="navLinks">
@@ -433,7 +432,6 @@
   <button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')"><span class="pulse"></span> 💬 Request Chat</button>
 </nav>
 
-<!-- TOPBAR (保持不变) -->
 <div class="topbar">
   <div class="brand"><div class="logo">⏱</div> Payroll Overtime</div>
   <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
@@ -450,10 +448,8 @@
   <button class="btn btn-success" onclick="loadAllData()"><i class="fas fa-sync-alt"></i> Muat Semula</button>
 </div>
 
-<!-- ========== CONTENT 分栏 ========== -->
 <div class="content-wrap">
 
-  <!-- 左侧：已保存记录 -->
   <div class="left-sidebar">
     <h2><i class="fas fa-history"></i> 已保存加班记录</h2>
     <div class="sidebar-list" id="sidebarList">
@@ -461,7 +457,6 @@
     </div>
   </div>
 
-  <!-- 右侧：操作面板 -->
   <div class="right-content">
     <div class="page-header">
       <div class="info">
@@ -528,7 +523,6 @@
   </div>
 </div>
 
-<!-- 设置弹窗 -->
 <div class="modal-backdrop hidden" id="settingsModal">
   <div class="modal-content">
     <h2>⚙ 设置</h2>
@@ -605,12 +599,12 @@ const CACHE_TTL    = 5 * 60 * 1000;
 let SCRIPT_URL     = '';
 let allStaff       = [];
 let allSheetData   = [];
-let allOvertimeData= []; // 左侧栏数据
+let allOvertimeData= [];
 let currentStaff   = null;
 let currentMonth   = '';
 let selectedDates  = new Set();
 let isSaving       = false;
-let activeSidebarIndex = -1; // 高亮左侧选中项
+let activeSidebarIndex = -1;
 let settings       = { daysPerMonth: 26, hoursPerDay: 7.5, rate10: 1.0, rate15: 1.5, rate20: 2.0, rate30: 3.0 };
 
 /* ---------- 工具 ---------- */
@@ -642,6 +636,32 @@ function escapeHtml(s) {
   if (s == null) return '';
   return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
+
+// 【新增】月份归一化
+function normalizeMonth(v) {
+  if (!v) return '';
+  if (v instanceof Date) {
+    return `${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,'0')}`;
+  }
+  const s = String(v).trim().replace(/^'/, '');
+  const m = s.match(/^(\d{4})[-/](\d{1,2})/);
+  if (m) return `${m[1]}-${m[2].padStart(2, '0')}`;
+  return s;
+}
+
+// 【新增】格式化时间戳
+function formatUpdatedAt(v) {
+  if (!v) return '未知';
+  try {
+    const d = new Date(v);
+    if (isNaN(d.getTime())) return String(v);
+    return d.toLocaleString('zh-CN', {
+      year:'numeric', month:'2-digit', day:'2-digit',
+      hour:'2-digit', minute:'2-digit'
+    });
+  } catch (e) { return String(v); }
+}
+
 function setSyncBadge(state, text) {
   const b = document.getElementById('syncBadge'); const t = document.getElementById('syncBadgeText');
   if (!b || !t) return; b.className = 'sync-badge ' + (state || ''); t.textContent = text;
@@ -729,6 +749,12 @@ async function loadOvertimeData() {
     data = res.data || []; localStorage.setItem(LS_OT_DATA, JSON.stringify({ ts: Date.now(), data }));
   }
   allOvertimeData = data;
+  // 【修改】根据当前选中员工高亮侧栏
+  if (currentStaff) {
+    activeSidebarIndex = allOvertimeData.findIndex(item => String(item['ID KOD'] || '').trim() === currentStaff.code);
+  } else {
+    activeSidebarIndex = -1;
+  }
   renderSidebar();
 }
 
@@ -745,8 +771,9 @@ function renderSidebar() {
   allOvertimeData.forEach((item, index) => {
     const code = String(item['ID KOD'] || '').trim();
     const name = String(item['NAME'] || '').trim();
-    const month = String(item['MONTH'] || '').trim();
+    const month = normalizeMonth(item['MONTH']);
     const otH = parseH(item['TOTAL_OT_TIME_H']);
+    const updated = formatUpdatedAt(item['UPDATED_AT']);
 
     const div = document.createElement('div');
     div.className = `sidebar-item ${activeSidebarIndex === index ? 'active' : ''}`;
@@ -756,44 +783,33 @@ function renderSidebar() {
         <span>${escapeHtml(month)}</span>
         <span class="item-ot">加班: ${fmtHHMMSS(otH)}</span>
       </div>
+      <span class="item-time">🕐 ${escapeHtml(updated)}</span>
     `;
     div.addEventListener('click', () => loadFromSidebar(item, index));
     list.appendChild(div);
   });
 }
 
-/* ---------- 从侧边栏加载数据 ---------- */
+/* ---------- 【修改】从侧边栏点击 → 直接触发员工切换 → 自动载入 ---------- */
 function loadFromSidebar(item, index) {
-  activeSidebarIndex = index;
-  renderSidebar(); // 更新高亮
-
   const code = String(item['ID KOD'] || '').trim();
-  const month = String(item['MONTH'] || '').trim();
+  const sel = document.getElementById('staffSelect');
   
-  // 1. 设置员工
-  document.getElementById('staffSelect').value = code;
-  onStaffChange(); // 刷新基础信息
-
-  // 2. 设置月份
-  document.getElementById('monthPicker').value = month;
-  currentMonth = month;
-
-  // 3. 恢复选中的日期
-  selectedDates.clear();
-  try {
-    const details = typeof item['DETAILS'] === 'string' ? JSON.parse(item['DETAILS']) : (item['DETAILS'] || []);
-    if (Array.isArray(details)) {
-      details.forEach(d => { if (d.date) selectedDates.add(d.date); });
-    }
-  } catch (e) { console.warn('解析历史详情失败', e); }
-
-  // 4. 重新渲染日历和表格
-  refreshMonthlySummary();
-  renderCalendar();
-  renderTable();
+  // 如果搜索过滤隐藏了该选项，先清除过滤
+  const opt = document.querySelector(`#staffSelect option[value="${code}"]`);
+  if (opt && opt.style.display === 'none') {
+    document.getElementById('searchInput').value = '';
+    filterStaffOptions();
+  }
   
-  // 提示加载成功
-  showToast(`已载入 ${item['NAME']} (${month}) 的记录`, 'info');
+  sel.value = code;
+  if (!sel.value) {
+    showToast('找不到该员工（Code: ' + code + '）', 'error');
+    return;
+  }
+  
+  // 直接调用 onStaffChange，它会自动载入已保存数据
+  onStaffChange();
 }
 
 /* ---------- 搜索过滤 ---------- */
@@ -806,15 +822,24 @@ function filterStaffOptions() {
   });
 }
 
-/* ---------- 员工信息 ---------- */
+/* ---------- 【重写】员工切换 + 自动载入已保存数据 + 弹窗提示 ---------- */
 function onStaffChange() {
-  activeSidebarIndex = -1; // 取消左侧高亮
-  renderSidebar();
-
   const code = document.getElementById('staffSelect').value;
-  if (!code) { currentStaff = null; resetStaffInfo(); return; }
+  if (!code) {
+    currentStaff = null;
+    activeSidebarIndex = -1;
+    renderSidebar();
+    resetStaffInfo();
+    return;
+  }
+
   const opt = document.querySelector(`#staffSelect option[value="${code}"]`);
-  currentStaff = { code, name: opt.dataset.name || '', group: opt.dataset.group || '', salary: parseFloat(opt.dataset.salary) || 0 };
+  currentStaff = {
+    code,
+    name: opt.dataset.name || '',
+    group: opt.dataset.group || '',
+    salary: parseFloat(opt.dataset.salary) || 0
+  };
 
   document.getElementById('empCode').textContent   = currentStaff.code;
   document.getElementById('empName').textContent   = currentStaff.name;
@@ -825,7 +850,45 @@ function onStaffChange() {
   document.getElementById('dailyRate').textContent  = fmtRM(daily);
   document.getElementById('hourlyRate').textContent = fmtRM(hourly);
 
-  refreshMonthlySummary(); renderCalendar(); renderTable();
+  // 【核心新增】检查是否有已保存记录
+  const existing = allOvertimeData.find(item => String(item['ID KOD'] || '').trim() === code);
+  
+  if (existing) {
+    // 自动载入月份
+    const month = normalizeMonth(existing['MONTH']);
+    if (month) {
+      document.getElementById('monthPicker').value = month;
+      currentMonth = month;
+    }
+    
+    // 自动载入已选日期
+    selectedDates.clear();
+    try {
+      const details = typeof existing['DETAILS'] === 'string'
+        ? JSON.parse(existing['DETAILS'])
+        : (existing['DETAILS'] || []);
+      if (Array.isArray(details)) {
+        details.forEach(d => { if (d && d.date) selectedDates.add(d.date); });
+      }
+    } catch (e) { console.warn('解析历史详情失败', e); }
+
+    activeSidebarIndex = allOvertimeData.indexOf(existing);
+    
+    // 【弹窗提醒】保存/更新时间
+    const updatedAt = formatUpdatedAt(existing['UPDATED_AT']);
+    showToast(
+      `📂 已自动载入 ${existing['NAME']} (${month}) 的保存记录 · 最后更新：${updatedAt}`,
+      'info',
+      6000
+    );
+  } else {
+    activeSidebarIndex = -1;
+  }
+  
+  renderSidebar();
+  refreshMonthlySummary();
+  renderCalendar();
+  renderTable();
 }
 
 function resetStaffInfo() {
@@ -963,15 +1026,16 @@ function applySettings() {
 function openSettings()  { document.getElementById('settingsModal').classList.remove('hidden'); }
 function closeSettings() { document.getElementById('settingsModal').classList.add('hidden'); }
 
-/* ---------- 保存（手动与自动） ---------- */
-async function onSave(isAuto = false) {
+/* ---------- 【重写】保存（仅手动，覆盖更新或新建） ---------- */
+async function onSave() {
   if (!currentStaff || !currentMonth || selectedDates.size === 0) {
-    if (!isAuto) {
-      if (!currentStaff) alert('请先选择员工'); else if (!currentMonth) alert('请选择月份'); else alert('请先选择日期');
-    }
+    if (!currentStaff) alert('请先选择员工');
+    else if (!currentMonth) alert('请选择月份');
+    else alert('请先选择日期');
     return;
   }
-  if (isSaving) return; isSaving = true;
+  if (isSaving) return;
+  isSaving = true;
 
   const { daily, hourly } = currentRates(); const sorted = [...selectedDates].sort();
   const details = []; let sumW = 0, sumOT = 0, sum10 = 0, sum15 = 0, sum20 = 0, sum30 = 0;
@@ -1001,18 +1065,16 @@ async function onSave(isAuto = false) {
         const c2 = JSON.parse(localStorage.getItem(LS_OT_DATA) || 'null'); if (c2) { c2.ts = 0; localStorage.setItem(LS_OT_DATA, JSON.stringify(c2)); }
       } catch (e) {}
       
-      if (isAuto) showToast('✅ 自动保存成功', 'success');
-      else alert('✅ 加班记录已保存');
+      const mode = res.mode === 'updated' ? '已更新覆盖' : '已新建保存';
+      showToast(`✅ ${currentStaff.name} 的加班记录${mode}`, 'success', 4000);
       
-      // 保存成功后，静默刷新左侧列表
-      loadOvertimeData();
+      // 静默刷新左侧列表（会自动根据 currentStaff 高亮）
+      await loadOvertimeData();
     } else {
-      if (isAuto) showToast('自动保存失败：' + (res.message || '未知错误'), 'error');
-      else alert('保存失败：' + (res.message || '未知错误'));
+      showToast('保存失败：' + (res.message || '未知错误'), 'error', 5000);
     }
   } catch (err) {
-    if (isAuto) showToast('自动保存失败：网络异常', 'error');
-    else alert('保存失败：' + err.message);
+    showToast('保存失败：' + err.message, 'error', 5000);
   } finally {
     isSaving = false;
   }
@@ -1028,7 +1090,7 @@ async function init() {
 
   document.getElementById('staffSelect').addEventListener('change', onStaffChange);
   document.getElementById('monthPicker').addEventListener('change', e => {
-    activeSidebarIndex = -1; renderSidebar(); // 切换月份时取消左侧高亮
+    activeSidebarIndex = -1; renderSidebar();
     currentMonth = e.target.value; selectedDates.clear();
     refreshMonthlySummary(); renderCalendar(); renderTable();
   });
@@ -1036,15 +1098,10 @@ async function init() {
   document.getElementById('openSettings').addEventListener('click', openSettings);
   document.getElementById('cancelSettings').addEventListener('click', closeSettings);
   document.getElementById('applySettings').addEventListener('click', applySettings);
-  document.getElementById('saveBtn').addEventListener('click', () => onSave(false));
+  // 【修改】仅手动保存
+  document.getElementById('saveBtn').addEventListener('click', () => onSave());
 
-  // 30秒自动保存
-  setInterval(() => {
-    if (currentStaff && currentMonth && selectedDates.size > 0) {
-      showToast('⏳ 即将进行自动保存...', 'info', 2000);
-      setTimeout(() => onSave(true), 1500);
-    }
-  }, 30000);
+  // ❌ 已移除自动保存 setInterval
 
   if (SCRIPT_URL) await loadAllData();
   else { setSyncBadge('err', 'URL 未设置'); setCountBadge('请先在顶部 Apply URL'); }
