@@ -111,7 +111,7 @@ body { font-family:'Segoe UI',Roboto,Arial,sans-serif; background:var(--epf-bg);
 .calc-input{width:100%;padding:.5rem .7rem;border:1px solid var(--epf-border);border-radius:6px;font-size:.9rem;font-family:inherit;color:var(--epf-text);background:#fff;}
 .calc-input:focus{outline:none;border-color:var(--epf-blue);box-shadow:0 0 0 2px rgba(26,79,138,.10);}
 .calc-input:disabled{background:#f1f5f9;color:#94a3b8;cursor:not-allowed;}
-.lock-badge{position:absolute;inset:0;background:rgba(247,250,253,.72);backdrop-filter:blur(1px);display:flex;align-items:center;justify-content:center;text-align:center;font-size:.8rem;font-weight:700;color:var(--epf-muted);padding:1rem;border-radius:8px;z-index:5;}
+.lock-badge{position:absolute;inset:0;background:rgba(247,250,253,.85);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;text-align:center;font-size:.85rem;font-weight:700;color:var(--epf-muted);padding:1rem;border-radius:8px;z-index:5;}
 .lock-badge.hidden{display:none;}
 .calc-result{background:var(--epf-blue-light);border:1px solid var(--epf-border);border-radius:8px;padding:.9rem;text-align:center;}
 .calc-result .cr-label{font-size:.7rem;color:var(--epf-muted);font-weight:700;text-transform:uppercase;margin-bottom:4px;}
@@ -246,10 +246,10 @@ function applyUrl(){const url=document.getElementById('deployUrlInput').value.tr
 async function apiGet(action){if(!SCRIPT_URL)throw new Error('未设置 Deploy URL');const res=await fetch(`${SCRIPT_URL}?${new URLSearchParams({action,_t:Date.now()})}`);return await res.json();}
 async function apiPost(body){if(!SCRIPT_URL)throw new Error('未设置 Deploy URL');const res=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)});return await res.json();}
 
-async function loadAllData(){if(!SCRIPT_URL){setSyncBadge('err','URL 未设置');return;}setSyncBadge('busy','加载中...');try{await Promise.all([loadStaffList(),loadSheetData(),loadOvertimeData()]);setSyncBadge('ok','数据已加载');}catch(err){console.error(err);setSyncBadge('err','加载失败');alert('加载失败：'+err.message);}}
+async function loadAllData(){if(!SCRIPT_URL){setSyncBadge('err','URL 未设置');return;}setSyncBadge('busy','加载中...');try{await Promise.all([loadStaffList(),loadSheetData(),loadOvertimeData(true)]);setSyncBadge('ok','数据已加载');}catch(err){console.error(err);setSyncBadge('err','加载失败');alert('加载失败：'+err.message);}}
 async function loadStaffList(){let data=null;try{const c=JSON.parse(localStorage.getItem(LS_STAFF)||'null');if(c&&Date.now()-c.ts<CACHE_TTL)data=c.data;}catch(e){}if(!data){const res=await apiGet('getData');data=(res&&res.result==='success'&&Array.isArray(res.data))?res.data:(Array.isArray(res)?res:(res&&Array.isArray(res.data)?res.data:[]));localStorage.setItem(LS_STAFF,JSON.stringify({ts:Date.now(),data}));}allStaff=data;const select=document.getElementById('staffSelect');select.innerHTML='<option value="">-- 请选择 --</option>';data.forEach(s=>{const code=String(s.Code||s['ID KOD']||'').trim();if(!code)return;const opt=document.createElement('option');opt.value=code;opt.textContent=`${code} - ${String(s.Name||'').trim()}`;opt.dataset.name=String(s.Name||'').trim();opt.dataset.group=String(s.GroupName||s['GROUP']||'').trim();opt.dataset.salary=parseH(s.Salary||s['GAJI']||0);select.appendChild(opt);});}
 async function loadSheetData(){let data=null;try{const c=JSON.parse(localStorage.getItem(LS_SHEET)||'null');if(c&&Date.now()-c.ts<CACHE_TTL)data=c.data;}catch(e){}if(!data){const res=await apiGet('getSheetData');data=res.data||[];localStorage.setItem(LS_SHEET,JSON.stringify({ts:Date.now(),data}));}allSheetData=data;}
-async function loadOvertimeData(){let data=null;try{const c=JSON.parse(localStorage.getItem(LS_OT_DATA)||'null');if(c&&Date.now()-c.ts<CACHE_TTL)data=c.data;}catch(e){}if(!data){const res=await apiGet('getOvertimeData');data=res.data||[];localStorage.setItem(LS_OT_DATA,JSON.stringify({ts:Date.now(),data}));}allOvertimeData=data;if(currentStaff)activeSidebarIndex=allOvertimeData.findIndex(item=>isCodeMatch(item['ID KOD'],currentStaff.code)&&nameMatch(item['NAME'],currentStaff.name));else activeSidebarIndex=-1;renderSidebar();}
+async function loadOvertimeData(force){let data=null;if(!force){try{const c=JSON.parse(localStorage.getItem(LS_OT_DATA)||'null');if(c&&Date.now()-c.ts<CACHE_TTL)data=c.data;}catch(e){}}if(!data){const res=await apiGet('getOvertimeData');data=res.data||[];localStorage.setItem(LS_OT_DATA,JSON.stringify({ts:Date.now(),data}));}allOvertimeData=data;if(currentStaff)activeSidebarIndex=allOvertimeData.findIndex(item=>isCodeMatch(item['ID KOD'],currentStaff.code)&&nameMatch(item['NAME'],currentStaff.name));else activeSidebarIndex=-1;renderSidebar();}
 
 function renderSidebar(){
 const list=document.getElementById('sidebarList');list.innerHTML='';
@@ -257,13 +257,13 @@ if(!allOvertimeData||allOvertimeData.length===0){list.innerHTML='<div style="tex
 allOvertimeData.forEach((item,index)=>{
 const code=String(item['ID KOD']||'').trim();const name=String(item['NAME']||'').trim();const month=normalizeMonth(item['MONTH']);const otH=parseH(item['TOTAL_OT_TIME_H']);const updated=formatUpdatedAt(item['UPDATED_AT']);const otType=String(item['OT_TYPE']||'').trim();
 let colorClass='';if(otType==='1.0')colorClass='ot-10';else if(otType==='1.5')colorClass='ot-15';else if(otType==='2.0')colorClass='ot-20';else if(otType==='3.0')colorClass='ot-30';
-let isActive=false;if(currentStaff)isActive=isCodeMatch(code,currentStaff.code)&&(nameMatch(name,currentStaff.name)||!currentStaff.name);
+let isActive=false;if(currentStaff)isActive=isCodeMatch(code,currentStaff.code)&&nameMatch(name,currentStaff.name);
 const typeHtml=otType?`<div class="item-type set">OT 类型：×${otType}</div>`:`<div class="item-type none">OT 类型：未选择</div>`;
 const div=document.createElement('div');div.className=`sidebar-item ${colorClass} ${isActive?'active':''}`;
 const contentDiv=document.createElement('div');contentDiv.className='sidebar-item-content';
 contentDiv.innerHTML=`<div class="item-name">${escapeHtml(name)} <span style="font-size:.7rem;color:#64748b;">(${escapeHtml(code)})</span></div><div class="item-info"><span>${escapeHtml(month||'未知月份')}</span><span class="item-ot">加班: ${fmtHHMMSS(otH)}</span></div>${typeHtml}<span class="item-time">🕐 ${escapeHtml(updated)}</span>`;
 contentDiv.addEventListener('click',()=>loadFromSidebar(item,index));
-const menuBtn=document.createElement('button');menuBtn.className='sidebar-item-menu-btn'+(isActive&&editMode?' unlocked':'');menuBtn.innerHTML=isActive&&editMode?'✏️':'⋮';menuBtn.title=editMode?'锁定编辑':'解锁编辑';menuBtn.addEventListener('click',e=>{e.stopPropagation();toggleEdit(item,index);});
+const menuBtn=document.createElement('button');menuBtn.className='sidebar-item-menu-btn'+(isActive&&editMode?' unlocked':'');menuBtn.innerHTML=isActive&&editMode?'✏️':'⋮';menuBtn.title=editMode?'锁定查看':'解锁编辑';menuBtn.addEventListener('click',e=>{e.stopPropagation();toggleEdit(item,index);});
 div.appendChild(contentDiv);div.appendChild(menuBtn);list.appendChild(div);
 });
 }
@@ -287,28 +287,37 @@ if(!matchedStaff){showToast('找不到该员工记录: '+(itemCode||itemName),'e
 const targetCode=String(matchedStaff.Code||matchedStaff['ID KOD']||'').trim();
 const sel=document.getElementById('staffSelect');sel.value=targetCode;
 if(sel.value!==targetCode){showToast('无法选中该员工','error');return;}
-onStaffChange();
+onStaffChange(true);
 }
 
-function onStaffChange(){
+function onStaffChange(fromSidebar){
 const code=document.getElementById('staffSelect').value;
-editMode=false;
-if(!code){currentStaff=null;activeSidebarIndex=-1;renderSidebar();resetStaffInfo();resetRightPanel();applyEditLock();return;}
+if(!code){currentStaff=null;activeSidebarIndex=-1;editMode=false;renderSidebar();resetStaffInfo();resetRightPanel();applyEditLock();return;}
 const opt=document.querySelector(`#staffSelect option[value="${code}"]`);
 currentStaff={code,name:opt?String(opt.dataset.name||'').trim():'',group:opt?String(opt.dataset.group||'').trim():'',salary:opt?(parseFloat(opt.dataset.salary)||0):0};
 document.getElementById('empCode').textContent=currentStaff.code;document.getElementById('empName').textContent=currentStaff.name;document.getElementById('empGroup').textContent=currentStaff.group;document.getElementById('empSalary').textContent=fmtRM(currentStaff.salary);
-const{daily,hourly}=currentRates();
+const {daily,hourly}=currentRates();
 document.getElementById('dailyRate').textContent=fmtRM(daily);document.getElementById('hourlyRate').textContent=fmtRM(hourly);
+
 const existing=allOvertimeData.find(item=>isCodeMatch(item['ID KOD'],code)&&nameMatch(item['NAME'],currentStaff.name));
 if(existing){
-const month=normalizeMonth(existing['MONTH']);
-if(month&&/^\d{4}-\d{2}$/.test(month)){document.getElementById('monthPicker').value=month;currentMonth=month;}
-selectedDates.clear();
-try{let details=existing['DETAILS'];if(typeof details==='string')details=JSON.parse(details);if(Array.isArray(details))details.forEach(d=>{if(d&&d.date){const ds=String(d.date).trim();if(/^\d{4}-\d{2}-\d{2}$/.test(ds))selectedDates.add(ds);}});}catch(e){console.warn('解析历史详情失败',e);}
-activeSidebarIndex=allOvertimeData.indexOf(existing);
-showToast(`📂 已载入 ${existing['NAME']} (${month}) · 点 ⋮ 解锁编辑`,'info',6000);
-syncRightPanel(existing);
-}else{activeSidebarIndex=-1;selectedDates.clear();document.getElementById('calcDailyInput').value=daily.toFixed(2);document.getElementById('calcMultSelect').value='';document.getElementById('calcDaysInput').value=0;resetSummary();editMode=true;} // 新建默认可编辑
+  editMode = !fromSidebar;
+  const month=normalizeMonth(existing['MONTH']);
+  if(month&&/^\d{4}-\d{2}$/.test(month)){document.getElementById('monthPicker').value=month;currentMonth=month;}
+  selectedDates.clear();
+  try{let details=existing['DETAILS'];if(typeof details==='string')details=JSON.parse(details);if(Array.isArray(details))details.forEach(d=>{if(d&&d.date){const ds=String(d.date).trim();if(/^\d{4}-\d{2}-\d{2}$/.test(ds))selectedDates.add(ds);}});}catch(e){}
+  activeSidebarIndex=allOvertimeData.indexOf(existing);
+  syncRightPanel(existing);
+  showToast(fromSidebar?`📂 查看 ${existing['NAME']} (${month}) · 点 ⋮ 解锁编辑`:`✏️ 编辑 ${existing['NAME']} (${month}) · 改完点顶部保存`,'info',5000);
+}else{
+  editMode=true;
+  activeSidebarIndex=-1;
+  selectedDates.clear();
+  document.getElementById('calcDailyInput').value=(daily||0).toFixed(2);
+  document.getElementById('calcMultSelect').value='';
+  document.getElementById('calcDaysInput').value=0;
+  updateCalcResult();resetSummary();
+}
 renderSidebar();refreshMonthlySummary();renderCalendar();renderTable();highlightSelectedMult();applyEditLock();
 }
 
@@ -347,7 +356,6 @@ highlightSelectedMult();
 function highlightSelectedMult(){const mt=document.getElementById('calcMultSelect').value;document.querySelectorAll('[data-mt]').forEach(el=>el.classList.toggle('sel',!!mt&&el.dataset.mt===mt));}
 function resetTotals(){['sumWork','sumOT'].forEach(id=>document.getElementById(id).textContent='00:00:00');['sum10','sum15','sum20','sum30'].forEach(id=>document.getElementById(id).textContent='RM 0.00');}
 
-/* ===== 右侧日薪面板 ===== */
 function getCalcDaily(){const v=parseFloat(document.getElementById('calcDailyInput').value);return isNaN(v)||v<0?0:v;}
 function getCalcDays(){const v=parseInt(document.getElementById('calcDaysInput').value,10);return isNaN(v)||v<0?0:v;}
 function updateCalcResult(){
@@ -379,19 +387,17 @@ function updateSummary(){
 const type=document.getElementById('calcMultSelect').value;
 document.getElementById('summaryOtType').textContent=type?`×${type}`:'未选择';
 document.getElementById('summaryOtHours').textContent=fmtHHMMSS(selectedDates.size?allSheetData.filter(r=>isCodeMatch(r['ID KOD'],currentStaff.code)&&selectedDates.has(String(r['Date']||''))).reduce((s,r)=>s+getRowOT(r),0):0);
-const mtSum={ '1.0':document.getElementById('sum10').textContent,'1.5':document.getElementById('sum15').textContent,'2.0':document.getElementById('sum20').textContent,'3.0':document.getElementById('sum30').textContent };
+const mtSum={'1.0':document.getElementById('sum10').textContent,'1.5':document.getElementById('sum15').textContent,'2.0':document.getElementById('sum20').textContent,'3.0':document.getElementById('sum30').textContent};
 document.getElementById('summaryOtAmount').textContent=type?(mtSum[type]||'-'):'-';
 const daily=getCalcDaily();const days=getCalcDays();
 document.getElementById('summaryDailyOt').textContent=type?fmtRM(daily*parseFloat(type)*days):'-';
 }
 
-/* ===== 设置 ===== */
 function loadSettings(){try{const s=JSON.parse(localStorage.getItem(LS_SETTINGS));if(s)settings=Object.assign(settings,s);}catch(e){}document.getElementById('setDays').value=settings.daysPerMonth;document.getElementById('setHours').value=settings.hoursPerDay;document.getElementById('setRate10').value=settings.rate10;document.getElementById('setRate15').value=settings.rate15;document.getElementById('setRate20').value=settings.rate20;document.getElementById('setRate30').value=settings.rate30;}
-function applySettings(){settings.daysPerMonth=parseFloat(document.getElementById('setDays').value)||26;settings.hoursPerDay=parseFloat(document.getElementById('setHours').value)||7.5;settings.rate10=parseFloat(document.getElementById('setRate10').value)||1.0;settings.rate15=parseFloat(document.getElementById('setRate15').value)||1.5;settings.rate20=parseFloat(document.getElementById('setRate20').value)||2.0;settings.rate30=parseFloat(document.getElementById('setRate30').value)||3.0;localStorage.setItem(LS_SETTINGS,JSON.stringify(settings));closeSettings();if(currentStaff)onStaffChange();}
+function applySettings(){settings.daysPerMonth=parseFloat(document.getElementById('setDays').value)||26;settings.hoursPerDay=parseFloat(document.getElementById('setHours').value)||7.5;settings.rate10=parseFloat(document.getElementById('setRate10').value)||1.0;settings.rate15=parseFloat(document.getElementById('setRate15').value)||1.5;settings.rate20=parseFloat(document.getElementById('setRate20').value)||2.0;settings.rate30=parseFloat(document.getElementById('setRate30').value)||3.0;localStorage.setItem(LS_SETTINGS,JSON.stringify(settings));closeSettings();if(currentStaff)onStaffChange(false);}
 function openSettings(){document.getElementById('settingsModal').classList.remove('hidden');}
 function closeSettings(){document.getElementById('settingsModal').classList.add('hidden');}
 
-/* ===== 保存：时薪仅写选定倍率合计 + 日薪倍率×天数 ===== */
 async function onSave(){
 if(!currentStaff||!currentMonth||selectedDates.size===0){if(!currentStaff)alert('请先选择员工');else if(!currentMonth)alert('请选择月份');else alert('请先选择日期');return;}
 if(isSaving)return;isSaving=true;
@@ -409,7 +415,7 @@ const res=await apiPost(payload);
 if(res.status==='success'){
 try{const c2=JSON.parse(localStorage.getItem(LS_OT_DATA)||'null');if(c2){c2.ts=0;localStorage.setItem(LS_OT_DATA,JSON.stringify(c2));}}catch(e){}
 showToast(`✅ ${currentStaff.name} 的加班记录${res.mode==='updated'?'已更新覆盖':'已新建保存'}`,'success',4000);
-editMode=false;await loadOvertimeData();
+editMode=false;await loadOvertimeData(true);
 const ex=allOvertimeData.find(i=>isCodeMatch(i['ID KOD'],currentStaff.code)&&nameMatch(i['NAME'],currentStaff.name));if(ex)syncRightPanel(ex);
 renderSidebar();applyEditLock();
 }else showToast('保存失败：'+(res.message||'未知错误'),'error',5000);
@@ -421,7 +427,7 @@ loadSettings();loadSavedUrl();
 const today=new Date();const ym=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
 document.getElementById('monthPicker').value=ym;currentMonth=ym;
 document.getElementById('calcDailyInput').value='0.00';
-document.getElementById('staffSelect').addEventListener('change',onStaffChange);
+document.getElementById('staffSelect').addEventListener('change',()=>onStaffChange(false));
 document.getElementById('monthPicker').addEventListener('change',e=>{activeSidebarIndex=-1;editMode=false;renderSidebar();currentMonth=e.target.value;selectedDates.clear();refreshMonthlySummary();renderCalendar();renderTable();applyEditLock();});
 document.getElementById('openSettings').addEventListener('click',openSettings);
 document.getElementById('cancelSettings').addEventListener('click',closeSettings);
