@@ -8,165 +8,130 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
---epf-blue: #1a4f8a; --epf-blue-light: #e8f0fa; --epf-blue-soft: #f4f8fd;
---epf-border: #d4e0ee; --epf-border-soft: #e6eef7;
---epf-text: #1f2d3d; --epf-muted: #64748b; --epf-bg: #f7fafd;
---nav-h: 52px; --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover: #16345c;
---nav-text: #cbd9ea; --nav-accent: #4d9fff;
---shadow-sm: 0 1px 2px rgba(16,32,56,.05), 0 2px 10px rgba(16,32,56,.05);
---shadow-md: 0 8px 24px rgba(16,32,56,.10);
+--epf-blue:#1a4f8a; --epf-blue-light:#e8f0fa; --epf-blue-soft:#f4f8fd;
+--epf-border:#d4e0ee; --epf-border-soft:#e6eef7; --epf-text:#1f2d3d; --epf-muted:#64748b; --epf-bg:#f7fafd;
+--nav-h:52px; --nav-bg-1:#0b1b30; --nav-bg-2:#123153; --nav-hover:#16345c; --nav-text:#cbd9ea; --nav-accent:#4d9fff;
+--shadow-sm:0 1px 2px rgba(16,32,56,.05),0 2px 10px rgba(16,32,56,.05); --shadow-md:0 8px 24px rgba(16,32,56,.10);
 }
-body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: var(--epf-bg); color: var(--epf-text); min-height: 100vh; line-height: 1.5; font-size: 14px; -webkit-font-smoothing: antialiased; }
-.toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-.toast { background: #fff; border-left: 4px solid var(--epf-blue); padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 16px rgba(16,32,56,.15); color: var(--epf-text); font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease-out; min-width: 240px; }
-.toast.info { border-left-color: var(--epf-blue); } .toast.success { border-left-color: #22c55e; } .toast.error { border-left-color: #ef4444; }
-@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-.navbar { position: sticky; top: 0; z-index: 200; display: flex; align-items: stretch; flex-wrap: wrap; background: linear-gradient(90deg, var(--nav-bg-1) 0%, var(--nav-bg-2) 100%); padding: 0 1rem; min-height: var(--nav-h); box-shadow: 0 2px 12px rgba(0,0,0,0.25); border-bottom: 1px solid rgba(77,159,255,0.18); }
-.navbar .nav-brand { display: flex; align-items: center; gap: 0.55rem; color: #fff; font-weight: 800; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; padding-right: 1.1rem; margin-right: 0.5rem; border-right: 1px solid rgba(255,255,255,0.12); white-space: nowrap; }
-.navbar .nav-brand .logo { width: 28px; height: 28px; border-radius: 7px; background: linear-gradient(135deg, #4d9fff, #1a4f8a); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.85rem; font-weight: 800; box-shadow: 0 2px 6px rgba(77,159,255,0.35); }
-.nav-links { display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px; position: relative; }
-.nav-item { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0 0.85rem; min-height: var(--nav-h); color: var(--nav-text); text-decoration: none; font-family: inherit; font-size: 0.73rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: transparent; border: none; cursor: pointer; white-space: nowrap; transition: background 0.15s, color 0.15s; position: relative; }
-.nav-item:hover, .nav-item.active { background: var(--nav-hover); color: #fff; }
-.nav-item::after { content: ''; position: absolute; left: 0.85rem; right: 0.85rem; bottom: 0; height: 2px; background: var(--nav-accent); transform: scaleX(0); transform-origin: left; transition: transform 0.2s; }
-.nav-item:hover::after, .nav-item.active::after { transform: scaleX(1); }
-.nav-back { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; padding: 0 0.6rem; color: var(--nav-text); background: transparent; border: none; cursor: pointer; font-size: 1.1rem; transition: background 0.15s, color 0.15s; }
-.nav-back:hover { background: var(--nav-hover); color: #fff; }
-.nav-dropdown { position: relative; display: inline-flex; align-items: stretch; }
-.nav-dropdown > .nav-item { padding-right: 0.55rem; }
-.nav-dropdown > .nav-item .fa-caret-down { font-size: 0.6rem; margin-left: 0.2rem; opacity: 0.7; }
-.dropdown-menu { display: none; position: absolute; top: 100%; left: 0; min-width: 180px; background: #fff; border-radius: 8px; box-shadow: 0 8px 24px rgba(16,32,56,.15); padding: 0.4rem 0; z-index: 300; border: 1px solid var(--epf-border); animation: fadeSlide 0.15s ease; }
-.nav-dropdown.open .dropdown-menu { display: block; }
-@keyframes fadeSlide { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
-.dropdown-menu a { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; color: var(--epf-text); text-decoration: none; font-size: 0.78rem; font-weight: 500; transition: background 0.12s; white-space: nowrap; }
-.dropdown-menu a:hover { background: var(--epf-blue-soft); color: var(--epf-blue); }
-.dropdown-menu .divider { height: 1px; background: var(--epf-border-soft); margin: 0.3rem 0.5rem; }
-.nav-chat { margin-left: auto; align-self: center; display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.5rem 1rem; border: none; border-radius: 20px; background: linear-gradient(135deg, #2f7fe0 0%, #1a4f8a 100%); color: #fff; font-family: inherit; font-size: 0.73rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; white-space: nowrap; box-shadow: 0 3px 12px rgba(47,127,224,0.4); transition: transform 0.15s, box-shadow 0.15s, filter 0.15s; }
-.nav-chat:hover { filter: brightness(1.12); transform: translateY(-1px); }
-.nav-chat .pulse { width: 7px; height: 7px; border-radius: 50%; background: #6ef0a8; box-shadow: 0 0 0 0 rgba(110,240,168,0.75); animation: pulse 2s infinite; }
-@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(110,240,168,0.7); } 70% { box-shadow: 0 0 0 7px rgba(110,240,168,0); } 100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); } }
-
-/* ===== TOPBAR (已移除搜索框，加入保存按钮) ===== */
-.topbar { position: sticky; top: var(--nav-h); z-index: 100; background: #fff; border-bottom: 1px solid var(--epf-border); padding: 0.65rem 1.75rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; box-shadow: 0 1px 2px rgba(26,79,138,0.04); }
-.topbar .brand { font-weight: 700; font-size: 0.95rem; color: var(--epf-blue); display: flex; align-items: center; gap: 0.6rem; margin-right: 0.5rem; }
-.topbar .brand .logo { width: 32px; height: 32px; background: var(--epf-blue); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.95rem; font-weight: 800; }
-.url-box { display: flex; align-items: center; gap: 0.4rem; flex: 1; max-width: 420px; background: #f4f8fd; border: 1px solid var(--epf-border); border-radius: 6px; padding: 2px; }
-.url-box input { flex: 1; border: none; background: transparent; padding: 0.4rem 0.6rem; font-size: 0.78rem; font-family: inherit; color: var(--epf-text); outline: none; }
-.url-box input::placeholder { color: #a7b7c9; }
-.url-box button { padding: 0.3rem 0.8rem; border-radius: 4px; border: none; background: var(--epf-blue); color: #fff; font-size: 0.72rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
-.url-box button:hover { background: #15406f; }
-.btn { background: #fff; border: 1px solid var(--epf-border); padding: 0.42rem 0.9rem; border-radius: 5px; font-size: 0.78rem; font-weight: 500; cursor: pointer; color: var(--epf-blue); display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.15s ease; white-space: nowrap; font-family: inherit; }
-.btn:hover { background: var(--epf-blue-soft); border-color: #b8cfe8; }
-.btn-success { background: #0f7a54; border: 1px solid #0f7a54; color: #fff; } .btn-success:hover { background: #0c6a48; border-color: #0c6a48; color: #fff; }
-.btn-sm { padding: 0.25rem 0.7rem; font-size: 0.72rem; border-radius: 4px; }
-.sync-badge { display: inline-flex; align-items: center; gap: 0.35rem; background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft); padding: 0.3rem 0.7rem; border-radius: 20px; font-size: 0.68rem; font-weight: 600; color: var(--epf-muted); white-space: nowrap; }
-.sync-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: #9db8d2; transition: background 0.2s; }
-.sync-badge.ok .dot { background: #22c55e; } .sync-badge.busy .dot { background: #f59e0b; animation: pulse 1s infinite; } .sync-badge.err .dot { background: #ef4444; }
-
-/* ===== 三栏布局 ===== */
-.content-wrap { max-width: 100%; margin: 0 auto; padding: 1rem 1.5rem 2rem; display: flex; gap: 1rem; align-items: flex-start; height: calc(100vh - var(--nav-h) - 60px); }
-.left-sidebar { width: 280px; flex-shrink: 0; background: #fff; border: 1px solid var(--epf-border); border-radius: 8px; padding: 1rem; box-shadow: 0 1px 3px rgba(26,79,138,0.04); height: 100%; overflow-y: auto; display: flex; flex-direction: column; }
-.left-sidebar h2 { font-size: 0.95rem; color: var(--epf-blue); font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.7rem; border-bottom: 1px solid var(--epf-border-soft); flex-shrink: 0; }
-.sidebar-list { display: flex; flex-direction: column; gap: 8px; flex: 1; }
-.sidebar-item { background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft); padding: 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.15s; display: flex; justify-content: space-between; align-items: center; }
-.sidebar-item:hover { filter: brightness(0.97); border-color: var(--epf-blue); }
-.sidebar-item.active { border-left: 3px solid var(--epf-blue); filter: brightness(0.95); }
-.sidebar-item.ot-10 { background: #dcfce7; border-color: #bbf7d0; } .sidebar-item.ot-10.active { background: #bbf7d0; border-left-color: #16a34a; }
-.sidebar-item.ot-15 { background: #fef9c3; border-color: #fef08a; } .sidebar-item.ot-15.active { background: #fef08a; border-left-color: #ca8a04; }
-.sidebar-item.ot-20 { background: #dbeafe; border-color: #bfdbfe; } .sidebar-item.ot-20.active { background: #bfdbfe; border-left-color: #2563eb; }
-.sidebar-item.ot-30 { background: #f3e8ff; border-color: #e9d5ff; } .sidebar-item.ot-30.active { background: #e9d5ff; border-left-color: #9333ea; }
-.sidebar-item.ot-40 { background: #fce7f3; border-color: #fbcfe8; } .sidebar-item.ot-40.active { background: #fbcfe8; border-left-color: #db2777; }
-.sidebar-item.ot-50 { background: #fed7aa; border-color: #fdba74; } .sidebar-item.ot-50.active { background: #fdba74; border-left-color: #ea580c; }
-.sidebar-item-content { flex: 1; min-width: 0; }
-.sidebar-item .item-name { font-weight: 700; font-size: 0.85rem; color: var(--epf-blue); margin-bottom: 4px; }
-.sidebar-item .item-info { font-size: 0.75rem; color: var(--epf-muted); display: flex; justify-content: space-between; }
-.sidebar-item .item-ot { font-weight: 700; color: #d97706; }
-.sidebar-item .item-type { font-size: 0.72rem; font-weight: 700; margin-top: 3px; }
-.sidebar-item .item-type.set { color: #15803d; }
-.sidebar-item .item-type.none { color: #94a3b8; font-style: italic; font-weight: 500; }
-.sidebar-item .item-time { font-size: 0.68rem; color: #94a3b8; margin-top: 4px; display: block; }
-.sidebar-item-menu-btn { background: transparent; border: none; color: var(--epf-muted); font-size: 1.3rem; cursor: pointer; padding: 4px 8px; border-radius: 4px; flex-shrink: 0; line-height: 1; }
-.sidebar-item-menu-btn:hover { background: rgba(0,0,0,0.08); color: var(--epf-text); }
-
-.middle-content { flex: 1; min-width: 0; background: #fff; border: 1px solid var(--epf-border); border-radius: 8px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(26,79,138,0.04); height: 100%; overflow-y: auto; }
-.page-header { margin-bottom: 1.5rem; } .page-header h1 { font-size: 1.45rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--epf-blue); } .page-header p { font-size: 0.85rem; color: var(--epf-muted); }
-.ot-card { background: #fff; border: 1px solid var(--epf-border); border-radius: 10px; padding: 1.4rem 1.5rem; margin-bottom: 1.2rem; box-shadow: var(--shadow-sm); }
-.ot-card h2 { font-size: 1rem; color: var(--epf-blue); font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.7rem; border-bottom: 1px solid var(--epf-border-soft); display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
-.toolbar { display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
-.toolbar label { font-size: 0.8rem; color: var(--epf-muted); font-weight: 600; }
-.toolbar select, .toolbar input[type="month"] { padding: 0.45rem 0.75rem; border: 1px solid var(--epf-border); border-radius: 6px; font-size: 0.82rem; font-family: inherit; color: var(--epf-text); background: #fff; min-width: 200px; }
-.toolbar select:focus, .toolbar input[type="month"]:focus { outline: none; border-color: var(--epf-blue); box-shadow: 0 0 0 2px rgba(26,79,138,0.10); }
-.info-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 12px; } .info-grid:last-child { margin-bottom: 0; }
-.info-item { background: var(--epf-blue-soft); padding: 0.75rem 0.9rem; border-radius: 8px; border-left: 3px solid var(--epf-border); }
-.info-item .label { font-size: 0.7rem; color: var(--epf-muted); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; margin-bottom: 4px; }
-.info-item .value { font-size: 0.95rem; font-weight: 700; color: var(--epf-text); font-variant-numeric: tabular-nums; word-break: break-word; }
-.info-item.highlight { background: var(--epf-blue-light); border-left-color: var(--epf-blue); } .info-item.highlight .value { color: var(--epf-blue); font-size: 1rem; }
-.calendar-wrap { background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft); border-radius: 8px; padding: 1rem; }
-.calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 8px; }
-.calendar-header .month-label { font-size: 0.92rem; font-weight: 700; color: var(--epf-blue); }
-.calendar-header .hint { font-size: 0.7rem; color: var(--epf-muted); font-style: italic; }
-.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-.cal-dow { text-align: center; font-size: 0.68rem; font-weight: 700; color: var(--epf-muted); padding: 4px; }
-.cal-day { text-align: center; padding: 9px 4px; border-radius: 6px; cursor: pointer; background: #fff; border: 1px solid var(--epf-border-soft); font-size: 0.82rem; font-weight: 500; color: var(--epf-text); user-select: none; transition: 0.15s; }
-.cal-day:hover { background: var(--epf-blue-light); border-color: var(--epf-blue); color: var(--epf-blue); }
-.cal-day.selected { background: var(--epf-blue); color: #fff; border-color: var(--epf-blue); font-weight: 700; }
-.cal-day.empty { background: transparent; border: none; cursor: default; }
-.cal-day.no-data { opacity: 0.35; cursor: not-allowed; }
-.cal-day.has-ot { box-shadow: inset 0 0 0 2px #f59e0b; }
-.cal-day.selected.has-ot { box-shadow: inset 0 0 0 2px #fbbf24; }
-.ot-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-.ot-table th, .ot-table td { padding: 0.65rem 0.7rem; text-align: right; border-bottom: 1px solid var(--epf-border-soft); }
-.ot-table th:first-child, .ot-table td:first-child { text-align: left; }
-.ot-table thead th { background: var(--epf-blue-soft); color: var(--epf-blue); font-weight: 700; font-size: 0.7rem; text-transform: uppercase; border-bottom: 1px solid var(--epf-border); }
-.ot-table tfoot th, .ot-table tfoot td { background: var(--epf-blue-light); color: var(--epf-blue); font-weight: 800; border-top: 2px solid var(--epf-border); font-variant-numeric: tabular-nums; }
-.empty-row td { text-align: center !important; color: var(--epf-muted); padding: 1.5rem !important; font-style: italic; }
-.note { font-size: 0.72rem; color: var(--epf-muted); margin-top: 0.6rem; font-style: italic; }
-
-.right-sidebar { width: 320px; flex-shrink: 0; display: flex; flex-direction: column; gap: 1rem; height: 100%; }
-.right-panel { background: #fff; border: 1px solid var(--epf-border); border-radius: 8px; padding: 1rem; box-shadow: 0 1px 3px rgba(26,79,138,0.04); overflow-y: auto; }
-.right-panel.calc { flex: 1; } .right-panel.summary { flex-shrink: 0; }
-.right-panel h3 { font-size: 0.95rem; color: var(--epf-blue); font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.7rem; border-bottom: 1px solid var(--epf-border-soft); }
-.calc-row { margin-bottom: 14px; }
-.calc-row .cl { font-size: 0.72rem; color: var(--epf-muted); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
-.calc-input { width: 100%; padding: 0.5rem 0.7rem; border: 1px solid var(--epf-border); border-radius: 6px; font-size: 0.9rem; font-family: inherit; color: var(--epf-text); background: #fff; }
-.calc-input:focus { outline: none; border-color: var(--epf-blue); box-shadow: 0 0 0 2px rgba(26,79,138,0.10); }
-.calc-input:disabled { background: #f1f5f9; color: #64748b; cursor: not-allowed; }
-select.calc-input { min-width: 0; }
-.toggle-wrap { display: inline-flex; align-items: center; gap: 6px; font-size: 0.7rem; color: var(--epf-muted); text-transform: none; font-weight: 600; }
-.toggle-switch { position: relative; width: 34px; height: 18px; background: #cbd5e1; border-radius: 20px; cursor: pointer; transition: 0.2s; }
-.toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: #fff; border-radius: 50%; transition: 0.2s; }
-.toggle-switch.on { background: var(--epf-blue); }
-.toggle-switch.on::after { left: 18px; }
-.calc-result { background: var(--epf-blue-light); border: 1px solid var(--epf-border); border-radius: 8px; padding: 0.9rem; text-align: center; }
-.calc-result .cr-label { font-size: 0.7rem; color: var(--epf-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
-.calc-result .cr-value { font-size: 1.5rem; font-weight: 800; color: var(--epf-blue); font-variant-numeric: tabular-nums; }
-.calc-formula { font-size: 0.72rem; color: var(--epf-muted); text-align: center; margin-top: 8px; font-style: italic; }
-.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.summary-item { background: var(--epf-blue-soft); padding: 0.75rem; border-radius: 6px; border-left: 3px solid var(--epf-border); }
-.summary-item .label { font-size: 0.7rem; color: var(--epf-muted); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; margin-bottom: 4px; }
-.summary-item .value { font-size: 0.95rem; font-weight: 700; color: var(--epf-text); font-variant-numeric: tabular-nums; }
-.summary-item.highlight { background: var(--epf-blue-light); border-left-color: var(--epf-blue); } .summary-item.highlight .value { color: var(--epf-blue); }
-
-.ot-menu-panel { position: fixed; z-index: 1000; background: #fff; border: 1px solid var(--epf-border); border-radius: 8px; box-shadow: 0 10px 30px rgba(15,23,42,.18); padding: 6px; width: 160px; display: none; }
-.ot-menu-panel.show { display: block; }
-.ot-menu-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; font-size: 0.8rem; font-weight: 600; color: var(--epf-text); border-radius: 6px; cursor: pointer; transition: background 0.12s; }
-.ot-menu-item:hover { background: var(--epf-blue-soft); }
-.ot-menu-item.current { background: var(--epf-blue-light); }
-.ot-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.ot-dot.c0 { background: #cbd5e1; } .ot-dot.c10 { background: #22c55e; } .ot-dot.c15 { background: #eab308; } .ot-dot.c20 { background: #3b82f6; } .ot-dot.c30 { background: #a855f7; } .ot-dot.c40 { background: #ec4899; } .ot-dot.c50 { background: #f97316; }
-.ot-menu-title { font-size: 0.68rem; color: var(--epf-muted); font-weight: 700; text-transform: uppercase; padding: 2px 10px 6px; border-bottom: 1px solid var(--epf-border-soft); margin-bottom: 4px; }
-
-.modal-backdrop { position: fixed; inset: 0; background: rgba(11,27,48,0.55); display: flex; align-items: center; justify-content: center; z-index: 500; backdrop-filter: blur(2px); } .modal-backdrop.hidden { display: none; }
-.modal-content { background: #fff; border-radius: 10px; padding: 1.5rem; width: 460px; max-width: 92vw; max-height: 88vh; overflow-y: auto; box-shadow: var(--shadow-md); }
-.modal-content h2 { font-size: 1rem; color: var(--epf-blue); font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.7rem; border-bottom: 1px solid var(--epf-border-soft); }
-.modal-content label { display: block; margin-bottom: 0.8rem; font-size: 0.8rem; color: var(--epf-text); font-weight: 600; }
-.modal-content label .hint { display: block; font-size: 0.7rem; color: var(--epf-muted); font-weight: 400; margin-top: 2px; }
-.modal-content input { width: 100%; padding: 0.5rem 0.7rem; border: 1px solid var(--epf-border); border-radius: 6px; margin-top: 4px; font-size: 0.82rem; font-family: inherit; color: var(--epf-text); }
-.modal-content input:focus { outline: none; border-color: var(--epf-blue); box-shadow: 0 0 0 2px rgba(26,79,138,0.10); }
-.modal-actions { display: flex; gap: 0.6rem; justify-content: flex-end; margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid var(--epf-border-soft); }
-
-@media (max-width: 1200px) { .content-wrap { flex-direction: column; height: auto; } .left-sidebar, .right-sidebar { width: 100%; height: auto; max-height: 320px; } .middle-content { height: auto; } }
-@media (max-width: 768px) { .navbar { padding: 0 0.5rem; } .navbar .nav-brand .brand-text { display: none; } .nav-item { padding: 0 0.6rem; font-size: 0.68rem; } .nav-chat { padding: 0.45rem 0.75rem; font-size: 0.66rem; } .topbar { padding: 0.6rem 1rem; } .content-wrap { padding: 0.5rem; } .info-grid { grid-template-columns: repeat(2, 1fr); } .url-box { max-width: 100%; flex: 1 1 100%; } }
+body { font-family:'Segoe UI',Roboto,Arial,sans-serif; background:var(--epf-bg); color:var(--epf-text); min-height:100vh; line-height:1.5; font-size:14px; }
+.toast-container { position:fixed; bottom:24px; right:24px; z-index:9999; display:flex; flex-direction:column; gap:10px; }
+.toast { background:#fff; border-left:4px solid var(--epf-blue); padding:12px 20px; border-radius:8px; box-shadow:0 4px 16px rgba(16,32,56,.15); font-size:.85rem; font-weight:600; display:flex; align-items:center; gap:10px; animation:slideIn .3s ease-out; min-width:240px; }
+.toast.info{border-left-color:var(--epf-blue);} .toast.success{border-left-color:#22c55e;} .toast.error{border-left-color:#ef4444;}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+@keyframes fadeOut{from{opacity:1;}to{opacity:0;}}
+.navbar{position:sticky;top:0;z-index:200;display:flex;align-items:stretch;flex-wrap:wrap;background:linear-gradient(90deg,var(--nav-bg-1),var(--nav-bg-2));padding:0 1rem;min-height:var(--nav-h);box-shadow:0 2px 12px rgba(0,0,0,.25);border-bottom:1px solid rgba(77,159,255,.18);}
+.navbar .nav-brand{display:flex;align-items:center;gap:.55rem;color:#fff;font-weight:800;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;padding-right:1.1rem;margin-right:.5rem;border-right:1px solid rgba(255,255,255,.12);white-space:nowrap;}
+.navbar .nav-brand .logo{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#4d9fff,#1a4f8a);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.85rem;font-weight:800;}
+.nav-links{display:flex;align-items:stretch;flex-wrap:wrap;gap:2px;position:relative;}
+.nav-item{display:inline-flex;align-items:center;gap:.35rem;padding:0 .85rem;min-height:var(--nav-h);color:var(--nav-text);text-decoration:none;font-family:inherit;font-size:.73rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:transparent;border:none;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s;position:relative;}
+.nav-item:hover,.nav-item.active{background:var(--nav-hover);color:#fff;}
+.nav-item::after{content:'';position:absolute;left:.85rem;right:.85rem;bottom:0;height:2px;background:var(--nav-accent);transform:scaleX(0);transform-origin:left;transition:transform .2s;}
+.nav-item:hover::after,.nav-item.active::after{transform:scaleX(1);}
+.nav-back{display:inline-flex;align-items:center;justify-content:center;min-width:44px;padding:0 .6rem;color:var(--nav-text);background:transparent;border:none;cursor:pointer;font-size:1.1rem;}
+.nav-back:hover{background:var(--nav-hover);color:#fff;}
+.nav-dropdown{position:relative;display:inline-flex;align-items:stretch;}
+.nav-dropdown>.nav-item{padding-right:.55rem;}
+.nav-dropdown>.nav-item .fa-caret-down{font-size:.6rem;margin-left:.2rem;opacity:.7;}
+.dropdown-menu{display:none;position:absolute;top:100%;left:0;min-width:180px;background:#fff;border-radius:8px;box-shadow:0 8px 24px rgba(16,32,56,.15);padding:.4rem 0;z-index:300;border:1px solid var(--epf-border);}
+.nav-dropdown.open .dropdown-menu{display:block;}
+.dropdown-menu a{display:flex;align-items:center;gap:.5rem;padding:.5rem 1rem;color:var(--epf-text);text-decoration:none;font-size:.78rem;font-weight:500;white-space:nowrap;}
+.dropdown-menu a:hover{background:var(--epf-blue-soft);color:var(--epf-blue);}
+.dropdown-menu .divider{height:1px;background:var(--epf-border-soft);margin:.3rem .5rem;}
+.nav-chat{margin-left:auto;align-self:center;display:inline-flex;align-items:center;gap:.45rem;padding:.5rem 1rem;border:none;border-radius:20px;background:linear-gradient(135deg,#2f7fe0,#1a4f8a);color:#fff;font-family:inherit;font-size:.73rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;white-space:nowrap;box-shadow:0 3px 12px rgba(47,127,224,.4);}
+.topbar{position:sticky;top:var(--nav-h);z-index:100;background:#fff;border-bottom:1px solid var(--epf-border);padding:.65rem 1.75rem;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;}
+.topbar .brand{font-weight:700;font-size:.95rem;color:var(--epf-blue);display:flex;align-items:center;gap:.6rem;margin-right:.5rem;}
+.topbar .brand .logo{width:32px;height:32px;background:var(--epf-blue);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.95rem;font-weight:800;}
+.url-box{display:flex;align-items:center;gap:.4rem;flex:1;max-width:420px;background:#f4f8fd;border:1px solid var(--epf-border);border-radius:6px;padding:2px;}
+.url-box input{flex:1;border:none;background:transparent;padding:.4rem .6rem;font-size:.78rem;font-family:inherit;color:var(--epf-text);outline:none;}
+.url-box button{padding:.3rem .8rem;border-radius:4px;border:none;background:var(--epf-blue);color:#fff;font-size:.72rem;font-weight:600;cursor:pointer;white-space:nowrap;}
+.btn{background:#fff;border:1px solid var(--epf-border);padding:.42rem .9rem;border-radius:5px;font-size:.78rem;font-weight:500;cursor:pointer;color:var(--epf-blue);display:inline-flex;align-items:center;gap:.4rem;white-space:nowrap;font-family:inherit;}
+.btn:hover{background:var(--epf-blue-soft);}
+.btn-success{background:#0f7a54;border:1px solid #0f7a54;color:#fff;}
+.btn-sm{padding:.25rem .7rem;font-size:.72rem;border-radius:4px;}
+.sync-badge{display:inline-flex;align-items:center;gap:.35rem;background:var(--epf-blue-soft);border:1px solid var(--epf-border-soft);padding:.3rem .7rem;border-radius:20px;font-size:.68rem;font-weight:600;color:var(--epf-muted);white-space:nowrap;}
+.sync-badge .dot{width:7px;height:7px;border-radius:50%;background:#9db8d2;}
+.sync-badge.ok .dot{background:#22c55e;} .sync-badge.busy .dot{background:#f59e0b;} .sync-badge.err .dot{background:#ef4444;}
+.content-wrap{max-width:100%;margin:0 auto;padding:1rem 1.5rem 2rem;display:flex;gap:1rem;align-items:flex-start;height:calc(100vh - var(--nav-h) - 60px);}
+.left-sidebar{width:280px;flex-shrink:0;background:#fff;border:1px solid var(--epf-border);border-radius:8px;padding:1rem;height:100%;overflow-y:auto;display:flex;flex-direction:column;}
+.left-sidebar h2{font-size:.95rem;color:var(--epf-blue);font-weight:700;margin-bottom:1rem;padding-bottom:.7rem;border-bottom:1px solid var(--epf-border-soft);}
+.sidebar-list{display:flex;flex-direction:column;gap:8px;flex:1;}
+.sidebar-item{background:var(--epf-blue-soft);border:1px solid var(--epf-border-soft);padding:.75rem;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+.sidebar-item.active{border-left:3px solid var(--epf-blue);}
+.sidebar-item.ot-10{background:#dcfce7;border-color:#bbf7d0;} .sidebar-item.ot-15{background:#fef9c3;border-color:#fef08a;} .sidebar-item.ot-20{background:#dbeafe;border-color:#bfdbfe;} .sidebar-item.ot-30{background:#f3e8ff;border-color:#e9d5ff;}
+.sidebar-item-content{flex:1;min-width:0;}
+.sidebar-item .item-name{font-weight:700;font-size:.85rem;color:var(--epf-blue);margin-bottom:4px;}
+.sidebar-item .item-info{font-size:.75rem;color:var(--epf-muted);display:flex;justify-content:space-between;}
+.sidebar-item .item-ot{font-weight:700;color:#d97706;}
+.sidebar-item .item-type{font-size:.72rem;font-weight:700;margin-top:3px;}
+.sidebar-item .item-type.set{color:#15803d;} .sidebar-item .item-type.none{color:#94a3b8;font-style:italic;font-weight:500;}
+.sidebar-item .item-time{font-size:.68rem;color:#94a3b8;margin-top:4px;display:block;}
+.sidebar-item-menu-btn{background:transparent;border:none;color:var(--epf-muted);font-size:1.3rem;cursor:pointer;padding:4px 8px;border-radius:4px;flex-shrink:0;line-height:1;}
+.sidebar-item-menu-btn:hover{background:rgba(0,0,0,.08);color:var(--epf-text);}
+.sidebar-item-menu-btn.unlocked{background:var(--epf-blue);color:#fff;}
+.middle-content{flex:1;min-width:0;background:#fff;border:1px solid var(--epf-border);border-radius:8px;padding:1.5rem;height:100%;overflow-y:auto;}
+.page-header{margin-bottom:1.5rem;} .page-header h1{font-size:1.45rem;font-weight:700;margin-bottom:.35rem;color:var(--epf-blue);} .page-header p{font-size:.85rem;color:var(--epf-muted);}
+.ot-card{background:#fff;border:1px solid var(--epf-border);border-radius:10px;padding:1.4rem 1.5rem;margin-bottom:1.2rem;box-shadow:var(--shadow-sm);}
+.ot-card h2{font-size:1rem;color:var(--epf-blue);font-weight:700;margin-bottom:1rem;padding-bottom:.7rem;border-bottom:1px solid var(--epf-border-soft);display:flex;align-items:center;justify-content:space-between;gap:.5rem;}
+.toolbar{display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem;}
+.toolbar label{font-size:.8rem;color:var(--epf-muted);font-weight:600;}
+.toolbar select,.toolbar input[type="month"]{padding:.45rem .75rem;border:1px solid var(--epf-border);border-radius:6px;font-size:.82rem;font-family:inherit;color:var(--epf-text);background:#fff;min-width:200px;}
+.info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px;} .info-grid:last-child{margin-bottom:0;}
+.info-item{background:var(--epf-blue-soft);padding:.75rem .9rem;border-radius:8px;border-left:3px solid var(--epf-border);}
+.info-item .label{font-size:.7rem;color:var(--epf-muted);text-transform:uppercase;font-weight:600;margin-bottom:4px;}
+.info-item .value{font-size:.95rem;font-weight:700;color:var(--epf-text);font-variant-numeric:tabular-nums;word-break:break-word;}
+.info-item.highlight{background:var(--epf-blue-light);border-left-color:var(--epf-blue);} .info-item.highlight .value{color:var(--epf-blue);}
+.calendar-wrap{background:var(--epf-blue-soft);border:1px solid var(--epf-border-soft);border-radius:8px;padding:1rem;}
+.calendar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;flex-wrap:wrap;gap:8px;}
+.calendar-header .month-label{font-size:.92rem;font-weight:700;color:var(--epf-blue);}
+.calendar-header .hint{font-size:.7rem;color:var(--epf-muted);font-style:italic;}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+.cal-dow{text-align:center;font-size:.68rem;font-weight:700;color:var(--epf-muted);padding:4px;}
+.cal-day{text-align:center;padding:9px 4px;border-radius:6px;cursor:pointer;background:#fff;border:1px solid var(--epf-border-soft);font-size:.82rem;font-weight:500;color:var(--epf-text);user-select:none;transition:.15s;}
+.cal-day:hover{background:var(--epf-blue-light);border-color:var(--epf-blue);color:var(--epf-blue);}
+.cal-day.selected{background:var(--epf-blue);color:#fff;border-color:var(--epf-blue);font-weight:700;}
+.cal-day.empty{background:transparent;border:none;cursor:default;}
+.cal-day.no-data{opacity:.35;cursor:not-allowed;}
+.cal-day.has-ot{box-shadow:inset 0 0 0 2px #f59e0b;}
+.cal-day.selected.has-ot{box-shadow:inset 0 0 0 2px #fbbf24;}
+.ot-table{width:100%;border-collapse:collapse;font-size:.82rem;}
+.ot-table th,.ot-table td{padding:.65rem .7rem;text-align:right;border-bottom:1px solid var(--epf-border-soft);}
+.ot-table th:first-child,.ot-table td:first-child{text-align:left;}
+.ot-table thead th{background:var(--epf-blue-soft);color:var(--epf-blue);font-weight:700;font-size:.7rem;text-transform:uppercase;border-bottom:1px solid var(--epf-border);}
+.ot-table tfoot th,.ot-table tfoot td{background:var(--epf-blue-light);color:var(--epf-blue);font-weight:800;border-top:2px solid var(--epf-border);font-variant-numeric:tabular-nums;}
+.ot-table td{font-variant-numeric:tabular-nums;}
+.ot-table th.sel,.ot-table td.sel{background:#cfe6ff;color:var(--epf-blue);font-weight:800;outline:2px solid var(--epf-blue);outline-offset:-2px;}
+.empty-row td{text-align:center!important;color:var(--epf-muted);padding:1.5rem!important;font-style:italic;}
+.note{font-size:.72rem;color:var(--epf-muted);margin-top:.6rem;font-style:italic;}
+.right-sidebar{width:320px;flex-shrink:0;display:flex;flex-direction:column;gap:1rem;height:100%;}
+.right-panel{background:#fff;border:1px solid var(--epf-border);border-radius:8px;padding:1rem;overflow-y:auto;}
+.right-panel.calc{flex:1;position:relative;} .right-panel.summary{flex-shrink:0;}
+.right-panel h3{font-size:.95rem;color:var(--epf-blue);font-weight:700;margin-bottom:1rem;padding-bottom:.7rem;border-bottom:1px solid var(--epf-border-soft);}
+.calc-row{margin-bottom:14px;}
+.calc-row .cl{font-size:.72rem;color:var(--epf-muted);font-weight:700;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;}
+.calc-input{width:100%;padding:.5rem .7rem;border:1px solid var(--epf-border);border-radius:6px;font-size:.9rem;font-family:inherit;color:var(--epf-text);background:#fff;}
+.calc-input:focus{outline:none;border-color:var(--epf-blue);box-shadow:0 0 0 2px rgba(26,79,138,.10);}
+.calc-input:disabled{background:#f1f5f9;color:#94a3b8;cursor:not-allowed;}
+.lock-badge{position:absolute;inset:0;background:rgba(247,250,253,.72);backdrop-filter:blur(1px);display:flex;align-items:center;justify-content:center;text-align:center;font-size:.8rem;font-weight:700;color:var(--epf-muted);padding:1rem;border-radius:8px;z-index:5;}
+.lock-badge.hidden{display:none;}
+.calc-result{background:var(--epf-blue-light);border:1px solid var(--epf-border);border-radius:8px;padding:.9rem;text-align:center;}
+.calc-result .cr-label{font-size:.7rem;color:var(--epf-muted);font-weight:700;text-transform:uppercase;margin-bottom:4px;}
+.calc-result .cr-value{font-size:1.5rem;font-weight:800;color:var(--epf-blue);font-variant-numeric:tabular-nums;}
+.calc-formula{font-size:.72rem;color:var(--epf-muted);text-align:center;margin-top:8px;font-style:italic;}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.summary-item{background:var(--epf-blue-soft);padding:.75rem;border-radius:6px;border-left:3px solid var(--epf-border);}
+.summary-item .label{font-size:.7rem;color:var(--epf-muted);text-transform:uppercase;font-weight:600;margin-bottom:4px;}
+.summary-item .value{font-size:.95rem;font-weight:700;color:var(--epf-text);font-variant-numeric:tabular-nums;}
+.summary-item.highlight{background:var(--epf-blue-light);border-left-color:var(--epf-blue);} .summary-item.highlight .value{color:var(--epf-blue);}
+.modal-backdrop{position:fixed;inset:0;background:rgba(11,27,48,.55);display:flex;align-items:center;justify-content:center;z-index:500;backdrop-filter:blur(2px);}
+.modal-backdrop.hidden{display:none;}
+.modal-content{background:#fff;border-radius:10px;padding:1.5rem;width:460px;max-width:92vw;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-md);}
+.modal-content h2{font-size:1rem;color:var(--epf-blue);font-weight:700;margin-bottom:1rem;padding-bottom:.7rem;border-bottom:1px solid var(--epf-border-soft);}
+.modal-content label{display:block;margin-bottom:.8rem;font-size:.8rem;color:var(--epf-text);font-weight:600;}
+.modal-content label .hint{display:block;font-size:.7rem;color:var(--epf-muted);font-weight:400;margin-top:2px;}
+.modal-content input{width:100%;padding:.5rem .7rem;border:1px solid var(--epf-border);border-radius:6px;margin-top:4px;font-size:.82rem;font-family:inherit;color:var(--epf-text);}
+.modal-actions{display:flex;gap:.6rem;justify-content:flex-end;margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--epf-border-soft);}
+@media (max-width:1200px){.content-wrap{flex-direction:column;height:auto;}.left-sidebar,.right-sidebar{width:100%;height:auto;max-height:320px;}.middle-content{height:auto;}}
+@media (max-width:768px){.navbar{padding:0 .5rem;}.navbar .nav-brand .brand-text{display:none;}.nav-item{padding:0 .6rem;font-size:.68rem;}.nav-chat{padding:.45rem .75rem;font-size:.66rem;}.topbar{padding:.6rem 1rem;}.content-wrap{padding:.5rem;}.info-grid{grid-template-columns:repeat(2,1fr);}.url-box{max-width:100%;flex:1 1 100%;}}
 </style>
 </head>
 <body>
@@ -186,95 +151,60 @@ select.calc-input { min-width: 0; }
 </div>
 <button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')"><span class="pulse"></span> 💬 Request Chat</button>
 </nav>
-
-<!-- 【修改】顶部工具栏：移除搜索框，加入手动保存按钮 -->
-<div class="topbar" id="tour-toolbar">
+<div class="topbar">
 <div class="brand"><div class="logo">⏱</div> Payroll Overtime</div>
 <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
 <span class="spacer" style="flex:1;"></span>
-<!-- 手动保存按钮移至顶部 -->
-<button class="btn btn-success" id="saveBtnTop" style="margin-right: 10px;"><i class="fas fa-save"></i> 手动保存加班记录</button>
+<button class="btn btn-success" id="saveBtnTop" style="margin-right:10px;"><i class="fas fa-save"></i> 手动保存加班记录</button>
 <div class="url-box"><input type="text" id="deployUrlInput" placeholder="Paste Deploy URL di sini..." onkeydown="if(event.key==='Enter') applyUrl()"><button onclick="applyUrl()">🔗 Apply</button></div>
 <span class="sync-badge" id="syncBadge"><span class="dot"></span><span id="syncBadgeText">Sedia</span></span>
 <button class="btn btn-success" onclick="loadAllData()"><i class="fas fa-sync-alt"></i> Muat Semula</button>
 </div>
-
 <div class="content-wrap">
-<!-- 左栏：已保存加班记录 -->
-<div class="left-sidebar" id="tour-sidebar">
+<div class="left-sidebar">
 <h2><i class="fas fa-history"></i> 已保存加班记录</h2>
-<div class="sidebar-list" id="sidebarList"><div style="text-align:center; font-size:0.8rem; color:#94a3b8; padding: 20px 0;">加载中...</div></div>
+<div class="sidebar-list" id="sidebarList"><div style="text-align:center;font-size:.8rem;color:#94a3b8;padding:20px 0;">加载中...</div></div>
 </div>
-
-<!-- 中栏：主要操作区 -->
 <div class="middle-content">
-<div class="page-header" id="tour-main-header"><h1>⏱ Overtime 加班计算</h1><p>选择员工 → 选择月份 → 点日历多选加班日期 → 系统自动从 TIMECARD REPORT 读取时长，计算补贴。</p></div>
-<section class="ot-card" id="tour-staff-info">
+<div class="page-header"><h1>⏱ Overtime 加班计算</h1><p>选择员工 → 选月份 → 点日历多选日期 → 时薪表预览 4 倍率，仅保存「选定倍率」结果；右侧日薪面板需点左侧 ⋮ 解锁后编辑。</p></div>
+<section class="ot-card">
 <h2>员工基础信息 <button class="btn btn-sm" id="openSettings"><i class="fas fa-cog"></i> 设置</button></h2>
 <div class="toolbar"><label>选择员工：</label><select id="staffSelect"><option value="">-- 请选择 --</option></select></div>
 <div class="info-grid"><div class="info-item"><div class="label">员工代码</div><div class="value" id="empCode">-</div></div><div class="info-item"><div class="label">姓名</div><div class="value" id="empName">-</div></div><div class="info-item"><div class="label">分店</div><div class="value" id="empGroup">-</div></div><div class="info-item"><div class="label">基础薪资 (RM)</div><div class="value" id="empSalary">-</div></div></div>
 <div class="info-grid"><div class="info-item highlight"><div class="label">日薪 (RM)</div><div class="value" id="dailyRate">-</div></div><div class="info-item highlight"><div class="label">时薪 (RM)</div><div class="value" id="hourlyRate">-</div></div><div class="info-item highlight"><div class="label">当月总工作时长</div><div class="value" id="monthlyWorkTime">-</div></div><div class="info-item highlight"><div class="label">当月总加班时长</div><div class="value" id="monthlyOtTime">-</div></div></div>
 <p class="note">参考标准：每天工作 7.5 小时，每月 26 天（可在「设置」中修改）</p>
 </section>
-<section class="ot-card" id="tour-calendar">
+<section class="ot-card">
 <h2>加班日期选择</h2>
 <div class="toolbar"><label>月份：</label><input type="month" id="monthPicker"></div>
-<div class="calendar-wrap"><div class="calendar-header"><span class="month-label" id="calLabel">-</span><span class="hint">点击日期多选；橙框 = 当天有加班；灰显 = 无工作记录</span></div><div class="calendar-grid" id="calendarGrid"></div></div>
+<div class="calendar-wrap"><div class="calendar-header"><span class="month-label" id="calLabel">-</span><span class="hint">点击日期多选；橙框=当天有加班；灰显=无工作记录</span></div><div class="calendar-grid" id="calendarGrid"></div></div>
 </section>
-<section class="ot-card" id="tour-table">
-<h2>加班补贴计算表</h2>
-<table class="ot-table"><thead><tr><th>日期</th><th>工作时长</th><th>加班时长</th><th>×1.0 (RM)</th><th>×1.5 (RM)</th><th>×2.0 (RM)</th><th>×3.0 (RM)</th></tr></thead><tbody id="calcBody"><tr class="empty-row"><td colspan="7">请选择员工与日期</td></tr></tbody><tfoot><tr><th>合计</th><th id="sumWork">00:00:00</th><th id="sumOT">00:00:00</th><th id="sum10">RM 0.00</th><th id="sum15">RM 0.00</th><th id="sum20">RM 0.00</th><th id="sum30">RM 0.00</th></tr></tfoot></table>
+<section class="ot-card">
+<h2>加班补贴计算表 <span style="font-size:.72rem;color:var(--epf-muted);font-weight:500;">（高亮列 = 选定倍率，仅该列保存）</span></h2>
+<table class="ot-table"><thead><tr><th>日期</th><th>工作时长</th><th>加班时长</th><th data-mt="1.0">×1.0 (RM)</th><th data-mt="1.5">×1.5 (RM)</th><th data-mt="2.0">×2.0 (RM)</th><th data-mt="3.0">×3.0 (RM)</th></tr></thead><tbody id="calcBody"><tr class="empty-row"><td colspan="7">请选择员工与日期</td></tr></tbody><tfoot><tr><th>合计</th><th id="sumWork">00:00:00</th><th id="sumOT">00:00:00</th><th data-mt="1.0" id="sum10">RM 0.00</th><th data-mt="1.5" id="sum15">RM 0.00</th><th data-mt="2.0" id="sum20">RM 0.00</th><th data-mt="3.0" id="sum30">RM 0.00</th></tr></tfoot></table>
 </section>
 </div>
-
-<!-- 右栏：日薪加班计算 + 员工加班资料整合 -->
 <div class="right-sidebar">
-<div class="right-panel calc" id="tour-daily-ot">
+<div class="right-panel calc" id="calcPanel">
+<div class="lock-badge" id="lockBadge">🔒 点击左侧记录的 ⋮ 按钮解锁编辑</div>
 <h3>📊 日薪加班计算</h3>
-<div class="calc-row">
-<div class="cl"><span>日薪 (RM)</span><span class="toggle-wrap">手动<input type="checkbox" id="dailyManualToggle" style="display:none"><span class="toggle-switch" id="dailyToggleSwitch" onclick="toggleDailyManual()"></span></span></div>
-<input type="number" step="0.01" min="0" class="calc-input" id="calcDailyInput" disabled>
-</div>
-<div class="calc-row">
-<div class="cl"><span>倍数 (OT TYPE)</span></div>
-<select class="calc-input" id="calcMultSelect" onchange="onCalcMultChange()">
-<option value="">未选择</option>
-<option value="1.0">×1.0（绿）</option>
-<option value="1.5">×1.5（黄）</option>
-<option value="2.0">×2.0（蓝）</option>
-<option value="3.0">×3.0（紫）</option>
-<option value="4.0">×4.0（粉）</option>
-<option value="5.0">×5.0（橙）</option>
-</select>
-</div>
+<div class="calc-row"><div class="cl"><span>日薪 (RM)</span></div><input type="number" step="0.01" min="0" class="calc-input" id="calcDailyInput" disabled></div>
+<div class="calc-row"><div class="cl"><span>倍率 (OT TYPE)</span></div><select class="calc-input" id="calcMultSelect" disabled><option value="">未选择</option><option value="1.0">×1.0（绿）</option><option value="1.5">×1.5（黄）</option><option value="2.0">×2.0（蓝）</option><option value="3.0">×3.0（紫）</option></select></div>
+<div class="calc-row"><div class="cl"><span>加班天数</span></div><input type="number" step="1" min="0" class="calc-input" id="calcDaysInput" disabled></div>
 <div class="calc-result"><div class="cr-label">日薪加班工资</div><div class="cr-value" id="calcResultValue">-</div></div>
-<div class="calc-formula" id="calcFormulaText">日薪 × 倍数 = 日薪加班工资</div>
+<div class="calc-formula" id="calcFormulaText">日薪 × 倍率 × 天数 = 日薪加班工资</div>
 </div>
-<div class="right-panel summary" id="tour-summary">
+<div class="right-panel summary">
 <h3>📋 员工加班资料整合</h3>
 <div class="summary-grid">
 <div class="summary-item highlight"><div class="label">OT 类型</div><div class="value" id="summaryOtType">未选择</div></div>
 <div class="summary-item highlight"><div class="label">加班总小时</div><div class="value" id="summaryOtHours">-</div></div>
+<div class="summary-item"><div class="label">时薪选定倍率合计</div><div class="value" id="summaryOtAmount">-</div></div>
 <div class="summary-item"><div class="label">日薪加班工资</div><div class="value" id="summaryDailyOt">-</div></div>
-<div class="summary-item"><div class="label">日薪加班天数</div><div class="value" id="summaryOtDays">-</div></div>
 </div>
 </div>
 </div>
 </div>
-
-<!-- OT 倍率全局浮动菜单 -->
-<div class="ot-menu-panel" id="otMenuPanel">
-<div class="ot-menu-title">选择 OT 倍率</div>
-<div class="ot-menu-item" data-type=""><span class="ot-dot c0"></span> 未选择</div>
-<div class="ot-menu-item" data-type="1.0"><span class="ot-dot c10"></span> x1.0（绿）</div>
-<div class="ot-menu-item" data-type="1.5"><span class="ot-dot c15"></span> x1.5（黄）</div>
-<div class="ot-menu-item" data-type="2.0"><span class="ot-dot c20"></span> x2.0（蓝）</div>
-<div class="ot-menu-item" data-type="3.0"><span class="ot-dot c30"></span> x3.0（紫）</div>
-<div class="ot-menu-item" data-type="4.0"><span class="ot-dot c40"></span> x4.0（粉）</div>
-<div class="ot-menu-item" data-type="5.0"><span class="ot-dot c50"></span> x5.0（橙）</div>
-</div>
-
-<!-- 设置弹窗 -->
 <div class="modal-backdrop hidden" id="settingsModal">
 <div class="modal-content">
 <h2>⚙ 设置</h2>
@@ -287,9 +217,7 @@ select.calc-input { min-width: 0; }
 <div class="modal-actions"><button class="btn" id="cancelSettings">取消</button><button class="btn btn-success" id="applySettings">保存设置</button></div>
 </div>
 </div>
-
 <script>
-/* NAVBAR */
 document.addEventListener('DOMContentLoaded', function() {
 const backBtn = document.getElementById('backBtn');
 if (backBtn) backBtn.addEventListener('click', e => { e.preventDefault(); history.back(); });
@@ -297,241 +225,210 @@ document.querySelectorAll('[data-dropdown-toggle]').forEach(toggle => { toggle.a
 document.addEventListener('click', e => { if (!e.target.closest('.nav-dropdown')) document.querySelectorAll('.nav-dropdown.open').forEach(dd => dd.classList.remove('open')); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.nav-dropdown.open').forEach(dd => dd.classList.remove('open')); });
 });
+function showToast(msg, type='info', duration=3000){const c=document.getElementById('toastContainer');if(!c)return;const el=document.createElement('div');el.className=`toast ${type}`;const icon=type==='success'?'✅':type==='error'?'❌':'ℹ️';el.innerHTML=`<span>${icon}</span> <span>${escapeHtml(msg)}</span>`;c.appendChild(el);setTimeout(()=>{el.style.animation='fadeOut .3s ease-in forwards';setTimeout(()=>el.remove(),300);},duration);}
 
-/* TOAST */
-function showToast(msg, type = 'info', duration = 3000) { const c = document.getElementById('toastContainer'); if (!c) return; const el = document.createElement('div'); el.className = `toast ${type}`; const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'; el.innerHTML = `<span>${icon}</span> <span>${escapeHtml(msg)}</span>`; c.appendChild(el); setTimeout(() => { el.style.animation = 'fadeOut 0.3s ease-in forwards'; setTimeout(() => el.remove(), 300); }, duration); }
+const URL_KEY='payrollScriptUrl',LS_SETTINGS='overtime_settings_v1',LS_STAFF='overtime_staffcache_v1',LS_SHEET='overtime_sheetcache_v1',LS_OT_DATA='overtime_recordcache_v1',CACHE_TTL=5*60*1000;
+let SCRIPT_URL='',allStaff=[],allSheetData=[],allOvertimeData=[],currentStaff=null,currentMonth='',selectedDates=new Set(),isSaving=false,activeSidebarIndex=-1,editMode=false;
+let settings={daysPerMonth:26,hoursPerDay:7.5,rate10:1.0,rate15:1.5,rate20:2.0,rate30:3.0};
 
-/* OVERTIME LOGIC */
-const URL_KEY = 'payrollScriptUrl', LS_SETTINGS = 'overtime_settings_v1', LS_STAFF = 'overtime_staffcache_v1', LS_SHEET = 'overtime_sheetcache_v1', LS_OT_DATA = 'overtime_recordcache_v1', CACHE_TTL = 5 * 60 * 1000;
-let SCRIPT_URL = '', allStaff = [], allSheetData = [], allOvertimeData = [], currentStaff = null, currentMonth = '', selectedDates = new Set(), isSaving = false, activeSidebarIndex = -1;
-let settings = { daysPerMonth: 26, hoursPerDay: 7.5, rate10: 1.0, rate15: 1.5, rate20: 2.0, rate30: 3.0 };
-let dailyManual = false;
+function fmtHHMMSS(h){if(!h||h<=0)return'00:00:00';const t=Math.round(h*3600);return[Math.floor(t/3600),Math.floor((t%3600)/60),t%60].map(n=>String(n).padStart(2,'0')).join(':');}
+function fmtRM(v){return'RM '+(Number(v)||0).toFixed(2);}
+function parseH(v){if(v===undefined||v===null||v==='')return 0;if(typeof v==='number')return v;let str=String(v).trim();if(str.includes('T')&&str.includes(':')){const m=str.match(/T(\d{2}):(\d{2})(?::(\d{2}))?/);if(m)return(parseInt(m[1],10)||0)+(parseInt(m[2],10)||0)/60+(parseInt(m[3],10)||0)/3600;}if(str.includes(':')){const p=str.split(':');return(parseFloat(p[0])||0)+(parseFloat(p[1])||0)/60+(parseFloat(p[2])||0)/3600;}if(str.toLowerCase().endsWith('h'))return parseFloat(str)||0;const n=parseFloat(str);return isNaN(n)?0:n;}
+function escapeHtml(s){if(s==null)return'';return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function normalizeMonth(v){if(!v)return'';if(v instanceof Date)return`${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,'0')}`;const s=String(v).trim().replace(/^'/,'');const m=s.match(/^(\d{4})[-/](\d{1,2})/);if(m)return`${m[1]}-${m[2].padStart(2,'0')}`;return'';}
+function formatUpdatedAt(v){if(!v)return'未知';try{const d=new Date(v);if(isNaN(d.getTime()))return String(v);return d.toLocaleString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});}catch(e){return String(v);}}
+function setSyncBadge(state,text){const b=document.getElementById('syncBadge');const t=document.getElementById('syncBadgeText');if(!b||!t)return;b.className='sync-badge '+(state||'');t.textContent=text;}
+function isCodeMatch(c1,c2){if(!c1||!c2)return false;const a=String(c1).trim(),b=String(c2).trim();if(a===b)return true;if(!isNaN(a)&&!isNaN(b))return Number(a)===Number(b);return false;}
+function nameMatch(a,b){const sa=String(a||'').trim().toUpperCase(),sb=String(b||'').trim().toUpperCase();if(sa===''||sb==='')return true;return sa===sb;}
 
-function fmtHHMMSS(h) { if (!h || h <= 0) return '00:00:00'; const t = Math.round(h * 3600); return [Math.floor(t / 3600), Math.floor((t % 3600) / 60), t % 60].map(n => String(n).padStart(2, '0')).join(':'); }
-function fmtRM(v) { return 'RM ' + (Number(v) || 0).toFixed(2); }
-function parseH(v) { if (v === undefined || v === null || v === '') return 0; if (typeof v === 'number') return v; let str = String(v).trim(); if (str.includes('T') && str.includes(':')) { const m = str.match(/T(\d{2}):(\d{2})(?::(\d{2}))?/); if (m) return (parseInt(m[1],10)||0)+(parseInt(m[2],10)||0)/60+(parseInt(m[3],10)||0)/3600; } if (str.includes(':')) { const p = str.split(':'); return (parseFloat(p[0])||0)+(parseFloat(p[1])||0)/60+(parseFloat(p[2])||0)/3600; } if (str.toLowerCase().endsWith('h')) return parseFloat(str)||0; const n = parseFloat(str); return isNaN(n)?0:n; }
-function escapeHtml(s) { if (s == null) return ''; return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
-function normalizeMonth(v) { if (!v) return ''; if (v instanceof Date) return `${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,'0')}`; const s = String(v).trim().replace(/^'/, ''); const m = s.match(/^(\d{4})[-/](\d{1,2})/); if (m) return `${m[1]}-${m[2].padStart(2,'0')}`; return ''; }
-function formatUpdatedAt(v) { if (!v) return '未知'; try { const d = new Date(v); if (isNaN(d.getTime())) return String(v); return d.toLocaleString('zh-CN', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' }); } catch (e) { return String(v); } }
-function setSyncBadge(state, text) { const b = document.getElementById('syncBadge'); const t = document.getElementById('syncBadgeText'); if (!b || !t) return; b.className = 'sync-badge ' + (state || ''); t.textContent = text; }
-function isCodeMatch(c1, c2) { if (!c1 || !c2) return false; const a = String(c1).trim(), b = String(c2).trim(); if (a === b) return true; if (!isNaN(a) && !isNaN(b)) return Number(a) === Number(b); return false; }
+function loadSavedUrl(){try{SCRIPT_URL=localStorage.getItem(URL_KEY)||'';document.getElementById('deployUrlInput').value=SCRIPT_URL;if(SCRIPT_URL)setSyncBadge('ok','URL 已就绪');else setSyncBadge('err','URL 未设置');}catch(e){SCRIPT_URL='';}}
+function applyUrl(){const url=document.getElementById('deployUrlInput').value.trim();if(!url){alert('请先输入 Deploy URL');return;}localStorage.setItem(URL_KEY,url);SCRIPT_URL=url;setSyncBadge('ok','URL 已保存');loadAllData();}
+async function apiGet(action){if(!SCRIPT_URL)throw new Error('未设置 Deploy URL');const res=await fetch(`${SCRIPT_URL}?${new URLSearchParams({action,_t:Date.now()})}`);return await res.json();}
+async function apiPost(body){if(!SCRIPT_URL)throw new Error('未设置 Deploy URL');const res=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)});return await res.json();}
 
-function loadSavedUrl() { try { SCRIPT_URL = localStorage.getItem(URL_KEY) || ''; document.getElementById('deployUrlInput').value = SCRIPT_URL; if (SCRIPT_URL) setSyncBadge('ok', 'URL 已就绪'); else setSyncBadge('err', 'URL 未设置'); } catch (e) { SCRIPT_URL = ''; } }
-function applyUrl() { const url = document.getElementById('deployUrlInput').value.trim(); if (!url) { alert('请先输入 Deploy URL'); return; } localStorage.setItem(URL_KEY, url); SCRIPT_URL = url; setSyncBadge('ok', 'URL 已保存'); loadAllData(); }
-async function apiGet(action) { if (!SCRIPT_URL) throw new Error('未设置 Deploy URL'); const res = await fetch(`${SCRIPT_URL}?${new URLSearchParams({ action, _t: Date.now() })}`); return await res.json(); }
-async function apiPost(body) { if (!SCRIPT_URL) throw new Error('未设置 Deploy URL'); const res = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) }); return await res.json(); }
+async function loadAllData(){if(!SCRIPT_URL){setSyncBadge('err','URL 未设置');return;}setSyncBadge('busy','加载中...');try{await Promise.all([loadStaffList(),loadSheetData(),loadOvertimeData()]);setSyncBadge('ok','数据已加载');}catch(err){console.error(err);setSyncBadge('err','加载失败');alert('加载失败：'+err.message);}}
+async function loadStaffList(){let data=null;try{const c=JSON.parse(localStorage.getItem(LS_STAFF)||'null');if(c&&Date.now()-c.ts<CACHE_TTL)data=c.data;}catch(e){}if(!data){const res=await apiGet('getData');data=(res&&res.result==='success'&&Array.isArray(res.data))?res.data:(Array.isArray(res)?res:(res&&Array.isArray(res.data)?res.data:[]));localStorage.setItem(LS_STAFF,JSON.stringify({ts:Date.now(),data}));}allStaff=data;const select=document.getElementById('staffSelect');select.innerHTML='<option value="">-- 请选择 --</option>';data.forEach(s=>{const code=String(s.Code||s['ID KOD']||'').trim();if(!code)return;const opt=document.createElement('option');opt.value=code;opt.textContent=`${code} - ${String(s.Name||'').trim()}`;opt.dataset.name=String(s.Name||'').trim();opt.dataset.group=String(s.GroupName||s['GROUP']||'').trim();opt.dataset.salary=parseH(s.Salary||s['GAJI']||0);select.appendChild(opt);});}
+async function loadSheetData(){let data=null;try{const c=JSON.parse(localStorage.getItem(LS_SHEET)||'null');if(c&&Date.now()-c.ts<CACHE_TTL)data=c.data;}catch(e){}if(!data){const res=await apiGet('getSheetData');data=res.data||[];localStorage.setItem(LS_SHEET,JSON.stringify({ts:Date.now(),data}));}allSheetData=data;}
+async function loadOvertimeData(){let data=null;try{const c=JSON.parse(localStorage.getItem(LS_OT_DATA)||'null');if(c&&Date.now()-c.ts<CACHE_TTL)data=c.data;}catch(e){}if(!data){const res=await apiGet('getOvertimeData');data=res.data||[];localStorage.setItem(LS_OT_DATA,JSON.stringify({ts:Date.now(),data}));}allOvertimeData=data;if(currentStaff)activeSidebarIndex=allOvertimeData.findIndex(item=>isCodeMatch(item['ID KOD'],currentStaff.code)&&nameMatch(item['NAME'],currentStaff.name));else activeSidebarIndex=-1;renderSidebar();}
 
-async function loadAllData() { if (!SCRIPT_URL) { setSyncBadge('err', 'URL 未设置'); return; } setSyncBadge('busy', '加载中...'); try { await Promise.all([loadStaffList(), loadSheetData(), loadOvertimeData()]); setSyncBadge('ok', '数据已加载'); } catch (err) { console.error(err); setSyncBadge('err', '加载失败'); alert('加载失败：' + err.message); } }
-async function loadStaffList() { let data = null; try { const c = JSON.parse(localStorage.getItem(LS_STAFF) || 'null'); if (c && Date.now() - c.ts < CACHE_TTL) data = c.data; } catch (e) {} if (!data) { const res = await apiGet('getData'); data = (res && res.result === 'success' && Array.isArray(res.data)) ? res.data : (Array.isArray(res) ? res : (res && Array.isArray(res.data) ? res.data : [])); localStorage.setItem(LS_STAFF, JSON.stringify({ ts: Date.now(), data })); } allStaff = data; const select = document.getElementById('staffSelect'); select.innerHTML = '<option value="">-- 请选择 --</option>'; data.forEach(s => { const code = String(s.Code || s['ID KOD'] || '').trim(); if (!code) return; const opt = document.createElement('option'); opt.value = code; opt.textContent = `${code} - ${String(s.Name || '').trim()}`; opt.dataset.name = String(s.Name || '').trim(); opt.dataset.group = String(s.GroupName || s['GROUP'] || '').trim(); opt.dataset.salary = parseH(s.Salary || s['GAJI'] || 0); select.appendChild(opt); }); }
-async function loadSheetData() { let data = null; try { const c = JSON.parse(localStorage.getItem(LS_SHEET) || 'null'); if (c && Date.now() - c.ts < CACHE_TTL) data = c.data; } catch (e) {} if (!data) { const res = await apiGet('getSheetData'); data = res.data || []; localStorage.setItem(LS_SHEET, JSON.stringify({ ts: Date.now(), data })); } allSheetData = data; }
-async function loadOvertimeData() { let data = null; try { const c = JSON.parse(localStorage.getItem(LS_OT_DATA) || 'null'); if (c && Date.now() - c.ts < CACHE_TTL) data = c.data; } catch (e) {} if (!data) { const res = await apiGet('getOvertimeData'); data = res.data || []; localStorage.setItem(LS_OT_DATA, JSON.stringify({ ts: Date.now(), data })); } allOvertimeData = data; if (currentStaff) activeSidebarIndex = allOvertimeData.findIndex(item => isCodeMatch(item['ID KOD'], currentStaff.code)); else activeSidebarIndex = -1; renderSidebar(); }
-
-function renderSidebar() {
-const list = document.getElementById('sidebarList'); list.innerHTML = '';
-if (!allOvertimeData || allOvertimeData.length === 0) { list.innerHTML = '<div style="text-align:center; font-size:0.8rem; color:#94a3b8; padding: 20px 0;">暂无保存记录</div>'; return; }
-allOvertimeData.forEach((item, index) => {
-const code = String(item['ID KOD'] || '').trim(); const name = String(item['NAME'] || '').trim(); const month = normalizeMonth(item['MONTH']); const otH = parseH(item['TOTAL_OT_TIME_H']); const updated = formatUpdatedAt(item['UPDATED_AT']);
-const otType = String(item['OT_TYPE'] || '').trim();
-let colorClass = ''; if (otType === '1.0') colorClass = 'ot-10'; else if (otType === '1.5') colorClass = 'ot-15'; else if (otType === '2.0') colorClass = 'ot-20'; else if (otType === '3.0') colorClass = 'ot-30'; else if (otType === '4.0') colorClass = 'ot-40'; else if (otType === '5.0') colorClass = 'ot-50';
-let isActive = false; if (currentStaff) isActive = isCodeMatch(code, currentStaff.code) || (name && name === currentStaff.name);
-const typeHtml = otType ? `<div class="item-type set">OT 类型：×${otType}</div>` : `<div class="item-type none">OT 类型：未选择</div>`;
-const div = document.createElement('div'); div.className = `sidebar-item ${colorClass} ${isActive ? 'active' : ''}`;
-const contentDiv = document.createElement('div'); contentDiv.className = 'sidebar-item-content';
-contentDiv.innerHTML = `<div class="item-name">${escapeHtml(name)} <span style="font-size:0.7rem; color:#64748b;">(${escapeHtml(code)})</span></div><div class="item-info"><span>${escapeHtml(month || '未知月份')}</span><span class="item-ot">加班: ${fmtHHMMSS(otH)}</span></div>${typeHtml}<span class="item-time">🕐 ${escapeHtml(updated)}</span>`;
-contentDiv.addEventListener('click', () => loadFromSidebar(item, index));
-const menuBtn = document.createElement('button'); menuBtn.className = 'sidebar-item-menu-btn'; menuBtn.innerHTML = '⋮'; menuBtn.title = '选择 OT 倍率'; menuBtn.addEventListener('click', (e) => openOtMenu(e, index));
-div.appendChild(contentDiv); div.appendChild(menuBtn); list.appendChild(div);
+function renderSidebar(){
+const list=document.getElementById('sidebarList');list.innerHTML='';
+if(!allOvertimeData||allOvertimeData.length===0){list.innerHTML='<div style="text-align:center;font-size:.8rem;color:#94a3b8;padding:20px 0;">暂无保存记录</div>';return;}
+allOvertimeData.forEach((item,index)=>{
+const code=String(item['ID KOD']||'').trim();const name=String(item['NAME']||'').trim();const month=normalizeMonth(item['MONTH']);const otH=parseH(item['TOTAL_OT_TIME_H']);const updated=formatUpdatedAt(item['UPDATED_AT']);const otType=String(item['OT_TYPE']||'').trim();
+let colorClass='';if(otType==='1.0')colorClass='ot-10';else if(otType==='1.5')colorClass='ot-15';else if(otType==='2.0')colorClass='ot-20';else if(otType==='3.0')colorClass='ot-30';
+let isActive=false;if(currentStaff)isActive=isCodeMatch(code,currentStaff.code)&&(nameMatch(name,currentStaff.name)||!currentStaff.name);
+const typeHtml=otType?`<div class="item-type set">OT 类型：×${otType}</div>`:`<div class="item-type none">OT 类型：未选择</div>`;
+const div=document.createElement('div');div.className=`sidebar-item ${colorClass} ${isActive?'active':''}`;
+const contentDiv=document.createElement('div');contentDiv.className='sidebar-item-content';
+contentDiv.innerHTML=`<div class="item-name">${escapeHtml(name)} <span style="font-size:.7rem;color:#64748b;">(${escapeHtml(code)})</span></div><div class="item-info"><span>${escapeHtml(month||'未知月份')}</span><span class="item-ot">加班: ${fmtHHMMSS(otH)}</span></div>${typeHtml}<span class="item-time">🕐 ${escapeHtml(updated)}</span>`;
+contentDiv.addEventListener('click',()=>loadFromSidebar(item,index));
+const menuBtn=document.createElement('button');menuBtn.className='sidebar-item-menu-btn'+(isActive&&editMode?' unlocked':'');menuBtn.innerHTML=isActive&&editMode?'✏️':'⋮';menuBtn.title=editMode?'锁定编辑':'解锁编辑';menuBtn.addEventListener('click',e=>{e.stopPropagation();toggleEdit(item,index);});
+div.appendChild(contentDiv);div.appendChild(menuBtn);list.appendChild(div);
 });
 }
 
-let otMenuTargetIndex = -1;
-function openOtMenu(e, index) { e.stopPropagation(); const panel = document.getElementById('otMenuPanel'); if (otMenuTargetIndex === index && panel.classList.contains('show')) { closeOtMenu(); return; } closeOtMenu(); const rect = e.target.getBoundingClientRect(); const pw = 160, ph = 270; let left = rect.right - pw, top = rect.bottom + 6; if (top + ph > window.innerHeight) top = Math.max(10, rect.top - ph - 6); if (left < 10) left = 10; panel.style.left = left + 'px'; panel.style.top = top + 'px'; const cur = String(allOvertimeData[index]?.['OT_TYPE'] || '').trim(); panel.querySelectorAll('.ot-menu-item').forEach(it => { it.classList.toggle('current', it.dataset.type === cur); }); panel.classList.add('show'); otMenuTargetIndex = index; }
-function closeOtMenu() { document.getElementById('otMenuPanel').classList.remove('show'); otMenuTargetIndex = -1; }
-document.addEventListener('mousedown', e => { const panel = document.getElementById('otMenuPanel'); if (panel.classList.contains('show') && !panel.contains(e.target) && !e.target.closest('.sidebar-item-menu-btn')) closeOtMenu(); });
-window.addEventListener('scroll', () => closeOtMenu(), true);
-document.querySelectorAll('#otMenuPanel .ot-menu-item').forEach(it => { it.addEventListener('click', e => { e.stopPropagation(); if (otMenuTargetIndex >= 0) { const item = allOvertimeData[otMenuTargetIndex]; setOvertimeType(item, it.dataset.type); } closeOtMenu(); }); });
-
-async function setOvertimeType(item, type) {
-if (!item) return;
-const code = String(item['ID KOD'] || '').trim();
-const oldType = String(item['OT_TYPE'] || '').trim();
-if (oldType === type) return;
-const daily = getCalcDaily(); const amount = type ? daily * parseFloat(type) : 0;
-try {
-setSyncBadge('busy', '更新 OT 类型...');
-const res = await apiPost({ action: 'updateOvertimeType', code, otType: type, dailyOtAmount: amount });
-if (res.status === 'success') {
-item['OT_TYPE'] = type; item['DAILY_OT_AMOUNT'] = amount;
-showToast(type ? `✅ 已更新 ${item['NAME']} 的 OT 类型为 x${type}` : `✅ 已清除 ${item['NAME']} 的 OT 类型`, 'success', 3000);
-renderSidebar(); syncRightPanel(item);
-} else showToast('更新失败：' + (res.message || '未知错误'), 'error', 4000);
-} catch (err) { showToast('更新失败：' + err.message, 'error', 4000); } finally { setSyncBadge('ok', '数据已加载'); }
+function toggleEdit(item,index){
+const code=String(item['ID KOD']||'').trim();
+if(currentStaff&&isCodeMatch(currentStaff.code,code)){editMode=!editMode;}
+else{loadFromSidebar(item,index);editMode=true;}
+renderSidebar();applyEditLock();
+}
+function applyEditLock(){
+const locked=!editMode;
+document.getElementById('lockBadge').classList.toggle('hidden',!locked);
+['calcDailyInput','calcMultSelect','calcDaysInput'].forEach(id=>document.getElementById(id).disabled=locked);
 }
 
-function loadFromSidebar(item, index) {
-const itemCode = String(item['ID KOD'] || '').trim(); const itemName = String(item['NAME'] || '').trim();
-const matchedStaff = allStaff.find(s => { const sCode = String(s.Code || s['ID KOD'] || '').trim(); const sName = String(s.Name || '').trim(); return isCodeMatch(sCode, itemCode) || (itemName && sName === itemName); });
-if (!matchedStaff) { showToast('找不到该员工记录: ' + (itemCode || itemName), 'error'); return; }
-const targetCode = String(matchedStaff.Code || matchedStaff['ID KOD'] || '').trim();
-const sel = document.getElementById('staffSelect'); sel.value = targetCode;
-if (sel.value !== targetCode) { showToast('无法选中该员工', 'error'); return; }
+function loadFromSidebar(item,index){
+const itemCode=String(item['ID KOD']||'').trim();const itemName=String(item['NAME']||'').trim();
+const matchedStaff=allStaff.find(s=>{const sCode=String(s.Code||s['ID KOD']||'').trim();const sName=String(s.Name||'').trim();return isCodeMatch(sCode,itemCode)||(itemName&&sName===itemName);});
+if(!matchedStaff){showToast('找不到该员工记录: '+(itemCode||itemName),'error');return;}
+const targetCode=String(matchedStaff.Code||matchedStaff['ID KOD']||'').trim();
+const sel=document.getElementById('staffSelect');sel.value=targetCode;
+if(sel.value!==targetCode){showToast('无法选中该员工','error');return;}
 onStaffChange();
 }
 
-function onStaffChange() {
-const code = document.getElementById('staffSelect').value;
-if (!code) { currentStaff = null; activeSidebarIndex = -1; renderSidebar(); resetStaffInfo(); resetRightPanel(); return; }
-const opt = document.querySelector(`#staffSelect option[value="${code}"]`);
-currentStaff = { code, name: opt ? String(opt.dataset.name || '').trim() : '', group: opt ? String(opt.dataset.group || '').trim() : '', salary: opt ? (parseFloat(opt.dataset.salary) || 0) : 0 };
-document.getElementById('empCode').textContent = currentStaff.code; document.getElementById('empName').textContent = currentStaff.name; document.getElementById('empGroup').textContent = currentStaff.group; document.getElementById('empSalary').textContent = fmtRM(currentStaff.salary);
-const { daily, hourly } = currentRates();
-document.getElementById('dailyRate').textContent = fmtRM(daily); document.getElementById('hourlyRate').textContent = fmtRM(hourly);
-if (!dailyManual) document.getElementById('calcDailyInput').value = daily.toFixed(2);
-
-const existing = allOvertimeData.find(item => { const itemCode = String(item['ID KOD'] || '').trim(); const itemName = String(item['NAME'] || '').trim(); return isCodeMatch(itemCode, code) || (itemName && itemName === currentStaff.name); });
-if (existing) {
-const month = normalizeMonth(existing['MONTH']);
-if (month && /^\d{4}-\d{2}$/.test(month)) { document.getElementById('monthPicker').value = month; currentMonth = month; }
+function onStaffChange(){
+const code=document.getElementById('staffSelect').value;
+editMode=false;
+if(!code){currentStaff=null;activeSidebarIndex=-1;renderSidebar();resetStaffInfo();resetRightPanel();applyEditLock();return;}
+const opt=document.querySelector(`#staffSelect option[value="${code}"]`);
+currentStaff={code,name:opt?String(opt.dataset.name||'').trim():'',group:opt?String(opt.dataset.group||'').trim():'',salary:opt?(parseFloat(opt.dataset.salary)||0):0};
+document.getElementById('empCode').textContent=currentStaff.code;document.getElementById('empName').textContent=currentStaff.name;document.getElementById('empGroup').textContent=currentStaff.group;document.getElementById('empSalary').textContent=fmtRM(currentStaff.salary);
+const{daily,hourly}=currentRates();
+document.getElementById('dailyRate').textContent=fmtRM(daily);document.getElementById('hourlyRate').textContent=fmtRM(hourly);
+const existing=allOvertimeData.find(item=>isCodeMatch(item['ID KOD'],code)&&nameMatch(item['NAME'],currentStaff.name));
+if(existing){
+const month=normalizeMonth(existing['MONTH']);
+if(month&&/^\d{4}-\d{2}$/.test(month)){document.getElementById('monthPicker').value=month;currentMonth=month;}
 selectedDates.clear();
-try { let details = existing['DETAILS']; if (typeof details === 'string') details = JSON.parse(details); if (Array.isArray(details)) details.forEach(d => { if (d && d.date) { const ds = String(d.date).trim(); if (/^\d{4}-\d{2}-\d{2}$/.test(ds)) selectedDates.add(ds); } }); } catch (e) { console.warn('解析历史详情失败', e); }
-activeSidebarIndex = allOvertimeData.indexOf(existing);
-showToast(`📂 已自动载入 ${existing['NAME']} (${month}) 的保存记录 · 最后更新：${formatUpdatedAt(existing['UPDATED_AT'])}`, 'info', 6000);
+try{let details=existing['DETAILS'];if(typeof details==='string')details=JSON.parse(details);if(Array.isArray(details))details.forEach(d=>{if(d&&d.date){const ds=String(d.date).trim();if(/^\d{4}-\d{2}-\d{2}$/.test(ds))selectedDates.add(ds);}});}catch(e){console.warn('解析历史详情失败',e);}
+activeSidebarIndex=allOvertimeData.indexOf(existing);
+showToast(`📂 已载入 ${existing['NAME']} (${month}) · 点 ⋮ 解锁编辑`,'info',6000);
 syncRightPanel(existing);
-} else { activeSidebarIndex = -1; selectedDates.clear(); resetRightPanel(); }
-renderSidebar(); refreshMonthlySummary(); renderCalendar(); renderTable();
+}else{activeSidebarIndex=-1;selectedDates.clear();document.getElementById('calcDailyInput').value=daily.toFixed(2);document.getElementById('calcMultSelect').value='';document.getElementById('calcDaysInput').value=0;resetSummary();editMode=true;} // 新建默认可编辑
+renderSidebar();refreshMonthlySummary();renderCalendar();renderTable();highlightSelectedMult();applyEditLock();
 }
 
-/* ===== 右侧日薪加班计算器 ===== */
-function toggleDailyManual() {
-dailyManual = !dailyManual;
-const sw = document.getElementById('dailyToggleSwitch'); const inp = document.getElementById('calcDailyInput');
-sw.classList.toggle('on', dailyManual); document.getElementById('dailyManualToggle').checked = dailyManual;
-if (!dailyManual) { const { daily } = currentRates(); inp.value = daily.toFixed(2); inp.disabled = true; } else { inp.disabled = false; inp.focus(); }
-updateCalcResult();
-}
-function getCalcDaily() { const v = parseFloat(document.getElementById('calcDailyInput').value); return isNaN(v) || v < 0 ? 0 : v; }
-function onCalcMultChange() {
-const type = document.getElementById('calcMultSelect').value;
-updateCalcResult();
-if (currentStaff) { const existing = allOvertimeData.find(item => isCodeMatch(item['ID KOD'], currentStaff.code)); if (existing) setOvertimeType(existing, type); }
-}
-function updateCalcResult() {
-const daily = getCalcDaily(); const type = document.getElementById('calcMultSelect').value;
-const rv = document.getElementById('calcResultValue'); const ft = document.getElementById('calcFormulaText');
-if (!type) { rv.textContent = '-'; ft.textContent = '请选择倍数'; }
-else { const amt = daily * parseFloat(type); rv.textContent = fmtRM(amt); ft.textContent = `${fmtRM(daily)} × ${type} = ${fmtRM(amt)}`; }
-}
-function syncRightPanel(item) {
-const type = String(item['OT_TYPE'] || '').trim();
-document.getElementById('calcMultSelect').value = type;
-const savedAmount = parseFloat(item['DAILY_OT_AMOUNT']) || 0;
-const daily = getCalcDaily();
-updateCalcResult();
-const rv = document.getElementById('calcResultValue');
-if (!type) rv.textContent = '-';
-document.getElementById('summaryOtType').textContent = type ? `×${type}` : '未选择';
-document.getElementById('summaryOtHours').textContent = fmtHHMMSS(parseH(item['TOTAL_OT_TIME_H']));
-document.getElementById('summaryDailyOt').textContent = type ? (fmtRM(daily * parseFloat(type))) : (savedAmount ? fmtRM(savedAmount) : '-');
-document.getElementById('summaryOtDays').textContent = (selectedDates.size || (item['DETAILS'] ? (typeof item['DETAILS']==='string'?JSON.parse(item['DETAILS']||'[]'):(item['DETAILS']||[])).length : 0)) + ' 天';
-}
-function resetRightPanel() {
-document.getElementById('calcMultSelect').value = '';
-if (!dailyManual) { const { daily } = currentRates(); document.getElementById('calcDailyInput').value = daily ? daily.toFixed(2) : '0.00'; }
-updateCalcResult();
-document.getElementById('summaryOtType').textContent = '未选择'; document.getElementById('summaryOtHours').textContent = '-'; document.getElementById('summaryDailyOt').textContent = '-'; document.getElementById('summaryOtDays').textContent = '-';
-}
-
-function resetStaffInfo() { ['empCode','empName','empGroup','empSalary','dailyRate','hourlyRate','monthlyWorkTime','monthlyOtTime'].forEach(id => document.getElementById(id).textContent = '-'); document.getElementById('calendarGrid').innerHTML = ''; document.getElementById('calcBody').innerHTML = '<tr class="empty-row"><td colspan="7">请选择员工与日期</td></tr>'; resetTotals(); }
-function currentRates() { if (!currentStaff) return { daily: 0, hourly: 0 }; const daily = settings.daysPerMonth > 0 ? (currentStaff.salary / settings.daysPerMonth) : 0; const hourly = settings.hoursPerDay > 0 ? (daily / settings.hoursPerDay) : 0; return { daily, hourly }; }
-function getMonthRows() { if (!currentStaff || !currentMonth) return []; return allSheetData.filter(r => isCodeMatch(r['ID KOD'], currentStaff.code) && String(r['Date'] || '').startsWith(currentMonth + '-')); }
-function getDateRow(dateStr) { if (!currentStaff) return null; return allSheetData.find(r => isCodeMatch(r['ID KOD'], currentStaff.code) && String(r['Date'] || '') === dateStr) || null; }
-function getRowOT(row) { if (!row) return 0; const s = String(row['SITUATION WORK TIME'] || '').trim(); if (s !== '超时工作') return 0; const v = String(row['Total Over/Less Time (h)'] || '').trim(); if (v === '-' || v === '') return 0; return Math.max(0, parseH(v)); }
-function getRowWork(row) { return row ? Math.max(0, parseH(row['Total Work Time(h)'])) : 0; }
-function refreshMonthlySummary() { if (!currentStaff || !currentMonth) { document.getElementById('monthlyWorkTime').textContent = '-'; document.getElementById('monthlyOtTime').textContent = '-'; return; } const rows = getMonthRows(); document.getElementById('monthlyWorkTime').textContent = fmtHHMMSS(rows.reduce((s, r) => s + getRowWork(r), 0)); document.getElementById('monthlyOtTime').textContent = fmtHHMMSS(rows.reduce((s, r) => s + getRowOT(r), 0)); }
-function renderCalendar() {
-const grid = document.getElementById('calendarGrid'); const label = document.getElementById('calLabel'); grid.innerHTML = ''; if (!currentMonth) { label.textContent = '-'; return; }
-const [y, m] = currentMonth.split('-').map(Number); label.textContent = `${y} 年 ${m} 月`;
-['日','一','二','三','四','五','六'].forEach(d => { const el = document.createElement('div'); el.className = 'cal-dow'; el.textContent = d; grid.appendChild(el); });
-const firstDay = new Date(y, m - 1, 1).getDay(); const daysInMonth = new Date(y, m, 0).getDate();
-for (let i = 0; i < firstDay; i++) { const el = document.createElement('div'); el.className = 'cal-day empty'; grid.appendChild(el); }
-for (let d = 1; d <= daysInMonth; d++) {
-const dateStr = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`; const row = getDateRow(dateStr); const ot = getRowOT(row);
-const el = document.createElement('div'); el.className = 'cal-day'; el.textContent = d; el.dataset.date = dateStr;
-if (!row) el.classList.add('no-data'); else if (ot > 0) el.classList.add('has-ot');
-if (selectedDates.has(dateStr)) el.classList.add('selected');
-el.addEventListener('click', () => { if (!row) { alert('该日期没有此员工的工作记录'); return; } if (selectedDates.has(dateStr)) selectedDates.delete(dateStr); else selectedDates.add(dateStr); renderCalendar(); renderTable(); });
+function resetStaffInfo(){['empCode','empName','empGroup','empSalary','dailyRate','hourlyRate','monthlyWorkTime','monthlyOtTime'].forEach(id=>document.getElementById(id).textContent='-');document.getElementById('calendarGrid').innerHTML='';document.getElementById('calcBody').innerHTML='<tr class="empty-row"><td colspan="7">请选择员工与日期</td></tr>';resetTotals();}
+function currentRates(){if(!currentStaff)return{daily:0,hourly:0};const daily=settings.daysPerMonth>0?(currentStaff.salary/settings.daysPerMonth):0;const hourly=settings.hoursPerDay>0?(daily/settings.hoursPerDay):0;return{daily,hourly};}
+function getMonthRows(){if(!currentStaff||!currentMonth)return[];return allSheetData.filter(r=>isCodeMatch(r['ID KOD'],currentStaff.code)&&String(r['Date']||'').startsWith(currentMonth+'-'));}
+function getDateRow(dateStr){if(!currentStaff)return null;return allSheetData.find(r=>isCodeMatch(r['ID KOD'],currentStaff.code)&&String(r['Date']||'')===dateStr)||null;}
+function getRowOT(row){if(!row)return 0;const s=String(row['SITUATION WORK TIME']||'').trim();if(s!=='超时工作')return 0;const v=String(row['Total Over/Less Time (h)']||'').trim();if(v==='-'||v==='')return 0;return Math.max(0,parseH(v));}
+function getRowWork(row){return row?Math.max(0,parseH(row['Total Work Time(h)'])):0;}
+function refreshMonthlySummary(){if(!currentStaff||!currentMonth){document.getElementById('monthlyWorkTime').textContent='-';document.getElementById('monthlyOtTime').textContent='-';return;}const rows=getMonthRows();document.getElementById('monthlyWorkTime').textContent=fmtHHMMSS(rows.reduce((s,r)=>s+getRowWork(r),0));document.getElementById('monthlyOtTime').textContent=fmtHHMMSS(rows.reduce((s,r)=>s+getRowOT(r),0));}
+function renderCalendar(){
+const grid=document.getElementById('calendarGrid');const label=document.getElementById('calLabel');grid.innerHTML='';if(!currentMonth){label.textContent='-';return;}
+const[y,m]=currentMonth.split('-').map(Number);label.textContent=`${y} 年 ${m} 月`;
+['日','一','二','三','四','五','六'].forEach(d=>{const el=document.createElement('div');el.className='cal-dow';el.textContent=d;grid.appendChild(el);});
+const firstDay=new Date(y,m-1,1).getDay();const daysInMonth=new Date(y,m,0).getDate();
+for(let i=0;i<firstDay;i++){const el=document.createElement('div');el.className='cal-day empty';grid.appendChild(el);}
+for(let d=1;d<=daysInMonth;d++){
+const dateStr=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;const row=getDateRow(dateStr);const ot=getRowOT(row);
+const el=document.createElement('div');el.className='cal-day';el.textContent=d;
+if(!row)el.classList.add('no-data');else if(ot>0)el.classList.add('has-ot');
+if(selectedDates.has(dateStr))el.classList.add('selected');
+el.addEventListener('click',()=>{if(!row){alert('该日期没有此员工的工作记录');return;}if(selectedDates.has(dateStr))selectedDates.delete(dateStr);else selectedDates.add(dateStr);if(editMode)document.getElementById('calcDaysInput').value=selectedDates.size;renderCalendar();renderTable();});
 grid.appendChild(el);
 }
 }
-function renderTable() {
-const tbody = document.getElementById('calcBody'); tbody.innerHTML = '';
-if (!currentStaff) { tbody.innerHTML = '<tr class="empty-row"><td colspan="7">请选择员工与日期</td></tr>'; resetTotals(); return; }
-if (selectedDates.size === 0) { tbody.innerHTML = '<tr class="empty-row"><td colspan="7">请在日历中选择日期</td></tr>'; resetTotals(); return; }
-const { hourly } = currentRates(); const sorted = [...selectedDates].sort();
-let sumW = 0, sumOT = 0, sum10 = 0, sum15 = 0, sum20 = 0, sum30 = 0;
-sorted.forEach(dateStr => { const row = getDateRow(dateStr); if (!row) return; const work = getRowWork(row); const ot = getRowOT(row); const a10 = ot*hourly*settings.rate10, a15 = ot*hourly*settings.rate15, a20 = ot*hourly*settings.rate20, a30 = ot*hourly*settings.rate30; sumW+=work; sumOT+=ot; sum10+=a10; sum15+=a15; sum20+=a20; sum30+=a30; const tr = document.createElement('tr'); tr.innerHTML = `<td>${escapeHtml(dateStr)}</td><td>${fmtHHMMSS(work)}</td><td>${ot>0?fmtHHMMSS(ot):'—'}</td><td>${fmtRM(a10)}</td><td>${fmtRM(a15)}</td><td>${fmtRM(a20)}</td><td>${fmtRM(a30)}</td>`; tbody.appendChild(tr); });
-document.getElementById('sumWork').textContent = fmtHHMMSS(sumW); document.getElementById('sumOT').textContent = fmtHHMMSS(sumOT); document.getElementById('sum10').textContent = fmtRM(sum10); document.getElementById('sum15').textContent = fmtRM(sum15); document.getElementById('sum20').textContent = fmtRM(sum20); document.getElementById('sum30').textContent = fmtRM(sum30);
+function renderTable(){
+const tbody=document.getElementById('calcBody');tbody.innerHTML='';
+if(!currentStaff){tbody.innerHTML='<tr class="empty-row"><td colspan="7">请选择员工与日期</td></tr>';resetTotals();return;}
+if(selectedDates.size===0){tbody.innerHTML='<tr class="empty-row"><td colspan="7">请在日历中选择日期</td></tr>';resetTotals();return;}
+const{hourly}=currentRates();const sorted=[...selectedDates].sort();
+let sumW=0,sumOT=0,sum10=0,sum15=0,sum20=0,sum30=0;
+sorted.forEach(dateStr=>{const row=getDateRow(dateStr);if(!row)return;const work=getRowWork(row);const ot=getRowOT(row);const a10=ot*hourly*settings.rate10,a15=ot*hourly*settings.rate15,a20=ot*hourly*settings.rate20,a30=ot*hourly*settings.rate30;sumW+=work;sumOT+=ot;sum10+=a10;sum15+=a15;sum20+=a20;sum30+=a30;const tr=document.createElement('tr');tr.innerHTML=`<td>${escapeHtml(dateStr)}</td><td>${fmtHHMMSS(work)}</td><td>${ot>0?fmtHHMMSS(ot):'—'}</td><td data-mt="1.0">${fmtRM(a10)}</td><td data-mt="1.5">${fmtRM(a15)}</td><td data-mt="2.0">${fmtRM(a20)}</td><td data-mt="3.0">${fmtRM(a30)}</td>`;tbody.appendChild(tr);});
+document.getElementById('sumWork').textContent=fmtHHMMSS(sumW);document.getElementById('sumOT').textContent=fmtHHMMSS(sumOT);document.getElementById('sum10').textContent=fmtRM(sum10);document.getElementById('sum15').textContent=fmtRM(sum15);document.getElementById('sum20').textContent=fmtRM(sum20);document.getElementById('sum30').textContent=fmtRM(sum30);
+highlightSelectedMult();
 }
-function resetTotals() { ['sumWork','sumOT'].forEach(id => document.getElementById(id).textContent = '00:00:00'); ['sum10','sum15','sum20','sum30'].forEach(id => document.getElementById(id).textContent = 'RM 0.00'); }
-function loadSettings() { try { const s = JSON.parse(localStorage.getItem(LS_SETTINGS)); if (s) settings = Object.assign(settings, s); } catch (e) {} document.getElementById('setDays').value = settings.daysPerMonth; document.getElementById('setHours').value = settings.hoursPerDay; document.getElementById('setRate10').value = settings.rate10; document.getElementById('setRate15').value = settings.rate15; document.getElementById('setRate20').value = settings.rate20; document.getElementById('setRate30').value = settings.rate30; }
-function applySettings() { settings.daysPerMonth = parseFloat(document.getElementById('setDays').value)||26; settings.hoursPerDay = parseFloat(document.getElementById('setHours').value)||7.5; settings.rate10 = parseFloat(document.getElementById('setRate10').value)||1.0; settings.rate15 = parseFloat(document.getElementById('setRate15').value)||1.5; settings.rate20 = parseFloat(document.getElementById('setRate20').value)||2.0; settings.rate30 = parseFloat(document.getElementById('setRate30').value)||3.0; localStorage.setItem(LS_SETTINGS, JSON.stringify(settings)); closeSettings(); if (currentStaff) onStaffChange(); }
-function openSettings() { document.getElementById('settingsModal').classList.remove('hidden'); }
-function closeSettings() { document.getElementById('settingsModal').classList.add('hidden'); }
+function highlightSelectedMult(){const mt=document.getElementById('calcMultSelect').value;document.querySelectorAll('[data-mt]').forEach(el=>el.classList.toggle('sel',!!mt&&el.dataset.mt===mt));}
+function resetTotals(){['sumWork','sumOT'].forEach(id=>document.getElementById(id).textContent='00:00:00');['sum10','sum15','sum20','sum30'].forEach(id=>document.getElementById(id).textContent='RM 0.00');}
 
-/* ===== 【核心修改】一次性保存时薪与日薪加班记录 ===== */
-async function onSave() {
-if (!currentStaff || !currentMonth || selectedDates.size === 0) { if (!currentStaff) alert('请先选择员工'); else if (!currentMonth) alert('请选择月份'); else alert('请先选择日期'); return; }
-if (isSaving) return; isSaving = true;
-const calcDaily = getCalcDaily(); // 使用右侧计算器中的日薪（支持手动修改）
-const { hourly } = currentRates(); 
-const sorted = [...selectedDates].sort();
-const details = []; let sumW = 0, sumOT = 0, sum10 = 0, sum15 = 0, sum20 = 0, sum30 = 0;
-sorted.forEach(dateStr => { const row = getDateRow(dateStr); if (!row) return; const work = getRowWork(row); const ot = getRowOT(row); const a10 = ot*hourly*settings.rate10, a15 = ot*hourly*settings.rate15, a20 = ot*hourly*settings.rate20, a30 = ot*hourly*settings.rate30; details.push({ date: dateStr, workHours: work, otHours: ot, a10, a15, a20, a30 }); sumW+=work; sumOT+=ot; sum10+=a10; sum15+=a15; sum20+=a20; sum30+=a30; });
+/* ===== 右侧日薪面板 ===== */
+function getCalcDaily(){const v=parseFloat(document.getElementById('calcDailyInput').value);return isNaN(v)||v<0?0:v;}
+function getCalcDays(){const v=parseInt(document.getElementById('calcDaysInput').value,10);return isNaN(v)||v<0?0:v;}
+function updateCalcResult(){
+const daily=getCalcDaily();const type=document.getElementById('calcMultSelect').value;const days=getCalcDays();
+const rv=document.getElementById('calcResultValue');const ft=document.getElementById('calcFormulaText');
+if(!type){rv.textContent='-';ft.textContent='请选择倍率';}
+else{const amt=daily*parseFloat(type)*days;rv.textContent=fmtRM(amt);ft.textContent=`${fmtRM(daily)} × ${type} × ${days} 天 = ${fmtRM(amt)}`;}
+highlightSelectedMult();updateSummary();
+}
+document.getElementById('calcDailyInput').addEventListener('input',()=>{if(editMode)updateCalcResult();});
+document.getElementById('calcDaysInput').addEventListener('input',()=>{if(editMode)updateCalcResult();});
+document.getElementById('calcMultSelect').addEventListener('change',()=>{if(editMode)updateCalcResult();});
 
-const existing = allOvertimeData.find(i => isCodeMatch(i['ID KOD'], currentStaff.code));
-const currentOtType = existing ? String(existing['OT_TYPE'] || '').trim() : document.getElementById('calcMultSelect').value || '';
-const dailyOtAmount = currentOtType ? calcDaily * parseFloat(currentOtType) : 0;
-
-// 一次性打包时薪和日薪的所有数据
-const payload = { 
-  action: 'saveOvertimeRecord', 
-  code: currentStaff.code, 
-  name: currentStaff.name, 
-  month: currentMonth, 
-  totalWorkTime: sumW, 
-  totalOtTime: sumOT, 
-  dailyRate: calcDaily, 
-  hourlyRate: hourly, 
-  amount10: sum10, amount15: sum15, amount20: sum20, amount30: sum30, 
-  totalAmount: sum15, 
-  otType: currentOtType, 
-  dailyOtAmount: dailyOtAmount, // 传递日薪加班工资
-  details 
-};
-try {
-const res = await apiPost(payload);
-if (res.status === 'success') {
-try { const c1 = JSON.parse(localStorage.getItem(LS_SHEET) || 'null'); if (c1) { c1.ts = 0; localStorage.setItem(LS_SHEET, JSON.stringify(c1)); } const c2 = JSON.parse(localStorage.getItem(LS_OT_DATA) || 'null'); if (c2) { c2.ts = 0; localStorage.setItem(LS_OT_DATA, JSON.stringify(c2)); } } catch (e) {}
-showToast(`✅ ${currentStaff.name} 的加班记录${res.mode === 'updated' ? '已更新覆盖' : '已新建保存'}`, 'success', 4000);
-await loadOvertimeData(); if (currentStaff) { const ex = allOvertimeData.find(i => isCodeMatch(i['ID KOD'], currentStaff.code)); if (ex) syncRightPanel(ex); }
-} else showToast('保存失败：' + (res.message || '未知错误'), 'error', 5000);
-} catch (err) { showToast('保存失败：' + err.message, 'error', 5000); } finally { isSaving = false; }
+function syncRightPanel(item){
+const type=String(item['OT_TYPE']||'').trim();
+document.getElementById('calcMultSelect').value=type;
+const{daily}=currentRates();document.getElementById('calcDailyInput').value=daily.toFixed(2);
+let days=0;try{let details=item['DETAILS'];if(typeof details==='string')details=JSON.parse(details);if(Array.isArray(details))days=details.length;}catch(e){}
+document.getElementById('calcDaysInput').value=days||selectedDates.size||0;
+updateCalcResult();
+document.getElementById('summaryOtType').textContent=type?`×${type}`:'未选择';
+document.getElementById('summaryOtHours').textContent=fmtHHMMSS(parseH(item['TOTAL_OT_TIME_H']));
+document.getElementById('summaryOtAmount').textContent=fmtRM(parseFloat(item['OT_AMOUNT'])||0);
+document.getElementById('summaryDailyOt').textContent=fmtRM(parseFloat(item['DAILY_OT_AMOUNT'])||0);
+}
+function resetRightPanel(){document.getElementById('calcMultSelect').value='';document.getElementById('calcDaysInput').value=0;const{daily}=currentRates();document.getElementById('calcDailyInput').value=daily?daily.toFixed(2):'0.00';updateCalcResult();resetSummary();}
+function resetSummary(){document.getElementById('summaryOtType').textContent='未选择';document.getElementById('summaryOtHours').textContent='-';document.getElementById('summaryOtAmount').textContent='-';document.getElementById('summaryDailyOt').textContent='-';}
+function updateSummary(){
+const type=document.getElementById('calcMultSelect').value;
+document.getElementById('summaryOtType').textContent=type?`×${type}`:'未选择';
+document.getElementById('summaryOtHours').textContent=fmtHHMMSS(selectedDates.size?allSheetData.filter(r=>isCodeMatch(r['ID KOD'],currentStaff.code)&&selectedDates.has(String(r['Date']||''))).reduce((s,r)=>s+getRowOT(r),0):0);
+const mtSum={ '1.0':document.getElementById('sum10').textContent,'1.5':document.getElementById('sum15').textContent,'2.0':document.getElementById('sum20').textContent,'3.0':document.getElementById('sum30').textContent };
+document.getElementById('summaryOtAmount').textContent=type?(mtSum[type]||'-'):'-';
+const daily=getCalcDaily();const days=getCalcDays();
+document.getElementById('summaryDailyOt').textContent=type?fmtRM(daily*parseFloat(type)*days):'-';
 }
 
-async function init() {
-loadSettings(); loadSavedUrl();
-const today = new Date(); const ym = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
-document.getElementById('monthPicker').value = ym; currentMonth = ym;
-document.getElementById('calcDailyInput').value = '0.00';
-document.getElementById('calcDailyInput').addEventListener('input', () => { if (dailyManual) updateCalcResult(); });
-document.getElementById('staffSelect').addEventListener('change', onStaffChange);
-document.getElementById('monthPicker').addEventListener('change', e => { activeSidebarIndex = -1; renderSidebar(); currentMonth = e.target.value; selectedDates.clear(); refreshMonthlySummary(); renderCalendar(); renderTable(); });
-document.getElementById('openSettings').addEventListener('click', openSettings);
-document.getElementById('cancelSettings').addEventListener('click', closeSettings);
-document.getElementById('applySettings').addEventListener('click', applySettings);
-// 绑定顶部保存按钮
-document.getElementById('saveBtnTop').addEventListener('click', () => onSave());
-if (SCRIPT_URL) await loadAllData(); else setSyncBadge('err', 'URL 未设置');
+/* ===== 设置 ===== */
+function loadSettings(){try{const s=JSON.parse(localStorage.getItem(LS_SETTINGS));if(s)settings=Object.assign(settings,s);}catch(e){}document.getElementById('setDays').value=settings.daysPerMonth;document.getElementById('setHours').value=settings.hoursPerDay;document.getElementById('setRate10').value=settings.rate10;document.getElementById('setRate15').value=settings.rate15;document.getElementById('setRate20').value=settings.rate20;document.getElementById('setRate30').value=settings.rate30;}
+function applySettings(){settings.daysPerMonth=parseFloat(document.getElementById('setDays').value)||26;settings.hoursPerDay=parseFloat(document.getElementById('setHours').value)||7.5;settings.rate10=parseFloat(document.getElementById('setRate10').value)||1.0;settings.rate15=parseFloat(document.getElementById('setRate15').value)||1.5;settings.rate20=parseFloat(document.getElementById('setRate20').value)||2.0;settings.rate30=parseFloat(document.getElementById('setRate30').value)||3.0;localStorage.setItem(LS_SETTINGS,JSON.stringify(settings));closeSettings();if(currentStaff)onStaffChange();}
+function openSettings(){document.getElementById('settingsModal').classList.remove('hidden');}
+function closeSettings(){document.getElementById('settingsModal').classList.add('hidden');}
+
+/* ===== 保存：时薪仅写选定倍率合计 + 日薪倍率×天数 ===== */
+async function onSave(){
+if(!currentStaff||!currentMonth||selectedDates.size===0){if(!currentStaff)alert('请先选择员工');else if(!currentMonth)alert('请选择月份');else alert('请先选择日期');return;}
+if(isSaving)return;isSaving=true;
+const calcDaily=getCalcDaily();const{hourly}=currentRates();const sorted=[...selectedDates].sort();
+const details=[];let sumW=0,sumOT=0,sum10=0,sum15=0,sum20=0,sum30=0;
+sorted.forEach(dateStr=>{const row=getDateRow(dateStr);if(!row)return;const work=getRowWork(row);const ot=getRowOT(row);const a10=ot*hourly*settings.rate10,a15=ot*hourly*settings.rate15,a20=ot*hourly*settings.rate20,a30=ot*hourly*settings.rate30;details.push({date:dateStr,workHours:work,otHours:ot,a10,a15,a20,a30});sumW+=work;sumOT+=ot;sum10+=a10;sum15+=a15;sum20+=a20;sum30+=a30;});
+const otType=document.getElementById('calcMultSelect').value||'';
+const otAmountMap={'1.0':sum10,'1.5':sum15,'2.0':sum20,'3.0':sum30};
+const otAmount=otType?(otAmountMap[otType]||0):0;
+const dailyOtDays=getCalcDays();
+const dailyOtAmount=otType?calcDaily*parseFloat(otType)*dailyOtDays:0;
+const payload={action:'saveOvertimeRecord',code:currentStaff.code,name:currentStaff.name,month:currentMonth,totalWorkTime:sumW,totalOtTime:sumOT,dailyRate:calcDaily,hourlyRate:hourly,otType,otAmount,dailyOtDays,dailyOtAmount,details};
+try{
+const res=await apiPost(payload);
+if(res.status==='success'){
+try{const c2=JSON.parse(localStorage.getItem(LS_OT_DATA)||'null');if(c2){c2.ts=0;localStorage.setItem(LS_OT_DATA,JSON.stringify(c2));}}catch(e){}
+showToast(`✅ ${currentStaff.name} 的加班记录${res.mode==='updated'?'已更新覆盖':'已新建保存'}`,'success',4000);
+editMode=false;await loadOvertimeData();
+const ex=allOvertimeData.find(i=>isCodeMatch(i['ID KOD'],currentStaff.code)&&nameMatch(i['NAME'],currentStaff.name));if(ex)syncRightPanel(ex);
+renderSidebar();applyEditLock();
+}else showToast('保存失败：'+(res.message||'未知错误'),'error',5000);
+}catch(err){showToast('保存失败：'+err.message,'error',5000);}finally{isSaving=false;}
+}
+
+async function init(){
+loadSettings();loadSavedUrl();
+const today=new Date();const ym=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
+document.getElementById('monthPicker').value=ym;currentMonth=ym;
+document.getElementById('calcDailyInput').value='0.00';
+document.getElementById('staffSelect').addEventListener('change',onStaffChange);
+document.getElementById('monthPicker').addEventListener('change',e=>{activeSidebarIndex=-1;editMode=false;renderSidebar();currentMonth=e.target.value;selectedDates.clear();refreshMonthlySummary();renderCalendar();renderTable();applyEditLock();});
+document.getElementById('openSettings').addEventListener('click',openSettings);
+document.getElementById('cancelSettings').addEventListener('click',closeSettings);
+document.getElementById('applySettings').addEventListener('click',applySettings);
+document.getElementById('saveBtnTop').addEventListener('click',()=>onSave());
+applyEditLock();
+if(SCRIPT_URL)await loadAllData();else setSyncBadge('err','URL 未设置');
 }
 init();
 </script>
