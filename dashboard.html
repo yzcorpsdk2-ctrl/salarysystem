@@ -189,8 +189,8 @@ display: flex; align-items: center; gap: 0.5rem; color: #991b1b;
 font-weight: 700; font-size: 0.85rem;
 }
 .notice-header .count-badge {
-background: #ef4444; color: #fff; font-size: 0.65rem; padding: 2px 6px;
-border-radius: 10px; margin-left: auto;
+background: #ef4444; color: #fff; font-size: 0.65rem;
+padding: 2px 6px; border-radius: 10px; margin-left: auto;
 }
 .notice-list { overflow-y: auto; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
 .notice-list::-webkit-scrollbar { width: 6px; }
@@ -270,10 +270,7 @@ background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transi
 </head>
 <body>
 <nav class="navbar">
-<div class="nav-brand">
-<span class="logo">Y</span>
-<span class="brand-text">YZ Payroll</span>
-</div>
+<div class="nav-brand"><span class="logo">Y</span><span class="brand-text">YZ Payroll</span></div>
 <div class="nav-links" id="navLinks">
 <button class="nav-back" id="backBtn" title="Kembali">⏎</button>
 <div class="nav-dropdown" id="filesDropdown">
@@ -375,21 +372,13 @@ dropdownToggles.forEach(function(toggle) {
 toggle.addEventListener('click', function(e) {
 e.stopPropagation();
 const dropdownId = this.getAttribute('data-dropdown-toggle');
-document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
-if (dd.id !== dropdownId + 'Dropdown') dd.classList.remove('open');
-});
+document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { if (dd.id !== dropdownId + 'Dropdown') dd.classList.remove('open'); });
 const wrapper = this.closest('.nav-dropdown');
 if (wrapper) wrapper.classList.toggle('open');
 });
 });
-document.addEventListener('click', function(e) {
-if (!e.target.closest('.nav-dropdown')) {
-document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); });
-}
-});
-document.addEventListener('keydown', function(e) {
-if (e.key === 'Escape') document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); });
-});
+document.addEventListener('click', function(e) { if (!e.target.closest('.nav-dropdown')) document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); }); });
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); }); });
 });
 
 const URL_KEY = 'payrollScriptUrl';
