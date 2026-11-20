@@ -438,7 +438,7 @@ document.addEventListener('keydown', function(e) { if (e.key === 'Escape') docum
 
 const STORAGE_KEY = 'payrollEmployees';
 const URL_KEY = 'payrollScriptUrl';
-// ✅ 修复：更新 FIELD_MAP 以匹配新表头，并恢复 Gaji Untuk Caruman 字段
+// ✅ FIELD_MAP 保持原有映射（Gaji Untuk Caruman 字段已恢复）
 const FIELD_MAP = {
 timeOTHour: 'TimeOTHour', timeOTAmount: 'TimeOTAmount',
 dailyOTDay: 'DailyOTDay', dailyOTAmount: 'DailyOTAmount',
@@ -586,11 +586,11 @@ selGroup.innerHTML = '<option value="">Semua Kumpulan</option>' + groups.map(g =
 populateKodAndNama('', '');
 selGroup.addEventListener('change', () => populateKodAndNama(selGroup.value, ''));
 selKod.addEventListener('change', () => {
-const emp = activeStaffList.find(s => s.Code === selKod.value);
+const emp = activeStaffList.find(s => String(s.Code) === String(selKod.value));
 if (emp) { selNama.value = emp.Name; selGroup.value = emp.GroupName; el('infoSituation').innerText = emp.Situation; switchEmployee(emp); }
 });
 selNama.addEventListener('change', () => {
-const emp = activeStaffList.find(s => s.Name === selNama.value);
+const emp = activeStaffList.find(s => String(s.Name).toUpperCase() === String(selNama.value).toUpperCase());
 if (emp) { selKod.value = emp.Code; selGroup.value = emp.GroupName; el('infoSituation').innerText = emp.Situation; switchEmployee(emp); }
 });
 autoSelectFromStorage();
@@ -600,23 +600,53 @@ function populateKodAndNama(groupFilter, keepCode) {
 const selKod = el('infoKod');
 const selNama = el('infoNama');
 let filtered = groupFilter ? activeStaffList.filter(s => s.GroupName === groupFilter) : activeStaffList;
-filtered.sort((a, b) => a.Code.localeCompare(b.Code));
+filtered.sort((a, b) => String(a.Code).localeCompare(String(b.Code)));
 selKod.innerHTML = '<option value="">Pilih Kod</option>' + filtered.map(s => `<option value="${s.Code}">${s.Code}</option>`).join('');
 selNama.innerHTML = '<option value="">Pilih Nama</option>' + filtered.map(s => `<option value="${s.Name}">${s.Name}</option>`).join('');
-if (keepCode && filtered.some(s => s.Code === keepCode)) {
-selKod.value = keepCode;
-const emp = filtered.find(s => s.Code === keepCode);
+if (keepCode && filtered.some(s => String(s.Code) === String(keepCode))) {
+selKod.value = String(keepCode);
+const emp = filtered.find(s => String(s.Code) === String(keepCode));
 if (emp) { selNama.value = emp.Name; el('infoSituation').innerText = emp.Situation; }
 }
 }
 
+// ✅ 修复 1：兼容 URL 参数 + 多种 localStorage key + Code/Name 双匹配
 async function autoSelectFromStorage() {
-const code = localStorage.getItem('payrollSelectedCode');
-if (!code) return;
-const emp = activeStaffList.find(s => s.Code === code);
+// 1) URL 参数（如 detail.html?code=1001 或 ?name=AHMAD）
+const urlParams = new URLSearchParams(window.location.search);
+const codeFromUrl = urlParams.get('code');
+const nameFromUrl = urlParams.get('name');
+
+// 2) localStorage 多种 key 兼容（dashboard 存哪个都能读到）
+const code = codeFromUrl
+|| localStorage.getItem('payrollSelectedCode')
+|| localStorage.getItem('selectedCode')
+|| localStorage.getItem('selectedEmployeeCode');
+const name = nameFromUrl
+|| localStorage.getItem('payrollSelectedName')
+|| localStorage.getItem('selectedName')
+|| localStorage.getItem('selectedEmployeeName');
+
+let emp = null;
+
+// 优先按 Code 匹配（用 String() 规避数字/字符串类型不一致）
+if (code) {
+emp = activeStaffList.find(s => String(s.Code) === String(code));
+// 若 code 找不到，且值看起来像姓名 → 再按 Name 匹配（兜底 dashboard 把名字塞进 Code key 的情况）
+if (!emp) {
+emp = activeStaffList.find(s => String(s.Name).toUpperCase() === String(code).toUpperCase());
+}
+}
+
+// 再按 Name 匹配
+if (!emp && name) {
+emp = activeStaffList.find(s => String(s.Name).toUpperCase() === String(name).toUpperCase());
+}
+
 if (!emp) return;
+
 el('infoKumpulan').value = emp.GroupName || '';
-el('infoKod').value = emp.Code || '';
+populateKodAndNama(emp.GroupName || '', emp.Code);
 el('infoNama').value = emp.Name || '';
 el('infoSituation').innerText = emp.Situation || 'ACTIVE';
 switchEmployee(emp);
@@ -624,13 +654,14 @@ await syncFromSheet(true);
 }
 
 function switchEmployee(staffObj) {
-const code = staffObj.Code;
+const code = String(staffObj.Code);
 try {
 const stored = localStorage.getItem(STORAGE_KEY);
 allEmployees = stored ? JSON.parse(stored) : [];
 if (!Array.isArray(allEmployees)) allEmployees = [];
 } catch (e) { allEmployees = []; }
-const existing = allEmployees.find(e => e.Code === code);
+// ✅ 修复 4：String 比较避免类型不一致
+const existing = allEmployees.find(e => String(e.Code) === String(code));
 if (existing) {
 fillForm(existing);
 if (!existing.Basic || existing.Basic === 0) {
@@ -640,7 +671,7 @@ updateCalc();
 }
 } else {
 const newObj = {
-Code: code, Name: staffObj.Name, GroupName: staffObj.GroupName, Situation: staffObj.Situation,
+Code: staffObj.Code, Name: staffObj.Name, GroupName: staffObj.GroupName, Situation: staffObj.Situation,
 BasicSalary: staffObj.Salary, Basic: staffObj.Salary,
 TimeOTHour: 0, TimeOTAmount: 0, DailyOTDay: 0, DailyOTAmount: 0,
 Allowance2: 0, Commission: 0, Incentives: 0,
@@ -658,17 +689,35 @@ fillForm(newObj);
 setSyncStatus('Data dimuat untuk ' + code, 'success');
 }
 
+// ✅ 修复 3：fillForm 不再无条件覆盖 Basic；用 String 比较 Code
 function fillForm(raw) {
 if (!raw) return;
-const staff = activeStaffList.find(s => s.Code === raw.Code);
+
+// 用 String() 比较，避免 Code 是数字时匹配失败
+const staff = activeStaffList.find(s => String(s.Code) === String(raw.Code));
+
 if (staff) {
-raw.Name = staff.Name; raw.GroupName = staff.GroupName; raw.Situation = staff.Situation; raw.Basic = staff.Salary;
+raw.Name = staff.Name;
+raw.GroupName = staff.GroupName;
+raw.Situation = staff.Situation;
+
+// 只有 Basic 缺失或为 0 时才用 StaffInfo 的 Salary 兜底；
+// 若 raw 中已有 BasicSalary（即从 Sheet 读回来的值），优先使用它
+if (raw.Basic === undefined || raw.Basic === null || raw.Basic === '' || num(raw.Basic) === 0) {
+if (raw.BasicSalary !== undefined && raw.BasicSalary !== null && num(raw.BasicSalary) > 0) {
+raw.Basic = num(raw.BasicSalary);
+} else {
+raw.Basic = staff.Salary;
+}
+}
+// 其余 Bank / EPF 等只在缺失时才用 StaffInfo 补齐（原有逻辑保留）
 if (raw.SLRBankNama === undefined || raw.SLRBankNama === null) raw.SLRBankNama = staff.BankNama || '';
 if (raw.SLRBankAccountNo === undefined || raw.SLRBankAccountNo === null) raw.SLRBankAccountNo = staff.BankAccountNo || '';
 if (raw.SLREPF === undefined || raw.SLREPF === null) raw.SLREPF = staff.EPF || '';
 if (raw.SLRPERKESO === undefined || raw.SLRPERKESO === null) raw.SLRPERKESO = staff.PERKESO || '';
 if (raw.SLREIS === undefined || raw.SLREIS === null) raw.SLREIS = staff.EIS || '';
 }
+
 currentRaw = raw;
 el('infoSituation').innerText = raw.Situation || 'ACTIVE';
 el('inputGajiAsas').value = (raw.Basic != null) ? raw.Basic : 0;
@@ -707,7 +756,7 @@ if (currentRaw) currentRaw[field.rawKey] = inp.value;
 
 function resetToDefault() {
 if (!currentRaw || !currentRaw.Code) { alert('Tiada pekerja dipilih.'); return; }
-const staff = activeStaffList.find(s => s.Code === currentRaw.Code);
+const staff = activeStaffList.find(s => String(s.Code) === String(currentRaw.Code));
 if (!staff) { alert('Data staff tidak dijumpai.'); return; }
 if (!confirm('Reset semua medan ke default?')) return;
 const defaultObj = {
@@ -740,7 +789,7 @@ btn.disabled = true;
 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
 
 const updated = { ...currentRaw };
-const staff = activeStaffList.find(s => s.Code === updated.Code);
+const staff = activeStaffList.find(s => String(s.Code) === String(updated.Code));
 if (staff) {
 updated.Name = staff.Name;
 updated.GroupName = staff.GroupName;
@@ -754,7 +803,7 @@ if (TEXT_FIELDS.has(id)) updated[key] = inp.value;
 else updated[key] = num(inp.value);
 });
 
-// ✅ 关键修复：确保 BasicSalary 和 Code 正确传递
+// ✅ 确保 BasicSalary 和 Code 正确传递
 updated.BasicSalary = updated.Basic;
 updated.Code = String(updated.Code).trim();
 
@@ -797,12 +846,19 @@ const allJson = localStorage.getItem(STORAGE_KEY);
 if (allJson) all = JSON.parse(allJson) || [];
 } catch (e) {}
 if (!Array.isArray(all)) all = [];
-const idx = all.findIndex(e => e.Code === updated.Code);
+// ✅ 修复 4：String 比较
+const idx = all.findIndex(e => String(e.Code) === String(updated.Code));
 if (idx !== -1) all[idx] = { ...all[idx], ...updated };
 else all.push(updated);
 try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); } catch (e) { console.error(e); }
 allEmployees = all;
 currentRaw = updated;
+
+// ✅ 修复 5：保存成功后写回当前选中的员工，让重进页面可自动定位
+try {
+localStorage.setItem('payrollSelectedCode', String(updated.Code));
+localStorage.setItem('payrollSelectedName', String(updated.Name || ''));
+} catch (e) {}
 
 try {
 if (window.opener && !window.opener.closed) {
@@ -838,32 +894,42 @@ btn.disabled = true;
 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menarik...';
 }
 try {
+// ✅ 修复 2：同时传 Code 和 Name，让后端按 Name 兜底匹配
 const res = await fetch(SCRIPT_URL, {
 method: 'POST',
 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-body: JSON.stringify({ action: 'getEmployeeDetail', Code: currentRaw.Code })
+body: JSON.stringify({
+action: 'getEmployeeDetail',
+Code: currentRaw.Code,
+Name: currentRaw.Name
+})
 });
 const result = await res.json();
 if (result.status === 'success' && result.data) {
 const sheetData = result.data;
-const staff = activeStaffList.find(s => s.Code === currentRaw.Code);
+const staff = activeStaffList.find(s => String(s.Code) === String(currentRaw.Code));
 
-// ✅ 关键修复：合并数据并确保 BasicSalary 映射到 Basic
+// ✅ 合并数据并确保 BasicSalary 映射到 Basic
 const merged = { ...currentRaw, ...sheetData };
 if (staff) {
 merged.Name = staff.Name;
 merged.GroupName = staff.GroupName;
 merged.Situation = staff.Situation;
+// 仅在 merged.Basic 缺失或为 0 时才用 StaffInfo 的 Salary
+if (merged.Basic === undefined || merged.Basic === null || merged.Basic === '' || num(merged.Basic) === 0) {
 merged.Basic = staff.Salary;
 }
+}
 
-// 将 Sheet 中的 BasicSalary 转换为前端使用的 Basic
+// 将 Sheet 中的 BasicSalary 转换为前端使用的 Basic（仅当 Basic 为 0 时优先采用）
 if (merged.BasicSalary !== undefined && merged.BasicSalary !== null && merged.BasicSalary !== '') {
+if (num(merged.Basic) === 0 && num(merged.BasicSalary) > 0) {
 merged.Basic = num(merged.BasicSalary);
+}
 }
 
 fillForm(merged);
-const idx = allEmployees.findIndex(e => e.Code === currentRaw.Code);
+const idx = allEmployees.findIndex(e => String(e.Code) === String(currentRaw.Code));
 if (idx !== -1) allEmployees[idx] = merged;
 else allEmployees.push(merged);
 try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees)); } catch(e) {}
@@ -923,7 +989,7 @@ el('syncSheetBtn').addEventListener('click', () => syncFromSheet(false));
 el('resetBtn').addEventListener('click', resetToDefault);
 el('reloadBtn').addEventListener('click', () => {
 const code = el('infoKod').value;
-if (code) { const emp = activeStaffList.find(s => s.Code === code); if (emp) { switchEmployee(emp); syncFromSheet(true); } }
+if (code) { const emp = activeStaffList.find(s => String(s.Code) === String(code)); if (emp) { switchEmployee(emp); syncFromSheet(true); } }
 else fetchStaffBasics();
 });
 el('printBtn').addEventListener('click', () => window.print());
