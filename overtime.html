@@ -296,7 +296,7 @@ const div=document.createElement('div');div.className=`sidebar-item ${colorClass
 const contentDiv=document.createElement('div');contentDiv.className='sidebar-item-content';
 contentDiv.innerHTML=`<div class="item-name">${escapeHtml(name)} <span style="font-size:.7rem;color:#64748b;">(${escapeHtml(code)})</span></div><div class="item-info"><span>${escapeHtml(month||'未知月份')}</span><span class="item-ot">加班: ${fmtHHMMSS(otH)}</span></div>${typeHtml}<span class="item-time">🕐 ${escapeHtml(updated)}</span>`;
 contentDiv.addEventListener('click',()=>loadFromSidebar(item,index));
-const menuBtn=document.createElement('button');menuBtn.className='sidebar-item-menu-btn'+(isActive&&editMode?' unlocked':'');menuBtn.innerHTML=isActive&&editMode?'':'⋮';menuBtn.title=editMode?'锁定查看':'解锁编辑';menuBtn.addEventListener('click',e=>{e.stopPropagation();toggleEdit(item,index);});
+const menuBtn=document.createElement('button');menuBtn.className='sidebar-item-menu-btn'+(isActive&&editMode?' unlocked':'');menuBtn.innerHTML=isActive&&editMode?'|||':'⋮';menuBtn.title=editMode?'锁定查看':'解锁编辑';menuBtn.addEventListener('click',e=>{e.stopPropagation();toggleEdit(item,index);});
 div.appendChild(contentDiv);div.appendChild(menuBtn);list.appendChild(div);
 });
 }
@@ -347,7 +347,7 @@ if(existing){
   const savedTimeType=String(existing['TIME_OT_TYPE']||'').trim();
   selectedTimeMt = savedTimeType ? savedTimeType.replace('×','') : '';
   syncRightPanel(existing);
-  showToast(fromSidebar?`📂 查看 ${existing['NAME']} (${month}) · 点 ⋮ 解锁编辑`:` 编辑 ${existing['NAME']} (${month})`,'info',5000);
+  showToast(fromSidebar?`📂 查看 ${existing['NAME']} (${month}) · 点 ⋮ 解锁编辑`:`||| 编辑 ${existing['NAME']} (${month})`,'info',5000);
 }else{
   editMode=true;
   activeSidebarIndex=-1;
