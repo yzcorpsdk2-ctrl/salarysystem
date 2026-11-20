@@ -6,193 +6,451 @@
 <title>Overtime · 加班计算</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-/* ... (CSS 部分保持你之前的样式，这里省略，直接复用之前的 CSS) ... */
-/* 为了节省篇幅，请保留你之前的 <style> 内容，只需确保有以下新增样式 */
-.mt-col { cursor: pointer; user-select: none; }
-.mt-col:hover { background-color: #f0f9ff !important; }
-.mt-col.sel { background-color: #1a4f8a !important; color: #fff !important; font-weight: bold; outline: 2px solid #f59e0b; outline-offset: -2px; }
-</style>
-<!-- 请把你之前的完整 <style> 块放在这里 -->
-<style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-:root { --epf-blue:#1a4f8a; --epf-blue-light:#e8f0fa; --epf-blue-soft:#f4f8fd; --epf-border:#d4e0ee; --epf-border-soft:#e6eef7; --epf-text:#1f2d3d; --epf-muted:#64748b; --epf-bg:#f7fafd; --nav-h:52px; --nav-bg-1:#0b1b30; --nav-bg-2:#123153; --nav-hover:#16345c; --nav-text:#cbd9ea; --nav-accent:#4d9fff; }
+:root {
+--epf-blue:#1a4f8a; --epf-blue-light:#e8f0fa; --epf-blue-soft:#f4f8fd;
+--epf-border:#d4e0ee; --epf-border-soft:#e6eef7; --epf-text:#1f2d3d; --epf-muted:#64748b; --epf-bg:#f7fafd;
+--nav-h:52px; --nav-bg-1:#0b1b30; --nav-bg-2:#123153; --nav-hover:#16345c; --nav-text:#cbd9ea; --nav-accent:#4d9fff;
+--shadow-sm:0 1px 2px rgba(16,32,56,.05),0 2px 10px rgba(16,32,56,.05); --shadow-md:0 8px 24px rgba(16,32,56,.10);
+}
 body { font-family:'Segoe UI',Roboto,Arial,sans-serif; background:var(--epf-bg); color:var(--epf-text); min-height:100vh; line-height:1.5; font-size:14px; }
-/* ... (此处省略几百行 CSS，请直接从你之前的代码复制过来，确保包含 .mt-col 样式) ... */
-/* 关键新增样式 */
-.mt-col { cursor: pointer; transition: background 0.2s; }
-.mt-col.sel { background: #1e3a8a !important; color: white !important; font-weight: 800; box-shadow: inset 0 0 0 2px #f59e0b; }
-.ot-table th.mt-col:hover { background: #dbeafe; }
+.toast-container { position:fixed; bottom:24px; right:24px; z-index:9999; display:flex; flex-direction:column; gap:10px; }
+.toast { background:#fff; border-left:4px solid var(--epf-blue); padding:12px 20px; border-radius:8px; box-shadow:0 4px 16px rgba(16,32,56,.15); font-size:.85rem; font-weight:600; display:flex; align-items:center; gap:10px; animation:slideIn .3s ease-out; min-width:240px; }
+.toast.info{border-left-color:var(--epf-blue);} .toast.success{border-left-color:#22c55e;} .toast.error{border-left-color:#ef4444;}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+@keyframes fadeOut{from{opacity:1;}to{opacity:0;}}
+.navbar{position:sticky;top:0;z-index:200;display:flex;align-items:stretch;flex-wrap:wrap;background:linear-gradient(90deg,var(--nav-bg-1),var(--nav-bg-2));padding:0 1rem;min-height:var(--nav-h);box-shadow:0 2px 12px rgba(0,0,0,.25);border-bottom:1px solid rgba(77,159,255,.18);}
+.navbar .nav-brand{display:flex;align-items:center;gap:.55rem;color:#fff;font-weight:800;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;padding-right:1.1rem;margin-right:.5rem;border-right:1px solid rgba(255,255,255,.12);white-space:nowrap;}
+.navbar .nav-brand .logo{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#4d9fff,#1a4f8a);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.85rem;font-weight:800;}
+.nav-links{display:flex;align-items:stretch;flex-wrap:wrap;gap:2px;position:relative;}
+.nav-item{display:inline-flex;align-items:center;gap:.35rem;padding:0 .85rem;min-height:var(--nav-h);color:var(--nav-text);text-decoration:none;font-family:inherit;font-size:.73rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:transparent;border:none;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s;position:relative;}
+.nav-item:hover,.nav-item.active{background:var(--nav-hover);color:#fff;}
+.nav-item::after{content:'';position:absolute;left:.85rem;right:.85rem;bottom:0;height:2px;background:var(--nav-accent);transform:scaleX(0);transform-origin:left;transition:transform .2s;}
+.nav-item:hover::after,.nav-item.active::after{transform:scaleX(1);}
+.nav-back{display:inline-flex;align-items:center;justify-content:center;min-width:44px;padding:0 .6rem;color:var(--nav-text);background:transparent;border:none;cursor:pointer;font-size:1.1rem;}
+.nav-back:hover{background:var(--nav-hover);color:#fff;}
+.nav-dropdown{position:relative;display:inline-flex;align-items:stretch;}
+.nav-dropdown>.nav-item{padding-right:.55rem;}
+.nav-dropdown>.nav-item .fa-caret-down{font-size:.6rem;margin-left:.2rem;opacity:.7;}
+.dropdown-menu{display:none;position:absolute;top:100%;left:0;min-width:180px;background:#fff;border-radius:8px;box-shadow:0 8px 24px rgba(16,32,56,.15);padding:.4rem 0;z-index:300;border:1px solid var(--epf-border);}
+.nav-dropdown.open .dropdown-menu{display:block;}
+.dropdown-menu a{display:flex;align-items:center;gap:.5rem;padding:.5rem 1rem;color:var(--epf-text);text-decoration:none;font-size:.78rem;font-weight:500;white-space:nowrap;}
+.dropdown-menu a:hover{background:var(--epf-blue-soft);color:var(--epf-blue);}
+.dropdown-menu .divider{height:1px;background:var(--epf-border-soft);margin:.3rem .5rem;}
+.nav-chat{margin-left:auto;align-self:center;display:inline-flex;align-items:center;gap:.45rem;padding:.5rem 1rem;border:none;border-radius:20px;background:linear-gradient(135deg,#2f7fe0,#1a4f8a);color:#fff;font-family:inherit;font-size:.73rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;white-space:nowrap;box-shadow:0 3px 12px rgba(47,127,224,.4);}
+.topbar{position:sticky;top:var(--nav-h);z-index:100;background:#fff;border-bottom:1px solid var(--epf-border);padding:.65rem 1.75rem;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;}
+.topbar .brand{font-weight:700;font-size:.95rem;color:var(--epf-blue);display:flex;align-items:center;gap:.6rem;margin-right:.5rem;}
+.topbar .brand .logo{width:32px;height:32px;background:var(--epf-blue);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.95rem;font-weight:800;}
+.url-box{display:flex;align-items:center;gap:.4rem;flex:1;max-width:420px;background:#f4f8fd;border:1px solid var(--epf-border);border-radius:6px;padding:2px;}
+.url-box input{flex:1;border:none;background:transparent;padding:.4rem .6rem;font-size:.78rem;font-family:inherit;color:var(--epf-text);outline:none;}
+.url-box button{padding:.3rem .8rem;border-radius:4px;border:none;background:var(--epf-blue);color:#fff;font-size:.72rem;font-weight:600;cursor:pointer;white-space:nowrap;}
+.btn{background:#fff;border:1px solid var(--epf-border);padding:.42rem .9rem;border-radius:5px;font-size:.78rem;font-weight:500;cursor:pointer;color:var(--epf-blue);display:inline-flex;align-items:center;gap:.4rem;white-space:nowrap;font-family:inherit;}
+.btn:hover{background:var(--epf-blue-soft);}
+.btn-success{background:#0f7a54;border:1px solid #0f7a54;color:#fff;}
+.btn-sm{padding:.25rem .7rem;font-size:.72rem;border-radius:4px;}
+.sync-badge{display:inline-flex;align-items:center;gap:.35rem;background:var(--epf-blue-soft);border:1px solid var(--epf-border-soft);padding:.3rem .7rem;border-radius:20px;font-size:.68rem;font-weight:600;color:var(--epf-muted);white-space:nowrap;}
+.sync-badge .dot{width:7px;height:7px;border-radius:50%;background:#9db8d2;}
+.sync-badge.ok .dot{background:#22c55e;} .sync-badge.busy .dot{background:#f59e0b;} .sync-badge.err .dot{background:#ef4444;}
+.content-wrap{max-width:100%;margin:0 auto;padding:1rem 1.5rem 2rem;display:flex;gap:1rem;align-items:flex-start;height:calc(100vh - var(--nav-h) - 60px);}
+.left-sidebar{width:280px;flex-shrink:0;background:#fff;border:1px solid var(--epf-border);border-radius:8px;padding:1rem;height:100%;overflow-y:auto;display:flex;flex-direction:column;}
+.left-sidebar h2{font-size:.95rem;color:var(--epf-blue);font-weight:700;margin-bottom:1rem;padding-bottom:.7rem;border-bottom:1px solid var(--epf-border-soft);}
+.sidebar-list{display:flex;flex-direction:column;gap:8px;flex:1;}
+.sidebar-item{background:var(--epf-blue-soft);border:1px solid var(--epf-border-soft);padding:.75rem;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+.sidebar-item.active{border-left:3px solid var(--epf-blue);}
+.sidebar-item-content{flex:1;min-width:0;}
+.sidebar-item .item-name{font-weight:700;font-size:.85rem;color:var(--epf-blue);margin-bottom:4px;}
+.sidebar-item .item-info{font-size:.75rem;color:var(--epf-muted);display:flex;justify-content:space-between;}
+.sidebar-item .item-ot{font-weight:700;color:#d97706;}
+.sidebar-item .item-type{font-size:.72rem;font-weight:700;margin-top:3px;}
+.sidebar-item .item-type.set{color:#15803d;} .sidebar-item .item-type.none{color:#94a3b8;font-style:italic;font-weight:500;}
+.sidebar-item .item-time{font-size:.68rem;color:#94a3b8;margin-top:4px;display:block;}
+.middle-content{flex:1;min-width:0;background:#fff;border:1px solid var(--epf-border);border-radius:8px;padding:1.5rem;height:100%;overflow-y:auto;}
+.page-header{margin-bottom:1.5rem;} .page-header h1{font-size:1.45rem;font-weight:700;margin-bottom:.35rem;color:var(--epf-blue);} .page-header p{font-size:.85rem;color:var(--epf-muted);}
+.ot-card{background:#fff;border:1px solid var(--epf-border);border-radius:10px;padding:1.4rem 1.5rem;margin-bottom:1.2rem;box-shadow:var(--shadow-sm);}
+.ot-card h2{font-size:1rem;color:var(--epf-blue);font-weight:700;margin-bottom:1rem;padding-bottom:.7rem;border-bottom:1px solid var(--epf-border-soft);display:flex;align-items:center;justify-content:space-between;gap:.5rem;}
+.toolbar{display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem;}
+.toolbar label{font-size:.8rem;color:var(--epf-muted);font-weight:600;}
+.toolbar select,.toolbar input[type="month"]{padding:.45rem .75rem;border:1px solid var(--epf-border);border-radius:6px;font-size:.82rem;font-family:inherit;color:var(--epf-text);background:#fff;min-width:200px;}
+.info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px;} .info-grid:last-child{margin-bottom:0;}
+.info-item{background:var(--epf-blue-soft);padding:.75rem .9rem;border-radius:8px;border-left:3px solid var(--epf-border);}
+.info-item .label{font-size:.7rem;color:var(--epf-muted);text-transform:uppercase;font-weight:600;margin-bottom:4px;}
+.info-item .value{font-size:.95rem;font-weight:700;color:var(--epf-text);font-variant-numeric:tabular-nums;word-break:break-word;}
+.info-item.highlight{background:var(--epf-blue-light);border-left-color:var(--epf-blue);} .info-item.highlight .value{color:var(--epf-blue);}
+.calendar-wrap{background:var(--epf-blue-soft);border:1px solid var(--epf-border-soft);border-radius:8px;padding:1rem;}
+.calendar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;flex-wrap:wrap;gap:8px;}
+.calendar-header .month-label{font-size:.92rem;font-weight:700;color:var(--epf-blue);}
+.calendar-header .hint{font-size:.7rem;color:var(--epf-muted);font-style:italic;}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+.cal-dow{text-align:center;font-size:.68rem;font-weight:700;color:var(--epf-muted);padding:4px;}
+.cal-day{text-align:center;padding:9px 4px;border-radius:6px;cursor:pointer;background:#fff;border:1px solid var(--epf-border-soft);font-size:.82rem;font-weight:500;color:var(--epf-text);user-select:none;transition:.15s;}
+.cal-day:hover{background:var(--epf-blue-light);border-color:var(--epf-blue);color:var(--epf-blue);}
+.cal-day.selected{background:var(--epf-blue);color:#fff;border-color:var(--epf-blue);font-weight:700;}
+.cal-day.empty{background:transparent;border:none;cursor:default;}
+.cal-day.no-data{opacity:.35;cursor:not-allowed;}
+.cal-day.has-ot{box-shadow:inset 0 0 0 2px #f59e0b;}
+.cal-day.selected.has-ot{box-shadow:inset 0 0 0 2px #fbbf24;}
+.ot-table{width:100%;border-collapse:collapse;font-size:.82rem;}
+.ot-table th,.ot-table td{padding:.65rem .7rem;text-align:right;border-bottom:1px solid var(--epf-border-soft);}
+.ot-table th:first-child,.ot-table td:first-child{text-align:left;}
+.ot-table thead th{background:var(--epf-blue-soft);color:var(--epf-blue);font-weight:700;font-size:.7rem;text-transform:uppercase;border-bottom:1px solid var(--epf-border);cursor:pointer;user-select:none;}
+.ot-table thead th:hover{background:#dbeafe;}
+.ot-table thead th.sel{background:#1a4f8a;color:#fff;outline:2px solid #f59e0b;outline-offset:-2px;}
+.ot-table tfoot th,.ot-table tfoot td{background:var(--epf-blue-light);color:var(--epf-blue);font-weight:800;border-top:2px solid var(--epf-border);font-variant-numeric:tabular-nums;}
+.ot-table td{font-variant-numeric:tabular-nums;}
+.ot-table td.sel{background:#e0ecfa;font-weight:700;}
+.empty-row td{text-align:center!important;color:var(--epf-muted);padding:1.5rem!important;font-style:italic;}
+.note{font-size:.72rem;color:var(--epf-muted);margin-top:.6rem;font-style:italic;}
+.right-sidebar{width:320px;flex-shrink:0;display:flex;flex-direction:column;gap:1rem;height:100%;}
+.right-panel{background:#fff;border:1px solid var(--epf-border);border-radius:8px;padding:1rem;overflow-y:auto;}
+.right-panel.calc{flex:1;} .right-panel.summary{flex-shrink:0;}
+.right-panel h3{font-size:.95rem;color:var(--epf-blue);font-weight:700;margin-bottom:1rem;padding-bottom:.7rem;border-bottom:1px solid var(--epf-border-soft);}
+.calc-row{margin-bottom:14px;}
+.calc-row .cl{font-size:.72rem;color:var(--epf-muted);font-weight:700;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;}
+.calc-input{width:100%;padding:.5rem .7rem;border:1px solid var(--epf-border);border-radius:6px;font-size:.9rem;font-family:inherit;color:var(--epf-text);background:#fff;}
+.calc-input:focus{outline:none;border-color:var(--epf-blue);box-shadow:0 0 0 2px rgba(26,79,138,.10);}
+.calc-input:disabled{background:#f1f5f9;color:#94a3b8;cursor:not-allowed;}
+.calc-result{background:var(--epf-blue-light);border:1px solid var(--epf-border);border-radius:8px;padding:.9rem;text-align:center;margin-top:10px;}
+.calc-result .cr-label{font-size:.7rem;color:var(--epf-muted);font-weight:700;text-transform:uppercase;margin-bottom:4px;}
+.calc-result .cr-value{font-size:1.5rem;font-weight:800;color:var(--epf-blue);font-variant-numeric:tabular-nums;}
+.calc-formula{font-size:.72rem;color:var(--epf-muted);text-align:center;margin-top:8px;font-style:italic;}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.summary-item{background:var(--epf-blue-soft);padding:.75rem;border-radius:6px;border-left:3px solid var(--epf-border);}
+.summary-item .label{font-size:.7rem;color:var(--epf-muted);text-transform:uppercase;font-weight:600;margin-bottom:4px;}
+.summary-item .value{font-size:.95rem;font-weight:700;color:var(--epf-text);font-variant-numeric:tabular-nums;}
+.summary-item.highlight{background:var(--epf-blue-light);border-left-color:var(--epf-blue);} .summary-item.highlight .value{color:var(--epf-blue);}
+.modal-backdrop{position:fixed;inset:0;background:rgba(11,27,48,.55);display:flex;align-items:center;justify-content:center;z-index:500;backdrop-filter:blur(2px);}
+.modal-backdrop.hidden{display:none;}
+.modal-content{background:#fff;border-radius:10px;padding:1.5rem;width:460px;max-width:92vw;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-md);}
+.modal-content h2{font-size:1rem;color:var(--epf-blue);font-weight:700;margin-bottom:1rem;padding-bottom:.7rem;border-bottom:1px solid var(--epf-border-soft);}
+.modal-content label{display:block;margin-bottom:.8rem;font-size:.8rem;color:var(--epf-text);font-weight:600;}
+.modal-content label .hint{display:block;font-size:.7rem;color:var(--epf-muted);font-weight:400;margin-top:2px;}
+.modal-content input{width:100%;padding:.5rem .7rem;border:1px solid var(--epf-border);border-radius:6px;margin-top:4px;font-size:.82rem;font-family:inherit;color:var(--epf-text);}
+.modal-actions{display:flex;gap:.6rem;justify-content:flex-end;margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--epf-border-soft);}
+@media (max-width:1200px){.content-wrap{flex-direction:column;height:auto;}.left-sidebar,.right-sidebar{width:100%;height:auto;max-height:320px;}.middle-content{height:auto;}}
+@media (max-width:768px){.navbar{padding:0 .5rem;}.navbar .nav-brand .brand-text{display:none;}.nav-item{padding:0 .6rem;font-size:.68rem;}.nav-chat{padding:.45rem .75rem;font-size:.66rem;}.topbar{padding:.6rem 1rem;}.content-wrap{padding:.5rem;}.info-grid{grid-template-columns:repeat(2,1fr);}.url-box{max-width:100%;flex:1 1 100%;}}
 </style>
 </head>
 <body>
-<!-- ... (HTML 结构保持之前的三栏布局，确保表格表头有 class="mt-col" data-mt="...") ... -->
-<!-- 这里只列出关键的结构修改，请基于你之前的 HTML 修改 -->
-
-<!-- 中间表格表头修改 -->
-<table class="ot-table">
-  <thead>
-    <tr>
-      <th>日期</th><th>工作时长</th><th>加班时长</th>
-      <th class="mt-col" data-mt="1.0" data-type="x1.0">×1.0 (RM)</th>
-      <th class="mt-col" data-mt="1.5" data-type="x1.5">×1.5 (RM)</th>
-      <th class="mt-col" data-mt="2.0" data-type="x2.0">×2.0 (RM)</th>
-      <th class="mt-col" data-mt="3.0" data-type="x3.0">×3.0 (RM)</th>
-    </tr>
-  </thead>
-  <tbody id="calcBody"><tr class="empty-row"><td colspan="7">请选择员工与日期</td></tr></tbody>
-  <tfoot>
-    <tr>
-      <th>合计</th><th id="sumWork">00:00:00</th><th id="sumOT">00:00:00</th>
-      <th class="mt-col" data-mt="1.0" id="sum10">RM 0.00</th>
-      <th class="mt-col" data-mt="1.5" id="sum15">RM 0.00</th>
-      <th class="mt-col" data-mt="2.0" id="sum20">RM 0.00</th>
-      <th class="mt-col" data-mt="3.0" id="sum30">RM 0.00</th>
-    </tr>
-  </tfoot>
-</table>
-
-<!-- 右侧面板结构微调 -->
-<div class="right-panel calc">
-  <h3>⚙️ OT 设定与日薪计算</h3>
-  
-  <!-- 时薪显示区 -->
-  <div class="calc-row">
-    <div class="cl"><span>时薪 OT 类型 (点表头选)</span></div>
-    <div id="hourlyTypeDisplay" style="font-weight:bold; color:var(--epf-blue);">未选择</div>
-  </div>
-  <hr style="margin: 15px 0; border:0; border-top:1px solid #eee;">
-
-  <!-- 日薪输入区 -->
-  <div class="calc-row"><div class="cl"><span>日薪 (RM)</span></div><input type="number" id="calcDailyInput" class="calc-input"></div>
-  <div class="calc-row"><div class="cl"><span>日薪倍率</span></div>
-    <select id="calcMultSelect" class="calc-input">
-      <option value="">未选择</option>
-      <option value="1.0" data-type="x1.0">×1.0</option>
-      <option value="1.5" data-type="x1.5">×1.5</option>
-      <option value="2.0" data-type="x2.0">×2.0</option>
-      <option value="3.0" data-type="x3.0">×3.0</option>
-    </select>
-  </div>
-  <div class="calc-row"><div class="cl"><span>加班天数 (手动)</span></div><input type="number" id="calcDaysInput" class="calc-input" value="0"></div>
-  
-  <div class="calc-result">
-    <div class="cr-label">日薪加班工资</div>
-    <div class="cr-value" id="calcResultValue">-</div>
-    <div class="calc-formula" id="calcFormulaText">日薪 × 倍率 × 天数</div>
-  </div>
+<div class="toast-container" id="toastContainer"></div>
+<nav class="navbar">
+<div class="nav-brand"><span class="logo">Y</span><span class="brand-text">YZ Payroll</span></div>
+<div class="nav-links" id="navLinks">
+<button class="nav-back" id="backBtn" title="返回上一页">⏎</button>
+<div class="nav-dropdown" id="filesDropdown"><button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button><div class="dropdown-menu"><a href="dashboard.html">📊 DASHBOARD</a><a href="staffinfo.html">👥 EMPLOYEES</a><a href="leave.html">📅 TIMECARD REPORT</a><a href="overtime.html">⏱️ OVERTIME SHEET</a><div class="divider"></div><a href="epf.html">🏦 EPF</a><a href="socso.html">🛡️ SOCSO</a><a href="eis.html">📋 EIS</a><a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a><div class="divider"></div><a href="companysetting.html">⚙️ COMPANY SETTING</a><a href="121.html">📄 121</a><a href="122.html">📄 122</a><a href="123.html">📄 123</a><a href="GoogleSheetBackupURL.html">📄 Google Sheet Backup URL</a></div></div>
+<a class="nav-item" href="dashboard.html">DASHBOARD</a>
+<a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
+<a class="nav-item" href="leave.html">TIMECARD REPORT</a>
+<a class="nav-item active" href="overtime.html">OVERTIME</a>
+<div class="nav-dropdown" id="carumanDropdown"><button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button><div class="dropdown-menu"><a href="epf.html">🏦 EPF</a><a href="socso.html">🛡️ SOCSO</a><a href="eis.html">📋 EIS</a><a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a></div></div>
+<a class="nav-item" href="companysetting.html">SETTING</a>
+<div class="nav-dropdown" id="othersDropdown"><button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button><div class="dropdown-menu"><a href="companysetting.html">⚙️ COMPANY SETTING</a><div class="divider"></div><a href="121.html">📄 121</a><a href="122.html">📄 122</a><a href="123.html">📄 123</a><a href="GoogleSheetBackupURL.html">📄 Google Sheet Backup URL</a></div></div>
 </div>
-
+<button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')"><span class="pulse"></span> 💬 Request Chat</button>
+</nav>
+<div class="topbar">
+<div class="brand"><div class="logo">⏱</div> Payroll Overtime</div>
+<span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
+<span class="spacer" style="flex:1;"></span>
+<button class="btn btn-success" id="saveBtnTop" style="margin-right:10px;"><i class="fas fa-save"></i> 手动保存加班记录</button>
+<div class="url-box"><input type="text" id="deployUrlInput" placeholder="Paste Deploy URL di sini..." onkeydown="if(event.key==='Enter') applyUrl()"><button onclick="applyUrl()">🔗 Apply</button></div>
+<span class="sync-badge" id="syncBadge"><span class="dot"></span><span id="syncBadgeText">Sedia</span></span>
+<button class="btn btn-success" onclick="loadAllData()"><i class="fas fa-sync-alt"></i> Muat Semula</button>
+</div>
+<div class="content-wrap">
+<div class="left-sidebar">
+<h2><i class="fas fa-history"></i> 已保存加班记录</h2>
+<div class="sidebar-list" id="sidebarList"><div style="text-align:center;font-size:.8rem;color:#94a3b8;padding:20px 0;">加载中...</div></div>
+</div>
+<div class="middle-content">
+<div class="page-header"><h1>⏱ Overtime 加班计算</h1><p>时薪：点表头列选倍率；日薪：右侧手动输入天数。两者独立计算保存。</p></div>
+<section class="ot-card">
+<h2>员工基础信息 <button class="btn btn-sm" id="openSettings"><i class="fas fa-cog"></i> 设置</button></h2>
+<div class="toolbar"><label>选择员工：</label><select id="staffSelect"><option value="">-- 请选择 --</option></select></div>
+<div class="info-grid"><div class="info-item"><div class="label">员工代码</div><div class="value" id="empCode">-</div></div><div class="info-item"><div class="label">姓名</div><div class="value" id="empName">-</div></div><div class="info-item"><div class="label">分店</div><div class="value" id="empGroup">-</div></div><div class="info-item"><div class="label">基础薪资 (RM)</div><div class="value" id="empSalary">-</div></div></div>
+<div class="info-grid"><div class="info-item highlight"><div class="label">日薪 (RM)</div><div class="value" id="dailyRate">-</div></div><div class="info-item highlight"><div class="label">时薪 (RM)</div><div class="value" id="hourlyRate">-</div></div><div class="info-item highlight"><div class="label">当月总工作时长</div><div class="value" id="monthlyWorkTime">-</div></div><div class="info-item highlight"><div class="label">当月总加班时长</div><div class="value" id="monthlyOtTime">-</div></div></div>
+<p class="note">参考标准：每天工作 7.5 小时，每月 26 天（可在「设置」中修改）</p>
+</section>
+<section class="ot-card">
+<h2>加班日期选择（时薪用）</h2>
+<div class="toolbar"><label>月份：</label><input type="month" id="monthPicker"></div>
+<div class="calendar-wrap"><div class="calendar-header"><span class="month-label" id="calLabel">-</span><span class="hint">点击日期多选；橙框=当天有加班；灰显=无工作记录</span></div><div class="calendar-grid" id="calendarGrid"></div></div>
+</section>
+<section class="ot-card">
+<h2>加班补贴计算表 <span style="font-size:.72rem;color:var(--epf-muted);font-weight:500;">（点击表头列名选择时薪 OT 倍率）</span></h2>
+<table class="ot-table">
+<thead><tr><th>日期</th><th>工作时长</th><th>加班时长</th><th class="mt-col" data-mt="1.0">×1.0 (RM)</th><th class="mt-col" data-mt="1.5">×1.5 (RM)</th><th class="mt-col" data-mt="2.0">×2.0 (RM)</th><th class="mt-col" data-mt="3.0">×3.0 (RM)</th></tr></thead>
+<tbody id="calcBody"><tr class="empty-row"><td colspan="7">请选择员工与日期</td></tr></tbody>
+<tfoot><tr><th>合计</th><th id="sumWork">00:00:00</th><th id="sumOT">00:00:00</th><th class="mt-col" data-mt="1.0" id="sum10">RM 0.00</th><th class="mt-col" data-mt="1.5" id="sum15">RM 0.00</th><th class="mt-col" data-mt="2.0" id="sum20">RM 0.00</th><th class="mt-col" data-mt="3.0" id="sum30">RM 0.00</th></tr></tfoot>
+</table>
+</section>
+</div>
+<div class="right-sidebar">
+<div class="right-panel calc">
+<h3>⚙️ OT 设定与日薪计算</h3>
+<div class="calc-row">
+<div class="cl"><span>时薪 OT 类型（点表头选）</span></div>
+<div class="value" id="hourlyTypeDisplay" style="font-size:1.1rem;font-weight:700;color:var(--epf-blue);">未选择</div>
+</div>
+<hr style="border:0;border-top:1px solid var(--epf-border);margin:15px 0;">
+<div class="calc-row"><div class="cl"><span>日薪 (RM)</span></div><input type="number" step="0.01" min="0" class="calc-input" id="calcDailyInput"></div>
+<div class="calc-row"><div class="cl"><span>日薪倍率 (OT TYPE)</span></div><select class="calc-input" id="calcMultSelect"><option value="">未选择</option><option value="1.0">×1.0</option><option value="1.5">×1.5</option><option value="2.0">×2.0</option><option value="3.0">×3.0</option></select></div>
+<div class="calc-row"><div class="cl"><span>加班天数（手动输入）</span></div><input type="number" step="1" min="0" class="calc-input" id="calcDaysInput" value="0"></div>
+<div class="calc-result"><div class="cr-label">日薪加班工资</div><div class="cr-value" id="calcResultValue">-</div></div>
+<div class="calc-formula" id="calcFormulaText">日薪 × 倍率 × 天数</div>
+</div>
+<div class="right-panel summary">
+<h3>📋 员工加班资料整合</h3>
+<div class="summary-grid">
+<div class="summary-item highlight"><div class="label">时薪 OT 类型</div><div class="value" id="summaryHourlyType">-</div></div>
+<div class="summary-item highlight"><div class="label">时薪 OT 金额</div><div class="value" id="summaryHourlyAmt">-</div></div>
+<div class="summary-item"><div class="label">日薪 OT 类型</div><div class="value" id="summaryDailyType">-</div></div>
+<div class="summary-item"><div class="label">日薪 OT 金额</div><div class="value" id="summaryDailyAmt">-</div></div>
+</div>
+</div>
+</div>
+</div>
+<div class="modal-backdrop hidden" id="settingsModal">
+<div class="modal-content">
+<h2>⚙ 设置</h2>
+<label>日薪计算天数<span class="hint">日薪 = 基础薪资 ÷ 天数（默认 26）</span><input type="number" id="setDays" min="1" step="1" value="26"></label>
+<label>时薪计算小时<span class="hint">时薪 = 日薪 ÷ 小时（默认 7.5）</span><input type="number" id="setHours" min="0.1" step="0.1" value="7.5"></label>
+<label>×1.0 倍率<span class="hint">时薪 × 1.0</span><input type="number" id="setRate10" step="0.1" value="1.0"></label>
+<label>×1.5 倍率<span class="hint">普通加班</span><input type="number" id="setRate15" step="0.1" value="1.5"></label>
+<label>×2.0 倍率<span class="hint">休息日加班</span><input type="number" id="setRate20" step="0.1" value="2.0"></label>
+<label>×3.0 倍率<span class="hint">公共假期加班</span><input type="number" id="setRate30" step="0.1" value="3.0"></label>
+<div class="modal-actions"><button class="btn" id="cancelSettings">取消</button><button class="btn btn-success" id="applySettings">保存设置</button></div>
+</div>
+</div>
 <script>
-// ... (保留之前的变量定义和工具函数) ...
-let hourlyOtTypeVal = ''; // 存数值 1.0, 2.0
-let hourlyOtTypeLabel = ''; // 存标签 x1.0, x2.0
+document.addEventListener('DOMContentLoaded', function() {
+const backBtn = document.getElementById('backBtn');
+if (backBtn) backBtn.addEventListener('click', e => { e.preventDefault(); history.back(); });
+document.querySelectorAll('[data-dropdown-toggle]').forEach(toggle => { toggle.addEventListener('click', function(e) { e.stopPropagation(); const id = this.getAttribute('data-dropdown-toggle'); document.querySelectorAll('.nav-dropdown.open').forEach(dd => { if (dd.id !== id + 'Dropdown') dd.classList.remove('open'); }); this.closest('.nav-dropdown')?.classList.toggle('open'); }); });
+document.addEventListener('click', e => { if (!e.target.closest('.nav-dropdown')) document.querySelectorAll('.nav-dropdown.open').forEach(dd => dd.classList.remove('open')); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.nav-dropdown.open').forEach(dd => dd.classList.remove('open')); });
+});
+function showToast(msg, type='info', duration=3000){const c=document.getElementById('toastContainer');if(!c)return;const el=document.createElement('div');el.className=`toast ${type}`;const icon=type==='success'?'✅':type==='error'?'❌':'ℹ️';el.innerHTML=`<span>${icon}</span> <span>${escapeHtml(msg)}</span>`;c.appendChild(el);setTimeout(()=>{el.style.animation='fadeOut .3s ease-in forwards';setTimeout(()=>el.remove(),300);},duration);}
 
-// ... (保留 loadAllData, renderSidebar 等) ...
+const URL_KEY='payrollScriptUrl',LS_SETTINGS='overtime_settings_v1',LS_STAFF='overtime_staffcache_v1',LS_SHEET='overtime_sheetcache_v1',LS_OT_DATA='overtime_recordcache_v1',CACHE_TTL=5*60*1000;
+let SCRIPT_URL='',allStaff=[],allSheetData=[],allOvertimeData=[],currentStaff=null,currentMonth='',selectedDates=new Set(),isSaving=false,activeSidebarIndex=-1;
+let settings={daysPerMonth:26,hoursPerDay:7.5,rate10:1.0,rate15:1.5,rate20:2.0,rate30:3.0};
+let hourlyOtType = ''; // 时薪选中的倍率（如"2.0"）
 
-// 1. 表头点击事件
+function fmtHHMMSS(h){if(!h||h<=0)return'00:00:00';const t=Math.round(h*3600);return[Math.floor(t/3600),Math.floor((t%3600)/60),t%60].map(n=>String(n).padStart(2,'0')).join(':');}
+function fmtRM(v){return'RM '+(Number(v)||0).toFixed(2);}
+function parseH(v){if(v===undefined||v===null||v==='')return 0;if(typeof v==='number')return v;let str=String(v).trim();if(str.includes('T')&&str.includes(':')){const m=str.match(/T(\d{2}):(\d{2})(?::(\d{2}))?/);if(m)return(parseInt(m[1],10)||0)+(parseInt(m[2],10)||0)/60+(parseInt(m[3],10)||0)/3600;}if(str.includes(':')){const p=str.split(':');return(parseFloat(p[0])||0)+(parseFloat(p[1])||0)/60+(parseFloat(p[2])||0)/3600;}if(str.toLowerCase().endsWith('h'))return parseFloat(str)||0;const n=parseFloat(str);return isNaN(n)?0:n;}
+function escapeHtml(s){if(s==null)return'';return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function normalizeMonth(v){if(!v)return'';if(v instanceof Date)return`${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,'0')}`;const s=String(v).trim().replace(/^'/,'');const m=s.match(/^(\d{4})[-/](\d{1,2})/);if(m)return`${m[1]}-${m[2].padStart(2,'0')}`;return'';}
+function formatUpdatedAt(v){if(!v)return'未知';try{const d=new Date(v);if(isNaN(d.getTime()))return String(v);return d.toLocaleString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});}catch(e){return String(v);}}
+function setSyncBadge(state,text){const b=document.getElementById('syncBadge');const t=document.getElementById('syncBadgeText');if(!b||!t)return;b.className='sync-badge '+(state||'');t.textContent=text;}
+function isCodeMatch(c1,c2){if(!c1||!c2)return false;const a=String(c1).trim(),b=String(c2).trim();if(a===b)return true;if(!isNaN(a)&&!isNaN(b))return Number(a)===Number(b);return false;}
+function nameMatch(a,b){const sa=String(a||'').trim().toUpperCase(),sb=String(b||'').trim().toUpperCase();if(sa===''||sb==='')return true;return sa===sb;}
+
+function loadSavedUrl(){try{SCRIPT_URL=localStorage.getItem(URL_KEY)||'';document.getElementById('deployUrlInput').value=SCRIPT_URL;if(SCRIPT_URL)setSyncBadge('ok','URL 已就绪');else setSyncBadge('err','URL 未设置');}catch(e){SCRIPT_URL='';}}
+function applyUrl(){const url=document.getElementById('deployUrlInput').value.trim();if(!url){alert('请先输入 Deploy URL');return;}localStorage.setItem(URL_KEY,url);SCRIPT_URL=url;setSyncBadge('ok','URL 已保存');loadAllData();}
+async function apiGet(action){if(!SCRIPT_URL)throw new Error('未设置 Deploy URL');const res=await fetch(`${SCRIPT_URL}?${new URLSearchParams({action,_t:Date.now()})}`);return await res.json();}
+async function apiPost(body){if(!SCRIPT_URL)throw new Error('未设置 Deploy URL');const res=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)});return await res.json();}
+
+async function loadAllData(){if(!SCRIPT_URL){setSyncBadge('err','URL 未设置');return;}setSyncBadge('busy','加载中...');try{await Promise.all([loadStaffList(),loadSheetData(),loadOvertimeData(true)]);setSyncBadge('ok','数据已加载');}catch(err){console.error(err);setSyncBadge('err','加载失败');alert('加载失败：'+err.message);}}
+async function loadStaffList(){let data=null;try{const c=JSON.parse(localStorage.getItem(LS_STAFF)||'null');if(c&&Date.now()-c.ts<CACHE_TTL)data=c.data;}catch(e){}if(!data){const res=await apiGet('getData');data=(res&&res.result==='success'&&Array.isArray(res.data))?res.data:(Array.isArray(res)?res:(res&&Array.isArray(res.data)?res.data:[]));localStorage.setItem(LS_STAFF,JSON.stringify({ts:Date.now(),data}));}allStaff=data;const select=document.getElementById('staffSelect');select.innerHTML='<option value="">-- 请选择 --</option>';data.forEach(s=>{const code=String(s.Code||s['ID KOD']||'').trim();if(!code)return;const opt=document.createElement('option');opt.value=code;opt.textContent=`${code} - ${String(s.Name||'').trim()}`;opt.dataset.name=String(s.Name||'').trim();opt.dataset.group=String(s.GroupName||s['GROUP']||'').trim();opt.dataset.salary=parseH(s.Salary||s['GAJI']||0);select.appendChild(opt);});}
+async function loadSheetData(){let data=null;try{const c=JSON.parse(localStorage.getItem(LS_SHEET)||'null');if(c&&Date.now()-c.ts<CACHE_TTL)data=c.data;}catch(e){}if(!data){const res=await apiGet('getSheetData');data=res.data||[];localStorage.setItem(LS_SHEET,JSON.stringify({ts:Date.now(),data}));}allSheetData=data;}
+async function loadOvertimeData(force){let data=null;if(!force){try{const c=JSON.parse(localStorage.getItem(LS_OT_DATA)||'null');if(c&&Date.now()-c.ts<CACHE_TTL)data=c.data;}catch(e){}}if(!data){const res=await apiGet('getOvertimeData');data=res.data||[];localStorage.setItem(LS_OT_DATA,JSON.stringify({ts:Date.now(),data}));}allOvertimeData=data;if(currentStaff)activeSidebarIndex=allOvertimeData.findIndex(item=>isCodeMatch(item['ID KOD'],currentStaff.code)&&nameMatch(item['NAME'],currentStaff.name));else activeSidebarIndex=-1;renderSidebar();}
+
+function renderSidebar(){
+const list=document.getElementById('sidebarList');list.innerHTML='';
+if(!allOvertimeData||allOvertimeData.length===0){list.innerHTML='<div style="text-align:center;font-size:.8rem;color:#94a3b8;padding:20px 0;">暂无保存记录</div>';return;}
+allOvertimeData.forEach((item,index)=>{
+const code=String(item['ID KOD']||'').trim();const name=String(item['NAME']||'').trim();const month=normalizeMonth(item['MONTH']);const otH=parseH(item['TOTAL_OT_TIME_H']);const updated=formatUpdatedAt(item['UPDATED_AT']);
+const hType=String(item['TIME_OT_TYPE']||'').trim();const dType=String(item['DAILY_OT_TYPE']||'').trim();
+const typeText = (hType||dType) ? `时薪×${hType||'-'} / 日薪×${dType||'-'}` : '未设定倍率';
+let isActive=false;if(currentStaff)isActive=isCodeMatch(code,currentStaff.code)&&nameMatch(name,currentStaff.name);
+const div=document.createElement('div');div.className=`sidebar-item ${isActive?'active':''}`;
+const contentDiv=document.createElement('div');contentDiv.className='sidebar-item-content';
+contentDiv.innerHTML=`<div class="item-name">${escapeHtml(name)} <span style="font-size:.7rem;color:#64748b;">(${escapeHtml(code)})</span></div><div class="item-info"><span>${escapeHtml(month||'未知月份')}</span><span class="item-ot">加班: ${fmtHHMMSS(otH)}</span></div><div class="item-type set">${typeText}</div><span class="item-time">🕐 ${escapeHtml(updated)}</span>`;
+contentDiv.addEventListener('click',()=>loadFromSidebar(item,index));
+list.appendChild(div);
+});
+}
+
+function loadFromSidebar(item,index){
+const itemCode=String(item['ID KOD']||'').trim();const itemName=String(item['NAME']||'').trim();
+const matchedStaff=allStaff.find(s=>{const sCode=String(s.Code||s['ID KOD']||'').trim();const sName=String(s.Name||'').trim();return isCodeMatch(sCode,itemCode)||(itemName&&sName===itemName);});
+if(!matchedStaff){showToast('找不到该员工记录: '+(itemCode||itemName),'error');return;}
+const targetCode=String(matchedStaff.Code||matchedStaff['ID KOD']||'').trim();
+const sel=document.getElementById('staffSelect');sel.value=targetCode;
+if(sel.value!==targetCode){showToast('无法选中该员工','error');return;}
+onStaffChange();
+}
+
+function onStaffChange(){
+const code=document.getElementById('staffSelect').value;
+if(!code){currentStaff=null;activeSidebarIndex=-1;renderSidebar();resetStaffInfo();resetRightPanel();return;}
+const opt=document.querySelector(`#staffSelect option[value="${code}"]`);
+currentStaff={code,name:opt?String(opt.dataset.name||'').trim():'',group:opt?String(opt.dataset.group||'').trim():'',salary:opt?(parseFloat(opt.dataset.salary)||0):0};
+document.getElementById('empCode').textContent=currentStaff.code;document.getElementById('empName').textContent=currentStaff.name;document.getElementById('empGroup').textContent=currentStaff.group;document.getElementById('empSalary').textContent=fmtRM(currentStaff.salary);
+const {daily,hourly}=currentRates();
+document.getElementById('dailyRate').textContent=fmtRM(daily);document.getElementById('hourlyRate').textContent=fmtRM(hourly);
+document.getElementById('calcDailyInput').value=daily.toFixed(2);
+
+const existing=allOvertimeData.find(item=>isCodeMatch(item['ID KOD'],code)&&nameMatch(item['NAME'],currentStaff.name));
+if(existing){
+  const month=normalizeMonth(existing['MONTH']);
+  if(month&&/^\d{4}-\d{2}$/.test(month)){document.getElementById('monthPicker').value=month;currentMonth=month;}
+  selectedDates.clear();
+  try{let details=existing['DETAILS'];if(typeof details==='string')details=JSON.parse(details);if(Array.isArray(details))details.forEach(d=>{if(d&&d.date){const ds=String(d.date).trim();if(/^\d{4}-\d{2}-\d{2}$/.test(ds))selectedDates.add(ds);}});}catch(e){}
+  activeSidebarIndex=allOvertimeData.indexOf(existing);
+  hourlyOtType = String(existing['TIME_OT_RATE']||'').trim();
+  document.getElementById('calcMultSelect').value = String(existing['DAILY_OT_TYPE']||'').trim();
+  document.getElementById('calcDaysInput').value = parseFloat(existing['DAILY_OT_DAY'])||0;
+  showToast(`📂 已载入 ${existing['NAME']} (${month})`,'info',5000);
+  updateRightPanelDisplay(existing);
+}else{
+  activeSidebarIndex=-1;selectedDates.clear();hourlyOtType='';
+  document.getElementById('calcMultSelect').value='';document.getElementById('calcDaysInput').value=0;
+  updateCalcResult();resetSummary();
+}
+renderSidebar();refreshMonthlySummary();renderCalendar();renderTable();updateHourlyTypeDisplay();
+}
+
+function resetStaffInfo(){['empCode','empName','empGroup','empSalary','dailyRate','hourlyRate','monthlyWorkTime','monthlyOtTime'].forEach(id=>document.getElementById(id).textContent='-');document.getElementById('calendarGrid').innerHTML='';document.getElementById('calcBody').innerHTML='<tr class="empty-row"><td colspan="7">请选择员工与日期</td></tr>';resetTotals();}
+function currentRates(){if(!currentStaff)return{daily:0,hourly:0};const daily=settings.daysPerMonth>0?(currentStaff.salary/settings.daysPerMonth):0;const hourly=settings.hoursPerDay>0?(daily/settings.hoursPerDay):0;return{daily,hourly};}
+function getMonthRows(){if(!currentStaff||!currentMonth)return[];return allSheetData.filter(r=>isCodeMatch(r['ID KOD'],currentStaff.code)&&String(r['Date']||'').startsWith(currentMonth+'-'));}
+function getDateRow(dateStr){if(!currentStaff)return null;return allSheetData.find(r=>isCodeMatch(r['ID KOD'],currentStaff.code)&&String(r['Date']||'')===dateStr)||null;}
+function getRowOT(row){if(!row)return 0;const s=String(row['SITUATION WORK TIME']||'').trim();if(s!=='超时工作')return 0;const v=String(row['Total Over/Less Time (h)']||'').trim();if(v==='-'||v==='')return 0;return Math.max(0,parseH(v));}
+function getRowWork(row){return row?Math.max(0,parseH(row['Total Work Time(h)'])):0;}
+function refreshMonthlySummary(){if(!currentStaff||!currentMonth){document.getElementById('monthlyWorkTime').textContent='-';document.getElementById('monthlyOtTime').textContent='-';return;}const rows=getMonthRows();document.getElementById('monthlyWorkTime').textContent=fmtHHMMSS(rows.reduce((s,r)=>s+getRowWork(r),0));document.getElementById('monthlyOtTime').textContent=fmtHHMMSS(rows.reduce((s,r)=>s+getRowOT(r),0));}
+function renderCalendar(){
+const grid=document.getElementById('calendarGrid');const label=document.getElementById('calLabel');grid.innerHTML='';if(!currentMonth){label.textContent='-';return;}
+const[y,m]=currentMonth.split('-').map(Number);label.textContent=`${y} 年 ${m} 月`;
+['日','一','二','三','四','五','六'].forEach(d=>{const el=document.createElement('div');el.className='cal-dow';el.textContent=d;grid.appendChild(el);});
+const firstDay=new Date(y,m-1,1).getDay();const daysInMonth=new Date(y,m,0).getDate();
+for(let i=0;i<firstDay;i++){const el=document.createElement('div');el.className='cal-day empty';grid.appendChild(el);}
+for(let d=1;d<=daysInMonth;d++){
+const dateStr=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;const row=getDateRow(dateStr);const ot=getRowOT(row);
+const el=document.createElement('div');el.className='cal-day';el.textContent=d;
+if(!row)el.classList.add('no-data');else if(ot>0)el.classList.add('has-ot');
+if(selectedDates.has(dateStr))el.classList.add('selected');
+el.addEventListener('click',()=>{if(!row){alert('该日期没有此员工的工作记录');return;}if(selectedDates.has(dateStr))selectedDates.delete(dateStr);else selectedDates.add(dateStr);renderCalendar();renderTable();});
+grid.appendChild(el);
+}
+}
+
+// 时薪表头点击选择倍率
 document.querySelectorAll('.mt-col').forEach(th => {
   th.addEventListener('click', function() {
     if (!currentStaff) { showToast('请先选择员工', 'error'); return; }
-    const mt = this.dataset.mt; // 1.0, 2.0...
-    const typeLabel = this.dataset.type; // x1.0, x2.0...
-    
-    // 切换逻辑
-    if (hourlyOtTypeVal === mt) {
-      hourlyOtTypeVal = ''; hourlyOtTypeLabel = ''; // 取消选中
-    } else {
-      hourlyOtTypeVal = mt; hourlyOtTypeLabel = typeLabel;
-    }
-    
-    // 更新 UI
-    document.querySelectorAll('.mt-col').forEach(el => {
-      el.classList.toggle('sel', el.dataset.mt === hourlyOtTypeVal);
-    });
-    document.getElementById('hourlyTypeDisplay').textContent = hourlyOtTypeLabel ? `×${hourlyOtTypeVal} (已选)` : '未选择';
-    
-    // 更新右侧摘要
-    updateSummaryDisplay();
+    const mt = this.dataset.mt;
+    if (hourlyOtType === mt) hourlyOtType = '';
+    else hourlyOtType = mt;
+    updateHourlyTypeDisplay();
+    renderTable();
   });
 });
 
-// 2. 修改 onSave 函数 (核心修复)
-async function onSave() {
-  if (!currentStaff || !currentMonth) {
-    alert('请先选择员工和月份'); return;
-  }
-  
-  // 检查是否有有效输入：要么选了日期(时薪)，要么填了天数(日薪)
-  const hasHourly = selectedDates.size > 0 && hourlyOtTypeVal !== '';
-  const dailyDays = parseInt(document.getElementById('calcDaysInput').value) || 0;
-  const dailyTypeVal = document.getElementById('calcMultSelect').value;
-  const hasDaily = dailyDays > 0 && dailyTypeVal !== '';
-
-  if (!hasHourly && !hasDaily) {
-    alert('请至少选择时薪日期并点选倍率，或者填写日薪天数与倍率');
-    return;
-  }
-
-  if (isSaving) return; isSaving = true;
-
-  const calcDaily = parseFloat(document.getElementById('calcDailyInput').value) || 0;
-  const { hourly } = currentRates();
-  const sorted = [...selectedDates].sort();
-  
-  // 计算时薪数据
-  const details = []; 
-  let sumW = 0, sumOT = 0, sum10 = 0, sum15 = 0, sum20 = 0, sum30 = 0;
-  
-  sorted.forEach(dateStr => {
-    const row = getDateRow(dateStr); if (!row) return;
-    const work = getRowWork(row); const ot = getRowOT(row);
-    const a10 = ot*hourly*settings.rate10, a15 = ot*hourly*settings.rate15, a20 = ot*hourly*settings.rate20, a30 = ot*hourly*settings.rate30;
-    details.push({ date: dateStr, workHours: work, otHours: ot, a10, a15, a20, a30 });
-    sumW += work; sumOT += ot; sum10 += a10; sum15 += a15; sum20 += a20; sum30 += a30;
-  });
-
-  // 提取选中的时薪总额
-  const timeOtAmountMap = { '1.0': sum10, '1.5': sum15, '2.0': sum20, '3.0': sum30 };
-  const timeOtAmount = hourlyOtTypeVal ? (timeOtAmountMap[hourlyOtTypeVal] || 0) : 0;
-
-  // 计算日薪数据
-  const dailyOtAmount = hasDaily ? (calcDaily * parseFloat(dailyTypeVal) * dailyDays) : 0;
-  const dailyTypeLabel = document.getElementById('calcMultSelect').options[document.getElementById('calcMultSelect').selectedIndex].text;
-
-  const payload = {
-    action: 'saveOvertimeRecord',
-    code: currentStaff.code,
-    name: currentStaff.name,
-    month: currentMonth,
-    // 时薪字段
-    totalWorkTime: sumW,
-    totalOtTime: sumOT,
-    timeOtRate: hourlyOtTypeVal,       // 数值 2.0
-    timeOtType: hourlyOtTypeLabel,     // 标签 x2.0
-    timeOtAmount: timeOtAmount,        // 总额 237.18
-    // 日薪字段
-    dailyRate: calcDaily,
-    dailyOtType: dailyTypeLabel,       // 标签 x1.0
-    dailyOtDays: dailyDays,
-    dailyOtAmount: dailyOtAmount,
-    // 详情
-    details: details
-  };
-
-  try {
-    const res = await apiPost(payload);
-    if (res.status === 'success') {
-      showToast(`✅ 保存成功 (${res.mode === 'updated' ? '覆盖' : '新建'})`, 'success');
-      await loadOvertimeData(true); // 强制刷新
-    } else {
-      showToast('保存失败：' + res.message, 'error');
-    }
-  } catch (err) {
-    showToast('保存失败：' + err.message, 'error');
-  } finally {
-    isSaving = false;
-  }
+function updateHourlyTypeDisplay() {
+  document.querySelectorAll('.mt-col').forEach(el => el.classList.toggle('sel', hourlyOtType && el.dataset.mt === hourlyOtType));
+  document.getElementById('hourlyTypeDisplay').textContent = hourlyOtType ? `×${hourlyOtType}` : '未选择';
+  document.getElementById('summaryHourlyType').textContent = hourlyOtType ? `×${hourlyOtType}` : '-';
 }
 
-// ... (其余代码保持不变) ...
+function renderTable(){
+const tbody=document.getElementById('calcBody');tbody.innerHTML='';
+if(!currentStaff){tbody.innerHTML='<tr class="empty-row"><td colspan="7">请选择员工与日期</td></tr>';resetTotals();return;}
+if(selectedDates.size===0){tbody.innerHTML='<tr class="empty-row"><td colspan="7">请在日历中选择日期</td></tr>';resetTotals();return;}
+const{hourly}=currentRates();const sorted=[...selectedDates].sort();
+let sumW=0,sumOT=0,sum10=0,sum15=0,sum20=0,sum30=0;
+sorted.forEach(dateStr=>{const row=getDateRow(dateStr);if(!row)return;const work=getRowWork(row);const ot=getRowOT(row);const a10=ot*hourly*settings.rate10,a15=ot*hourly*settings.rate15,a20=ot*hourly*settings.rate20,a30=ot*hourly*settings.rate30;sumW+=work;sumOT+=ot;sum10+=a10;sum15+=a15;sum20+=a20;sum30+=a30;const tr=document.createElement('tr');tr.innerHTML=`<td>${escapeHtml(dateStr)}</td><td>${fmtHHMMSS(work)}</td><td>${ot>0?fmtHHMMSS(ot):'—'}</td><td class="mt-col" data-mt="1.0">${fmtRM(a10)}</td><td class="mt-col" data-mt="1.5">${fmtRM(a15)}</td><td class="mt-col" data-mt="2.0">${fmtRM(a20)}</td><td class="mt-col" data-mt="3.0">${fmtRM(a30)}</td>`;tbody.appendChild(tr);});
+document.getElementById('sumWork').textContent=fmtHHMMSS(sumW);document.getElementById('sumOT').textContent=fmtHHMMSS(sumOT);document.getElementById('sum10').textContent=fmtRM(sum10);document.getElementById('sum15').textContent=fmtRM(sum15);document.getElementById('sum20').textContent=fmtRM(sum20);document.getElementById('sum30').textContent=fmtRM(sum30);
+document.querySelectorAll('tfoot .mt-col').forEach(el => el.classList.toggle('sel', hourlyOtType && el.dataset.mt === hourlyOtType));
+const amtMap = {'1.0':sum10,'1.5':sum15,'2.0':sum20,'3.0':sum30};
+document.getElementById('summaryHourlyAmt').textContent = hourlyOtType ? fmtRM(amtMap[hourlyOtType]||0) : '-';
+}
+function resetTotals(){['sumWork','sumOT'].forEach(id=>document.getElementById(id).textContent='00:00:00');['sum10','sum15','sum20','sum30'].forEach(id=>document.getElementById(id).textContent='RM 0.00');}
+
+function getCalcDaily(){const v=parseFloat(document.getElementById('calcDailyInput').value);return isNaN(v)||v<0?0:v;}
+function getCalcDays(){const v=parseInt(document.getElementById('calcDaysInput').value,10);return isNaN(v)||v<0?0:v;}
+function updateCalcResult(){
+const daily=getCalcDaily();const type=document.getElementById('calcMultSelect').value;const days=getCalcDays();
+const rv=document.getElementById('calcResultValue');const ft=document.getElementById('calcFormulaText');
+if(!type){rv.textContent='-';ft.textContent='请选择倍率';}
+else{const amt=daily*parseFloat(type)*days;rv.textContent=fmtRM(amt);ft.textContent=`${fmtRM(daily)} × ${type} × ${days} 天 = ${fmtRM(amt)}`;}
+document.getElementById('summaryDailyType').textContent=type?`×${type}`:'-';
+document.getElementById('summaryDailyAmt').textContent=type?fmtRM(daily*parseFloat(type)*days):'-';
+}
+document.getElementById('calcDailyInput').addEventListener('input',updateCalcResult);
+document.getElementById('calcDaysInput').addEventListener('input',updateCalcResult);
+document.getElementById('calcMultSelect').addEventListener('change',updateCalcResult);
+
+function updateRightPanelDisplay(item) {
+  updateCalcResult();
+  document.getElementById('summaryHourlyType').textContent = String(item['TIME_OT_TYPE']||'').trim() ? `×${item['TIME_OT_TYPE']}` : '-';
+  document.getElementById('summaryHourlyAmt').textContent = fmtRM(parseFloat(item['TIME_OT_AMOUNT'])||0);
+  document.getElementById('summaryDailyType').textContent = String(item['DAILY_OT_TYPE']||'').trim() ? `×${item['DAILY_OT_TYPE']}` : '-';
+  document.getElementById('summaryDailyAmt').textContent = fmtRM(parseFloat(item['DAILY_OT_AMOUNT'])||0);
+}
+function resetRightPanel(){document.getElementById('calcMultSelect').value='';document.getElementById('calcDaysInput').value=0;const{daily}=currentRates();document.getElementById('calcDailyInput').value=daily?daily.toFixed(2):'0.00';updateCalcResult();resetSummary();}
+function resetSummary(){document.getElementById('summaryHourlyType').textContent='-';document.getElementById('summaryHourlyAmt').textContent='-';document.getElementById('summaryDailyType').textContent='-';document.getElementById('summaryDailyAmt').textContent='-';}
+
+function loadSettings(){try{const s=JSON.parse(localStorage.getItem(LS_SETTINGS));if(s)settings=Object.assign(settings,s);}catch(e){}document.getElementById('setDays').value=settings.daysPerMonth;document.getElementById('setHours').value=settings.hoursPerDay;document.getElementById('setRate10').value=settings.rate10;document.getElementById('setRate15').value=settings.rate15;document.getElementById('setRate20').value=settings.rate20;document.getElementById('setRate30').value=settings.rate30;}
+function applySettings(){settings.daysPerMonth=parseFloat(document.getElementById('setDays').value)||26;settings.hoursPerDay=parseFloat(document.getElementById('setHours').value)||7.5;settings.rate10=parseFloat(document.getElementById('setRate10').value)||1.0;settings.rate15=parseFloat(document.getElementById('setRate15').value)||1.5;settings.rate20=parseFloat(document.getElementById('setRate20').value)||2.0;settings.rate30=parseFloat(document.getElementById('setRate30').value)||3.0;localStorage.setItem(LS_SETTINGS,JSON.stringify(settings));closeSettings();if(currentStaff)onStaffChange();}
+function openSettings(){document.getElementById('settingsModal').classList.remove('hidden');}
+function closeSettings(){document.getElementById('settingsModal').classList.add('hidden');}
+
+async function onSave(){
+if(!currentStaff||!currentMonth){if(!currentStaff)alert('请先选择员工');else alert('请选择月份');return;}
+if(isSaving)return;isSaving=true;
+
+const calcDaily=getCalcDaily();const{hourly}=currentRates();
+let sumW=0,sumOT=0,sum10=0,sum15=0,sum20=0,sum30=0;
+const details=[];
+
+// 时薪计算（如果有选中日期）
+if(selectedDates.size>0){
+  const sorted=[...selectedDates].sort();
+  sorted.forEach(dateStr=>{const row=getDateRow(dateStr);if(!row)return;const work=getRowWork(row);const ot=getRowOT(row);const a10=ot*hourly*settings.rate10,a15=ot*hourly*settings.rate15,a20=ot*hourly*settings.rate20,a30=ot*hourly*settings.rate30;details.push({date:dateStr,workHours:work,otHours:ot,a10,a15,a20,a30});sumW+=work;sumOT+=ot;sum10+=a10;sum15+=a15;sum20+=a20;sum30+=a30;});
+}
+
+// 时薪 OT 数据
+const timeOtRate = hourlyOtType ? parseFloat(hourlyOtType) : 0;
+const timeOtType = hourlyOtType ? `×${hourlyOtType}` : '';
+const timeOtAmountMap={'1.0':sum10,'1.5':sum15,'2.0':sum20,'3.0':sum30};
+const timeOtAmount = hourlyOtType ? (timeOtAmountMap[hourlyOtType]||0) : 0;
+
+// 日薪 OT 数据
+const dailyOtType=document.getElementById('calcMultSelect').value||'';
+const dailyOtDay=getCalcDays();
+const dailyOtAmount=dailyOtType?calcDaily*parseFloat(dailyOtType)*dailyOtDay:0;
+
+// 至少要有时薪或日薪数据才允许保存
+if(!hourlyOtType && !dailyOtType){showToast('请至少选择时薪倍率或日薪倍率','error',3000);isSaving=false;return;}
+
+const payload={action:'saveOvertimeRecord',code:currentStaff.code,name:currentStaff.name,month:currentMonth,totalWorkTime:sumW,totalOtTime:sumOT,timeOtRate,timeOtType,timeOtAmount,dailyRate:calcDaily,dailyOtType,dailyOtDay,dailyOtAmount,details};
+try{
+const res=await apiPost(payload);
+if(res.status==='success'){
+try{const c2=JSON.parse(localStorage.getItem(LS_OT_DATA)||'null');if(c2){c2.ts=0;localStorage.setItem(LS_OT_DATA,JSON.stringify(c2));}}catch(e){}
+showToast(`✅ ${currentStaff.name} 的加班记录${res.mode==='updated'?'已更新覆盖':'已新建保存'}`,'success',4000);
+await loadOvertimeData(true);
+const ex=allOvertimeData.find(i=>isCodeMatch(i['ID KOD'],currentStaff.code)&&nameMatch(i['NAME'],currentStaff.name));if(ex)updateRightPanelDisplay(ex);
+renderSidebar();
+}else showToast('保存失败：'+(res.message||'未知错误'),'error',5000);
+}catch(err){showToast('保存失败：'+err.message,'error',5000);}finally{isSaving=false;}
+}
+
+async function init(){
+loadSettings();loadSavedUrl();
+const today=new Date();const ym=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
+document.getElementById('monthPicker').value=ym;currentMonth=ym;
+document.getElementById('calcDailyInput').value='0.00';
+document.getElementById('staffSelect').addEventListener('change',onStaffChange);
+document.getElementById('monthPicker').addEventListener('change',e=>{activeSidebarIndex=-1;renderSidebar();currentMonth=e.target.value;selectedDates.clear();refreshMonthlySummary();renderCalendar();renderTable();});
+document.getElementById('openSettings').addEventListener('click',openSettings);
+document.getElementById('cancelSettings').addEventListener('click',closeSettings);
+document.getElementById('applySettings').addEventListener('click',applySettings);
+document.getElementById('saveBtnTop').addEventListener('click',()=>onSave());
+if(SCRIPT_URL)await loadAllData();else setSyncBadge('err','URL 未设置');
+}
+init();
 </script>
 </body>
 </html>
