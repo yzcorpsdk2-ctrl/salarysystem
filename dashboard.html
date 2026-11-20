@@ -6,970 +6,592 @@
 <title>Dashboard · 员工薪资仪表盘</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --epf-blue: #1a4f8a; --epf-blue-light: #e8f0fa; --epf-blue-soft: #f4f8fd;
-    --epf-border: #d4e0ee; --epf-border-soft: #e6eef7;
-    --epf-text: #1f2d3d; --epf-muted: #64748b; --epf-bg: #f7fafd;
-    --nav-h: 52px;
-    --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover: #16345c;
-    --nav-text: #cbd9ea; --nav-accent: #4d9fff;
-    --shadow-sm: 0 1px 2px rgba(16,32,56,.05), 0 2px 10px rgba(16,32,56,.05);
-    --shadow-md: 0 8px 24px rgba(16,32,56,.10);
-    --dropdown-bg: #ffffff;
-    --dropdown-shadow: 0 8px 24px rgba(16,32,56,.15);
-  }
-  body {
-    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background: var(--epf-bg); color: var(--epf-text);
-    min-height: 100vh; line-height: 1.5; font-size: 14px;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* ---------- NAVBAR (with dropdown support) ---------- */
-  .navbar {
-    position: sticky; top: 0; z-index: 200;
-    display: flex; align-items: stretch; flex-wrap: wrap;
-    background: linear-gradient(90deg, var(--nav-bg-1) 0%, var(--nav-bg-2) 100%);
-    padding: 0 1rem; min-height: var(--nav-h);
-    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
-    border-bottom: 1px solid rgba(77,159,255,0.18);
-  }
-  .navbar .nav-brand {
-    display: flex; align-items: center; gap: 0.55rem;
-    color: #fff; font-weight: 800; font-size: 0.78rem;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    padding-right: 1.1rem; margin-right: 0.5rem;
-    border-right: 1px solid rgba(255,255,255,0.12);
-    white-space: nowrap;
-  }
-  .navbar .nav-brand .logo {
-    width: 28px; height: 28px; border-radius: 7px;
-    background: linear-gradient(135deg, #4d9fff, #1a4f8a);
-    display: flex; align-items: center; justify-content: center;
-    color: #fff; font-size: 0.85rem; font-weight: 800;
-    box-shadow: 0 2px 6px rgba(77,159,255,0.35);
-  }
-
-  .nav-links {
-    display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px;
-    position: relative;
-  }
-
-  /* generic nav item */
-  .nav-item {
-    display: inline-flex; align-items: center; gap: 0.35rem;
-    padding: 0 0.85rem; min-height: var(--nav-h);
-    color: var(--nav-text); text-decoration: none;
-    font-family: inherit; font-size: 0.73rem; font-weight: 700;
-    letter-spacing: 0.06em; text-transform: uppercase;
-    background: transparent; border: none; cursor: pointer;
-    white-space: nowrap; transition: background 0.15s, color 0.15s;
-    position: relative;
-  }
-  .nav-item:hover, .nav-item.active { background: var(--nav-hover); color: #fff; }
-  .nav-item::after {
-    content: ''; position: absolute; left: 0.85rem; right: 0.85rem; bottom: 0;
-    height: 2px; background: var(--nav-accent); transform: scaleX(0);
-    transform-origin: left; transition: transform 0.2s;
-  }
-  .nav-item:hover::after, .nav-item.active::after { transform: scaleX(1); }
-
-  /* back button – slightly distinct */
-  .nav-back {
-    display: inline-flex; align-items: center; justify-content: center;
-    min-width: 44px; padding: 0 0.6rem;
-    color: var(--nav-text);
-    background: transparent; border: none; cursor: pointer;
-    font-size: 1.1rem; transition: background 0.15s, color 0.15s;
-  }
-  .nav-back:hover { background: var(--nav-hover); color: #fff; }
-
-  /* dropdown wrapper */
-  .nav-dropdown {
-    position: relative;
-    display: inline-flex;
-    align-items: stretch;
-  }
-  .nav-dropdown > .nav-item {
-    padding-right: 0.55rem;
-  }
-  .nav-dropdown > .nav-item .fa-caret-down {
-    font-size: 0.6rem; margin-left: 0.2rem; opacity: 0.7;
-  }
-  .dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    min-width: 180px;
-    background: var(--dropdown-bg);
-    border-radius: 8px;
-    box-shadow: var(--dropdown-shadow);
-    padding: 0.4rem 0;
-    z-index: 300;
-    border: 1px solid var(--epf-border);
-    animation: fadeSlide 0.15s ease;
-  }
-  .nav-dropdown.open .dropdown-menu { display: block; }
-
-  @keyframes fadeSlide {
-    from { opacity: 0; transform: translateY(-6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .dropdown-menu a {
-    display: flex; align-items: center; gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    color: var(--epf-text);
-    text-decoration: none;
-    font-size: 0.78rem;
-    font-weight: 500;
-    transition: background 0.12s;
-    white-space: nowrap;
-  }
-  .dropdown-menu a:hover { background: var(--epf-blue-soft); color: var(--epf-blue); }
-  .dropdown-menu .divider {
-    height: 1px; background: var(--epf-border-soft); margin: 0.3rem 0.5rem;
-  }
-
-  /* chat button */
-  .nav-chat {
-    margin-left: auto; align-self: center;
-    display: inline-flex; align-items: center; gap: 0.45rem;
-    padding: 0.5rem 1rem; border: none; border-radius: 20px;
-    background: linear-gradient(135deg, #2f7fe0 0%, #1a4f8a 100%);
-    color: #fff; font-family: inherit; font-size: 0.73rem;
-    font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-    cursor: pointer; white-space: nowrap;
-    box-shadow: 0 3px 12px rgba(47,127,224,0.4);
-    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
-  }
-  .nav-chat:hover { filter: brightness(1.12); transform: translateY(-1px); }
-  .nav-chat .pulse {
-    width: 7px; height: 7px; border-radius: 50%; background: #6ef0a8;
-    box-shadow: 0 0 0 0 rgba(110,240,168,0.75); animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(110,240,168,0.7); }
-    70% { box-shadow: 0 0 0 7px rgba(110,240,168,0); }
-    100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); }
-  }
-
-  /* ---------- TOPBAR ---------- */
-  .topbar {
-    position: sticky; top: var(--nav-h); z-index: 100; background: #ffffff;
-    border-bottom: 1px solid var(--epf-border); padding: 0.65rem 1.75rem;
-    display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
-    box-shadow: 0 1px 2px rgba(26,79,138,0.04);
-  }
-  .topbar .brand {
-    font-weight: 700; font-size: 0.95rem; color: var(--epf-blue);
-    display: flex; align-items: center; gap: 0.6rem;
-    margin-right: 0.5rem; letter-spacing: -0.01em;
-  }
-  .topbar .brand .logo {
-    width: 32px; height: 32px; background: var(--epf-blue); border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    color: #fff; font-size: 0.95rem; font-weight: 800;
-  }
-  .search-box { flex: 1; max-width: 320px; position: relative; }
-  .search-box input {
-    width: 100%; padding: 0.5rem 0.85rem 0.5rem 2.2rem;
-    border: 1px solid var(--epf-border); border-radius: 6px;
-    font-size: 0.82rem; font-family: inherit; color: var(--epf-text);
-    transition: 0.15s;
-  }
-  .search-box input:focus {
-    outline: none; border-color: var(--epf-blue);
-    box-shadow: 0 0 0 2px rgba(26,79,138,0.10);
-  }
-  .search-box i {
-    position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%);
-    color: var(--epf-muted); font-size: 0.8rem;
-  }
-  .btn {
-    background: #ffffff; border: 1px solid var(--epf-border);
-    padding: 0.42rem 0.9rem; border-radius: 5px; font-size: 0.78rem;
-    font-weight: 500; cursor: pointer; color: var(--epf-blue);
-    display: inline-flex; align-items: center; gap: 0.4rem;
-    transition: all 0.15s ease; white-space: nowrap; font-family: inherit;
-  }
-  .btn:hover { background: var(--epf-blue-soft); border-color: #b8cfe8; }
-  .btn-success { background: #0f7a54; border: 1px solid #0f7a54; color: #fff; }
-  .btn-success:hover { background: #0c6a48; border-color: #0c6a48; }
-  .btn-sm { padding: 0.25rem 0.7rem; font-size: 0.72rem; border-radius: 4px; }
-  .sync-badge {
-    display: inline-flex; align-items: center; gap: 0.35rem;
-    background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft);
-    padding: 0.3rem 0.7rem; border-radius: 20px;
-    font-size: 0.68rem; font-weight: 600; color: var(--epf-muted);
-    white-space: nowrap;
-  }
-  .sync-badge .dot {
-    width: 7px; height: 7px; border-radius: 50%; background: #9db8d2;
-    transition: background 0.2s;
-  }
-  .sync-badge.ok .dot { background: #22c55e; }
-  .sync-badge.busy .dot { background: #f59e0b; animation: pulse 1s infinite; }
-  .sync-badge.err .dot { background: #ef4444; }
-  .url-box {
-    display: flex; align-items: center; gap: 0.4rem; flex: 1; max-width: 420px;
-    background: #f4f8fd; border: 1px solid var(--epf-border); border-radius: 6px; padding: 2px;
-  }
-  .url-box input {
-    flex: 1; border: none; background: transparent; padding: 0.4rem 0.6rem;
-    font-size: 0.78rem; font-family: inherit; color: var(--epf-text); outline: none;
-  }
-  .url-box input::placeholder { color: #a7b7c9; }
-  .url-box button {
-    padding: 0.3rem 0.8rem; border-radius: 4px; border: none;
-    background: var(--epf-blue); color: #fff; font-size: 0.72rem; font-weight: 600;
-    cursor: pointer; transition: 0.15s; white-space: nowrap;
-  }
-  .url-box button:hover { background: #15406f; }
-
-  /* ============================================================
-     布局调整：添加左侧布告栏
-     ============================================================ */
-  .main-layout {
-    display: flex;
-    align-items: flex-start;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 1.5rem 1.75rem 3rem;
-    gap: 20px;
-  }
-  
-  .content-area {
-    flex: 1;
-    min-width: 0; /* 防止内容溢出 */
-  }
-
-  /* 左侧布告栏 - 固定定位 */
-  .notice-board {
-    position: sticky;
-    top: calc(var(--nav-h) + 70px); /* 导航栏 + 工具栏的高度 */
-    width: 300px;
-    flex-shrink: 0;
-    background: #ffffff;
-    border: 1px solid var(--epf-border);
-    border-radius: 10px;
-    box-shadow: var(--shadow-sm);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    max-height: calc(100vh - var(--nav-h) - 90px);
-  }
-
-  .notice-header {
-    background: #fef2f2;
-    border-bottom: 1px solid #fecaca;
-    padding: 0.8rem 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #991b1b;
-    font-weight: 700;
-    font-size: 0.85rem;
-  }
-  .notice-header .count-badge {
-    background: #ef4444;
-    color: #fff;
-    font-size: 0.65rem;
-    padding: 2px 6px;
-    border-radius: 10px;
-    margin-left: auto;
-  }
-
-  .notice-list {
-    overflow-y: auto;
-    padding: 0.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  .notice-list::-webkit-scrollbar { width: 6px; }
-  .notice-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-
-  .notice-item {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-left: 4px solid #ef4444;
-    border-radius: 6px;
-    padding: 0.7rem;
-    font-size: 0.78rem;
-    transition: 0.15s;
-  }
-  .notice-item:hover {
-    background: #fff;
-    border-color: #cbd5e1;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-  }
-  .notice-name {
-    font-weight: 700;
-    color: var(--epf-blue);
-    margin-bottom: 0.2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .notice-code {
-    font-size: 0.65rem;
-    background: var(--epf-blue-soft);
-    color: var(--epf-muted);
-    padding: 1px 5px;
-    border-radius: 3px;
-    font-weight: 600;
-  }
-  .notice-info {
-    color: var(--epf-muted);
-    margin-bottom: 0.2rem;
-  }
-  .notice-info span { color: #c53030; font-weight: 600; }
-  .notice-target {
-    font-size: 0.72rem;
-    background: #fefcbf;
-    color: #975a16;
-    padding: 2px 6px;
-    border-radius: 4px;
-    display: inline-block;
-    margin-top: 0.3rem;
-    font-weight: 600;
-  }
-
-  .notice-empty {
-    text-align: center;
-    padding: 2rem 1rem;
-    color: var(--epf-muted);
-    font-size: 0.8rem;
-  }
-  .notice-empty .icon { font-size: 2rem; display: block; margin-bottom: 0.5rem; color: #cbd5e1; }
-
-  .container { display: none; } /* 隐藏旧容器 */
-
-  .page-header {
-    background: #ffffff; border: 1px solid var(--epf-border); border-radius: 8px;
-    padding: 1.4rem 1.75rem; margin-bottom: 1.5rem;
-    display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
-    justify-content: space-between; box-shadow: 0 1px 3px rgba(26,79,138,0.04);
-  }
-  .page-header .info { flex: 1; min-width: 240px; }
-  .page-header h1 { font-size: 1.45rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--epf-blue); letter-spacing: -0.015em; }
-  .page-header p { font-size: 0.85rem; color: var(--epf-muted); line-height: 1.6; }
-  
-  .employee-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
-  }
-  .employee-card {
-    background: #ffffff; border: 1px solid var(--epf-border);
-    border-radius: 10px; padding: 20px;
-    cursor: pointer; transition: transform 0.15s, box-shadow 0.2s, border-color 0.15s;
-    display: flex; flex-direction: column; gap: 14px;
-    position: relative; overflow: hidden;
-    box-shadow: var(--shadow-sm);
-  }
-  .employee-card:hover {
-    border-color: var(--epf-blue);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-  }
-  .employee-card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    background: linear-gradient(90deg, var(--epf-blue), #4d9fff);
-    opacity: 0; transition: opacity 0.2s;
-  }
-  .employee-card:hover::before { opacity: 1; }
-  .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-  .card-name { font-size: 1.05rem; font-weight: 700; color: var(--epf-blue); word-break: break-word; line-height: 1.3; }
-  .card-code {
-    font-size: 0.72rem; font-weight: 700; color: var(--epf-muted);
-    background: var(--epf-blue-soft); padding: 2px 8px; border-radius: 4px;
-    white-space: nowrap;
-  }
-  .card-body { display: flex; flex-direction: column; gap: 8px; }
-  .card-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--epf-text); }
-  .card-row .label { color: var(--epf-muted); font-weight: 500; }
-  .card-row .value { font-weight: 600; text-align: right; }
-  .card-row .value.salary { font-size: 1.1rem; font-weight: 800; color: #0f7a54; font-variant-numeric: tabular-nums; }
-  .card-footer {
-    display: flex; align-items: center; justify-content: space-between;
-    padding-top: 12px; border-top: 1px solid var(--epf-border-soft);
-    font-size: 0.72rem; color: var(--epf-muted);
-  }
-  .card-footer .status-badge {
-    display: inline-block; padding: 0.2rem 0.7rem; border-radius: 20px;
-    font-size: 0.68rem; font-weight: 600; letter-spacing: 0.03em;
-  }
-  .status-badge.active { background: #c6f6d5; color: #22543d; }
-  .status-badge.pending { background: #fefcbf; color: #975a16; }
-  .status-badge.inactive { background: #fed7d7; color: #9b2c2c; }
-  .card-footer .arrow { font-size: 1rem; color: var(--epf-muted); transition: transform 0.15s; }
-  .employee-card:hover .arrow { transform: translateX(3px); color: var(--epf-blue); }
-  .empty-state { grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: #a7b7c9; font-size: 0.85rem; }
-  .empty-state .icon { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; }
-  .spinner {
-    display: inline-block; width: 16px; height: 16px;
-    border: 2px solid rgba(26,79,138,0.2); border-top: 2px solid var(--epf-blue);
-    border-radius: 50%; animation: spin 0.8s linear infinite;
-    margin-right: 6px; vertical-align: middle;
-  }
-  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-  @media (max-width: 1024px) {
-    .notice-board { width: 250px; }
-  }
-  @media (max-width: 900px) {
-    .main-layout { flex-direction: column; }
-    .notice-board { 
-      position: relative; 
-      top: 0; 
-      width: 100%; 
-      max-height: 300px; 
-      margin-bottom: 1rem;
-    }
-  }
-  @media (max-width: 768px) {
-    .navbar { padding: 0 0.5rem; }
-    .navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
-    .navbar .nav-brand .brand-text { display: none; }
-    .nav-item { padding: 0 0.6rem; font-size: 0.68rem; }
-    .nav-chat { padding: 0.45rem 0.75rem; font-size: 0.66rem; }
-    .topbar { padding: 0.6rem 1rem; }
-    .main-layout { padding: 1rem; }
-    .page-header { padding: 1.2rem; }
-    .page-header h1 { font-size: 1.2rem; }
-    .employee-grid { grid-template-columns: 1fr; }
-    .url-box { max-width: 100%; flex: 1 1 100%; }
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+--epf-blue: #1a4f8a; --epf-blue-light: #e8f0fa; --epf-blue-soft: #f4f8fd;
+--epf-border: #d4e0ee; --epf-border-soft: #e6eef7;
+--epf-text: #1f2d3d; --epf-muted: #64748b; --epf-bg: #f7fafd;
+--nav-h: 52px;
+--nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover: #16345c;
+--nav-text: #cbd9ea; --nav-accent: #4d9fff;
+--shadow-sm: 0 1px 2px rgba(16,32,56,.05), 0 2px 10px rgba(16,32,56,.05);
+--shadow-md: 0 8px 24px rgba(16,32,56,.10);
+--dropdown-bg: #ffffff;
+--dropdown-shadow: 0 8px 24px rgba(16,32,56,.15);
+}
+body {
+font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+background: var(--epf-bg); color: var(--epf-text);
+min-height: 100vh; line-height: 1.5; font-size: 14px;
+-webkit-font-smoothing: antialiased;
+}
+.navbar {
+position: sticky; top: 0; z-index: 200;
+display: flex; align-items: stretch; flex-wrap: wrap;
+background: linear-gradient(90deg, var(--nav-bg-1) 0%, var(--nav-bg-2) 100%);
+padding: 0 1rem; min-height: var(--nav-h);
+box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+border-bottom: 1px solid rgba(77,159,255,0.18);
+}
+.navbar .nav-brand {
+display: flex; align-items: center; gap: 0.55rem;
+color: #fff; font-weight: 800; font-size: 0.78rem;
+letter-spacing: 0.1em; text-transform: uppercase;
+padding-right: 1.1rem; margin-right: 0.5rem;
+border-right: 1px solid rgba(255,255,255,0.12);
+white-space: nowrap;
+}
+.navbar .nav-brand .logo {
+width: 28px; height: 28px; border-radius: 7px;
+background: linear-gradient(135deg, #4d9fff, #1a4f8a);
+display: flex; align-items: center; justify-content: center;
+color: #fff; font-size: 0.85rem; font-weight: 800;
+box-shadow: 0 2px 6px rgba(77,159,255,0.35);
+}
+.nav-links { display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px; position: relative; }
+.nav-item {
+display: inline-flex; align-items: center; gap: 0.35rem;
+padding: 0 0.85rem; min-height: var(--nav-h);
+color: var(--nav-text); text-decoration: none;
+font-family: inherit; font-size: 0.73rem; font-weight: 700;
+letter-spacing: 0.06em; text-transform: uppercase;
+background: transparent; border: none; cursor: pointer;
+white-space: nowrap; transition: background 0.15s, color 0.15s;
+position: relative;
+}
+.nav-item:hover, .nav-item.active { background: var(--nav-hover); color: #fff; }
+.nav-item::after {
+content: ''; position: absolute; left: 0.85rem; right: 0.85rem; bottom: 0;
+height: 2px; background: var(--nav-accent); transform: scaleX(0);
+transform-origin: left; transition: transform 0.2s;
+}
+.nav-item:hover::after, .nav-item.active::after { transform: scaleX(1); }
+.nav-back {
+display: inline-flex; align-items: center; justify-content: center;
+min-width: 44px; padding: 0 0.6rem;
+color: var(--nav-text);
+background: transparent; border: none; cursor: pointer;
+font-size: 1.1rem; transition: background 0.15s, color 0.15s;
+}
+.nav-back:hover { background: var(--nav-hover); color: #fff; }
+.nav-dropdown { position: relative; display: inline-flex; align-items: stretch; }
+.nav-dropdown > .nav-item { padding-right: 0.55rem; }
+.nav-dropdown > .nav-item .fa-caret-down { font-size: 0.6rem; margin-left: 0.2rem; opacity: 0.7; }
+.dropdown-menu {
+display: none; position: absolute; top: 100%; left: 0;
+min-width: 180px; background: var(--dropdown-bg);
+border-radius: 8px; box-shadow: var(--dropdown-shadow);
+padding: 0.4rem 0; z-index: 300; border: 1px solid var(--epf-border);
+animation: fadeSlide 0.15s ease;
+}
+.nav-dropdown.open .dropdown-menu { display: block; }
+@keyframes fadeSlide { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+.dropdown-menu a {
+display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem;
+color: var(--epf-text); text-decoration: none; font-size: 0.78rem;
+font-weight: 500; transition: background 0.12s; white-space: nowrap;
+}
+.dropdown-menu a:hover { background: var(--epf-blue-soft); color: var(--epf-blue); }
+.dropdown-menu .divider { height: 1px; background: var(--epf-border-soft); margin: 0.3rem 0.5rem; }
+.nav-chat {
+margin-left: auto; align-self: center;
+display: inline-flex; align-items: center; gap: 0.45rem;
+padding: 0.5rem 1rem; border: none; border-radius: 20px;
+background: linear-gradient(135deg, #2f7fe0 0%, #1a4f8a 100%);
+color: #fff; font-family: inherit; font-size: 0.73rem;
+font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+cursor: pointer; white-space: nowrap;
+box-shadow: 0 3px 12px rgba(47,127,224,0.4);
+transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+}
+.nav-chat:hover { filter: brightness(1.12); transform: translateY(-1px); }
+.nav-chat .pulse {
+width: 7px; height: 7px; border-radius: 50%; background: #6ef0a8;
+box-shadow: 0 0 0 0 rgba(110,240,168,0.75); animation: pulse 2s infinite;
+}
+@keyframes pulse {
+0% { box-shadow: 0 0 0 0 rgba(110,240,168,0.7); }
+70% { box-shadow: 0 0 0 7px rgba(110,240,168,0); }
+100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); }
+}
+.topbar {
+position: sticky; top: var(--nav-h); z-index: 100; background: #ffffff;
+border-bottom: 1px solid var(--epf-border); padding: 0.65rem 1.75rem;
+display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+box-shadow: 0 1px 2px rgba(26,79,138,0.04);
+}
+.topbar .brand {
+font-weight: 700; font-size: 0.95rem; color: var(--epf-blue);
+display: flex; align-items: center; gap: 0.6rem;
+margin-right: 0.5rem; letter-spacing: -0.01em;
+}
+.topbar .brand .logo {
+width: 32px; height: 32px; background: var(--epf-blue); border-radius: 6px;
+display: flex; align-items: center; justify-content: center;
+color: #fff; font-size: 0.95rem; font-weight: 800;
+}
+.search-box { flex: 1; max-width: 320px; position: relative; }
+.search-box input {
+width: 100%; padding: 0.5rem 0.85rem 0.5rem 2.2rem;
+border: 1px solid var(--epf-border); border-radius: 6px;
+font-size: 0.82rem; font-family: inherit; color: var(--epf-text);
+transition: 0.15s;
+}
+.search-box input:focus { outline: none; border-color: var(--epf-blue); box-shadow: 0 0 0 2px rgba(26,79,138,0.10); }
+.search-box i { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--epf-muted); font-size: 0.8rem; }
+.btn {
+background: #ffffff; border: 1px solid var(--epf-border);
+padding: 0.42rem 0.9rem; border-radius: 5px; font-size: 0.78rem;
+font-weight: 500; cursor: pointer; color: var(--epf-blue);
+display: inline-flex; align-items: center; gap: 0.4rem;
+transition: all 0.15s ease; white-space: nowrap; font-family: inherit;
+}
+.btn:hover { background: var(--epf-blue-soft); border-color: #b8cfe8; }
+.btn-success { background: #0f7a54; border: 1px solid #0f7a54; color: #fff; }
+.btn-success:hover { background: #0c6a48; border-color: #0c6a48; }
+.sync-badge {
+display: inline-flex; align-items: center; gap: 0.35rem;
+background: var(--epf-blue-soft); border: 1px solid var(--epf-border-soft);
+padding: 0.3rem 0.7rem; border-radius: 20px;
+font-size: 0.68rem; font-weight: 600; color: var(--epf-muted);
+white-space: nowrap;
+}
+.sync-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: #9db8d2; transition: background 0.2s; }
+.sync-badge.ok .dot { background: #22c55e; }
+.sync-badge.busy .dot { background: #f59e0b; animation: pulse 1s infinite; }
+.sync-badge.err .dot { background: #ef4444; }
+.url-box {
+display: flex; align-items: center; gap: 0.4rem; flex: 1; max-width: 420px;
+background: #f4f8fd; border: 1px solid var(--epf-border); border-radius: 6px; padding: 2px;
+}
+.url-box input {
+flex: 1; border: none; background: transparent; padding: 0.4rem 0.6rem;
+font-size: 0.78rem; font-family: inherit; color: var(--epf-text); outline: none;
+}
+.url-box input::placeholder { color: #a7b7c9; }
+.url-box button {
+padding: 0.3rem 0.8rem; border-radius: 4px; border: none;
+background: var(--epf-blue); color: #fff; font-size: 0.72rem; font-weight: 600;
+cursor: pointer; transition: 0.15s; white-space: nowrap;
+}
+.url-box button:hover { background: #15406f; }
+.main-layout { display: flex; align-items: flex-start; max-width: 1400px; margin: 0 auto; padding: 1.5rem 1.75rem 3rem; gap: 20px; }
+.content-area { flex: 1; min-width: 0; }
+.notice-board {
+position: sticky; top: calc(var(--nav-h) + 70px); width: 300px; flex-shrink: 0;
+background: #ffffff; border: 1px solid var(--epf-border); border-radius: 10px;
+box-shadow: var(--shadow-sm); overflow: hidden; display: flex; flex-direction: column;
+max-height: calc(100vh - var(--nav-h) - 90px);
+}
+.notice-header {
+background: #fef2f2; border-bottom: 1px solid #fecaca; padding: 0.8rem 1rem;
+display: flex; align-items: center; gap: 0.5rem; color: #991b1b;
+font-weight: 700; font-size: 0.85rem;
+}
+.notice-header .count-badge {
+background: #ef4444; color: #fff; font-size: 0.65rem; padding: 2px 6px;
+border-radius: 10px; margin-left: auto;
+}
+.notice-list { overflow-y: auto; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.notice-list::-webkit-scrollbar { width: 6px; }
+.notice-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+.notice-item {
+background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #ef4444;
+border-radius: 6px; padding: 0.7rem; font-size: 0.78rem; transition: 0.15s;
+}
+.notice-item:hover { background: #fff; border-color: #cbd5e1; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.notice-name { font-weight: 700; color: var(--epf-blue); margin-bottom: 0.2rem; display: flex; justify-content: space-between; align-items: center; }
+.notice-code { font-size: 0.65rem; background: var(--epf-blue-soft); color: var(--epf-muted); padding: 1px 5px; border-radius: 3px; font-weight: 600; }
+.notice-info { color: var(--epf-muted); margin-bottom: 0.2rem; }
+.notice-info span { color: #c53030; font-weight: 600; }
+.notice-target { font-size: 0.72rem; background: #fefcbf; color: #975a16; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 0.3rem; font-weight: 600; }
+.notice-empty { text-align: center; padding: 2rem 1rem; color: var(--epf-muted); font-size: 0.8rem; }
+.notice-empty .icon { font-size: 2rem; display: block; margin-bottom: 0.5rem; color: #cbd5e1; }
+.page-header {
+background: #ffffff; border: 1px solid var(--epf-border); border-radius: 8px;
+padding: 1.4rem 1.75rem; margin-bottom: 1.5rem;
+display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
+justify-content: space-between; box-shadow: 0 1px 3px rgba(26,79,138,0.04);
+}
+.page-header .info { flex: 1; min-width: 240px; }
+.page-header h1 { font-size: 1.45rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--epf-blue); letter-spacing: -0.015em; }
+.page-header p { font-size: 0.85rem; color: var(--epf-muted); line-height: 1.6; }
+.employee-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.employee-card {
+background: #ffffff; border: 1px solid var(--epf-border); border-radius: 10px; padding: 20px;
+cursor: pointer; transition: transform 0.15s, box-shadow 0.2s, border-color 0.15s;
+display: flex; flex-direction: column; gap: 14px; position: relative; overflow: hidden;
+box-shadow: var(--shadow-sm);
+}
+.employee-card:hover { border-color: var(--epf-blue); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.employee-card::before {
+content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transition: opacity 0.2s;
+}
+.employee-card:hover::before { opacity: 1; }
+.card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.card-name { font-size: 1.05rem; font-weight: 700; color: var(--epf-blue); word-break: break-word; line-height: 1.3; }
+.card-code { font-size: 0.72rem; font-weight: 700; color: var(--epf-muted); background: var(--epf-blue-soft); padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+.card-body { display: flex; flex-direction: column; gap: 8px; }
+.card-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--epf-text); }
+.card-row .label { color: var(--epf-muted); font-weight: 500; }
+.card-row .value { font-weight: 600; text-align: right; }
+.card-row .value.salary { font-size: 1.1rem; font-weight: 800; color: #0f7a54; font-variant-numeric: tabular-nums; }
+.card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--epf-border-soft); font-size: 0.72rem; color: var(--epf-muted); }
+.card-footer .status-badge { display: inline-block; padding: 0.2rem 0.7rem; border-radius: 20px; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.03em; }
+.status-badge.active { background: #c6f6d5; color: #22543d; }
+.status-badge.pending { background: #fefcbf; color: #975a16; }
+.status-badge.inactive { background: #fed7d7; color: #9b2c2c; }
+.card-footer .arrow { font-size: 1rem; color: var(--epf-muted); transition: transform 0.15s; }
+.employee-card:hover .arrow { transform: translateX(3px); color: var(--epf-blue); }
+.empty-state { grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: #a7b7c9; font-size: 0.85rem; }
+.empty-state .icon { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; }
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(26,79,138,0.2); border-top: 2px solid var(--epf-blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 6px; vertical-align: middle; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@media (max-width: 1024px) { .notice-board { width: 250px; } }
+@media (max-width: 900px) {
+.main-layout { flex-direction: column; }
+.notice-board { position: relative; top: 0; width: 100%; max-height: 300px; margin-bottom: 1rem; }
+}
+@media (max-width: 768px) {
+.navbar { padding: 0 0.5rem; }
+.navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
+.navbar .nav-brand .brand-text { display: none; }
+.nav-item { padding: 0 0.6rem; font-size: 0.68rem; }
+.nav-chat { padding: 0.45rem 0.75rem; font-size: 0.66rem; }
+.topbar { padding: 0.6rem 1rem; }
+.main-layout { padding: 1rem; }
+.page-header { padding: 1.2rem; }
+.page-header h1 { font-size: 1.2rem; }
+.employee-grid { grid-template-columns: 1fr; }
+.url-box { max-width: 100%; flex: 1 1 100%; }
+}
 </style>
 </head>
 <body>
-
-<!-- ========== NAVBAR ========== -->
 <nav class="navbar">
-  <div class="nav-brand">
-    <span class="logo">Y</span>
-    <span class="brand-text">YZ Payroll</span>
-  </div>
-
-  <div class="nav-links" id="navLinks">
-    <button class="nav-back" id="backBtn" title="Kembali ke halaman sebelumnya">⏎</button>
-
-    <div class="nav-dropdown" id="filesDropdown">
-      <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
-      <div class="dropdown-menu">
-        <a href="dashboard.html">📊 DASHBOARD</a>
-        <a href="staffinfo.html">👥 EMPLOYEES</a>
-        <a href="leave.html">📅 TIMECARD REPORT</a>
-        <a href="overtime.html">⏱️ OVERTIME SHEET</a>
-        <div class="divider"></div>
-        <a href="epf.html">🏦 EPF</a>
-        <a href="socso.html">🛡️ SOCSO</a>
-        <a href="eis.html">📋 EIS</a>
-        <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
-        <div class="divider"></div>
-        <a href="companysetting.html">⚙️ COMPANY SETTING</a>
-        <a href="121.html">📄 121</a>
-        <a href="122.html">📄 122</a>
-        <a href="123.html">📄 123</a>
-        <a href="GoogleSheetBackupURL.html">📄 Google Sheet Backup URL</a>
-      </div>
-    </div>
-
-    <a class="nav-item active" href="dashboard.html">DASHBOARD</a>
-    <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
-    <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
-
-    <div class="nav-dropdown" id="carumanDropdown">
-      <button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
-      <div class="dropdown-menu">
-        <a href="epf.html">🏦 EPF</a>
-        <a href="socso.html">🛡️ SOCSO</a>
-        <a href="eis.html">📋 EIS</a>
-        <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
-      </div>
-    </div>
-
-    <a class="nav-item" href="companysetting.html">SETTING</a>
-
-    <div class="nav-dropdown" id="othersDropdown">
-      <button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
-      <div class="dropdown-menu">
-        <a href="companysetting.html">⚙️ COMPANY SETTING</a>
-        <div class="divider"></div>
-        <a href="121.html">📄 121</a>
-        <a href="122.html">📄 122</a>
-        <a href="123.html">📄 123</a>
-        <a href="GoogleSheetBackupURL.html">📄 Google Sheet Backup URL</a>
-      </div>
-    </div>
-  </div>
-
-  <button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')">
-    <span class="pulse"></span> 💬 Request Chat
-  </button>
+<div class="nav-brand">
+<span class="logo">Y</span>
+<span class="brand-text">YZ Payroll</span>
+</div>
+<div class="nav-links" id="navLinks">
+<button class="nav-back" id="backBtn" title="Kembali">⏎</button>
+<div class="nav-dropdown" id="filesDropdown">
+<button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
+<div class="dropdown-menu">
+<a href="dashboard.html">📊 DASHBOARD</a>
+<a href="staffinfo.html">👥 EMPLOYEES</a>
+<a href="leave.html">📅 TIMECARD REPORT</a>
+<a href="overtime.html">⏱️ OVERTIME SHEET</a>
+<div class="divider"></div>
+<a href="epf.html">🏦 EPF</a>
+<a href="socso.html">🛡️ SOCSO</a>
+<a href="eis.html">📋 EIS</a>
+<a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+<div class="divider"></div>
+<a href="companysetting.html">⚙️ COMPANY SETTING</a>
+</div>
+</div>
+<a class="nav-item active" href="dashboard.html">DASHBOARD</a>
+<a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
+<a class="nav-item" href="leave.html">TIMECARD REPORT</a>
+<div class="nav-dropdown" id="carumanDropdown">
+<button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
+<div class="dropdown-menu">
+<a href="epf.html">🏦 EPF</a>
+<a href="socso.html">🛡️ SOCSO</a>
+<a href="eis.html">📋 EIS</a>
+<a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+</div>
+</div>
+<a class="nav-item" href="companysetting.html">SETTING</a>
+</div>
+<button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')">
+<span class="pulse"></span> 💬 Request Chat
+</button>
 </nav>
 
-<!-- ========== TOPBAR ========== -->
 <div class="topbar">
-  <div class="brand"><div class="logo">P</div> Payroll Dashboard</div>
-  <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
-
-  <div class="search-box">
-    <i class="fas fa-search"></i>
-    <input type="text" id="searchInput" placeholder="Cari Nama / Kod / Kumpulan..." oninput="filterCards()">
-  </div>
-
-  <span class="spacer" style="flex:1;"></span>
-
-  <div class="url-box">
-    <input type="text" id="deployUrlInput" placeholder="Paste Deploy URL di sini..." onkeydown="if(event.key==='Enter') applyUrl()">
-    <button onclick="applyUrl()">🔗 Apply</button>
-  </div>
-
-  <button class="btn" onclick="createEmployeeSheets()" id="btnCreateSheets" title="Buat sheet individu untuk setiap pekerja aktif">
-    📄 Buat Sheet
-  </button>
-
-  <span class="sync-badge" id="syncBadge">
-    <span class="dot"></span><span id="syncBadgeText">Sedia</span>
-  </span>
-
-  <button class="btn btn-success" onclick="loadData()">
-    <i class="fas fa-sync-alt"></i> Muat Semula
-  </button>
+<div class="brand"><div class="logo">P</div> Payroll Dashboard</div>
+<span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
+<div class="search-box">
+<i class="fas fa-search"></i>
+<input type="text" id="searchInput" placeholder="Cari Nama / Kod / Kumpulan..." oninput="filterCards()">
+</div>
+<span class="spacer" style="flex:1;"></span>
+<div class="url-box">
+<input type="text" id="deployUrlInput" placeholder="Paste Deploy URL di sini..." onkeydown="if(event.key==='Enter') applyUrl()">
+<button onclick="applyUrl()">🔗 Apply</button>
+</div>
+<span class="sync-badge" id="syncBadge">
+<span class="dot"></span><span id="syncBadgeText">Sedia</span>
+</span>
+<button class="btn btn-success" onclick="loadData()">
+<i class="fas fa-sync-alt"></i> Muat Semula
+</button>
 </div>
 
-<!-- ========== 主布局 (左侧布告栏 + 右侧内容) ========== -->
 <div class="main-layout">
-  
-  <!-- 左侧固定布告栏 -->
-  <div class="notice-board">
-    <div class="notice-header">
-      <i class="fas fa-exclamation-triangle"></i> 预设超时提醒
-      <span class="count-badge" id="noticeCount">0</span>
-    </div>
-    <div class="notice-list" id="noticeList">
-      <div class="notice-empty">
-        <span class="icon">✅</span>
-        暂无超时未处理的预设
-      </div>
-    </div>
-  </div>
+<div class="notice-board">
+<div class="notice-header">
+<i class="fas fa-exclamation-triangle"></i> 预设超时提醒
+<span class="count-badge" id="noticeCount">0</span>
+</div>
+<div class="notice-list" id="noticeList">
+<div class="notice-empty">
+<span class="icon">✅</span>
+暂无超时未处理的预设
+</div>
+</div>
+</div>
 
-  <!-- 右侧原有内容 -->
-  <div class="content-area">
-    <div class="page-header">
-      <div class="info">
-        <h1>📊 Dashboard Pekerja</h1>
-        <p>Klik pada kad pekerja untuk membuka halaman detail &amp; sunting gaji.</p>
-      </div>
-      <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
-        <div class="sync-badge" id="countBadge">
-          <span class="dot ok"></span><span id="countText">Memuatkan...</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="employee-grid" id="employeeGrid">
-      <div class="empty-state">
-        <span class="icon">⏳</span>
-        Memuatkan data pekerja...
-      </div>
-    </div>
-  </div>
-
+<div class="content-area">
+<div class="page-header">
+<div class="info">
+<h1>📊 Dashboard Pekerja</h1>
+<p>Klik pada kad pekerja untuk membuka halaman detail &amp; sunting gaji.</p>
+</div>
+<div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+<div class="sync-badge" id="countBadge">
+<span class="dot ok"></span><span id="countText">Memuatkan...</span>
+</div>
+</div>
+</div>
+<div class="employee-grid" id="employeeGrid">
+<div class="empty-state">
+<span class="icon">⏳</span>
+Memuatkan data pekerja...
+</div>
+</div>
+</div>
 </div>
 
 <script>
-/* ============================================================
-   NAVBAR DROPDOWN & BACK BUTTON LOGIC
-   ============================================================ */
 document.addEventListener('DOMContentLoaded', function() {
-  const backBtn = document.getElementById('backBtn');
-  if (backBtn) {
-    backBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      window.history.back();
-    });
-  }
-
-  const dropdownToggles = document.querySelectorAll('[data-dropdown-toggle]');
-  dropdownToggles.forEach(function(toggle) {
-    toggle.addEventListener('click', function(e) {
-      e.stopPropagation();
-      const dropdownId = this.getAttribute('data-dropdown-toggle');
-      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
-        if (dd.id !== dropdownId + 'Dropdown') dd.classList.remove('open');
-      });
-      const wrapper = this.closest('.nav-dropdown');
-      if (wrapper) wrapper.classList.toggle('open');
-    });
-  });
-
-  document.addEventListener('click', function(e) {
-    if (!e.target.closest('.nav-dropdown')) {
-      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
-        dd.classList.remove('open');
-      });
-    }
-  });
-
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
-        dd.classList.remove('open');
-      });
-    }
-  });
-
-  document.querySelectorAll('.dropdown-menu a').forEach(function(link) {
-    link.addEventListener('click', function() {
-      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
-        dd.classList.remove('open');
-      });
-    });
-  });
+const backBtn = document.getElementById('backBtn');
+if (backBtn) backBtn.addEventListener('click', function(e) { e.preventDefault(); window.history.back(); });
+const dropdownToggles = document.querySelectorAll('[data-dropdown-toggle]');
+dropdownToggles.forEach(function(toggle) {
+toggle.addEventListener('click', function(e) {
+e.stopPropagation();
+const dropdownId = this.getAttribute('data-dropdown-toggle');
+document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+if (dd.id !== dropdownId + 'Dropdown') dd.classList.remove('open');
+});
+const wrapper = this.closest('.nav-dropdown');
+if (wrapper) wrapper.classList.toggle('open');
+});
+});
+document.addEventListener('click', function(e) {
+if (!e.target.closest('.nav-dropdown')) {
+document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); });
+}
+});
+document.addEventListener('keydown', function(e) {
+if (e.key === 'Escape') document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); });
+});
 });
 
-/* ============================================================
-   ORIGINAL PAYROLL LOGIC
-   ============================================================ */
 const URL_KEY = 'payrollScriptUrl';
 const STORAGE_KEY = 'payrollEmployees';
 const SELECTED_CODE_KEY = 'payrollSelectedCode';
 const SELECTED_EMP_KEY = 'payrollSelectedEmployee';
 const DETAIL_URL = 'detail.html';
-
 let SCRIPT_URL = '';
 let allEmployees = [];
 let filteredEmployees = [];
 
-async function createEmployeeSheets() {
-  if (!SCRIPT_URL) { alert('Sila tetapkan URL Deploy terlebih dahulu.'); return; }
-  const btn = document.getElementById('btnCreateSheets');
-  btn.disabled = true;
-  btn.innerHTML = '⏳ Mencipta...';
-  setSyncBadge('busy', 'Mencipta sheet...');
-  try {
-    const res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'createStaffSheets' })
-    });
-    const result = await res.json();
-    if (result.status === 'success') {
-      setSyncBadge('ok', 'Sheet dicipta');
-      alert(`✅ ${result.message}\n\nDicipta: ${result.created.length}\nDilangkau: ${result.skipped.length}`);
-    } else {
-      throw new Error(result.message || 'Gagal mencipta sheet');
-    }
-  } catch (err) {
-    console.error('Create sheets error:', err);
-    setSyncBadge('err', 'Gagal cipta sheet');
-    alert('❌ Gagal: ' + err.message);
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '📄 Buat Sheet';
-  }
-}
-
 function num(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
 function fmtRM(v) { return 'RM ' + Number(v || 0).toFixed(2); }
 function escapeHtml(s) {
-  if (s === null || s === undefined) return '';
-  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+if (s === null || s === undefined) return '';
+return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
 function setSyncBadge(state, text) {
-  const badge = document.getElementById('syncBadge');
-  const txt = document.getElementById('syncBadgeText');
-  if (!badge || !txt) return;
-  badge.className = 'sync-badge ' + (state || '');
-  txt.textContent = text;
+const badge = document.getElementById('syncBadge');
+const txt = document.getElementById('syncBadgeText');
+if (!badge || !txt) return;
+badge.className = 'sync-badge ' + (state || '');
+txt.textContent = text;
 }
-
 function loadSavedUrl() {
-  try {
-    const saved = localStorage.getItem(URL_KEY);
-    if (saved) {
-      SCRIPT_URL = saved;
-      document.getElementById('deployUrlInput').value = saved;
-    } else {
-      SCRIPT_URL = '';
-      document.getElementById('deployUrlInput').value = '';
-    }
-  } catch (e) { SCRIPT_URL = ''; }
+try {
+const saved = localStorage.getItem(URL_KEY);
+if (saved) { SCRIPT_URL = saved; document.getElementById('deployUrlInput').value = saved; }
+else { SCRIPT_URL = ''; document.getElementById('deployUrlInput').value = ''; }
+} catch (e) { SCRIPT_URL = ''; }
 }
-
 function applyUrl() {
-  const input = document.getElementById('deployUrlInput');
-  const url = input.value.trim();
-  if (!url) { alert('Sila masukkan URL terlebih dahulu.'); return; }
-  try {
-    localStorage.setItem(URL_KEY, url);
-    SCRIPT_URL = url;
-    setSyncBadge('ok', 'URL disimpan');
-    loadData();
-    loadNoticeBoard(); // 重新加载布告栏
-  } catch (e) { alert('Gagal menyimpan URL.'); }
+const input = document.getElementById('deployUrlInput');
+const url = input.value.trim();
+if (!url) { alert('Sila masukkan URL terlebih dahulu.'); return; }
+try {
+localStorage.setItem(URL_KEY, url);
+SCRIPT_URL = url;
+setSyncBadge('ok', 'URL disimpan');
+loadData();
+loadNoticeBoard();
+} catch (e) { alert('Gagal menyimpan URL.'); }
 }
 
 async function loadData() {
-  if (!SCRIPT_URL) {
-    document.getElementById('employeeGrid').innerHTML = `
-      <div class="empty-state">
-        <span class="icon">🔗</span>
-        Sila masukkan URL Deploy Google Apps Script di toolbar di atas.
-      </div>`;
-    setSyncBadge('err', 'URL belum ditetapkan');
-    document.getElementById('countText').textContent = '0 pekerja';
-    return;
-  }
-  setSyncBadge('busy', 'Memuatkan data...');
-  document.getElementById('employeeGrid').innerHTML = `
-    <div class="empty-state">
-      <span class="spinner"></span> Memuatkan data pekerja...
-    </div>`;
-  try {
-    const res = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
-    const data = await res.json();
-    let staffRaw = [];
-    if (data && data.result === 'success' && Array.isArray(data.data)) staffRaw = data.data;
-    else if (Array.isArray(data)) staffRaw = data;
+if (!SCRIPT_URL) {
+document.getElementById('employeeGrid').innerHTML = `<div class="empty-state"><span class="icon">🔗</span>Sila masukkan URL Deploy Google Apps Script di toolbar di atas.</div>`;
+setSyncBadge('err', 'URL belum ditetapkan');
+document.getElementById('countText').textContent = '0 pekerja';
+return;
+}
+setSyncBadge('busy', 'Memuatkan data...');
+document.getElementById('employeeGrid').innerHTML = `<div class="empty-state"><span class="spinner"></span> Memuatkan data pekerja...</div>`;
 
-    const activeStaff = staffRaw.map(row => {
-      return {
-        Code: String(row.Code || '').trim(),
-        Name: String(row.Name || '').trim(),
-        GroupName: String(row.GroupName || '').trim(),
-        Situation: String(row.Situation || 'ACTIVE').toUpperCase(),
-        Salary: parseFloat(row.Salary) || 0,
-        Jantina: row.Jantina || '',
-        TarikhLahir: row.TarikhLahir || '',
-        IC: row.IC || '',
-        Jawatan: row.Jawatan || '',
-        BankNama: row.BankNama || '',
-        BankAccountNo: row.BankAccountNo || '',
-        EPF: row.EPF || '',
-        PERKESO: row.PERKESO || '',
-        EIS: row.EIS || '',
-        Lindungan: row.Lindungan || ''
-      };
-    }).filter(s => s.Code && s.Name && s.Situation === 'ACTIVE');
+try {
+const res = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
+const data = await res.json();
+let staffRaw = [];
+if (data && data.result === 'success' && Array.isArray(data.data)) staffRaw = data.data;
+else if (Array.isArray(data)) staffRaw = data;
 
-    let localPayroll = [];
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) localPayroll = JSON.parse(stored) || [];
-    } catch (e) { localPayroll = []; }
-    if (!Array.isArray(localPayroll)) localPayroll = [];
+let listCalcData = [];
+try {
+const resCalc = await fetch(`${SCRIPT_URL}?action=getListCalculation&_t=${Date.now()}`);
+const dataCalc = await resCalc.json();
+if (dataCalc.status === 'success' && Array.isArray(dataCalc.data)) listCalcData = dataCalc.data;
+} catch (e) { console.error('Load LISTCALCULATION error:', e); }
 
-    allEmployees = activeStaff.map(staff => {
-      const payroll = localPayroll.find(p => p.Code === staff.Code) || {};
-      return {
-        ...staff, ...payroll,
-        Name: staff.Name, GroupName: staff.GroupName, Situation: staff.Situation,
-        Basic: payroll.Basic || staff.Salary || 0,
-        Salary: staff.Salary || 0
-      };
-    });
+const calcMap = {};
+listCalcData.forEach(item => {
+if (item.Code) calcMap[String(item.Code).trim()] = item;
+});
 
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees)); } catch (e) {}
+const activeStaff = staffRaw.map(row => {
+const code = String(row.Code || '').trim();
+const calcItem = calcMap[code] || {};
+return {
+Code: code,
+Name: String(row.Name || '').trim(),
+GroupName: String(row.GroupName || '').trim(),
+Situation: String(row.Situation || 'ACTIVE').toUpperCase(),
+Salary: parseFloat(row.Salary) || 0,
+Jantina: row.Jantina || '', TarikhLahir: row.TarikhLahir || '', IC: row.IC || '', Jawatan: row.Jawatan || '',
+BankNama: row.BankNama || '', BankAccountNo: row.BankAccountNo || '',
+EPF: row.EPF || '', PERKESO: row.PERKESO || '', EIS: row.EIS || '', Lindungan: row.Lindungan || '',
+BasicSalary: calcItem.BasicSalary || row.Salary || 0,
+TotalSalaryPay: calcItem.TotalSalaryPay || 0,
+LastUpdated: calcItem.LastUpdated || ''
+};
+}).filter(s => s.Code && s.Name && s.Situation === 'ACTIVE');
 
-    filteredEmployees = [...allEmployees];
-    renderCards();
-    setSyncBadge('ok', 'Data dimuat (' + allEmployees.length + ' pekerja)');
-    document.getElementById('countText').textContent = allEmployees.length + ' pekerja aktif';
-    
-    // 加载数据后同时刷新布告栏
-    loadNoticeBoard();
+allEmployees = activeStaff;
+try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees)); } catch (e) {}
 
-  } catch (err) {
-    console.error('Load error:', err);
-    setSyncBadge('err', 'Gagal muat data');
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        allEmployees = JSON.parse(stored) || [];
-        allEmployees = allEmployees.filter(e => e.Situation === 'ACTIVE');
-        filteredEmployees = [...allEmployees];
-        renderCards();
-        setSyncBadge('', 'Data fallback (localStorage)');
-        document.getElementById('countText').textContent = allEmployees.length + ' pekerja';
-        return;
-      }
-    } catch (e) {}
-    document.getElementById('employeeGrid').innerHTML = `
-      <div class="empty-state">
-        <span class="icon">⚠️</span>
-        Gagal memuatkan data. Sila semak sambungan atau cuba lagi.
-        <br><br>
-        <button class="btn" onclick="loadData()">🔄 Cuba Lagi</button>
-      </div>`;
-  }
+filteredEmployees = [...allEmployees];
+renderCards();
+setSyncBadge('ok', 'Data dimuat (' + allEmployees.length + ' pekerja)');
+document.getElementById('countText').textContent = allEmployees.length + ' pekerja aktif';
+loadNoticeBoard();
+} catch (err) {
+console.error('Load error:', err);
+setSyncBadge('err', 'Gagal muat data');
+document.getElementById('employeeGrid').innerHTML = `<div class="empty-state"><span class="icon">⚠️</span>Gagal memuatkan data. Sila semak sambungan atau cuba lagi.<br><br><button class="btn" onclick="loadData()">🔄 Cuba Lagi</button></div>`;
+}
 }
 
-/* ============================================================
-   新增：左侧布告栏逻辑 (直接调用后端专用接口)
-   ============================================================ */
 async function loadNoticeBoard() {
-  const listEl = document.getElementById('noticeList');
-  const countEl = document.getElementById('noticeCount');
-
-  if (!SCRIPT_URL) {
-    listEl.innerHTML = '<div class="notice-empty"><span class="icon">🔗</span>请先设置 URL</div>';
-    countEl.textContent = '0';
-    return;
-  }
-
-  listEl.innerHTML = '<div class="notice-empty"><span class="spinner"></span> 加载中...</div>';
-
-  try {
-    // 直接请求后端专门处理过期预设的接口
-    const res = await fetch(`${SCRIPT_URL}?action=getOverduePresets&_t=${Date.now()}`);
-    const result = await res.json();
-
-    if (result.status !== 'success') {
-      throw new Error(result.message || '请求失败');
-    }
-
-    const overdueStaff = result.data || [];
-
-    if (overdueStaff.length === 0) {
-      listEl.innerHTML = `
-        <div class="notice-empty">
-          <span class="icon">✅</span>
-          暂无超时未处理的预设
-        </div>`;
-      countEl.textContent = '0';
-      return;
-    }
-
-    countEl.textContent = overdueStaff.length;
-    let html = '';
-    overdueStaff.forEach(s => {
-      // 美化时间显示
-      let displayTime = s.PresetDateTime;
-      try {
-        const d = new Date(s.PresetDateTime);
-        if (!isNaN(d.getTime())) {
-          displayTime = d.toLocaleString('zh-CN', { hour12: false });
-        }
-      } catch(e) {}
-
-      html += `
-        <div class="notice-item">
-          <div class="notice-name">
-            ${escapeHtml(s.Name)}
-            <span class="notice-code">${escapeHtml(s.Code)}</span>
-          </div>
-          <div class="notice-info">原状态: ${escapeHtml(s.Situation)}</div>
-          <div class="notice-info">到期时间: <span>${escapeHtml(displayTime)}</span></div>
-          <div class="notice-target">需设为: ${escapeHtml(s.PresetSituation)}</div>
-        </div>
-      `;
-    });
-    listEl.innerHTML = html;
-
-  } catch (err) {
-    console.error('Notice board error:', err);
-    listEl.innerHTML = '<div class="notice-empty"><span class="icon">⚠️</span>加载失败，请检查网络或后端部署</div>';
-    countEl.textContent = '0';
-  }
+const listEl = document.getElementById('noticeList');
+const countEl = document.getElementById('noticeCount');
+if (!SCRIPT_URL) { listEl.innerHTML = '<div class="notice-empty"><span class="icon">🔗</span>请先设置 URL</div>'; countEl.textContent = '0'; return; }
+listEl.innerHTML = '<div class="notice-empty"><span class="spinner"></span> 加载中...</div>';
+try {
+const res = await fetch(`${SCRIPT_URL}?action=getOverduePresets&_t=${Date.now()}`);
+const result = await res.json();
+if (result.status !== 'success') throw new Error(result.message || '请求失败');
+const overdueStaff = result.data || [];
+if (overdueStaff.length === 0) {
+listEl.innerHTML = `<div class="notice-empty"><span class="icon">✅</span>暂无超时未处理的预设</div>`;
+countEl.textContent = '0';
+return;
+}
+countEl.textContent = overdueStaff.length;
+let html = '';
+overdueStaff.forEach(s => {
+let displayTime = s.PresetDateTime;
+try { const d = new Date(s.PresetDateTime); if (!isNaN(d.getTime())) displayTime = d.toLocaleString('zh-CN', { hour12: false }); } catch(e) {}
+html += `<div class="notice-item"><div class="notice-name">${escapeHtml(s.Name)}<span class="notice-code">${escapeHtml(s.Code)}</span></div><div class="notice-info">原状态: ${escapeHtml(s.Situation)}</div><div class="notice-info">到期时间: <span>${escapeHtml(displayTime)}</span></div><div class="notice-target">需设为: ${escapeHtml(s.PresetSituation)}</div></div>`;
+});
+listEl.innerHTML = html;
+} catch (err) {
+console.error('Notice board error:', err);
+listEl.innerHTML = '<div class="notice-empty"><span class="icon">⚠️</span>加载失败，请检查网络或后端部署</div>';
+countEl.textContent = '0';
+}
 }
 
 function renderCards() {
-  const grid = document.getElementById('employeeGrid');
-  if (filteredEmployees.length === 0) {
-    grid.innerHTML = `<div class="empty-state"><span class="icon">📭</span> Tiada pekerja ditemui.</div>`;
-    return;
-  }
-  let html = '';
-  filteredEmployees.forEach(emp => {
-    const sitLower = String(emp.Situation || '').toLowerCase();
-    let badgeClass = 'active';
-    if (sitLower === 'pending') badgeClass = 'pending';
-    else if (sitLower === 'inactive') badgeClass = 'inactive';
-    const displaySalary = num(emp.Basic || emp.Salary);
-    html += `
-      <div class="employee-card" onclick="openDetail('${escapeHtml(emp.Code)}')">
-        <div class="card-header">
-          <div class="card-name">${escapeHtml(emp.Name || 'Tiada Nama')}</div>
-          <div class="card-code">${escapeHtml(emp.Code || '-')}</div>
-        </div>
-        <div class="card-body">
-          <div class="card-row"><span class="label">Kumpulan</span><span class="value">${escapeHtml(emp.GroupName || '-')}</span></div>
-          <div class="card-row"><span class="label">Gaji Asas</span><span class="value salary">${fmtRM(displaySalary)}</span></div>
-        </div>
-        <div class="card-footer">
-          <span class="status-badge ${badgeClass}">${escapeHtml(emp.Situation || 'ACTIVE')}</span>
-          <span class="arrow">›</span>
-        </div>
-      </div>`;
-  });
-  grid.innerHTML = html;
+const grid = document.getElementById('employeeGrid');
+if (filteredEmployees.length === 0) {
+grid.innerHTML = `<div class="empty-state"><span class="icon">📭</span> Tiada pekerja ditemui.</div>`;
+return;
+}
+let html = '';
+filteredEmployees.forEach(emp => {
+const sitLower = String(emp.Situation || '').toLowerCase();
+let badgeClass = 'active';
+if (sitLower === 'pending') badgeClass = 'pending';
+else if (sitLower === 'inactive') badgeClass = 'inactive';
+
+const displayBasic = num(emp.BasicSalary || emp.Salary);
+const displayNet = num(emp.TotalSalaryPay);
+
+html += `
+<div class="employee-card" onclick="openDetail('${escapeHtml(emp.Code)}')">
+<div class="card-header">
+<div class="card-name">${escapeHtml(emp.Name || 'Tiada Nama')}</div>
+<div class="card-code">${escapeHtml(emp.Code || '-')}</div>
+</div>
+<div class="card-body">
+<div class="card-row"><span class="label">Kumpulan</span><span class="value">${escapeHtml(emp.GroupName || '-')}</span></div>
+<div class="card-row"><span class="label">Gaji Asas</span><span class="value">${fmtRM(displayBasic)}</span></div>
+<div class="card-row"><span class="label">Gaji Bersih</span><span class="value salary">${fmtRM(displayNet)}</span></div>
+</div>
+<div class="card-footer">
+<span class="status-badge ${badgeClass}">${escapeHtml(emp.Situation || 'ACTIVE')}</span>
+<span class="arrow">›</span>
+</div>
+</div>`;
+});
+grid.innerHTML = html;
 }
 
 function filterCards() {
-  const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  if (!q) {
-    filteredEmployees = [...allEmployees];
-  } else {
-    filteredEmployees = allEmployees.filter(emp => {
-      return (
-        String(emp.Name || '').toLowerCase().includes(q) ||
-        String(emp.Code || '').toLowerCase().includes(q) ||
-        String(emp.GroupName || '').toLowerCase().includes(q)
-      );
-    });
-  }
-  renderCards();
+const q = document.getElementById('searchInput').value.trim().toLowerCase();
+if (!q) filteredEmployees = [...allEmployees];
+else filteredEmployees = allEmployees.filter(emp => String(emp.Name || '').toLowerCase().includes(q) || String(emp.Code || '').toLowerCase().includes(q) || String(emp.GroupName || '').toLowerCase().includes(q));
+renderCards();
 }
 
 function openDetail(code) {
-  const emp = allEmployees.find(e => e.Code === code);
-  if (!emp) return;
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees));
-    localStorage.setItem(SELECTED_CODE_KEY, emp.Code || '');
-    localStorage.setItem(SELECTED_EMP_KEY, JSON.stringify(emp));
-  } catch (err) { console.error('localStorage save failed:', err); }
-  window.open(DETAIL_URL, '_blank');
+const emp = allEmployees.find(e => e.Code === code);
+if (!emp) return;
+try {
+localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees));
+localStorage.setItem(SELECTED_CODE_KEY, emp.Code || '');
+localStorage.setItem(SELECTED_EMP_KEY, JSON.stringify(emp));
+} catch (err) { console.error('localStorage save failed:', err); }
+window.open(DETAIL_URL, '_blank');
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  loadSavedUrl();
-  if (SCRIPT_URL) {
-    loadData(); // 这个函数内部会调用 loadNoticeBoard
-  } else {
-    document.getElementById('employeeGrid').innerHTML = `
-      <div class="empty-state">
-        <span class="icon">🔗</span>
-        Sila masukkan URL Deploy Google Apps Script di toolbar di atas.
-      </div>`;
-    setSyncBadge('err', 'URL belum ditetapkan');
-    document.getElementById('countText').textContent = '0 pekerja';
-    loadNoticeBoard(); // 尝试加载布告栏（会提示先设置URL）
-  }
+loadSavedUrl();
+if (SCRIPT_URL) { loadData(); } 
+else {
+document.getElementById('employeeGrid').innerHTML = `<div class="empty-state"><span class="icon">🔗</span>Sila masukkan URL Deploy Google Apps Script di toolbar di atas.</div>`;
+setSyncBadge('err', 'URL belum ditetapkan');
+document.getElementById('countText').textContent = '0 pekerja';
+loadNoticeBoard();
+}
 });
-
-document.addEventListener('keydown', (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-    e.preventDefault();
-    document.getElementById('searchInput').focus();
-  }
-});
-
-window.addEventListener('storage', (e) => {
-  if (e.key === URL_KEY && e.newValue) {
-    SCRIPT_URL = e.newValue;
-    document.getElementById('deployUrlInput').value = e.newValue;
-    loadData();
-  }
-});
+document.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); document.getElementById('searchInput').focus(); } });
+window.addEventListener('storage', (e) => { if (e.key === URL_KEY && e.newValue) { SCRIPT_URL = e.newValue; document.getElementById('deployUrlInput').value = e.newValue; loadData(); } });
 </script>
 </body>
 </html>
