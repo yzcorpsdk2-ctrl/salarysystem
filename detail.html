@@ -215,10 +215,7 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
 </head>
 <body>
 <nav class="navbar">
-<div class="nav-brand">
-<span class="logo">Y</span>
-<span class="brand-text">YZ Payroll</span>
-</div>
+<div class="nav-brand"><span class="logo">Y</span><span class="brand-text">YZ Payroll</span></div>
 <div class="nav-links" id="navLinks">
 <button class="nav-back" id="backBtn" title="Kembali">⏎</button>
 <div class="nav-dropdown" id="filesDropdown">
@@ -504,7 +501,7 @@ const totalDays = num(inputs.annualLeaveDays.value) + num(inputs.sickLeaveDays.v
 
 el('infoGajiAsas').innerText = fmtRM(basic);
 el('firstCalcTotal').innerText = fmtRM(income);
-el('totalPotongan').innerText = fmtRM(totalPotongan); // 包含法定扣除的总扣除
+el('totalPotongan').innerText = fmtRM(totalPotongan);
 el('totalHariCuti').innerText = totalDays + ' Hari';
 
 el('gajiKasarDisplay').innerText = fmtRM(totalGajiKasar);
@@ -722,173 +719,170 @@ alert('✅ Semua medan telah direset ke default.\nKlik "Simpan & Sync" untuk men
 }
 
 async function saveAndSync() {
-  if (!currentRaw || !currentRaw.Code) {
-    alert('Tiada pekerja dipilih. Sila pilih KOD terlebih dahulu.');
-    return;
-  }
-  const btn = el('saveBtn');
-  const originalText = btn.innerHTML;
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+if (!currentRaw || !currentRaw.Code) {
+alert('Tiada pekerja dipilih. Sila pilih KOD terlebih dahulu.');
+return;
+}
+const btn = el('saveBtn');
+const originalText = btn.innerHTML;
+btn.disabled = true;
+btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
 
-  const updated = { ...currentRaw };
-  const staff = activeStaffList.find(s => s.Code === updated.Code);
-  if (staff) {
-    updated.Name = staff.Name;
-    updated.GroupName = staff.GroupName;
-    updated.Situation = staff.Situation;
-    updated.Basic = staff.Salary;
-  }
-  Object.entries(FIELD_MAP).forEach(([id, key]) => {
-    const inp = inputs[id];
-    if (!inp) return;
-    if (TEXT_FIELDS.has(id)) updated[key] = inp.value;
-    else updated[key] = num(inp.value);
-  });
+const updated = { ...currentRaw };
+const staff = activeStaffList.find(s => s.Code === updated.Code);
+if (staff) {
+updated.Name = staff.Name;
+updated.GroupName = staff.GroupName;
+updated.Situation = staff.Situation;
+updated.Basic = staff.Salary;
+}
+Object.entries(FIELD_MAP).forEach(([id, key]) => {
+const inp = inputs[id];
+if (!inp) return;
+if (TEXT_FIELDS.has(id)) updated[key] = inp.value;
+else updated[key] = num(inp.value);
+});
 
-  // 确保 BasicSalary 和 Code 正确
-  updated.BasicSalary = updated.Basic;
-  updated.Code = String(updated.Code).trim(); // 确保 Code 是字符串
+// 确保 BasicSalary 和 Code 正确
+updated.BasicSalary = updated.Basic;
+updated.Code = String(updated.Code).trim();
 
-  // 同步总计字段和 LastUpdated 到 payload
-  updated.TotalGajiKasar = num(el('gajiKasarDisplay').innerText.replace('RM ', '').replace(/,/g, ''));
-  updated.TotalPotongan = num(el('totalPotonganDisplay').innerText.replace('RM ', '').replace(/,/g, ''));
-  updated.TotalSalaryPay = num(el('gajiBersihDisplay').innerText.replace('RM ', '').replace(/,/g, ''));
-  updated.LastUpdated = new Date().toISOString();
+// 同步总计字段和 LastUpdated 到 payload
+updated.TotalGajiKasar = num(el('gajiKasarDisplay').innerText.replace(/[^0-9.\-]/g,''));
+updated.TotalPotongan = num(el('totalPotonganDisplay').innerText.replace(/[^0-9.\-]/g,''));
+updated.TotalSalaryPay = num(el('gajiBersihDisplay').innerText.replace(/[^0-9.\-]/g,''));
+updated.LastUpdated = new Date().toISOString();
 
-  let sheetSuccess = false;
-  if (SCRIPT_URL) {
-    try {
-      const payload = { ...updated, action: 'saveEmployeeDetail' };
-      Logger.log('Saving payload:', payload);
-      const res = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      });
-      const result = await res.json();
-      Logger.log('Save result:', result);
-      if (result.status === 'success') {
-        sheetSuccess = true;
-      } else {
-        throw new Error(result.message || 'Gagal sync ke Sheet');
-      }
-    } catch (err) {
-      console.error('Sync to sheet error:', err);
-      const proceed = confirm(`⚠️ Gagal sync ke Google Sheet: ${err.message}\nAdakah anda mahu tetap simpan di LocalStorage sahaja?`);
-      if (!proceed) {
-        btn.disabled = false;
-        btn.innerHTML = originalText;
-        setSyncStatus('Batal simpan', 'error');
-        return;
-      }
-    }
-  }
+let sheetSuccess = false;
+if (SCRIPT_URL) {
+try {
+const payload = { ...updated, action: 'saveEmployeeDetail' };
+const res = await fetch(SCRIPT_URL, {
+method: 'POST',
+headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+body: JSON.stringify(payload)
+});
+const result = await res.json();
+if (result.status === 'success') {
+sheetSuccess = true;
+} else {
+throw new Error(result.message || 'Gagal sync ke Sheet');
+}
+} catch (err) {
+console.error('Sync to sheet error:', err);
+const proceed = confirm(`⚠️ Gagal sync ke Google Sheet: ${err.message}\nAdakah anda mahu tetap simpan di LocalStorage sahaja?`);
+if (!proceed) {
+btn.disabled = false;
+btn.innerHTML = originalText;
+setSyncStatus('Batal simpan', 'error');
+return;
+}
+}
+}
 
-  let all = [];
-  try {
-    const allJson = localStorage.getItem(STORAGE_KEY);
-    if (allJson) all = JSON.parse(allJson) || [];
-  } catch (e) {}
-  if (!Array.isArray(all)) all = [];
-  const idx = all.findIndex(e => e.Code === updated.Code);
-  if (idx !== -1) all[idx] = { ...all[idx], ...updated };
-  else all.push(updated);
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); } catch (e) { console.error(e); }
-  allEmployees = all;
-  currentRaw = updated;
+let all = [];
+try {
+const allJson = localStorage.getItem(STORAGE_KEY);
+if (allJson) all = JSON.parse(allJson) || [];
+} catch (e) {}
+if (!Array.isArray(all)) all = [];
+const idx = all.findIndex(e => e.Code === updated.Code);
+if (idx !== -1) all[idx] = { ...all[idx], ...updated };
+else all.push(updated);
+try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); } catch (e) { console.error(e); }
+allEmployees = all;
+currentRaw = updated;
 
-  try {
-    if (window.opener && !window.opener.closed) {
-      window.opener.postMessage({ type: 'PAYROLL_UPDATE', employees: all }, '*');
-    }
-  } catch (e) {}
+try {
+if (window.opener && !window.opener.closed) {
+window.opener.postMessage({ type: 'PAYROLL_UPDATE', employees: all }, '*');
+}
+} catch (e) {}
 
-  btn.disabled = false;
-  btn.innerHTML = originalText;
-  const time = new Date().toLocaleTimeString('ms-MY', { hour12: false });
-  if (sheetSuccess) {
-    setSyncStatus('Disimpan & Sync ke Sheet · ' + time, 'success');
-    alert('✅ Data berjaya disimpan & disegerakkan ke LISTCALCULATION untuk ' + (updated.Name || updated.Code));
-  } else {
-    setSyncStatus('Disimpan (Local sahaja) · ' + time, 'success');
-    alert('✅ Data disimpan di LocalStorage. (Gagal sync ke Sheet)');
-  }
+btn.disabled = false;
+btn.innerHTML = originalText;
+const time = new Date().toLocaleTimeString('ms-MY', { hour12: false });
+if (sheetSuccess) {
+setSyncStatus('Disimpan & Sync ke Sheet · ' + time, 'success');
+alert('✅ Data berjaya disimpan & disegerakkan ke LISTCALCULATION untuk ' + (updated.Name || updated.Code));
+} else {
+setSyncStatus('Disimpan (Local sahaja) · ' + time, 'success');
+alert('✅ Data disimpan di LocalStorage. (Gagal sync ke Sheet)');
+}
 }
 
 async function syncFromSheet(silent = false) {
-  if (!currentRaw || !currentRaw.Code) {
-    if (!silent) alert('Sila pilih pekerja dahulu.');
-    return;
-  }
-  if (!SCRIPT_URL) {
-    if (!silent) alert('Sila tetapkan URL Deploy terlebih dahulu di Dashboard.');
-    return;
-  }
-  const btn = el('syncSheetBtn');
-  const originalText = btn.innerHTML;
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menarik...';
-  }
-  try {
-    const res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'getEmployeeDetail', Code: currentRaw.Code })
-    });
-    const result = await res.json();
-    Logger.log('syncFromSheet result:', result);
-    if (result.status === 'success' && result.data) {
-      const sheetData = result.data;
-      const staff = activeStaffList.find(s => s.Code === currentRaw.Code);
-      
-      // 合并数据，确保 BasicSalary 映射到 Basic
-      const merged = { ...currentRaw, ...sheetData };
-      if (staff) {
-        merged.Name = staff.Name;
-        merged.GroupName = staff.GroupName;
-        merged.Situation = staff.Situation;
-        merged.Basic = staff.Salary;
-      }
-      
-      // 关键修复：将 BasicSalary 映射到 Basic
-      if (merged.BasicSalary !== undefined && merged.BasicSalary !== null && merged.BasicSalary !== '') {
-        merged.Basic = num(merged.BasicSalary);
-      }
-      
-      fillForm(merged);
-      const idx = allEmployees.findIndex(e => e.Code === currentRaw.Code);
-      if (idx !== -1) allEmployees[idx] = merged;
-      else allEmployees.push(merged);
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees)); } catch(e) {}
-      const lastUpdated = sheetData.LastUpdated || '—';
-      setSyncStatus('Data dari Sheet dimuat · ' + lastUpdated, 'success');
-      if (!silent) {
-        alert('✅ Data berjaya dimuat dari LISTCALCULATION.\nTerakhir dikemas kini: ' + lastUpdated);
-      }
-    } else {
-      if (staff) {
-        if (currentRaw.SLRBankNama === undefined || currentRaw.SLRBankNama === null || currentRaw.SLRBankNama === '') currentRaw.SLRBankNama = staff.BankNama || '';
-        if (currentRaw.SLRBankAccountNo === undefined || currentRaw.SLRBankAccountNo === null || currentRaw.SLRBankAccountNo === '') currentRaw.SLRBankAccountNo = staff.BankAccountNo || '';
-        if (currentRaw.SLREPF === undefined || currentRaw.SLREPF === null || currentRaw.SLREPF === '') currentRaw.SLREPF = staff.EPF || '';
-        if (currentRaw.SLRPERKESO === undefined || currentRaw.SLRPERKESO === null || currentRaw.SLRPERKESO === '') currentRaw.SLRPERKESO = staff.PERKESO || '';
-        if (currentRaw.SLREIS === undefined || currentRaw.SLREIS === null || currentRaw.SLREIS === '') currentRaw.SLREIS = staff.EIS || '';
-      }
-      fillForm(currentRaw);
-      setSyncStatus('Tiada data Sheet · Guna default StaffInfo', '');
-      if (!silent) alert('Tiada data di Sheet untuk pekerja ini. Menggunakan data default dari StaffInfo.');
-    }
-  } catch (err) {
-    console.error('Sync from sheet error:', err);
-    setSyncStatus('Gagal sync dari Sheet', 'error');
-    if (!silent) alert('❌ Gagal sync dari Sheet: ' + err.message);
-  } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = originalText;
-    }
-  }
+if (!currentRaw || !currentRaw.Code) {
+if (!silent) alert('Sila pilih pekerja dahulu.');
+return;
+}
+if (!SCRIPT_URL) {
+if (!silent) alert('Sila tetapkan URL Deploy terlebih dahulu di Dashboard.');
+return;
+}
+const btn = el('syncSheetBtn');
+const originalText = btn.innerHTML;
+if (btn) {
+btn.disabled = true;
+btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menarik...';
+}
+try {
+const res = await fetch(SCRIPT_URL, {
+method: 'POST',
+headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+body: JSON.stringify({ action: 'getEmployeeDetail', Code: currentRaw.Code })
+});
+const result = await res.json();
+if (result.status === 'success' && result.data) {
+const sheetData = result.data;
+const staff = activeStaffList.find(s => s.Code === currentRaw.Code);
+
+// 合并数据，确保 BasicSalary 映射到 Basic
+const merged = { ...currentRaw, ...sheetData };
+if (staff) {
+merged.Name = staff.Name;
+merged.GroupName = staff.GroupName;
+merged.Situation = staff.Situation;
+merged.Basic = staff.Salary;
+}
+
+// 关键修复：将 BasicSalary 映射到 Basic
+if (merged.BasicSalary !== undefined && merged.BasicSalary !== null && merged.BasicSalary !== '') {
+merged.Basic = num(merged.BasicSalary);
+}
+
+fillForm(merged);
+const idx = allEmployees.findIndex(e => e.Code === currentRaw.Code);
+if (idx !== -1) allEmployees[idx] = merged;
+else allEmployees.push(merged);
+try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees)); } catch(e) {}
+const lastUpdated = sheetData.LastUpdated || '—';
+setSyncStatus('Data dari Sheet dimuat · ' + lastUpdated, 'success');
+if (!silent) {
+alert('✅ Data berjaya dimuat dari LISTCALCULATION.\nTerakhir dikemas kini: ' + lastUpdated);
+}
+} else {
+if (staff) {
+if (currentRaw.SLRBankNama === undefined || currentRaw.SLRBankNama === null || currentRaw.SLRBankNama === '') currentRaw.SLRBankNama = staff.BankNama || '';
+if (currentRaw.SLRBankAccountNo === undefined || currentRaw.SLRBankAccountNo === null || currentRaw.SLRBankAccountNo === '') currentRaw.SLRBankAccountNo = staff.BankAccountNo || '';
+if (currentRaw.SLREPF === undefined || currentRaw.SLREPF === null || currentRaw.SLREPF === '') currentRaw.SLREPF = staff.EPF || '';
+if (currentRaw.SLRPERKESO === undefined || currentRaw.SLRPERKESO === null || currentRaw.SLRPERKESO === '') currentRaw.SLRPERKESO = staff.PERKESO || '';
+if (currentRaw.SLREIS === undefined || currentRaw.SLREIS === null || currentRaw.SLREIS === '') currentRaw.SLREIS = staff.EIS || '';
+}
+fillForm(currentRaw);
+setSyncStatus('Tiada data Sheet · Guna default StaffInfo', '');
+if (!silent) alert('Tiada data di Sheet untuk pekerja ini. Menggunakan data default dari StaffInfo.');
+}
+} catch (err) {
+console.error('Sync from sheet error:', err);
+setSyncStatus('Gagal sync dari Sheet', 'error');
+if (!silent) alert('❌ Gagal sync dari Sheet: ' + err.message);
+} finally {
+if (btn) {
+btn.disabled = false;
+btn.innerHTML = originalText;
+}
+}
 }
 
 function loadFallbackFromStorage() {
