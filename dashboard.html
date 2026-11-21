@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard · 员工薪资仪表盘</title>
+<!-- ✅ 添加 Font Awesome 图标库 -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -11,13 +12,16 @@
 --epf-blue: #1a4f8a; --epf-blue-light: #e8f0fa; --epf-blue-soft: #f4f8fd;
 --epf-border: #d4e0ee; --epf-border-soft: #e6eef7;
 --epf-text: #1f2d3d; --epf-muted: #64748b; --epf-bg: #f7fafd;
+
+/* NAVBAR VARS */
 --nav-h: 52px;
 --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover: #16345c;
 --nav-text: #cbd9ea; --nav-accent: #4d9fff;
---shadow-sm: 0 1px 2px rgba(16,32,56,.05), 0 2px 10px rgba(16,32,56,.05);
---shadow-md: 0 8px 24px rgba(16,32,56,.10);
 --dropdown-bg: #ffffff;
 --dropdown-shadow: 0 8px 24px rgba(16,32,56,.15);
+
+--shadow-sm: 0 1px 2px rgba(16,32,56,.05), 0 2px 10px rgba(16,32,56,.05);
+--shadow-md: 0 8px 24px rgba(16,32,56,.10);
 }
 body {
 font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -25,6 +29,10 @@ background: var(--epf-bg); color: var(--epf-text);
 min-height: 100vh; line-height: 1.5; font-size: 14px;
 -webkit-font-smoothing: antialiased;
 }
+
+/* ============================================================
+     NEW NAVBAR STYLES
+     ============================================================ */
 .navbar {
 position: sticky; top: 0; z-index: 200;
 display: flex; align-items: stretch; flex-wrap: wrap;
@@ -93,6 +101,8 @@ font-weight: 500; transition: background 0.12s; white-space: nowrap;
 }
 .dropdown-menu a:hover { background: var(--epf-blue-soft); color: var(--epf-blue); }
 .dropdown-menu .divider { height: 1px; background: var(--epf-border-soft); margin: 0.3rem 0.5rem; }
+
+/* TIPS / CHAT BUTTON */
 .nav-chat {
 margin-left: auto; align-self: center;
 display: inline-flex; align-items: center; gap: 0.45rem;
@@ -114,6 +124,8 @@ box-shadow: 0 0 0 0 rgba(110,240,168,0.75); animation: pulse 2s infinite;
 70% { box-shadow: 0 0 0 7px rgba(110,240,168,0); }
 100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); }
 }
+
+/* TOPBAR & CONTENT STYLES (Original) */
 .topbar {
 position: sticky; top: var(--nav-h); z-index: 100; background: #ffffff;
 border-bottom: 1px solid var(--epf-border); padding: 0.65rem 1.75rem;
@@ -269,10 +281,13 @@ background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transi
 </style>
 </head>
 <body>
+
+<!-- ✅ 新版导航栏开始 -->
 <nav class="navbar">
 <div class="nav-brand"><span class="logo">Y</span><span class="brand-text">YZ Payroll</span></div>
 <div class="nav-links" id="navLinks">
 <button class="nav-back" id="backBtn" title="Kembali">⏎</button>
+
 <div class="nav-dropdown" id="filesDropdown">
 <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
 <div class="dropdown-menu">
@@ -287,11 +302,19 @@ background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transi
 <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
 <div class="divider"></div>
 <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+<a href="veiwofepfsocsoeis.html">📰 View Epf/Socso/Eis</a>
+<a href="hrdcorp.html">📓 HRD Corp</a>
+<a href="salarysumview.html">📊 Salary View</a>
+<a href="GoogleSheetBackupURL.html">🔗 Google Sheet Backup URL</a>
 </div>
 </div>
+
+<!-- ✅ 修正：当前是 Dashboard 页面，所以这里加 active -->
 <a class="nav-item active" href="dashboard.html">DASHBOARD</a>
 <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
 <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
+<a class="nav-item" href="overtime.html">OVERTIME</a>
+
 <div class="nav-dropdown" id="carumanDropdown">
 <button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
 <div class="dropdown-menu">
@@ -301,12 +324,27 @@ background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transi
 <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
 </div>
 </div>
+
 <a class="nav-item" href="companysetting.html">SETTING</a>
+
+<div class="nav-dropdown" id="othersDropdown">
+<button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
+<div class="dropdown-menu">
+<a href="companysetting.html">⚙️ COMPANY SETTING</a>
+<div class="divider"></div>
+<a href="veiwofepfsocsoeis.html">📰 View Epf/Socso/Eis</a>
+<a href="hrdcorp.html">📓 HRD Corp</a>
+<a href="salarysumview.html">📊 Salary View</a>
+<a href="GoogleSheetBackupURL.html">🔗 Google Sheet Backup URL</a>
 </div>
+</div>
+</div>
+
 <button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')">
 <span class="pulse"></span> 💬 Request Chat
 </button>
 </nav>
+<!-- ✅ 新版导航栏结束 -->
 
 <div class="topbar">
 <div class="brand"><div class="logo">P</div> Payroll Dashboard</div>
@@ -367,18 +405,30 @@ Memuatkan data pekerja...
 document.addEventListener('DOMContentLoaded', function() {
 const backBtn = document.getElementById('backBtn');
 if (backBtn) backBtn.addEventListener('click', function(e) { e.preventDefault(); window.history.back(); });
+
+// 下拉菜单交互逻辑
 const dropdownToggles = document.querySelectorAll('[data-dropdown-toggle]');
 dropdownToggles.forEach(function(toggle) {
 toggle.addEventListener('click', function(e) {
 e.stopPropagation();
 const dropdownId = this.getAttribute('data-dropdown-toggle');
-document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { if (dd.id !== dropdownId + 'Dropdown') dd.classList.remove('open'); });
+document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { 
+if (dd.id !== dropdownId + 'Dropdown') dd.classList.remove('open'); 
+});
 const wrapper = this.closest('.nav-dropdown');
 if (wrapper) wrapper.classList.toggle('open');
 });
 });
-document.addEventListener('click', function(e) { if (!e.target.closest('.nav-dropdown')) document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); }); });
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); }); });
+
+document.addEventListener('click', function(e) { 
+if (!e.target.closest('.nav-dropdown')) 
+document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); }); 
+});
+
+document.addEventListener('keydown', function(e) { 
+if (e.key === 'Escape') 
+document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); }); 
+});
 });
 
 const URL_KEY = 'payrollScriptUrl';
