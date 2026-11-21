@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leave · Timecard System</title>
+<!-- ✅ 修复1: 添加 Font Awesome 图标库 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -11,7 +13,7 @@
     --text: #1f2d3d; --muted: #64748b; --bg: #f7fafd;
     --nav-dark: #1a2b4c; --nav-hover: #243a66;
 
-    /* NAVBAR VARS (aligned with dashboard.html) */
+    /* NAVBAR VARS */
     --nav-h: 52px;
     --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover2: #16345c;
     --nav-text: #cbd9ea; --nav-accent: #4d9fff;
@@ -25,7 +27,7 @@
   body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); font-size: 13px; min-height: 100vh; padding-bottom: 50px; }
 
   /* ============================================================
-     NEW NAVBAR (adapted from dashboard.html)
+     NAVBAR STYLES
      ============================================================ */
   .navbar {
     position: sticky; top: 0; z-index: 200;
@@ -34,7 +36,6 @@
     padding: 0 1rem; min-height: var(--nav-h);
     box-shadow: 0 2px 12px rgba(0,0,0,0.25);
     border-bottom: 1px solid rgba(77,159,255,0.18);
-    margin-bottom: 0;
     width: 100%;
   }
   .navbar .nav-brand {
@@ -52,12 +53,10 @@
     color: #fff; font-size: 0.85rem; font-weight: 800;
     box-shadow: 0 2px 6px rgba(77,159,255,0.35);
   }
-
   .nav-links {
     display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px;
     position: relative;
   }
-
   .nav-item {
     display: inline-flex; align-items: center; gap: 0.35rem;
     padding: 0 0.85rem; min-height: var(--nav-h);
@@ -75,60 +74,38 @@
     transform-origin: left; transition: transform 0.2s;
   }
   .nav-item:hover::after, .nav-item.active::after { transform: scaleX(1); }
-
   .nav-back {
     display: inline-flex; align-items: center; justify-content: center;
     min-width: 44px; padding: 0 0.6rem;
-    color: var(--nav-text);
-    background: transparent; border: none; cursor: pointer;
+    color: var(--nav-text); background: transparent; border: none; cursor: pointer;
     font-size: 1.1rem; transition: background 0.15s, color 0.15s;
   }
   .nav-back:hover { background: var(--nav-hover2); color: #fff; }
-
-  .nav-dropdown {
-    position: relative;
-    display: inline-flex;
-    align-items: stretch;
-  }
+  .nav-dropdown { position: relative; display: inline-flex; align-items: stretch; }
   .nav-dropdown > .nav-item { padding-right: 0.55rem; }
   .nav-dropdown > .nav-item .fa-caret-down { font-size: 0.6rem; margin-left: 0.2rem; opacity: 0.7; }
   .dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    min-width: 180px;
-    background: var(--dropdown-bg);
-    border-radius: 8px;
-    box-shadow: var(--dropdown-shadow);
-    padding: 0.4rem 0;
-    z-index: 300;
-    border: 1px solid var(--line);
+    display: none; position: absolute; top: 100%; left: 0;
+    min-width: 180px; background: var(--dropdown-bg);
+    border-radius: 8px; box-shadow: var(--dropdown-shadow);
+    padding: 0.4rem 0; z-index: 300; border: 1px solid var(--line);
     animation: fadeSlide 0.15s ease;
   }
   .nav-dropdown.open .dropdown-menu { display: block; }
-
   @keyframes fadeSlide {
     from { opacity: 0; transform: translateY(-6px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-
   .dropdown-menu a {
     display: flex; align-items: center; gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    color: #1e293b;
-    text-decoration: none;
-    font-size: 0.78rem;
-    font-weight: 500;
-    transition: background 0.12s;
+    padding: 0.5rem 1rem; color: #1e293b; text-decoration: none;
+    font-size: 0.78rem; font-weight: 500; transition: background 0.12s;
     white-space: nowrap;
   }
   .dropdown-menu a:hover { background: var(--navy-soft); color: var(--navy); }
-  .dropdown-menu .divider {
-    height: 1px; background: var(--line-soft); margin: 0.3rem 0.5rem;
-  }
+  .dropdown-menu .divider { height: 1px; background: var(--line-soft); margin: 0.3rem 0.5rem; }
 
-  /* 将 Request Chat 改为 Tips 按钮样式，但保持原本的外形结构 */
+  /* TIPS BUTTON */
   .nav-chat {
     margin-left: auto; align-self: center;
     display: inline-flex; align-items: center; gap: 0.45rem;
@@ -151,7 +128,7 @@
     100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); }
   }
 
-  /* ====== 浅色工具栏 ====== */
+  /* TOOLBAR */
   .toolbar { background: #fff; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 8px 20px; gap: 15px; box-shadow: 0 1px 3px rgba(26,79,138,.04); }
   .toolbar-left { display: flex; align-items: center; gap: 16px; flex: 1; }
   .toolbar-brand { display: flex; align-items: center; gap: 8px; color: var(--nav-dark); font-weight: 800; font-size: 15px; }
@@ -159,7 +136,6 @@
   .toolbar-search { display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; width: 320px; gap: 6px; }
   .toolbar-search input { border: none; background: transparent; outline: none; font-size: 12px; flex: 1; color: var(--text); }
   .toolbar-search span { color: var(--muted); font-size: 14px; }
-
   .toolbar-right { display: flex; align-items: center; gap: 10px; }
   .url-box { display: flex; align-items: center; gap: 4px; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 2px; }
   .url-box input { border: none; background: transparent; padding: 6px 8px; font-size: 12px; outline: none; width: 260px; }
@@ -168,16 +144,13 @@
   .btn-outline:hover { background: var(--blue-soft); color: var(--blue); }
   .btn-success { background: #16a34a; color: #fff; border-color: #16a34a; }
   .btn-success:hover { background: #15803d; color: #fff; }
-  .btn-setting { background: #f1f5f9; color: #0f172a; border-color: #cbd5e1; }
-  .btn-setting:hover { background: #e2e8f0; color: #000; }
   .btn-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
   .btn-primary:hover { background: #163f6e; color: #fff; }
   .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
-
   .sync-badge { display: inline-flex; align-items: center; gap: 5px; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; color: #047857; }
   .sync-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; }
 
-  /* ====== 仪表盘等主体内容 ====== */
+  /* CONTENT & DASHBOARD */
   .container { max-width: 100%; padding: 14px 20px; }
   .dashboard-panel { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(15,23,42,.03); display: flex; flex-wrap: wrap; gap: 16px; }
   .dash-group { flex: 1 1 auto; background: var(--blue-soft); border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 10px; min-width: 260px; }
@@ -191,14 +164,14 @@
   .dash-item.search-wrap input { font-size: 13px; font-weight: 600; color: var(--text); padding: 4px 6px; width: 100%; border: 1px solid var(--border); border-radius: 4px; background: #fff; outline: none; }
   .dash-item.search-wrap input:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(26,79,138,.12); }
 
-  /* 搜索下拉 */
+  /* SEARCH DROPDOWN */
   .search-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,.1); max-height: 250px; overflow-y: auto; z-index: 50; display: none; }
   .search-dropdown.show { display: block; }
   .sd-item { padding: 8px 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
   .sd-item:hover { background: var(--blue-soft); color: var(--blue); }
   .sd-item.all-item { font-weight: 700; background: #eef4fb; color: var(--blue); border-bottom: 2px solid #dbe6f2; }
 
-  /* 表格 */
+  /* TABLE */
   .table-wrap { overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: #fff; max-height: calc(100vh - 320px); position: relative; }
   table { border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; font-size: 11.5px; }
   thead th { position: sticky; top: 0; z-index: 3; background: #eef4fb; color: #334155; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; padding: 8px 5px; border-right: 1px solid #dbe6f2; border-bottom: 2px solid #cbd9ea; white-space: nowrap; text-align: center; }
@@ -215,7 +188,7 @@
   input.cell:disabled, select.cell:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
   input.cell.wide { min-width: 120px; text-align: left; }
 
-  /* 其它组件 */
+  /* FILTER PANEL */
   .filter-panel { position: fixed; z-index: 1000; background: #fff; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 10px 30px rgba(15,23,42,.15); padding: 10px; width: 220px; max-height: 300px; display: none; flex-direction: column; font-size: 12px; }
   .filter-panel.show { display: flex; }
   .fp-head { margin-bottom: 8px; }
@@ -230,7 +203,7 @@
   .fp-footer button { padding: 4px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; border: 1px solid var(--border); background: #fff; }
   .fp-footer button.apply { background: var(--blue); color: #fff; border-color: var(--blue); }
 
-  /* Modal */
+  /* MODALS */
   .modal-mask { position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 9999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
   .modal-mask.show { display: flex; }
   .modal { background: #fff; border-radius: 12px; padding: 22px 24px; width: 420px; max-width: 92vw; box-shadow: 0 20px 60px rgba(15,23,42,.35); text-align: center; }
@@ -241,14 +214,14 @@
   .modal .actions button { padding: 8px 18px; border-radius: 6px; font-size: 12.5px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: #fff; color: var(--text); }
   .modal .actions button.confirm { background: var(--blue); color: #fff; border-color: var(--blue); }
 
-  /* Setting Center 专用 */
+  /* SETTING CENTER */
   .setting-modal { width: 600px; text-align: left; }
   .setting-modal h3 { text-align: center; }
   .setting-input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; margin-bottom: 12px; outline: none; }
   .setting-textarea { width: 100%; height: 200px; padding: 10px; font-family: monospace; font-size: 12px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 12px; resize: vertical; outline: none; background: #f8fafc; }
   .setting-textarea:focus { border-color: var(--blue); background: #fff; }
 
-  /* ====== TIPS 浮窗/弹窗专用 ====== */
+  /* TIPS MODAL */
   .tips-modal { width: 650px; max-width: 95vw; text-align: left; padding: 24px 30px; }
   .tips-modal h3 { font-size: 20px; color: var(--nav-dark); margin-bottom: 12px; text-align: center; }
   .tips-modal p.subtitle { text-align: center; margin-bottom: 20px; color: var(--muted); font-size: 13px; }
@@ -264,18 +237,14 @@
   .tips-actions .btn-detail { background: #e2e8f0; color: #0f172a; }
   .tips-actions .btn-close { background: transparent; color: var(--muted); font-weight: 600; }
 
-  /* 遮罩与高亮浮窗 (Walkthrough) - 已修复白块遮挡问题 */
+  /* WALKTHROUGH */
   .tour-mask { position: fixed; inset: 0; z-index: 10000; display: none; cursor: pointer; }
   .tour-mask.show { display: block; }
   .tour-highlight { 
-    position: absolute; 
-    background: transparent; 
-    outline: 9999px solid rgba(0,0,0,0.6); /* 使用 outline 替代 box-shadow 避免白块覆盖 */
-    border-radius: 8px; 
-    z-index: 10001; 
-    display: none; 
-    transition: all 0.3s ease; 
-    pointer-events: none; 
+    position: absolute; background: transparent; 
+    outline: 9999px solid rgba(0,0,0,0.6); 
+    border-radius: 8px; z-index: 10001; display: none; 
+    transition: all 0.3s ease; pointer-events: none; 
   }
   .tour-highlight.show { display: block; }
   .tour-tooltip { position: absolute; background: #fff; border-radius: 8px; padding: 16px; width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 10002; display: none; flex-direction: column; gap: 8px; border-top: 4px solid #007bff; }
@@ -284,7 +253,7 @@
   .tour-tooltip p { font-size: 12.5px; color: #334155; line-height: 1.5; }
   .tour-tooltip .tour-hint { font-size: 11px; color: #94a3b8; font-style: italic; margin-top: 6px; }
 
-  /* ===== RESPONSIVE NAVBAR ===== */
+  /* RESPONSIVE */
   @media (max-width: 768px) {
     .navbar { padding: 0 0.5rem; }
     .navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
@@ -298,18 +267,13 @@
 
 <!-- ✅ 顶端导航栏开始 -->
 <nav class="navbar">
-    <!-- Logo 区域 -->
     <div class="nav-brand">
         <span class="logo">Y</span>
         <span class="brand-text">YZ Payroll</span>
     </div>
-
-    <!-- 导航链接区域 -->
     <div class="nav-links" id="navLinks">
-        <!-- 返回按钮 -->
         <button class="nav-back" id="backBtn" title="返回上一页">⏎</button>
-
-        <!-- FILES 下拉菜单 -->
+        
         <div class="nav-dropdown" id="filesDropdown">
             <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
             <div class="dropdown-menu">
@@ -324,20 +288,19 @@
                 <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
                 <div class="divider"></div>
                 <a href="companysetting.html">⚙️ COMPANY SETTING</a>
-                <a href="veiwofepfsocsoeis.html">📰 Veiw of Epf/Socso/Eis</a>
+                <a href="veiwofepfsocsoeis.html">📰 View Epf/Socso/Eis</a>
                 <a href="hrdcorp.html">📓 HRD Corp</a>
                 <a href="salarysumview.html">📊 Salary View</a>
                 <a href="GoogleSheetBackupURL.html">🔗 Google Sheet Backup URL</a>
             </div>
         </div>
 
-        <!-- 独立链接 -->
         <a class="nav-item" href="dashboard.html">DASHBOARD</a>
         <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
-        <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
-        <a class="nav-item active" href="overtime.html">OVERTIME</a>
+        <!-- ✅ 修复2: 更新导航栏激活状态 -->
+        <a class="nav-item active" href="leave.html">TIMECARD REPORT</a>
+        <a class="nav-item" href="overtime.html">OVERTIME</a>
 
-        <!-- CARUMAN 下拉菜单 -->
         <div class="nav-dropdown" id="carumanDropdown">
             <button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
             <div class="dropdown-menu">
@@ -348,16 +311,14 @@
             </div>
         </div>
 
-        <!-- 独立链接 -->
         <a class="nav-item" href="companysetting.html">SETTING</a>
 
-        <!-- OTHERS 下拉菜单 -->
         <div class="nav-dropdown" id="othersDropdown">
             <button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
             <div class="dropdown-menu">
                 <a href="companysetting.html">⚙️ COMPANY SETTING</a>
                 <div class="divider"></div>
-                <a href="veiwofepfsocsoeis.html">📰 Veiw of Epf/Socso/Eis</a>
+                <a href="veiwofepfsocsoeis.html">📰 View Epf/Socso/Eis</a>
                 <a href="hrdcorp.html">📓 HRD Corp</a>
                 <a href="salarysumview.html">📊 Salary View</a>
                 <a href="GoogleSheetBackupURL.html">🔗 Google Sheet Backup URL</a>
@@ -365,13 +326,13 @@
         </div>
     </div>
 
-    <!-- 右侧聊天按钮 -->
-    <button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')">
-        <span class="pulse"></span> 💬 Request Chat
+    <!-- ✅ 修复3: 绑定 Tips 弹窗函数 -->
+    <button class="nav-chat" type="button" onclick="openTipsChoice()">
+        <span class="pulse"></span> 💬 Tips & Panduan
     </button>
 </nav>
 <!-- ✅ 顶端导航栏结束 -->
-<!-- ====== 浅色工具栏 ====== -->
+
 <div class="toolbar" id="tour-toolbar">
   <div class="toolbar-left">
     <div class="toolbar-brand"><div class="logo">P</div> Payroll Dashboard</div>
@@ -409,14 +370,8 @@
         </div>
       </div>
       <div class="dash-row">
-        <div class="dash-item">
-          <label>SITUATION</label>
-          <span id="dpSituation">-</span>
-        </div>
-        <div class="dash-item">
-          <label>GAJI (RM)</label>
-          <span id="dpGaji">0.00</span>
-        </div>
+        <div class="dash-item"><label>SITUATION</label><span id="dpSituation">-</span></div>
+        <div class="dash-item"><label>GAJI (RM)</label><span id="dpGaji">0.00</span></div>
       </div>
     </div>
 
@@ -474,7 +429,7 @@
   </div>
 </div>
 
-<!-- ====== Filter Panel ====== -->
+<!-- Filter Panel -->
 <div class="filter-panel" id="filterPanel">
   <div class="fp-head"><input type="text" id="fpSearch" placeholder="Cari nilai..."></div>
   <div class="fp-actions">
@@ -488,7 +443,7 @@
   </div>
 </div>
 
-<!-- ====== Autosave Modal ====== -->
+<!-- Autosave Modal -->
 <div class="modal-mask" id="autoSaveModal">
   <div class="modal">
     <h3>⏰ Autosave</h3>
@@ -501,12 +456,11 @@
   </div>
 </div>
 
-<!-- ====== SETTING Center Modal ====== -->
+<!-- Setting Center Modal -->
 <div class="modal-mask" id="settingModal">
   <div class="modal setting-modal">
     <h3>⚙️ SETTING CENTER</h3>
     <p id="settingDesc">Masukkan kata laluan untuk mengakses tetapan kod.</p>
-
     <div id="settingStep1">
       <input type="password" id="settingPasswordInput" class="setting-input" placeholder="Kata Laluan (Password)...">
       <div class="actions" style="margin-top: 16px;">
@@ -514,7 +468,6 @@
         <button class="confirm" onclick="verifyPassword()">Buka Kunci</button>
       </div>
     </div>
-
     <div id="settingStep2" style="display: none;">
       <p style="margin-bottom: 8px; font-size: 12px; text-align: left;">Edit core logic ( <code>overLessMin</code> calculation ).</p>
       <textarea id="settingCodeInput" class="setting-textarea"></textarea>
@@ -526,7 +479,7 @@
   </div>
 </div>
 
-<!-- ====== TIPS 选择弹窗 ====== -->
+<!-- Tips Choice Modal -->
 <div class="modal-mask" id="tipsChoiceModal">
   <div class="modal" style="width: 400px;">
     <h3 style="color: #007bff;">❓ BANTUAN & PANDUAN</h3>
@@ -541,12 +494,11 @@
   </div>
 </div>
 
-<!-- ====== TIPS 详细弹窗 (Modal) ====== -->
+<!-- Tips Detail Modal -->
 <div class="modal-mask" id="tipsDetailModal">
   <div class="modal tips-modal">
     <h3>📖 PANDUAN SISTEM PAYROLL</h3>
     <p class="subtitle">Ketahui fungsi setiap bahagian di dashboard ini.</p>
-
     <div class="tips-section">
       <h4>1. Toolbar Atas (Top Bar)</h4>
       <ul>
@@ -555,7 +507,6 @@
         <li><strong>Simpan / Muat Semula:</strong> Simpan ke Sheet atau ambil data terbaru.</li>
       </ul>
     </div>
-
     <div class="tips-section">
       <h4>2. Maklumat Asas & Cuti</h4>
       <ul>
@@ -564,7 +515,6 @@
         <li><strong>BAKI CUTI:</strong> Baki cuti tahun lepas (LAST), cuti diambil bulan ini (THIS), dan baki semasa (REMAIN). Jika merah, cuti telah <em>overdraft</em>.</li>
       </ul>
     </div>
-
     <div class="tips-section">
       <h4>3. Jadual Kehadiran (Table)</h4>
       <ul>
@@ -574,14 +524,13 @@
         <li><strong>TOTAL DEDUCTION:</strong> Potongan gaji automatik jika ambil cuti tanpa gaji.</li>
       </ul>
     </div>
-
     <div class="tips-actions">
       <button class="btn-close" onclick="closeTipsModal()">Tutup</button>
     </div>
   </div>
 </div>
 
-<!-- ====== TIPS 浮窗 (Walkthrough) ====== -->
+<!-- Walkthrough Overlay -->
 <div class="tour-mask" id="tourMask" onclick="nextTourStep()"></div>
 <div class="tour-highlight" id="tourHighlight"></div>
 <div class="tour-tooltip" id="tourTooltip">
@@ -590,10 +539,9 @@
   <div class="tour-hint">Klik di mana-mana untuk teruskan ➔</div>
 </div>
 
-
 <script>
 /* ============================================================
-   NAVBAR LOGIC (dropdowns & back button)
+   NAVBAR LOGIC
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function() {
   const backBtn = document.getElementById('backBtn');
@@ -643,16 +591,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /* ============================================================
-   ORIGINAL PAYROLL LOGIC (unchanged)
+   PAYROLL SYSTEM LOGIC
    ============================================================ */
 const URL_KEY = 'payrollScriptUrl';
 const CODE_KEY = 'payrollCustomCalcCode';
-
-const DEFAULT_CALC_CODE = `
-const standardMinutes = 7.5 * 60; 
-return workMin - standardMinutes;
-`;
-
+const DEFAULT_CALC_CODE = `const standardMinutes = 7.5 * 60; return workMin - standardMinutes;`;
 let customCalcFunction = null;
 
 const SHEET_HEADERS = [
@@ -671,7 +614,6 @@ const READONLY_COLS = ['ID KOD','SITUATION','GROUP','NAME','SHIF','GAJI',
   'SITUATION WORK TIME','TOTAL DEDUCTION(RM)','THIS AL REMAIN','THIS SL REMAIN'];
 
 const STATUS_OPTIONS = ['', 'ANNUAL LEAVE','UNPAID LEAVE','HALF DAY LEAVE','SICK LEAVE','OFF DAY','UNDEDUCTION LEAVE','MATERNITY LEAVE'];
-
 const STATUS_COLORS = {
   'ANNUAL LEAVE': { bg: '#fca5a5', color: '#7f1d1d' },
   'UNPAID LEAVE': { bg: '#bbf7d0', color: '#14532d' },
@@ -686,31 +628,25 @@ const SITUATION_COLORS = {
   'PENDING': { bg: '#fcd34d', color: '#000000' },
   'INACTIVE': { bg: '#fca5a5', color: '#000000' }
 };
-const ROW_HL_COLORS = {
-  'hl-red': '#ffe4e6',
-  'hl-green': '#dcfce7',
-  'hl-yellow': '#fef9c3'
-};
+const ROW_HL_COLORS = { 'hl-red': '#ffe4e6', 'hl-green': '#dcfce7', 'hl-yellow': '#fef9c3' };
 
 let SCRIPT_URL = '';
 let allRows = [];
 let filteredRows = [];
 let staffList = [];
 let alslData = [];
-
 let currentSelectedCode = 'ALL';
 let currentGroupFilter = '';
 let filters = {};
 let currentFilterCol = null;
 let tempCheckedValues = new Set();
-
 let dirty = false;
 let idleTimer = null;
 let countdownTimer = null;
 let countdownLeft = 10;
 let modalOpen = false;
 
-// ====== TIPS 走马灯状态 ======
+// TOUR STATE
 let tourStepIndex = -1;
 const tourSteps = [
   { elementId: 'tour-toolbar', title: 'Toolbar Utama', desc: 'Di sini anda boleh masukkan URL Apps Script, buka tetapan formula (SETTING), dan simpan/muat semula data dari Google Sheet.' },
@@ -769,23 +705,11 @@ document.getElementById('globalSearchInput').addEventListener('input', function(
   document.getElementById('searchEmpInput').dispatchEvent(new Event('input'));
 });
 
-// ====== TIPS 控制逻辑 ======
-function openTipsChoice() {
-  document.getElementById('tipsChoiceModal').classList.add('show');
-}
-
-function closeTipsChoice() {
-  document.getElementById('tipsChoiceModal').classList.remove('show');
-}
-
-function openTipsModal() {
-  closeTipsChoice();
-  document.getElementById('tipsDetailModal').classList.add('show');
-}
-
-function closeTipsModal() {
-  document.getElementById('tipsDetailModal').classList.remove('show');
-}
+/* ====== TIPS CONTROL ====== */
+function openTipsChoice() { document.getElementById('tipsChoiceModal').classList.add('show'); }
+function closeTipsChoice() { document.getElementById('tipsChoiceModal').classList.remove('show'); }
+function openTipsModal() { closeTipsChoice(); document.getElementById('tipsDetailModal').classList.add('show'); }
+function closeTipsModal() { document.getElementById('tipsDetailModal').classList.remove('show'); }
 
 function startTour() {
   closeTipsChoice();
@@ -796,30 +720,18 @@ function startTour() {
 
 function nextTourStep() {
   tourStepIndex++;
-
-  // 如果结束了
-  if (tourStepIndex >= tourSteps.length) {
-    endTour();
-    return;
-  }
-
+  if (tourStepIndex >= tourSteps.length) { endTour(); return; }
+  
   const step = tourSteps[tourStepIndex];
   const el = document.getElementById(step.elementId);
   const highlight = document.getElementById('tourHighlight');
   const tooltip = document.getElementById('tourTooltip');
-  const mask = document.getElementById('tourMask');
 
-  if (!el) {
-    nextTourStep();
-    return;
-  }
-
+  if (!el) { nextTourStep(); return; }
   el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
   setTimeout(() => {
     const rect = el.getBoundingClientRect();
-
-    // 因为 highlighter 使用了 outline，这里不需要再给 top 加上 scroll 偏移，只需对照视口位置即可
     highlight.style.left = rect.left + 'px';
     highlight.style.top = rect.top + 'px';
     highlight.style.width = rect.width + 'px';
@@ -828,19 +740,12 @@ function nextTourStep() {
 
     let tooltipTop = rect.bottom + 15;
     let tooltipLeft = rect.left;
-
-    if (tooltipTop + 150 > window.innerHeight) {
-      tooltipTop = rect.top - 160;
-    }
-
-    if (tooltipLeft + 300 > window.innerWidth) {
-      tooltipLeft = window.innerWidth - 320;
-    }
+    if (tooltipTop + 150 > window.innerHeight) tooltipTop = rect.top - 160;
+    if (tooltipLeft + 300 > window.innerWidth) tooltipLeft = window.innerWidth - 320;
 
     tooltip.style.top = tooltipTop + 'px';
     tooltip.style.left = tooltipLeft + 'px';
     tooltip.classList.add('show');
-
     document.getElementById('tourTitle').textContent = step.title;
     document.getElementById('tourDesc').textContent = step.desc;
   }, 300);
@@ -853,10 +758,10 @@ function endTour() {
   tourStepIndex = -1;
 }
 
-// ====== 修复后的 Setting Center 逻辑 ======
+/* ====== SETTING CENTER ====== */
 function getObfuscatedPass() {
   const parts = [49, 49, 49, 49];
-  return String.fromCharCode(...parts.map(p => p - 1));
+  return String.fromCharCode(...parts.map(p => p - 1)); // Returns "0000"
 }
 
 function openSettingCenter() {
@@ -867,21 +772,15 @@ function openSettingCenter() {
   document.getElementById('settingDesc').textContent = 'Masukkan kata laluan untuk mengakses tetapan kod.';
 }
 
-function closeSettingCenter() {
-  document.getElementById('settingModal').classList.remove('show');
-}
+function closeSettingCenter() { document.getElementById('settingModal').classList.remove('show'); }
 
 function verifyPassword() {
   const pwd = document.getElementById('settingPasswordInput').value;
-  const realPwd = getObfuscatedPass();
-
-  if (pwd === realPwd) {
+  if (pwd === getObfuscatedPass()) {
     document.getElementById('settingStep1').style.display = 'none';
     document.getElementById('settingStep2').style.display = 'block';
     document.getElementById('settingDesc').textContent = 'Edit formula di bawah (Guna pembolehubah: workMin).';
-
-    const savedCode = localStorage.getItem(CODE_KEY) || DEFAULT_CALC_CODE;
-    document.getElementById('settingCodeInput').value = savedCode.trim();
+    document.getElementById('settingCodeInput').value = (localStorage.getItem(CODE_KEY) || DEFAULT_CALC_CODE).trim();
   } else {
     alert('❌ Kata laluan salah!');
     document.getElementById('settingPasswordInput').value = '';
@@ -899,19 +798,17 @@ function saveCustomCode() {
   try {
     const testFn = new Function('workMin', newCode);
     testFn(400);
-
     localStorage.setItem(CODE_KEY, newCode);
     customCalcFunction = testFn;
     closeSettingCenter();
     alert('✅ Kod berjaya disimpan & digunakan!');
-
     applyFiltersAndRender();
   } catch (err) {
     alert('❌ Ralat sintaks kod: \n' + err.message);
   }
 }
 
-// ====== 核心业务逻辑 ======
+/* ====== CORE BUSINESS LOGIC ====== */
 async function loadData() {
   if (!SCRIPT_URL) { setSync('err', 'URL belum ditetapkan'); return; }
   setSync('busy', 'Memuatkan...');
@@ -941,7 +838,6 @@ async function loadData() {
     document.getElementById('searchEmpInput').value = '';
     document.getElementById('searchGroupInput').value = '';
     selectEmployee('ALL');
-
     setSync('ok', 'Data dimuat');
   } catch (err) {
     console.error(err);
@@ -964,7 +860,6 @@ function normalizeDate(v) {
 function timeToMin(s) {
   if (!s) return null;
   const str = String(s).trim();
-
   const match12 = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i);
   if (match12) {
     let h = parseInt(match12[1], 10);
@@ -974,19 +869,16 @@ function timeToMin(s) {
     if (ampm === 'AM' && h === 12) h = 0;
     return h * 60 + m;
   }
-
   const match24 = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
   if (match24) {
     const h = parseInt(match24[1], 10), m = parseInt(match24[2], 10);
     if (h <= 23 && m <= 59) return h * 60 + m;
   }
-
   const matchFallback = str.match(/(\d{1,2}):(\d{2}):(\d{2})/);
   if (matchFallback) {
     const h = parseInt(matchFallback[1], 10), m = parseInt(matchFallback[2], 10);
     if (h <= 23 && m <= 59) return h * 60 + m;
   }
-
   return null;
 }
 
@@ -1026,12 +918,8 @@ function computeRow(r) {
 
   let overLessMin = 0;
   if (hasAnyIn) {
-    try {
-      overLessMin = customCalcFunction(workMin);
-    } catch (e) {
-      console.error("Calc Error:", e);
-      overLessMin = workMin - 450;
-    }
+    try { overLessMin = customCalcFunction(workMin); } 
+    catch (e) { console.error("Calc Error:", e); overLessMin = workMin - 450; }
   }
 
   let swt = '', hl = '';
@@ -1043,9 +931,8 @@ function computeRow(r) {
   const gaji = parseFloat(r['GAJI']) || 0;
   const status = (r['STATUS'] || '').toUpperCase();
   let deduct = 0;
-  if (status === 'UNPAID LEAVE') {
-    deduct = gaji / 30;
-  } else if (status === 'HALF DAY LEAVE') {
+  if (status === 'UNPAID LEAVE') deduct = gaji / 30;
+  else if (status === 'HALF DAY LEAVE') {
     const j = parseFloat(r['HALF TT JAM']) || 0;
     const m = parseFloat(r['HALF TT MIN']) || 0;
     const hrs = j + m/60;
@@ -1062,34 +949,21 @@ const empDropdown = document.getElementById('empDropdown');
 searchEmpInput.addEventListener('input', () => {
   const q = searchEmpInput.value.trim().toLowerCase();
   if (!q) { empDropdown.classList.remove('show'); return; }
-
   const matchStaff = staffList.filter(s =>
     String(s.Name || '').toLowerCase().includes(q) ||
     String(s.Code || '').toLowerCase().includes(q)
   ).slice(0, 15);
 
-  let html = `
-    <div class="sd-item all-item" onclick="selectEmployee('ALL')">
-      🌐 ALL (SEMUA PEKERJA)
-    </div>
-  `;
-
+  let html = `<div class="sd-item all-item" onclick="selectEmployee('ALL')">🌐 ALL (SEMUA PEKERJA)</div>`;
   if (matchStaff.length > 0) {
-    html += matchStaff.map(m => `
-      <div class="sd-item" onclick="selectEmployee('${m.Code}')">
-        <b>${m.Code}</b> - ${m.Name}
-      </div>
-    `).join('');
+    html += matchStaff.map(m => `<div class="sd-item" onclick="selectEmployee('${m.Code}')"><b>${m.Code}</b> - ${m.Name}</div>`).join('');
   }
-
   empDropdown.innerHTML = html;
   empDropdown.classList.add('show');
 });
 
 document.addEventListener('click', (e) => {
-  if (!searchEmpInput.contains(e.target) && !empDropdown.contains(e.target)) {
-    empDropdown.classList.remove('show');
-  }
+  if (!searchEmpInput.contains(e.target) && !empDropdown.contains(e.target)) empDropdown.classList.remove('show');
 });
 
 const searchGroupInput = document.getElementById('searchGroupInput');
@@ -1098,38 +972,24 @@ const groupDropdown = document.getElementById('groupDropdown');
 searchGroupInput.addEventListener('input', () => {
   const q = searchGroupInput.value.trim().toLowerCase();
   if (!q) { groupDropdown.classList.remove('show'); return; }
-
   const allGroups = getAllGroups();
   const matchGroups = allGroups.filter(g => g.toLowerCase().includes(q)).slice(0, 15);
 
-  let html = `
-    <div class="sd-item all-item" onclick="selectEmployee('ALL')">
-      🌐 ALL (SEMUA KUMPULAN)
-    </div>
-  `;
-
+  let html = `<div class="sd-item all-item" onclick="selectEmployee('ALL')">🌐 ALL (SEMUA KUMPULAN)</div>`;
   if (matchGroups.length > 0) {
-    html += matchGroups.map(g => `
-      <div class="sd-item" onclick="selectGroup('${g.replace(/'/g, "\\'")}')">
-        🏢 SEMUA KUMPULAN: <b>${g}</b>
-      </div>
-    `).join('');
+    html += matchGroups.map(g => `<div class="sd-item" onclick="selectGroup('${g.replace(/'/g, "\\'")}')">🏢 SEMUA KUMPULAN: <b>${g}</b></div>`).join('');
   }
-
   groupDropdown.innerHTML = html;
   groupDropdown.classList.add('show');
 });
 
 document.addEventListener('click', (e) => {
-  if (!searchGroupInput.contains(e.target) && !groupDropdown.contains(e.target)) {
-    groupDropdown.classList.remove('show');
-  }
+  if (!searchGroupInput.contains(e.target) && !groupDropdown.contains(e.target)) groupDropdown.classList.remove('show');
 });
 
 function selectEmployee(code) {
   currentSelectedCode = code;
   currentGroupFilter = '';
-
   if (code === 'ALL') {
     searchEmpInput.value = 'ALL (SEMUA PEKERJA)';
     searchGroupInput.value = 'SEMUA KUMPULAN';
@@ -1144,7 +1004,6 @@ function selectEmployee(code) {
       document.getElementById('dpGaji').textContent = parseFloat(staff.Salary || 0).toFixed(2);
     }
   }
-
   empDropdown.classList.remove('show');
   groupDropdown.classList.remove('show');
   updateDashboardStats();
@@ -1154,13 +1013,10 @@ function selectEmployee(code) {
 function selectGroup(groupName) {
   currentSelectedCode = 'ALL';
   currentGroupFilter = groupName;
-
   searchEmpInput.value = `ALL (${groupName})`;
   searchGroupInput.value = groupName;
-
   document.getElementById('dpSituation').textContent = 'SEMUA STATUS';
   document.getElementById('dpGaji').textContent = 'JUMLAH KUMPULAN';
-
   empDropdown.classList.remove('show');
   groupDropdown.classList.remove('show');
   updateDashboardStats();
@@ -1169,16 +1025,11 @@ function selectGroup(groupName) {
 
 function updateDashboardStats() {
   let targetCodes = [];
-  if (currentGroupFilter) {
-    targetCodes = staffList.filter(s => String(s.GroupName) === currentGroupFilter).map(s => String(s.Code));
-  } else if (currentSelectedCode === 'ALL') {
-    targetCodes = staffList.map(s => String(s.Code));
-  } else {
-    targetCodes = [String(currentSelectedCode)];
-  }
+  if (currentGroupFilter) targetCodes = staffList.filter(s => String(s.GroupName) === currentGroupFilter).map(s => String(s.Code));
+  else if (currentSelectedCode === 'ALL') targetCodes = staffList.map(s => String(s.Code));
+  else targetCodes = [String(currentSelectedCode)];
 
   const empRows = allRows.filter(r => targetCodes.includes(String(r['ID KOD'])));
-
   let lastAL = 0, lastSL = 0;
   alslData.forEach(a => {
     if (targetCodes.includes(String(a['ID KOD']))) {
@@ -1196,12 +1047,8 @@ function updateDashboardStats() {
     if (dates.length > 0) targetMonth = dates[dates.length - 1].substring(0, 7);
   }
 
-  let countAL = 0, countSL = 0, countUNPL = 0, countOFF = 0, countHALF = 0, countUNDD = 0, countMTNT = 0;
-  let totalDeduct = 0;
-
-  let totalDays = 0;
-  let totalHours = 0;
-  let totalMinutes = 0;
+  let countAL=0, countSL=0, countUNPL=0, countOFF=0, countHALF=0, countUNDD=0, countMTNT=0;
+  let totalDeduct = 0, totalDays = 0, totalHours = 0, totalMinutes = 0;
 
   empRows.forEach(r => {
     if (targetMonth && r['Date'] && r['Date'].startsWith(targetMonth)) {
@@ -1217,17 +1064,12 @@ function updateDashboardStats() {
       if (s && s !== 'OFF DAY') {
         if (s === 'HALF DAY LEAVE') {
           totalDays += 0.5;
-          const j = parseFloat(r['HALF TT JAM']) || 0;
-          const m = parseFloat(r['HALF TT MIN']) || 0;
-          totalHours += j;
-          totalMinutes += m;
-        } else {
-          totalDays += 1;
-        }
+          totalHours += parseFloat(r['HALF TT JAM']) || 0;
+          totalMinutes += parseFloat(r['HALF TT MIN']) || 0;
+        } else totalDays += 1;
       }
     }
-    const c = computeRow(r);
-    totalDeduct += c.deduct;
+    totalDeduct += computeRow(r).deduct;
   });
 
   totalHours += Math.floor(totalMinutes / 60);
@@ -1235,15 +1077,7 @@ function updateDashboardStats() {
   totalDays += Math.floor(totalHours / 24);
   totalHours = totalHours % 24;
 
-  const totalPickedLeaveStr = `${Math.floor(totalDays)} DAYS ${Math.floor(totalHours)} HOURS ${Math.floor(totalMinutes)} MIN`;
-  document.getElementById('dpTotalPickedLeave').textContent = totalPickedLeaveStr;
-
-  const thisAL = countAL;
-  const thisSL = countSL;
-
-  const remainAL = lastAL - thisAL;
-  const remainSL = lastSL - thisSL;
-
+  document.getElementById('dpTotalPickedLeave').textContent = `${Math.floor(totalDays)} DAYS ${Math.floor(totalHours)} HOURS ${Math.floor(totalMinutes)} MIN`;
   document.getElementById('dpPickedAL').textContent = countAL;
   document.getElementById('dpPickedSL').textContent = countSL;
   document.getElementById('dpPickedUNPL').textContent = countUNPL;
@@ -1251,19 +1085,15 @@ function updateDashboardStats() {
   document.getElementById('dpPickedHALF').textContent = countHALF;
   document.getElementById('dpPickedUNDD').textContent = countUNDD;
   document.getElementById('dpPickedMTNT').textContent = countMTNT;
-
-  document.getElementById('dpThisAL').textContent = thisAL.toFixed(2);
-  document.getElementById('dpThisSL').textContent = thisSL.toFixed(2);
-
-  document.getElementById('dpRemainAL').textContent = remainAL.toFixed(2);
-  document.getElementById('dpRemainSL').textContent = remainSL.toFixed(2);
-
+  document.getElementById('dpThisAL').textContent = countAL.toFixed(2);
+  document.getElementById('dpThisSL').textContent = countSL.toFixed(2);
+  document.getElementById('dpRemainAL').textContent = (lastAL - countAL).toFixed(2);
+  document.getElementById('dpRemainSL').textContent = (lastSL - countSL).toFixed(2);
   document.getElementById('dpTotalDeduct').textContent = totalDeduct.toFixed(2);
 }
 
 function applyFiltersAndRender() {
   let baseRows = allRows;
-
   if (currentGroupFilter) {
     const codes = staffList.filter(s => String(s.GroupName) === currentGroupFilter).map(s => String(s.Code));
     baseRows = allRows.filter(r => codes.includes(String(r['ID KOD'])));
@@ -1306,10 +1136,8 @@ function render() {
 function buildRow(r, i) {
   const c = computeRow(r);
   const tr = document.createElement('tr');
-
   let baseBg = '';
   if (c.hl) baseBg = ROW_HL_COLORS[c.hl] || '';
-
   const situation = (r['SITUATION'] || '').toUpperCase();
   if (situation === 'INACTIVE') baseBg = '#ffe4e6';
 
@@ -1321,10 +1149,8 @@ function buildRow(r, i) {
 
   SHEET_HEADERS.forEach(h => {
     const td = document.createElement('td');
-
     const isCodeOrName = (h === 'ID KOD' || h === 'NAME');
     const statusVal = (r['STATUS'] || '').toUpperCase();
-
     if (baseBg) td.style.backgroundColor = baseBg;
 
     if (isCodeOrName && statusVal && STATUS_COLORS[statusVal]) {
@@ -1333,43 +1159,30 @@ function buildRow(r, i) {
       td.style.fontWeight = '700';
     }
 
-    if (h === 'SITUATION WORK TIME') {
-      td.className = 'calc';
-      td.textContent = c.swt;
-      if (baseBg) td.style.backgroundColor = baseBg;
-    }
-    else if (h === 'Clock Time(h) 01' || h === 'Clock Time(h) 02' || h === 'Clock Time(h) 03') {
+    if (h === 'SITUATION WORK TIME') { td.className = 'calc'; td.textContent = c.swt; }
+    else if (h.startsWith('Clock Time(h)')) {
       const k = h.endsWith('01') ? 0 : h.endsWith('02') ? 1 : 2;
       td.className = 'calc'; td.textContent = formatDuration(c.segH[k]);
     }
-    else if (h === 'Total Break Time(h)') {
-      td.className = 'calc'; td.textContent = c.workMin > 0 ? '01:00:00' : '00:00:00';
-    }
-    else if (h === 'Total Work Time(h)') {
-      td.className = 'calc'; td.textContent = formatDuration(c.workMin);
-    }
+    else if (h === 'Total Break Time(h)') { td.className = 'calc'; td.textContent = c.workMin > 0 ? '01:00:00' : '00:00:00'; }
+    else if (h === 'Total Work Time(h)') { td.className = 'calc'; td.textContent = formatDuration(c.workMin); }
     else if (h === 'Total Over/Less Time (h)') {
-      td.className = 'calc';
-      td.textContent = formatOverLessTime(c.otMin);
+      td.className = 'calc'; td.textContent = formatOverLessTime(c.otMin);
       if (c.otMin < 0) td.style.color = '#dc2626';
       else if (c.otMin > 0) td.style.color = '#16a34a';
     }
-    else if (h === 'TOTAL DEDUCTION(RM)') {
-      td.className = 'calc'; td.textContent = c.deduct ? c.deduct.toFixed(2) : '0.00';
-    }
+    else if (h === 'TOTAL DEDUCTION(RM)') { td.className = 'calc'; td.textContent = c.deduct ? c.deduct.toFixed(2) : '0.00'; }
     else if (h === 'THIS AL REMAIN' || h === 'THIS SL REMAIN') {
       td.className = 'calc';
       td.textContent = (!currentGroupFilter && currentSelectedCode !== 'ALL')
-        ? (h === 'THIS AL REMAIN' ? document.getElementById('dpRemainAL').textContent : document.getElementById('dpRemainSL').textContent)
-        : '';
+        ? (h === 'THIS AL REMAIN' ? document.getElementById('dpRemainAL').textContent : document.getElementById('dpRemainSL').textContent) : '';
     }
     else if (h === 'SITUATION') {
       td.textContent = r[h] || '';
       if (SITUATION_COLORS[situation]) {
         td.style.backgroundColor = SITUATION_COLORS[situation].bg;
         td.style.color = SITUATION_COLORS[situation].color;
-        td.style.fontWeight = '700';
-        td.style.borderRadius = '4px';
+        td.style.fontWeight = '700'; td.style.borderRadius = '4px';
       }
     }
     else if (h === 'STATUS') {
@@ -1379,43 +1192,25 @@ function buildRow(r, i) {
         if ((r[h]||'').toUpperCase() === o) opt.selected = true;
         sel.appendChild(opt);
       });
-
       if (statusVal && STATUS_COLORS[statusVal]) {
         sel.style.backgroundColor = STATUS_COLORS[statusVal].bg;
         sel.style.color = STATUS_COLORS[statusVal].color;
-        sel.style.fontWeight = '700';
-        sel.style.borderColor = 'transparent';
-      } else {
-        sel.style.backgroundColor = 'transparent';
+        sel.style.fontWeight = '700'; sel.style.borderColor = 'transparent';
       }
-
       sel.addEventListener('change', () => {
-        r[h] = sel.value; markDirty();
-        updateDashboardStats();
+        r[h] = sel.value; markDirty(); updateDashboardStats();
         if (filters[h]) applyFiltersAndRender();
-        else {
-           const idx = filteredRows.indexOf(r);
-           if (idx !== -1) { const newTr = buildRow(r, idx); tr.replaceWith(newTr); }
-        }
+        else { const idx = filteredRows.indexOf(r); if (idx !== -1) { const newTr = buildRow(r, idx); tr.replaceWith(newTr); } }
       });
       td.appendChild(sel);
     }
-    else if (READONLY_COLS.includes(h)) {
-      td.className = 'ro'; td.textContent = r[h] || '';
-    }
+    else if (READONLY_COLS.includes(h)) { td.className = 'ro'; td.textContent = r[h] || ''; }
     else {
       const inp = document.createElement('input');
       inp.className = 'cell' + (h === 'REMARK' ? ' wide' : '');
       inp.value = r[h] || '';
-      inp.placeholder = '';
-
-      if ((h === 'HALF TT JAM' || h === 'HALF TT MIN') && statusVal !== 'HALF DAY LEAVE') {
-        inp.disabled = true;
-      }
-      inp.addEventListener('input', () => {
-        r[h] = h === 'Date' ? normalizeDate(inp.value) : inp.value.trim();
-        markDirty();
-      });
+      if ((h === 'HALF TT JAM' || h === 'HALF TT MIN') && statusVal !== 'HALF DAY LEAVE') inp.disabled = true;
+      inp.addEventListener('input', () => { r[h] = h === 'Date' ? normalizeDate(inp.value) : inp.value.trim(); markDirty(); });
       inp.addEventListener('change', () => {
         if (h === 'Date') inp.value = normalizeDate(inp.value);
         updateDashboardStats();
@@ -1434,7 +1229,6 @@ function openFilter(col, e) {
   currentFilterCol = col;
   const panel = document.getElementById('filterPanel');
   const rect = e.target.getBoundingClientRect();
-
   const valSet = new Set();
   let baseRows = allRows;
   if (currentGroupFilter) {
@@ -1443,11 +1237,9 @@ function openFilter(col, e) {
   } else if (currentSelectedCode !== 'ALL') {
     baseRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
   }
-
   baseRows.forEach(r => valSet.add(r[col] ? String(r[col]).trim() : ''));
   const vals = Array.from(valSet).sort((a,b) => {
-    if (a === '') return -1;
-    if (b === '') return 1;
+    if (a === '') return -1; if (b === '') return 1;
     return a.localeCompare(b, undefined, {numeric: true});
   });
 
@@ -1470,29 +1262,17 @@ function openFilter(col, e) {
     }).join('');
   };
   renderList('');
-
   searchEl.oninput = () => renderList(searchEl.value);
 
   panel.style.left = Math.min(rect.left, window.innerWidth - 240) + 'px';
   panel.style.top = (rect.bottom + 5) + 'px';
   panel.classList.add('show');
-
   document.addEventListener('mousedown', closeFilterOnClickOutside);
 }
 
-function fpToggle(cb) {
-  if (cb.checked) tempCheckedValues.add(cb.value);
-  else tempCheckedValues.delete(cb.value);
-}
-function fpSelectAll() {
-  const cbs = document.querySelectorAll('#fpList input[type="checkbox"]');
-  cbs.forEach(cb => { cb.checked = true; tempCheckedValues.add(cb.value); });
-}
-function fpClearAll() {
-  const cbs = document.querySelectorAll('#fpList input[type="checkbox"]');
-  cbs.forEach(cb => { cb.checked = false; });
-  tempCheckedValues.clear();
-}
+function fpToggle(cb) { if (cb.checked) tempCheckedValues.add(cb.value); else tempCheckedValues.delete(cb.value); }
+function fpSelectAll() { document.querySelectorAll('#fpList input[type="checkbox"]').forEach(cb => { cb.checked = true; tempCheckedValues.add(cb.value); }); }
+function fpClearAll() { document.querySelectorAll('#fpList input[type="checkbox"]').forEach(cb => { cb.checked = false; }); tempCheckedValues.clear(); }
 function fpApply() {
   let baseRows = allRows;
   if (currentGroupFilter) {
@@ -1501,17 +1281,11 @@ function fpApply() {
   } else if (currentSelectedCode !== 'ALL') {
     baseRows = allRows.filter(r => String(r['ID KOD']) === String(currentSelectedCode));
   }
-
   const allVals = new Set();
   baseRows.forEach(r => allVals.add(r[currentFilterCol] ? String(r[currentFilterCol]).trim() : ''));
-
-  if (tempCheckedValues.size === allVals.size) {
-    delete filters[currentFilterCol];
-  } else {
-    filters[currentFilterCol] = new Set(tempCheckedValues);
-  }
-  fpClose();
-  applyFiltersAndRender();
+  if (tempCheckedValues.size === allVals.size) delete filters[currentFilterCol];
+  else filters[currentFilterCol] = new Set(tempCheckedValues);
+  fpClose(); applyFiltersAndRender();
 }
 function fpClose() {
   document.getElementById('filterPanel').classList.remove('show');
@@ -1530,8 +1304,7 @@ function markDirty() {
 }
 
 function startAutoSaveCountdown() {
-  modalOpen = true;
-  countdownLeft = 10;
+  modalOpen = true; countdownLeft = 10;
   document.getElementById('countdownNum').textContent = countdownLeft;
   document.getElementById('autoSaveModal').classList.add('show');
   countdownTimer = setInterval(() => {
@@ -1546,7 +1319,6 @@ function closeModal() {
   document.getElementById('autoSaveModal').classList.remove('show');
   if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
 }
-
 function autoSaveCancel() { closeModal(); }
 function autoSaveConfirm() { closeModal(); doSave(); }
 
@@ -1555,11 +1327,7 @@ async function manualSave() {
   if (!allRows.length) { alert('Tiada data untuk disimpan.'); return; }
   const btn = document.getElementById('manualSaveBtn');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Menyimpan...'; }
-  try {
-    await doSave();
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '💾 Simpan'; }
-  }
+  try { await doSave(); } finally { if (btn) { btn.disabled = false; btn.textContent = '💾 Simpan'; } }
 }
 
 async function doSave() {
@@ -1567,43 +1335,31 @@ async function doSave() {
   setSync('busy', 'Menyimpan...');
   try {
     const payload = allRows.map(r => {
-      const c = computeRow(r);   // 每行重新计算一次
+      const c = computeRow(r);
       const o = {};
       SHEET_HEADERS.forEach(h => {
         let v;
-
-        // --- 计算列：用 computeRow 结果写回 ---
-        if (h === 'Clock Time(h) 01')         v = formatDuration(c.segH[0]);
-        else if (h === 'Clock Time(h) 02')    v = formatDuration(c.segH[1]);
-        else if (h === 'Clock Time(h) 03')    v = formatDuration(c.segH[2]);
+        if (h === 'Clock Time(h) 01') v = formatDuration(c.segH[0]);
+        else if (h === 'Clock Time(h) 02') v = formatDuration(c.segH[1]);
+        else if (h === 'Clock Time(h) 03') v = formatDuration(c.segH[2]);
         else if (h === 'Total Break Time(h)') v = c.workMin > 0 ? '01:00:00' : '00:00:00';
-        else if (h === 'Total Work Time(h)')  v = formatDuration(c.workMin);
+        else if (h === 'Total Work Time(h)') v = formatDuration(c.workMin);
         else if (h === 'Total Over/Less Time (h)') v = formatOverLessTime(c.otMin);
         else if (h === 'SITUATION WORK TIME') v = c.swt;
         else if (h === 'TOTAL DEDUCTION(RM)') v = c.deduct ? c.deduct.toFixed(2) : '0.00';
-
-        // --- 这两个保留原有逻辑（依据是否单人选）---
         else if (h === 'THIS AL REMAIN' || h === 'THIS SL REMAIN') {
-          if (!currentGroupFilter && currentSelectedCode !== 'ALL'
-              && String(r['ID KOD']) === currentSelectedCode) {
-            v = h === 'THIS AL REMAIN'
-                ? document.getElementById('dpRemainAL').textContent
-                : document.getElementById('dpRemainSL').textContent;
-          } else {
-            v = r[h] || '';
-          }
+          if (!currentGroupFilter && currentSelectedCode !== 'ALL' && String(r['ID KOD']) === currentSelectedCode) {
+            v = h === 'THIS AL REMAIN' ? document.getElementById('dpRemainAL').textContent : document.getElementById('dpRemainSL').textContent;
+          } else v = r[h] || '';
         }
-        else {
-          v = r[h] === undefined || r[h] === null ? '' : r[h];
-        }
+        else v = r[h] === undefined || r[h] === null ? '' : r[h];
         o[h] = v;
       });
       return o;
     });
 
     const res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ action: 'saveSheetData', rows: payload })
     });
     const json = await res.json();
