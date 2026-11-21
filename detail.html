@@ -4,58 +4,54 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Slip Gaji Pekerja · Sistem Penggajian</title>
-<!-- ✅ 必须引入 Font Awesome 才能显示下拉箭头 -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
 :root{
-  /* 原 Slip Gaji 变量 */
-  --navy:#1e3a5f; --navy-dark:#152c48; --navy-soft:#eaf0f7;
-  --green:#0f7a4d; --green-dark:#0b5c3a; --green-light:#e6f4ec;
-  --red:#a52222; --red-dark:#841a1a; --red-light:#fbeaea;
-  --card:#ffffff; --bg:#eef2f7; --line:#dbe3ec; --line-soft:#e8eef6;
-  --ink:#16233a; --ink-2:#40556f; --ink-3:#6b7f99;
-  --radius:14px;
-  --shadow-sm:0 1px 2px rgba(16,32,56,.05), 0 2px 10px rgba(16,32,56,.05);
-  --shadow-md:0 8px 24px rgba(16,32,56,.10);
+--navy:#1e3a5f; --navy-dark:#152c48; --navy-soft:#eaf0f7;
+--green:#0f7a4d; --green-dark:#0b5c3a; --green-light:#e6f4ec;
+--red:#a52222; --red-dark:#841a1a; --red-light:#fbeaea;
+--card:#ffffff; --bg:#eef2f7; --line:#dbe3ec; --line-soft:#e8eef6;
+--ink:#16233a; --ink-2:#40556f; --ink-3:#6b7f99;
+--radius:14px;
+--shadow-sm:0 1px 2px rgba(16,32,56,.05), 0 2px 10px rgba(16,32,56,.05);
+--shadow-md:0 8px 24px rgba(16,32,56,.10);
 
-  /* ✅ 新导航栏变量 (YZ Payroll) */
-  --nav-h: 52px;
-  --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover: #16345c;
-  --nav-text: #cbd9ea; --nav-accent: #4d9fff;
-  --dropdown-bg: #ffffff;
-  --dropdown-shadow: 0 8px 24px rgba(16,32,56,.15);
+/* ✅ 统一使用 leave.html 的 Navbar 变量 */
+--nav-h: 52px;
+--nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover2: #16345c;
+--nav-text: #cbd9ea; --nav-accent: #4d9fff;
+--dropdown-bg: #ffffff;
+--dropdown-shadow: 0 8px 24px rgba(16,32,56,.15);
 }
 *,*::before,*::after{ margin:0; padding:0; box-sizing:border-box; }
 html{ -webkit-text-size-adjust:100%; }
 body{
-  font-family:'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
-  background:radial-gradient(1200px 600px at 50% -10%, #e2eaf6 0%, #eef2f7 55%, #e9eef5 100%);
-  color:var(--ink); font-size:15px; line-height:1.5;
-  padding: 0 18px 60px;
-  display:flex; flex-direction: column; align-items: center; min-height:100vh;
+font-family:'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+background:radial-gradient(1200px 600px at 50% -10%, #e2eaf6 0%, #eef2f7 55%, #e9eef5 100%);
+color:var(--ink); font-size:15px; line-height:1.5;
+padding: 0 18px 60px;
+display:flex; flex-direction: column; align-items: center; min-height:100vh;
 }
 
-/* ============================================================
-   ✅ 新导航栏样式 (YZ Payroll)
-   ============================================================ */
+/* ✅ 更新为 leave.html 的 Navbar 样式 */
 .navbar {
-  position: sticky; top: 0; z-index: 200;
-  display: flex; align-items: stretch; flex-wrap: wrap;
-  background: linear-gradient(90deg, var(--nav-bg-1) 0%, var(--nav-bg-2) 100%);
-  padding: 0 1rem; min-height: var(--nav-h);
-  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
-  border-bottom: 1px solid rgba(77,159,255,0.18);
-  width: calc(100% + 36px); margin-left: -18px; margin-right: -18px; margin-bottom: 20px; border-radius: 0;
+position: sticky; top: 0; z-index: 200;
+display: flex; align-items: stretch; flex-wrap: wrap;
+background: linear-gradient(90deg, var(--nav-bg-1) 0%, var(--nav-bg-2) 100%);
+padding: 0 1rem; min-height: var(--nav-h);
+box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+border-bottom: 1px solid rgba(77,159,255,0.18);
+width: calc(100% + 36px); margin-left: -18px; margin-right: -18px; margin-bottom: 20px; border-radius: 0;
 }
 .navbar .nav-brand { display: flex; align-items: center; gap: 0.55rem; color: #fff; font-weight: 800; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; padding-right: 1.1rem; margin-right: 0.5rem; border-right: 1px solid rgba(255,255,255,0.12); white-space: nowrap; }
 .navbar .nav-brand .logo { width: 28px; height: 28px; border-radius: 7px; background: linear-gradient(135deg, #4d9fff, #1a4f8a); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.85rem; font-weight: 800; box-shadow: 0 2px 6px rgba(77,159,255,0.35); }
 .nav-links { display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px; position: relative; }
 .nav-item { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0 0.85rem; min-height: var(--nav-h); color: var(--nav-text); text-decoration: none; font-family: inherit; font-size: 0.73rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: transparent; border: none; cursor: pointer; white-space: nowrap; transition: background 0.15s, color 0.15s; position: relative; }
-.nav-item:hover, .nav-item.active { background: var(--nav-hover); color: #fff; }
+.nav-item:hover, .nav-item.active { background: var(--nav-hover2); color: #fff; }
 .nav-item::after { content: ''; position: absolute; left: 0.85rem; right: 0.85rem; bottom: 0; height: 2px; background: var(--nav-accent); transform: scaleX(0); transform-origin: left; transition: transform 0.2s; }
 .nav-item:hover::after, .nav-item.active::after { transform: scaleX(1); }
 .nav-back { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; padding: 0 0.6rem; color: var(--nav-text); background: transparent; border: none; cursor: pointer; font-size: 1.1rem; transition: background 0.15s, color 0.15s; }
-.nav-back:hover { background: var(--nav-hover); color: #fff; }
+.nav-back:hover { background: var(--nav-hover2); color: #fff; }
 .nav-dropdown { position: relative; display: inline-flex; align-items: stretch; }
 .nav-dropdown > .nav-item { padding-right: 0.55rem; }
 .nav-dropdown > .nav-item .fa-caret-down { font-size: 0.6rem; margin-left: 0.2rem; opacity: 0.7; }
@@ -70,9 +66,6 @@ body{
 .nav-chat .pulse { width: 7px; height: 7px; border-radius: 50%; background: #6ef0a8; box-shadow: 0 0 0 0 rgba(110,240,168,0.75); animation: pulse 2s infinite; }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(110,240,168,0.7); } 70% { box-shadow: 0 0 0 7px rgba(110,240,168,0); } 100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); } }
 
-/* ============================================================
-   原有 Payslip Content 样式 (保持不变)
-   ============================================================ */
 .payslip-container{ width:100%; max-width:1280px; background:var(--card); border:1px solid #e2e9f1; border-radius:18px; box-shadow:0 1px 2px rgba(16,32,56,.06), 0 18px 48px rgba(16,32,56,.12); padding:30px 34px 34px; position:relative; overflow:hidden; margin-top: 8px; }
 .payslip-container::before{ content:''; position:absolute; inset:0 0 auto 0; height:4px; background:linear-gradient(90deg, var(--navy) 0%, var(--navy) 58%, var(--green) 58%, var(--green) 100%); }
 .payslip-header{ display:flex; justify-content:space-between; align-items:flex-start; gap:18px; flex-wrap:wrap; padding-bottom:16px; margin-bottom:22px; border-bottom:1px solid var(--line); position:relative; }
@@ -144,7 +137,6 @@ select.field-input { appearance: none; padding-right: 28px; cursor: pointer; bac
 .panel-total i{ margin-right:4px; opacity:.75; }
 .panel-total strong{ font-size:.95rem; font-variant-numeric:tabular-nums; }
 
-/* 修改为 3 列布局以容纳拆分后的卡片 */
 .extra-grid{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:16px; margin-bottom:22px; }
 .extra-card{ background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px 8px; box-shadow:var(--shadow-sm); min-width:0; transition:border-color .18s, box-shadow .18s; }
 .extra-card:hover{ border-color:#c2d4e6; box-shadow:var(--shadow-md); }
@@ -197,11 +189,18 @@ kbd{ font-family:inherit; font-size:.68rem; font-weight:700; background:#eef3f9;
 .signature-line span:first-child{ font-size:.66rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); }
 .signature-line .line{ height:38px; border-bottom:1.5px solid #a8bcd2; }
 .signature-line .line-sub{ font-size:.68rem; color:#9aabc0; letter-spacing:.02em; }
-
 @media (max-width: 1100px){ .columns{ grid-template-columns:1fr 1fr; } .panel-cuti{ grid-column: 1 / -1; } .extra-grid{ grid-template-columns:repeat(2, minmax(0,1fr)); } }
 @media (max-width: 980px){ .meta-grid{ grid-template-columns:1fr; } .extra-grid{ grid-template-columns:1fr 1fr; } }
 @media (max-width: 760px){ .columns{ grid-template-columns:1fr; } .summary{ grid-template-columns:1fr; } .extra-grid{ grid-template-columns:1fr; } .payslip-container{ padding:24px 20px 28px; } .brand h1{ font-size:1.2rem; } }
 @media (max-width: 540px){ body{ padding:14px 10px 40px; } .payslip-container{ padding:20px 14px 24px; border-radius:14px; } .field-grid{ grid-template-columns:1fr; } .payslip-header{ flex-direction:column; } .header-badges{ justify-content:flex-start; } .btn-group{ width:100%; } .btn{ flex:1 1 auto; } .line-item{ flex-wrap:wrap; } .amount{ width:100%; } .extra-card .amount{ width:100%; } }
+@media (max-width: 768px) {
+.navbar { padding: 0 0.5rem; width: calc(100% + 20px); margin-left: -10px; margin-right: -10px; }
+.navbar .nav-brand { padding-right: 0.6rem; margin-right: 0.25rem; }
+.navbar .nav-brand .brand-text { display: none; }
+.nav-item { padding: 0 0.6rem; font-size: 0.68rem; }
+.nav-chat { padding: 0.45rem 0.75rem; font-size: 0.66rem; }
+body { padding: 0 10px 40px; }
+}
 @media print{
 *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
 body{ background:#fff; padding:0; display:block; font-size:12px; }
@@ -219,14 +218,11 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
 </head>
 <body>
 
-<!-- ✅ 顶端导航栏开始 (YZ Payroll Style) -->
+<!-- ✅ 顶端导航栏开始 -->
 <nav class="navbar">
-    <div class="nav-brand">
-        <span class="logo">Y</span>
-        <span class="brand-text">YZ Payroll</span>
-    </div>
+    <div class="nav-brand"><span class="logo">Y</span><span class="brand-text">YZ Payroll</span></div>
     <div class="nav-links" id="navLinks">
-        <button class="nav-back" id="backBtn" title="Kembali">⏎</button>
+        <button class="nav-back" id="backBtn" title="返回上一页">⏎</button>
         
         <div class="nav-dropdown" id="filesDropdown">
             <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
@@ -242,12 +238,19 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
                 <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
                 <div class="divider"></div>
                 <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+                <a href="veiwofepfsocsoeis.html">📰 View Epf/Socso/Eis</a>
+                <a href="hrdcorp.html">📓 HRD Corp</a>
+                <a href="salarysumview.html">📊 Salary View</a>
+                <a href="GoogleSheetBackupURL.html">🔗 Google Sheet Backup URL</a>
             </div>
         </div>
 
         <a class="nav-item" href="dashboard.html">DASHBOARD</a>
         <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
         <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
+        <!-- ✅ 激活当前页面 -->
+        <a class="nav-item active" href="salaryslip.html">SALARY SLIP</a>
+        <a class="nav-item" href="overtime.html">OVERTIME</a>
 
         <div class="nav-dropdown" id="carumanDropdown">
             <button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
@@ -260,10 +263,23 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
         </div>
 
         <a class="nav-item" href="companysetting.html">SETTING</a>
+
+        <div class="nav-dropdown" id="othersDropdown">
+            <button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
+            <div class="dropdown-menu">
+                <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+                <div class="divider"></div>
+                <a href="veiwofepfsocsoeis.html">📰 View Epf/Socso/Eis</a>
+                <a href="hrdcorp.html">📓 HRD Corp</a>
+                <a href="salarysumview.html">📊 Salary View</a>
+                <a href="GoogleSheetBackupURL.html">🔗 Google Sheet Backup URL</a>
+            </div>
+        </div>
     </div>
 
-    <button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')">
-        <span class="pulse"></span> 💬 Request Chat
+    <!-- ✅ 绑定 Tips 弹窗函数 -->
+    <button class="nav-chat" type="button" onclick="openTipsChoice()">
+        <span class="pulse"></span> 💬 Tips & Panduan
     </button>
 </nav>
 <!-- ✅ 顶端导航栏结束 -->
@@ -308,7 +324,6 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
 </section>
 </div>
 
-<!-- 第一排：PENDAPATAN, POTONGAN, HARI CUTI -->
 <div class="columns">
 <section class="panel panel-income">
 <div class="panel-head"><span class="panel-icon"><i class="fas fa-plus"></i></span><h2>Pendapatan / Earnings</h2></div>
@@ -345,7 +360,6 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
 </section>
 </div>
 
-<!-- 第二排：CARUMAN STATUTORI, GAJI UNTUK CARUMAN, BANK & PENDAFTARAN -->
 <div class="extra-grid">
 <section class="extra-card">
 <h4><i class="fas fa-building"></i><span>Caruman Statutori</span><button type="button" class="mini-btn" id="autoCalcBtn" title="Kira anggaran caruman berdasarkan Gaji Caruman"><i class="fas fa-magic"></i> Auto</button></h4>
@@ -358,7 +372,6 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
 <div class="line-item"><label for="lindung24jam">24 JAM (Pekerja)</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="lindung24jam" value="0"></div></div>
 </section>
 
-<!-- 自动计算：GAJI UNTUK CARUMAN 卡片 -->
 <section class="extra-card">
 <h4><i class="fas fa-shield-alt"></i><span>Gaji Untuk Caruman</span></h4>
 <div class="line-item"><label for="salaryEpf">EPF (KWSP)</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="salaryEpf" value="0" readonly></div></div>
@@ -434,21 +447,34 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
 <script>
 (function () {
 'use strict';
+
+// ✅ 统一的 Navbar 交互逻辑
 document.addEventListener('DOMContentLoaded', function() {
-const backBtn = document.getElementById('backBtn');
-if (backBtn) backBtn.addEventListener('click', function(e) { e.preventDefault(); window.history.back(); });
-const dropdownToggles = document.querySelectorAll('[data-dropdown-toggle]');
-dropdownToggles.forEach(function(toggle) {
-toggle.addEventListener('click', function(e) {
-e.stopPropagation();
-const dropdownId = this.getAttribute('data-dropdown-toggle');
-document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { if (dd.id !== dropdownId + 'Dropdown') dd.classList.remove('open'); });
-const wrapper = this.closest('.nav-dropdown');
-if (wrapper) wrapper.classList.toggle('open');
-});
-});
-document.addEventListener('click', function(e) { if (!e.target.closest('.nav-dropdown')) document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); }); });
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); }); });
+  const backBtn = document.getElementById('backBtn');
+  if (backBtn) backBtn.addEventListener('click', function(e) { e.preventDefault(); window.history.back(); });
+  
+  const dropdownToggles = document.querySelectorAll('[data-dropdown-toggle]');
+  dropdownToggles.forEach(function(toggle) {
+    toggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const dropdownId = this.getAttribute('data-dropdown-toggle');
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { 
+        if (dd.id !== dropdownId + 'Dropdown') dd.classList.remove('open'); 
+      });
+      const wrapper = this.closest('.nav-dropdown');
+      if (wrapper) wrapper.classList.toggle('open');
+    });
+  });
+
+  document.addEventListener('click', function(e) { 
+    if (!e.target.closest('.nav-dropdown')) 
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); }); 
+  });
+
+  document.addEventListener('keydown', function(e) { 
+    if (e.key === 'Escape') 
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); }); 
+  });
 });
 
 const STORAGE_KEY = 'payrollEmployees';
@@ -511,7 +537,6 @@ const commission = num(inputs.commision.value);
 const allowance = num(inputs.allowance.value);
 const otTotal = num(inputs.timeOTAmount.value) + num(inputs.dailyOTAmount.value);
 
-// 1. 自动计算 Gaji Untuk Caruman (Bases)
 const epfBase = basic + commission + allowance;
 const socsoBase = basic + commission + allowance + otTotal;
 const eisBase = basic + commission + allowance + otTotal;
@@ -522,7 +547,6 @@ inputs.salarySocso.value = socsoBase.toFixed(2);
 inputs.salaryEis.value = eisBase.toFixed(2);
 inputs.salary24jam.value = lindungBase.toFixed(2);
 
-// 2. 计算收入与扣款
 const income = basic
 + num(inputs.timeOTAmount.value) + num(inputs.dailyOTAmount.value)
 + allowance + commission
@@ -557,7 +581,6 @@ currentRaw.TotalSalaryPay = totalSalaryPay;
 }
 
 function autoCalcStatutory() {
-// 抓取自动算出的 Gaji Untuk Caruman 作为基数
 const epfBase = num(inputs.salaryEpf.value);
 const socsoBase = num(inputs.salarySocso.value);
 const eisBase = num(inputs.salaryEis.value);
@@ -567,21 +590,17 @@ alert('Sila masukkan Gaji Asas terlebih dahulu.');
 return;
 }
 
-// EPF (无上限，11% / 13% 或 12%)
 inputs.epfEmployee.value = Math.ceil(epfBase * 0.11);
 inputs.epfEmployer.value = Math.ceil(epfBase * (epfBase <= 5000 ? 0.13 : 0.12));
 
-// SOCSO (上限 RM6000，0.5% / 1.75%)
 const socsoCap = Math.min(socsoBase, 6000);
 inputs.socsoEmployee.value = Math.round(socsoCap * 0.005 * 100) / 100;
 inputs.socsoEmployer.value = Math.round(socsoCap * 0.0175 * 100) / 100;
 
-// EIS (上限 RM6000，0.2% / 0.2%)
 const eisCap = Math.min(eisBase, 6000);
 inputs.eisEmployee.value = Math.round(eisCap * 0.002 * 100) / 100;
 inputs.eisEmployer.value = Math.round(eisCap * 0.002 * 100) / 100;
 
-// 24 Jam (如果为空则默认为 RM10，也可自行修改)
 if (num(inputs.lindung24jam.value) === 0) {
 inputs.lindung24jam.value = 10.00;
 }
