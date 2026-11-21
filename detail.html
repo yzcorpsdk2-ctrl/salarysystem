@@ -245,11 +245,11 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
             </div>
         </div>
 
-        <a class="nav-item" href="dashboard.html">DASHBOARD</a>
+        <!-- ✅ 如果你想让它在 Dashboard 亮起，保留 active -->
+        <a class="nav-item active" href="dashboard.html">DASHBOARD</a>
         <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
         <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
-        <!-- ✅ 激活当前页面 -->
-        <a class="nav-item active" href="salaryslip.html">SALARY SLIP</a>
+        <!-- ❌ 删除了 SALARY SLIP -->
         <a class="nav-item" href="overtime.html">OVERTIME</a>
 
         <div class="nav-dropdown" id="carumanDropdown">
@@ -277,9 +277,9 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
         </div>
     </div>
 
-    <!-- ✅ 绑定 Tips 弹窗函数 -->
-    <button class="nav-chat" type="button" onclick="openTipsChoice()">
-        <span class="pulse"></span> 💬 Tips & Panduan
+    <!-- ✅ 替换为 Request Chat 按钮 -->
+    <button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')">
+        <span class="pulse"></span> 💬 Request Chat
     </button>
 </nav>
 <!-- ✅ 顶端导航栏结束 -->
