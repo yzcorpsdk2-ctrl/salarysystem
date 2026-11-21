@@ -151,21 +151,70 @@ body { font-family:'Segoe UI',Roboto,Arial,sans-serif; background:var(--epf-bg);
 </head>
 <body>
 <div class="toast-container" id="toastContainer"></div>
+  
 <nav class="navbar">
-<div class="nav-brand"><span class="logo">Y</span><span class="brand-text">YZ Payroll</span></div>
-<div class="nav-links" id="navLinks">
-<button class="nav-back" id="backBtn" title="返回上一页">⏎</button>
-<div class="nav-dropdown" id="filesDropdown"><button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button><div class="dropdown-menu"><a href="dashboard.html">📊 DASHBOARD</a><a href="staffinfo.html">👥 EMPLOYEES</a><a href="leave.html">📅 TIMECARD REPORT</a><a href="overtime.html">⏱️ OVERTIME SHEET</a><div class="divider"></div><a href="epf.html">🏦 EPF</a><a href="socso.html">🛡️ SOCSO</a><a href="eis.html">📋 EIS</a><a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a><div class="divider"></div><a href="companysetting.html">⚙️ COMPANY SETTING</a><a href="121.html">📄 121</a><a href="122.html">📄 122</a><a href="123.html">📄 123</a><a href="GoogleSheetBackupURL.html">📄 Google Sheet Backup URL</a></div></div>
-<a class="nav-item" href="dashboard.html">DASHBOARD</a>
-<a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
-<a class="nav-item" href="leave.html">TIMECARD REPORT</a>
-<a class="nav-item active" href="overtime.html">OVERTIME</a>
-<div class="nav-dropdown" id="carumanDropdown"><button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button><div class="dropdown-menu"><a href="epf.html">🏦 EPF</a><a href="socso.html">🛡️ SOCSO</a><a href="eis.html">📋 EIS</a><a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a></div></div>
-<a class="nav-item" href="companysetting.html">SETTING</a>
-<div class="nav-dropdown" id="othersDropdown"><button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button><div class="dropdown-menu"><a href="companysetting.html">⚙️ COMPANY SETTING</a><div class="divider"></div><a href="121.html">📄 121</a><a href="122.html">📄 122</a><a href="123.html">📄 123</a><a href="GoogleSheetBackupURL.html">📄 Google Sheet Backup URL</a></div></div>
-</div>
-<button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')"><span class="pulse"></span> 💬 Request Chat</button>
+    <div class="nav-brand"><span class="logo">Y</span><span class="brand-text">YZ Payroll</span></div>
+    <div class="nav-links" id="navLinks">
+        <button class="nav-back" id="backBtn" title="返回上一页">⏎</button>
+        
+        <div class="nav-dropdown" id="filesDropdown">
+            <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
+            <div class="dropdown-menu">
+                <a href="dashboard.html">📊 DASHBOARD</a>
+                <a href="staffinfo.html">👥 EMPLOYEES</a>
+                <a href="leave.html">📅 TIMECARD REPORT</a>
+                <a href="overtime.html">⏱️ OVERTIME SHEET</a>
+                <div class="divider"></div>
+                <a href="epf.html">🏦 EPF</a>
+                <a href="socso.html">🛡️ SOCSO</a>
+                <a href="eis.html">📋 EIS</a>
+                <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+                <div class="divider"></div>
+                <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+                <a href="veiwofepfsocsoeis.html">📰 View Epf/Socso/Eis</a>
+                <a href="hrdcorp.html">📓 HRD Corp</a>
+                <a href="salarysumview.html">📊 Salary View</a>
+                <a href="GoogleSheetBackupURL.html">🔗 Google Sheet Backup URL</a>
+            </div>
+        </div>
+
+        <a class="nav-item" href="dashboard.html">DASHBOARD</a>
+        <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
+        <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
+        
+        <!-- ✅ 保持当前页面高亮 -->
+        <a class="nav-item active" href="overtime.html">OVERTIME</a>
+
+        <div class="nav-dropdown" id="carumanDropdown">
+            <button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
+            <div class="dropdown-menu">
+                <a href="epf.html">🏦 EPF</a>
+                <a href="socso.html">🛡️ SOCSO</a>
+                <a href="eis.html">📋 EIS</a>
+                <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+            </div>
+        </div>
+
+        <a class="nav-item" href="companysetting.html">SETTING</a>
+
+        <div class="nav-dropdown" id="othersDropdown">
+            <button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
+            <div class="dropdown-menu">
+                <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+                <div class="divider"></div>
+                <a href="veiwofepfsocsoeis.html">📰 View Epf/Socso/Eis</a>
+                <a href="hrdcorp.html">📓 HRD Corp</a>
+                <a href="salarysumview.html">📊 Salary View</a>
+                <a href="GoogleSheetBackupURL.html">🔗 Google Sheet Backup URL</a>
+            </div>
+        </div>
+    </div>
+
+    <button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')">
+        <span class="pulse"></span> 💬 Request Chat
+    </button>
 </nav>
+  
 <div class="topbar">
 <div class="brand"><div class="logo">⏱</div> Payroll Overtime</div>
 <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
