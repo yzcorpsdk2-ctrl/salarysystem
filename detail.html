@@ -245,11 +245,9 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
             </div>
         </div>
 
-        <!-- ✅ 如果你想让它在 Dashboard 亮起，保留 active -->
         <a class="nav-item active" href="dashboard.html">DASHBOARD</a>
         <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
         <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
-        <!-- ❌ 删除了 SALARY SLIP -->
         <a class="nav-item" href="overtime.html">OVERTIME</a>
 
         <div class="nav-dropdown" id="carumanDropdown">
@@ -277,7 +275,6 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
         </div>
     </div>
 
-    <!-- ✅ 替换为 Request Chat 按钮 -->
     <button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')">
         <span class="pulse"></span> 💬 Request Chat
     </button>
@@ -368,12 +365,21 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
 </section>
 
 <section class="panel panel-deduction">
-<div class="panel-head"><span class="panel-icon"><i class="fas fa-minus"></i></span><h2>Potongan / Deductions</h2></div>
+<div class="panel-head">
+    <span class="panel-icon"><i class="fas fa-minus"></i></span>
+    <h2>Potongan / Deductions</h2>
+    <button type="button" class="mini-btn" id="resetUnpaidBtn" style="margin-left:auto;" title="Reset Cuti Tanpa Gaji dari SHEET"><i class="fas fa-undo"></i> Reset</button>
+</div>
 <div class="panel-body">
-<div class="line-item"><label for="unpaidLeave"><i class="fas fa-calendar-times"></i> Cuti Tanpa Gaji</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="unpaidLeave" value="0"></div></div>
+<div class="line-item">
+    <label for="unpaidLeave"><i class="fas fa-calendar-times"></i> Cuti Tanpa Gaji</label>
+    <div style="display:flex; gap:4px; align-items:center;">
+        <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="unpaidLeave" value="0.00" readonly></div>
+        <button type="button" class="mini-edit-btn" id="btnEditUnpaidLeave" title="Edit manual"><i class="fas fa-pen"></i></button>
+    </div>
+</div>
 <div class="line-item"><label for="pinjaman"><i class="fas fa-hand-holding-usd"></i> Pinjaman</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="pinjaman" value="0"></div></div>
 <div class="line-item"><label for="deductionLain"><i class="fas fa-ellipsis-h"></i> Potongan Lain</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="deductionLain" value="0"></div></div>
-<!-- 修改了这里：Cuti Setengah Hari 改为 Potongan Lain 2 -->
 <div class="line-item"><label for="potonganLain2"><i class="fas fa-file-invoice"></i> Potongan Lain 2</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="potonganLain2" value="0"></div></div>
 </div>
 <div class="panel-total"><span><i class="fas fa-calculator"></i> Jumlah Potongan</span><strong id="totalPotongan">RM 0.00</strong></div>
@@ -513,7 +519,7 @@ timeOTHour: 'TimeOTHour', timeOTAmount: 'TimeOTAmount',
 dailyOTDay: 'DailyOTDay', dailyOTAmount: 'DailyOTAmount',
 allowance: 'Allowance2', commision: 'Commission', incentives: 'Incentives',
 unpaidLeave: 'UnpaidLeave', pinjaman: 'Pinjaman', deductionLain: 'Deduction', 
-potonganLain2: 'PotonganLain2', // <-- 已更新
+potonganLain2: 'PotonganLain2', 
 annualLeaveDays: 'AnnualLeaveDays', sickLeaveDays: 'SickLeaveDays',
 salaryEpf: 'EPFSalary', salarySocso: 'SOCSOSalary', salaryEis: 'EISSalary', salary24jam: 'LindungSalary',
 epfEmployee: 'EPF_Employee', epfEmployer: 'EPF_Employer',
@@ -524,7 +530,7 @@ bankNama: 'SLRBankNama', bankAcc: 'SLRBankAccountNo',
 epfNo: 'SLREPF', socsoNo: 'SLRPERKESO', eisNo: 'SLREIS'
 };
 const TEXT_FIELDS = new Set(['bankNama', 'bankAcc', 'epfNo', 'socsoNo', 'eisNo']);
-const NUM_2DEC_FIELDS = new Set(['timeOTHour', 'timeOTAmount', 'dailyOTDay', 'dailyOTAmount']); // 需要格式化为2位小数的字段
+const NUM_2DEC_FIELDS = new Set(['unpaidLeave', 'timeOTHour', 'timeOTAmount', 'dailyOTDay', 'dailyOTAmount']);
 
 const el = id => document.getElementById(id);
 const inputs = {};
@@ -532,12 +538,13 @@ Object.keys(FIELD_MAP).forEach(id => { inputs[id] = el(id); });
 let currentRaw = null;
 let allEmployees = [];
 let allOvertimeData = [];
-let allSheetData = []; // 新增：保存 SHEET 数据
-let allAlslData = []; // 新增：保存 ALSLREMAIN 数据
+let allSheetData = []; 
+let allAlslData = []; 
 let activeStaffList = [];
 let SCRIPT_URL = '';
 
 const MANUAL_FIELDS = [
+{ inputId: 'unpaidLeave', btnId: 'btnEditUnpaidLeave', rawKey: 'UnpaidLeave' },
 { inputId: 'timeOTHour', btnId: 'btnEditTimeOTHour', rawKey: 'TimeOTHour' },
 { inputId: 'timeOTAmount', btnId: 'btnEditTimeOTAmount', rawKey: 'TimeOTAmount' },
 { inputId: 'dailyOTDay', btnId: 'btnEditDailyOTDay', rawKey: 'DailyOTDay' },
@@ -553,7 +560,6 @@ const RM_FMT = new Intl.NumberFormat('ms-MY', { minimumFractionDigits: 2, maximu
 function num(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
 function fmtRM(v) { return 'RM ' + RM_FMT.format(num(v)); }
 
-// 新增：判断 4 个 OT 字段是否全部为 0 或空
 function isAllOtZero(raw) {
     if (!raw) return true;
     const v1 = num(raw.TimeOTHour);
@@ -595,7 +601,6 @@ async function fetchOvertimeData() {
   }
 }
 
-// 新增：拉取 SHEET 数据
 async function fetchSheetData() {
   if (!SCRIPT_URL) return;
   try {
@@ -607,7 +612,6 @@ async function fetchSheetData() {
   } catch (e) { console.error('Fetch SHEET error:', e); }
 }
 
-// 新增：拉取 ALSLREMAIN 数据
 async function fetchALSLData() {
   if (!SCRIPT_URL) return;
   try {
@@ -640,7 +644,6 @@ const income = basic
 + allowance + commission
 + num(inputs.incentives.value);
 
-// 修改这里：去掉了 halfDaysLeave，改成了 potonganLain2
 const ded = num(inputs.unpaidLeave.value) + num(inputs.pinjaman.value)
 + num(inputs.deductionLain.value) + num(inputs.potonganLain2.value);
 
@@ -702,7 +705,6 @@ async function fetchStaffBasics() {
 if (!SCRIPT_URL) { setSyncStatus('URL belum ditetapkan. Sila tetapkan di Dashboard.', 'error'); return; }
 setSyncStatus('Memuatkan data staf...', '');
 try {
-  // 同时拉取 OT, SHEET 和 ALSLREMAIN 数据
   await Promise.all([fetchOvertimeData(), fetchSheetData(), fetchALSLData()]);
   
   const res = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
@@ -822,7 +824,7 @@ Code: staffObj.Code, Name: staffObj.Name, GroupName: staffObj.GroupName, Situati
 BasicSalary: staffObj.Salary, Basic: staffObj.Salary,
 TimeOTHour: 0, TimeOTAmount: 0, DailyOTDay: 0, DailyOTAmount: 0,
 Allowance2: 0, Commission: 0, Incentives: 0,
-UnpaidLeave: 0, Pinjaman: 0, Deduction: 0, PotonganLain2: 0, // 这里改动
+UnpaidLeave: 0, Pinjaman: 0, Deduction: 0, PotonganLain2: 0, 
 AnnualLeaveDays: 0, SickLeaveDays: 0,
 EPFSalary: 0, SOCSOSalary: 0, EISSalary: 0, LindungSalary: 0,
 EPF_Employee: 0, EPF_Employer: 0, SOCSO_Employee: 0, SOCSO_Employer: 0,
@@ -847,7 +849,6 @@ if (allOvertimeData && allOvertimeData.length > 0) {
   }
 }
 
-// 【核心修改】判断 4 个 OT 字段是否全为 0，如果是，才从 OVERTIME 抓取
 if (isAllOtZero(raw) && otRecord) {
   raw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
   raw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
@@ -855,11 +856,9 @@ if (isAllOtZero(raw) && otRecord) {
   raw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
 }
 
-// ================= 新增：自动抓取 CUTI TANPA GAJI & LEAVE DAYS =================
 const targetName = String(raw.Name || '').trim().toUpperCase();
 const targetCode = String(raw.Code || '').trim();
 
-// 1. 从 SHEET 找 CUTI TANPA GAJI (TOTAL DEDUCTION 总和)
 if (allSheetData && allSheetData.length > 0) {
   let totalDeduction = 0;
   allSheetData.forEach(r => {
@@ -875,7 +874,6 @@ if (allSheetData && allSheetData.length > 0) {
   }
 }
 
-// 2. 从 ALSLREMAIN 找 CUTI TAHUNAN & CUTI SAKIT
 if (allAlslData && allAlslData.length > 0) {
   const alslRecord = allAlslData.find(r => {
     const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
@@ -888,7 +886,6 @@ if (allAlslData && allAlslData.length > 0) {
     if (num(raw.SickLeaveDays) === 0) raw.SickLeaveDays = num(alslRecord['THISSL']);
   }
 }
-// ================= 新增结束 =================
 
 const staff = activeStaffList.find(s => String(s.Code) === String(raw.Code));
 
@@ -921,7 +918,7 @@ const v = raw[key];
 if (TEXT_FIELDS.has(id)) {
   inp.value = (v === undefined || v === null || v === '') ? '—' : String(v);
 } else if (NUM_2DEC_FIELDS.has(id)) {
-  inp.value = num(v).toFixed(2); // OT 格式化为两位小数
+  inp.value = num(v).toFixed(2); 
 } else {
   inp.value = (v === undefined || v === null || v === '') ? 0 : num(v);
 }
@@ -951,7 +948,7 @@ btn.classList.remove('editing'); btn.innerHTML = '<i class="fas fa-pen"></i>';
 if (currentRaw) {
   if (NUM_2DEC_FIELDS.has(field.inputId)) {
     currentRaw[field.rawKey] = num(inp.value);
-    inp.value = num(inp.value).toFixed(2); // 退出编辑时格式化
+    inp.value = num(inp.value).toFixed(2); 
   } else {
     currentRaw[field.rawKey] = inp.value;
   }
@@ -969,7 +966,7 @@ Code: staff.Code, Name: staff.Name, GroupName: staff.GroupName, Situation: staff
 BasicSalary: staff.Salary, Basic: staff.Salary,
 TimeOTHour: 0, TimeOTAmount: 0, DailyOTDay: 0, DailyOTAmount: 0,
 Allowance2: 0, Commission: 0, Incentives: 0,
-UnpaidLeave: 0, Pinjaman: 0, Deduction: 0, PotonganLain2: 0, // 这里改动
+UnpaidLeave: 0, Pinjaman: 0, Deduction: 0, PotonganLain2: 0,
 AnnualLeaveDays: 0, SickLeaveDays: 0,
 EPFSalary: 0, SOCSOSalary: 0, EISSalary: 0, LindungSalary: 0,
 EPF_Employee: 0, EPF_Employer: 0, SOCSO_Employee: 0, SOCSO_Employer: 0,
@@ -1095,7 +1092,6 @@ btn.disabled = true;
 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menarik...';
 }
 try {
-  // 同时拉取最新数据
   await Promise.all([fetchOvertimeData(), fetchSheetData(), fetchALSLData()]);
 
   const res = await fetch(SCRIPT_URL, {
@@ -1123,7 +1119,6 @@ try {
     const sheetData = result.data;
     const merged = { ...currentRaw, ...sheetData };
     
-    // 【核心修改】只有 merged 里的 4 个 OT 字段全为 0 时，才从 OVERTIME 抓取覆盖
     if (isAllOtZero(merged) && otRecord) {
       merged.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
       merged.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
@@ -1131,7 +1126,6 @@ try {
       merged.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
     }
 
-    // 强制覆盖 Cuti Tanpa Gaji (Sum of TOTAL DEDUCTION) 和 AL/SL
     const targetName = String(merged.Name || '').trim().toUpperCase();
     const targetCode = String(merged.Code || '').trim();
     
@@ -1144,7 +1138,10 @@ try {
           totalDed += num(r['TOTAL DEDUCTION(RM)']);
         }
       });
-      if (totalDed > 0) merged.UnpaidLeave = totalDed;
+      // 修改：如果 merged.UnpaidLeave 为0，才用 SHEET 的数据
+      if (num(merged.UnpaidLeave) === 0 && totalDed > 0) {
+        merged.UnpaidLeave = totalDed;
+      }
     }
 
     if (allAlslData && allAlslData.length > 0) {
@@ -1185,7 +1182,6 @@ try {
       alert('✅ Data berjaya dimuat dari LISTCALCULATION & OVERTIME.\nTerakhir dikemas kini: ' + lastUpdated);
     }
   } else {
-    // 如果 LISTCALCULATION 没数据，默认 currentRaw 的 OT 可能是有值的（来自于本地缓存），但也做一次判断
     if (isAllOtZero(currentRaw) && otRecord) {
       currentRaw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
       currentRaw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
@@ -1193,7 +1189,6 @@ try {
       currentRaw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
     }
     
-    // 强制覆盖 AL/SL 和 Cuti Tanpa Gaji
     const targetName = String(currentRaw.Name || '').trim().toUpperCase();
     const targetCode = String(currentRaw.Code || '').trim();
     
@@ -1206,7 +1201,10 @@ try {
           totalDed += num(r['TOTAL DEDUCTION(RM)']);
         }
       });
-      if (totalDed > 0) currentRaw.UnpaidLeave = totalDed;
+      // 修改：如果 currentRaw.UnpaidLeave 为0，才用 SHEET 的数据
+      if (num(currentRaw.UnpaidLeave) === 0 && totalDed > 0) {
+        currentRaw.UnpaidLeave = totalDed;
+      }
     }
 
     if (allAlslData && allAlslData.length > 0) {
@@ -1277,7 +1275,7 @@ else fetchStaffBasics();
 el('printBtn').addEventListener('click', () => window.print());
 el('autoCalcBtn').addEventListener('click', autoCalcStatutory);
 
-// 新增：Reset OT 按钮逻辑
+// 重置 OT 按钮
 el('resetOTBtn').addEventListener('click', () => {
     if (!currentRaw || !currentRaw.Code) { alert('Sila pilih pekerja dahulu.'); return; }
     let otRecord = null;
@@ -1288,7 +1286,6 @@ el('resetOTBtn').addEventListener('click', () => {
         }
     }
     if (otRecord) {
-        // 强制覆盖，不判断是否为0，因为这是手动重置按钮
         currentRaw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
         currentRaw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
         currentRaw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
@@ -1303,6 +1300,31 @@ el('resetOTBtn').addEventListener('click', () => {
         setSyncStatus('OT telah direset berdasarkan data OVERTIME terkini', 'success');
     } else {
         alert('⚠️ Tiada data OVERTIME untuk pekerja ini.');
+    }
+});
+
+// 新增：重置 Cuti Tanpa Gaji 按钮
+el('resetUnpaidBtn').addEventListener('click', () => {
+    if (!currentRaw || !currentRaw.Code) { alert('Sila pilih pekerja dahulu.'); return; }
+    const targetName = String(currentRaw.Name || '').trim().toUpperCase();
+    const targetCode = String(currentRaw.Code || '').trim();
+    let totalDed = 0;
+    if (allSheetData && allSheetData.length > 0) {
+        allSheetData.forEach(r => {
+            const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
+            const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
+            if ((targetName && rName === targetName) || (targetCode && rCode === targetCode)) {
+                totalDed += num(r['TOTAL DEDUCTION(RM)']);
+            }
+        });
+    }
+    if (totalDed > 0) {
+        currentRaw.UnpaidLeave = totalDed;
+        inputs.unpaidLeave.value = totalDed.toFixed(2);
+        updateCalc();
+        setSyncStatus('Cuti Tanpa Gaji telah direset berdasarkan data SHEET', 'success');
+    } else {
+        alert('⚠️ Tiada data CUTI TANPA GAJI (TOTAL DEDUCTION) di SHEET untuk pekerja ini.');
     }
 });
 
