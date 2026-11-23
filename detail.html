@@ -499,6 +499,7 @@ const inputs = {};
 Object.keys(FIELD_MAP).forEach(id => { inputs[id] = el(id); });
 let currentRaw = null;
 let allEmployees = [];
+let allOvertimeData = []; // 新增：存储 OVERTIME 数据
 let activeStaffList = [];
 let SCRIPT_URL = '';
 const MANUAL_FIELDS = [
@@ -529,6 +530,20 @@ const saved = localStorage.getItem(URL_KEY);
 if (saved) { SCRIPT_URL = saved; el('deployUrlDisplay').value = saved; el('urlStatusDot').className = 'status-dot ok'; }
 else { SCRIPT_URL = ''; el('deployUrlDisplay').value = ''; el('deployUrlDisplay').placeholder = 'Menunggu URL dari Dashboard...'; el('urlStatusDot').className = 'status-dot err'; }
 } catch (e) { SCRIPT_URL = ''; el('urlStatusDot').className = 'status-dot err'; }
+}
+
+// 新增：获取 OVERTIME sheet 数据
+async function fetchOvertimeData() {
+  if (!SCRIPT_URL) return;
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=getOvertimeData&_t=${Date.now()}`);
+    const data = await res.json();
+    if (data && data.status === 'success' && Array.isArray(data.data)) {
+      allOvertimeData = data.data;
+    }
+  } catch (e) {
+    console.error('Fetch OT data error:', e);
+  }
 }
 
 function updateCalc() {
@@ -613,31 +628,34 @@ async function fetchStaffBasics() {
 if (!SCRIPT_URL) { setSyncStatus('URL belum ditetapkan. Sila tetapkan di Dashboard.', 'error'); return; }
 setSyncStatus('Memuatkan data staf...', '');
 try {
-const res = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
-const data = await res.json();
-let staffRaw = [];
-if (data && data.result === 'success' && Array.isArray(data.data)) staffRaw = data.data;
-else if (Array.isArray(data)) staffRaw = data;
-else throw new Error('Format data tidak dikenali.');
+  // 先拉取 Overtime 数据
+  await fetchOvertimeData();
 
-activeStaffList = staffRaw.map(row => {
-const code = String(row.Code || '').trim();
-const name = String(row.Name || '').trim();
-const group = String(row.GroupName || '').trim();
-const situation = String(row.Situation || 'ACTIVE').toUpperCase();
-const salary = parseFloat(row.Salary) || 0;
-return {
-Code: code, Name: name, GroupName: group, Situation: situation, Salary: salary,
-BankNama: String(row.BankNama || '').trim(), BankAccountNo: String(row.BankAccountNo || '').trim(),
-EPF: String(row.EPF || '').trim(), PERKESO: String(row.PERKESO || '').trim(), EIS: String(row.EIS || '').trim()
-};
-}).filter(s => s.Code && s.Name && s.Situation === 'ACTIVE');
-buildDropdowns();
-setSyncStatus('Data staf dimuat', 'success');
+  const res = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
+  const data = await res.json();
+  let staffRaw = [];
+  if (data && data.result === 'success' && Array.isArray(data.data)) staffRaw = data.data;
+  else if (Array.isArray(data)) staffRaw = data;
+  else throw new Error('Format data tidak dikenali.');
+
+  activeStaffList = staffRaw.map(row => {
+  const code = String(row.Code || '').trim();
+  const name = String(row.Name || '').trim();
+  const group = String(row.GroupName || '').trim();
+  const situation = String(row.Situation || 'ACTIVE').toUpperCase();
+  const salary = parseFloat(row.Salary) || 0;
+  return {
+  Code: code, Name: name, GroupName: group, Situation: situation, Salary: salary,
+  BankNama: String(row.BankNama || '').trim(), BankAccountNo: String(row.BankAccountNo || '').trim(),
+  EPF: String(row.EPF || '').trim(), PERKESO: String(row.PERKESO || '').trim(), EIS: String(row.EIS || '').trim()
+  };
+  }).filter(s => s.Code && s.Name && s.Situation === 'ACTIVE');
+  buildDropdowns();
+  setSyncStatus('Data staf dimuat', 'success');
 } catch (err) {
-console.error('Fetch staff error:', err);
-setSyncStatus('Gagal muat data staf', 'error');
-loadFallbackFromStorage();
+  console.error('Fetch staff error:', err);
+  setSyncStatus('Gagal muat data staf', 'error');
+  loadFallbackFromStorage();
 }
 }
 
@@ -747,6 +765,30 @@ setSyncStatus('Data dimuat untuk ' + code, 'success');
 function fillForm(raw) {
 if (!raw) return;
 
+// 新增：如果是从 OVERTIME sheet 来的，自动匹配并填充（仅当当前值为空或0时才覆盖）
+let otRecord = null;
+if (allOvertimeData && allOvertimeData.length > 0) {
+  otRecord = allOvertimeData.find(ot => String(ot['ID KOD'] || '').trim() === String(raw.Code).trim());
+  if (!otRecord) {
+    otRecord = allOvertimeData.find(ot => String(ot['NAME'] || '').trim().toUpperCase() === String(raw.Name || '').trim().toUpperCase());
+  }
+}
+
+if (otRecord) {
+  if (raw.TimeOTHour === undefined || raw.TimeOTHour === null || raw.TimeOTHour === '' || num(raw.TimeOTHour) === 0) {
+    raw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
+  }
+  if (raw.TimeOTAmount === undefined || raw.TimeOTAmount === null || raw.TimeOTAmount === '' || num(raw.TimeOTAmount) === 0) {
+    raw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
+  }
+  if (raw.DailyOTDay === undefined || raw.DailyOTDay === null || raw.DailyOTDay === '' || num(raw.DailyOTDay) === 0) {
+    raw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
+  }
+  if (raw.DailyOTAmount === undefined || raw.DailyOTAmount === null || raw.DailyOTAmount === '' || num(raw.DailyOTAmount) === 0) {
+    raw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
+  }
+}
+
 const staff = activeStaffList.find(s => String(s.Code) === String(raw.Code));
 
 if (staff) {
@@ -823,6 +865,7 @@ SLRBankNama: staff.BankNama || '', SLRBankAccountNo: staff.BankAccountNo || '',
 SLREPF: staff.EPF || '', SLRPERKESO: staff.PERKESO || '', SLREIS: staff.EIS || '',
 TotalGajiKasar: 0, TotalPotongan: 0, TotalSalaryPay: 0, LastUpdated: ''
 };
+// fillForm 里会检测如果 OT 为 0 则自动从 OVERTIME 拉取最新数据填充
 fillForm(defaultObj);
 setSyncStatus('Data telah direset · Belum disimpan', '');
 alert('✅ Semua medan telah direset ke default.\nKlik "Simpan & Sync" untuk menyimpan perubahan ini.');
@@ -940,67 +983,97 @@ btn.disabled = true;
 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menarik...';
 }
 try {
-const res = await fetch(SCRIPT_URL, {
-method: 'POST',
-headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-body: JSON.stringify({
-action: 'getEmployeeDetail',
-Code: currentRaw.Code,
-Name: currentRaw.Name
-})
-});
-const result = await res.json();
-if (result.status === 'success' && result.data) {
-const sheetData = result.data;
-const staff = activeStaffList.find(s => String(s.Code) === String(currentRaw.Code));
+  // 重新拉取 Overtime 数据
+  await fetchOvertimeData();
 
-const merged = { ...currentRaw, ...sheetData };
-if (staff) {
-merged.Name = staff.Name;
-merged.GroupName = staff.GroupName;
-merged.Situation = staff.Situation;
-if (merged.Basic === undefined || merged.Basic === null || merged.Basic === '' || num(merged.Basic) === 0) {
-merged.Basic = staff.Salary;
-}
-}
+  const res = await fetch(SCRIPT_URL, {
+  method: 'POST',
+  headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+  body: JSON.stringify({
+  action: 'getEmployeeDetail',
+  Code: currentRaw.Code,
+  Name: currentRaw.Name
+  })
+  });
+  const result = await res.json();
+  
+  const staff = activeStaffList.find(s => String(s.Code) === String(currentRaw.Code));
+  
+  // 匹配 OVERTIME 记录
+  let otRecord = null;
+  if (allOvertimeData && allOvertimeData.length > 0) {
+    otRecord = allOvertimeData.find(ot => String(ot['ID KOD'] || '').trim() === String(currentRaw.Code).trim());
+    if (!otRecord) {
+      otRecord = allOvertimeData.find(ot => String(ot['NAME'] || '').trim().toUpperCase() === String(currentRaw.Name || '').trim().toUpperCase());
+    }
+  }
 
-if (merged.BasicSalary !== undefined && merged.BasicSalary !== null && merged.BasicSalary !== '') {
-if (num(merged.Basic) === 0 && num(merged.BasicSalary) > 0) {
-merged.Basic = num(merged.BasicSalary);
-}
-}
+  if (result.status === 'success' && result.data) {
+    const sheetData = result.data;
+    const merged = { ...currentRaw, ...sheetData };
+    
+    // 强制使用最新的 OVERTIME 数据覆盖
+    if (otRecord) {
+      merged.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
+      merged.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
+      merged.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
+      merged.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
+    }
 
-fillForm(merged);
-const idx = allEmployees.findIndex(e => String(e.Code) === String(currentRaw.Code));
-if (idx !== -1) allEmployees[idx] = merged;
-else allEmployees.push(merged);
-try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees)); } catch(e) {}
-const lastUpdated = sheetData.LastUpdated || '—';
-setSyncStatus('Data dari Sheet dimuat · ' + lastUpdated, 'success');
-if (!silent) {
-alert('✅ Data berjaya dimuat dari LISTCALCULATION.\nTerakhir dikemas kini: ' + lastUpdated);
-}
-} else {
-if (staff) {
-if (currentRaw.SLRBankNama === undefined || currentRaw.SLRBankNama === null || currentRaw.SLRBankNama === '') currentRaw.SLRBankNama = staff.BankNama || '';
-if (currentRaw.SLRBankAccountNo === undefined || currentRaw.SLRBankAccountNo === null || currentRaw.SLRBankAccountNo === '') currentRaw.SLRBankAccountNo = staff.BankAccountNo || '';
-if (currentRaw.SLREPF === undefined || currentRaw.SLREPF === null || currentRaw.SLREPF === '') currentRaw.SLREPF = staff.EPF || '';
-if (currentRaw.SLRPERKESO === undefined || currentRaw.SLRPERKESO === null || currentRaw.SLRPERKESO === '') currentRaw.SLRPERKESO = staff.PERKESO || '';
-if (currentRaw.SLREIS === undefined || currentRaw.SLREIS === null || currentRaw.SLREIS === '') currentRaw.SLREIS = staff.EIS || '';
-}
-fillForm(currentRaw);
-setSyncStatus('Tiada data Sheet · Guna default StaffInfo', '');
-if (!silent) alert('Tiada data di Sheet untuk pekerja ini. Menggunakan data default dari StaffInfo.');
-}
+    if (staff) {
+      merged.Name = staff.Name;
+      merged.GroupName = staff.GroupName;
+      merged.Situation = staff.Situation;
+      if (merged.Basic === undefined || merged.Basic === null || merged.Basic === '' || num(merged.Basic) === 0) {
+        merged.Basic = staff.Salary;
+      }
+    }
+
+    if (merged.BasicSalary !== undefined && merged.BasicSalary !== null && merged.BasicSalary !== '') {
+      if (num(merged.Basic) === 0 && num(merged.BasicSalary) > 0) {
+        merged.Basic = num(merged.BasicSalary);
+      }
+    }
+
+    fillForm(merged);
+    const idx = allEmployees.findIndex(e => String(e.Code) === String(currentRaw.Code));
+    if (idx !== -1) allEmployees[idx] = merged;
+    else allEmployees.push(merged);
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees)); } catch(e) {}
+    const lastUpdated = sheetData.LastUpdated || '—';
+    setSyncStatus('Data dari Sheet & Overtime dimuat · ' + lastUpdated, 'success');
+    if (!silent) {
+      alert('✅ Data berjaya dimuat dari LISTCALCULATION & OVERTIME.\nTerakhir dikemas kini: ' + lastUpdated);
+    }
+  } else {
+    // 没有 LISTCALCULATION 数据时，尝试用 OVERTIME 数据覆盖
+    if (otRecord) {
+      currentRaw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
+      currentRaw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
+      currentRaw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
+      currentRaw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
+    }
+    
+    if (staff) {
+      if (currentRaw.SLRBankNama === undefined || currentRaw.SLRBankNama === null || currentRaw.SLRBankNama === '') currentRaw.SLRBankNama = staff.BankNama || '';
+      if (currentRaw.SLRBankAccountNo === undefined || currentRaw.SLRBankAccountNo === null || currentRaw.SLRBankAccountNo === '') currentRaw.SLRBankAccountNo = staff.BankAccountNo || '';
+      if (currentRaw.SLREPF === undefined || currentRaw.SLREPF === null || currentRaw.SLREPF === '') currentRaw.SLREPF = staff.EPF || '';
+      if (currentRaw.SLRPERKESO === undefined || currentRaw.SLRPERKESO === null || currentRaw.SLRPERKESO === '') currentRaw.SLRPERKESO = staff.PERKESO || '';
+      if (currentRaw.SLREIS === undefined || currentRaw.SLREIS === null || currentRaw.SLREIS === '') currentRaw.SLREIS = staff.EIS || '';
+    }
+    fillForm(currentRaw);
+    setSyncStatus('Tiada data LISTCALCULATION · Guna data Overtime & StaffInfo', '');
+    if (!silent) alert('Tiada data di LISTCALCULATION untuk pekerja ini. Menggunakan data dari Overtime dan StaffInfo.');
+  }
 } catch (err) {
-console.error('Sync from sheet error:', err);
-setSyncStatus('Gagal sync dari Sheet', 'error');
-if (!silent) alert('❌ Gagal sync dari Sheet: ' + err.message);
+  console.error('Sync from sheet error:', err);
+  setSyncStatus('Gagal sync dari Sheet', 'error');
+  if (!silent) alert('❌ Gagal sync dari Sheet: ' + err.message);
 } finally {
-if (btn) {
-btn.disabled = false;
-btn.innerHTML = originalText;
-}
+  if (btn) {
+  btn.disabled = false;
+  btn.innerHTML = originalText;
+  }
 }
 }
 
