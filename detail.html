@@ -326,12 +326,40 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
 
 <div class="columns">
 <section class="panel panel-income">
-<div class="panel-head"><span class="panel-icon"><i class="fas fa-plus"></i></span><h2>Pendapatan / Earnings</h2></div>
+<div class="panel-head">
+    <span class="panel-icon"><i class="fas fa-plus"></i></span>
+    <h2>Pendapatan / Earnings</h2>
+    <button type="button" class="mini-btn" id="resetOTBtn" style="margin-left:auto;" title="Reset OT dari OVERTIME"><i class="fas fa-undo"></i> Reset OT</button>
+</div>
 <div class="panel-body">
-<div class="line-item"><label for="timeOTHour"><i class="fas fa-clock"></i> Time OT (Jam)</label><div class="amount"><span class="cur">H</span><input type="number" step="0.01" id="timeOTHour" value="0"></div></div>
-<div class="line-item"><label for="timeOTAmount"><i class="fas fa-money-bill"></i> Time OT (RM)</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="timeOTAmount" value="0"></div></div>
-<div class="line-item"><label for="dailyOTDay"><i class="fas fa-calendar-day"></i> Daily OT (Hari)</label><div class="amount"><span class="cur">D</span><input type="number" step="0.01" id="dailyOTDay" value="0"></div></div>
-<div class="line-item"><label for="dailyOTAmount"><i class="fas fa-money-bill"></i> Daily OT (RM)</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="dailyOTAmount" value="0"></div></div>
+<div class="line-item">
+    <label for="timeOTHour"><i class="fas fa-clock"></i> Time OT (Jam)</label>
+    <div style="display:flex; gap:4px; align-items:center;">
+        <div class="amount"><span class="cur">H</span><input type="number" step="0.01" id="timeOTHour" value="0.00" readonly></div>
+        <button type="button" class="mini-edit-btn" id="btnEditTimeOTHour" title="Edit manual"><i class="fas fa-pen"></i></button>
+    </div>
+</div>
+<div class="line-item">
+    <label for="timeOTAmount"><i class="fas fa-money-bill"></i> Time OT (RM)</label>
+    <div style="display:flex; gap:4px; align-items:center;">
+        <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="timeOTAmount" value="0.00" readonly></div>
+        <button type="button" class="mini-edit-btn" id="btnEditTimeOTAmount" title="Edit manual"><i class="fas fa-pen"></i></button>
+    </div>
+</div>
+<div class="line-item">
+    <label for="dailyOTDay"><i class="fas fa-calendar-day"></i> Daily OT (Hari)</label>
+    <div style="display:flex; gap:4px; align-items:center;">
+        <div class="amount"><span class="cur">D</span><input type="number" step="0.01" id="dailyOTDay" value="0.00" readonly></div>
+        <button type="button" class="mini-edit-btn" id="btnEditDailyOTDay" title="Edit manual"><i class="fas fa-pen"></i></button>
+    </div>
+</div>
+<div class="line-item">
+    <label for="dailyOTAmount"><i class="fas fa-money-bill"></i> Daily OT (RM)</label>
+    <div style="display:flex; gap:4px; align-items:center;">
+        <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="dailyOTAmount" value="0.00" readonly></div>
+        <button type="button" class="mini-edit-btn" id="btnEditDailyOTAmount" title="Edit manual"><i class="fas fa-pen"></i></button>
+    </div>
+</div>
 <div class="line-item"><label for="allowance"><i class="fas fa-hand-holding-usd"></i> Allowance</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="allowance" value="0"></div></div>
 <div class="line-item"><label for="commision"><i class="fas fa-percent"></i> Commission</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="commision" value="0"></div></div>
 <div class="line-item"><label for="incentives"><i class="fas fa-gift"></i> Incentives</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="incentives" value="0"></div></div>
@@ -494,15 +522,22 @@ bankNama: 'SLRBankNama', bankAcc: 'SLRBankAccountNo',
 epfNo: 'SLREPF', socsoNo: 'SLRPERKESO', eisNo: 'SLREIS'
 };
 const TEXT_FIELDS = new Set(['bankNama', 'bankAcc', 'epfNo', 'socsoNo', 'eisNo']);
+const NUM_2DEC_FIELDS = new Set(['timeOTHour', 'timeOTAmount', 'dailyOTDay', 'dailyOTAmount']); // 需要格式化为2位小数的字段
+
 const el = id => document.getElementById(id);
 const inputs = {};
 Object.keys(FIELD_MAP).forEach(id => { inputs[id] = el(id); });
 let currentRaw = null;
 let allEmployees = [];
-let allOvertimeData = []; // 新增：存储 OVERTIME 数据
+let allOvertimeData = [];
 let activeStaffList = [];
 let SCRIPT_URL = '';
+
 const MANUAL_FIELDS = [
+{ inputId: 'timeOTHour', btnId: 'btnEditTimeOTHour', rawKey: 'TimeOTHour' },
+{ inputId: 'timeOTAmount', btnId: 'btnEditTimeOTAmount', rawKey: 'TimeOTAmount' },
+{ inputId: 'dailyOTDay', btnId: 'btnEditDailyOTDay', rawKey: 'DailyOTDay' },
+{ inputId: 'dailyOTAmount', btnId: 'btnEditDailyOTAmount', rawKey: 'DailyOTAmount' },
 { inputId: 'bankNama', btnId: 'btnEditBankNama', rawKey: 'SLRBankNama', staffKey: 'BankNama' },
 { inputId: 'bankAcc',  btnId: 'btnEditBankAcc',  rawKey: 'SLRBankAccountNo', staffKey: 'BankAccountNo' },
 { inputId: 'epfNo',    btnId: 'btnEditEpfNo',    rawKey: 'SLREPF', staffKey: 'EPF' },
@@ -532,7 +567,6 @@ else { SCRIPT_URL = ''; el('deployUrlDisplay').value = ''; el('deployUrlDisplay'
 } catch (e) { SCRIPT_URL = ''; el('urlStatusDot').className = 'status-dot err'; }
 }
 
-// 新增：获取 OVERTIME sheet 数据
 async function fetchOvertimeData() {
   if (!SCRIPT_URL) return;
   try {
@@ -628,9 +662,7 @@ async function fetchStaffBasics() {
 if (!SCRIPT_URL) { setSyncStatus('URL belum ditetapkan. Sila tetapkan di Dashboard.', 'error'); return; }
 setSyncStatus('Memuatkan data staf...', '');
 try {
-  // 先拉取 Overtime 数据
   await fetchOvertimeData();
-
   const res = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
   const data = await res.json();
   let staffRaw = [];
@@ -765,7 +797,6 @@ setSyncStatus('Data dimuat untuk ' + code, 'success');
 function fillForm(raw) {
 if (!raw) return;
 
-// 新增：如果是从 OVERTIME sheet 来的，自动匹配并填充（仅当当前值为空或0时才覆盖）
 let otRecord = null;
 if (allOvertimeData && allOvertimeData.length > 0) {
   otRecord = allOvertimeData.find(ot => String(ot['ID KOD'] || '').trim() === String(raw.Code).trim());
@@ -774,6 +805,7 @@ if (allOvertimeData && allOvertimeData.length > 0) {
   }
 }
 
+// 优先 LISTCALCULATION，如果没有则用 OVERTIME
 if (otRecord) {
   if (raw.TimeOTHour === undefined || raw.TimeOTHour === null || raw.TimeOTHour === '' || num(raw.TimeOTHour) === 0) {
     raw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
@@ -817,8 +849,13 @@ Object.entries(FIELD_MAP).forEach(([id, key]) => {
 const inp = inputs[id];
 if (!inp) return;
 const v = raw[key];
-if (TEXT_FIELDS.has(id)) inp.value = (v === undefined || v === null || v === '') ? '—' : String(v);
-else inp.value = (v === undefined || v === null || v === '') ? 0 : num(v);
+if (TEXT_FIELDS.has(id)) {
+  inp.value = (v === undefined || v === null || v === '') ? '—' : String(v);
+} else if (NUM_2DEC_FIELDS.has(id)) {
+  inp.value = num(v).toFixed(2); // OT 格式化为两位小数
+} else {
+  inp.value = (v === undefined || v === null || v === '') ? 0 : num(v);
+}
 });
 MANUAL_FIELDS.forEach(f => {
 const inp = el(f.inputId);
@@ -842,7 +879,14 @@ inp.focus(); if (inp.select) inp.select();
 btn.classList.add('editing'); btn.innerHTML = '<i class="fas fa-check"></i>';
 } else {
 btn.classList.remove('editing'); btn.innerHTML = '<i class="fas fa-pen"></i>';
-if (currentRaw) currentRaw[field.rawKey] = inp.value;
+if (currentRaw) {
+  if (NUM_2DEC_FIELDS.has(field.inputId)) {
+    currentRaw[field.rawKey] = num(inp.value);
+    inp.value = num(inp.value).toFixed(2); // 退出编辑时格式化
+  } else {
+    currentRaw[field.rawKey] = inp.value;
+  }
+}
 }
 }
 
@@ -865,7 +909,6 @@ SLRBankNama: staff.BankNama || '', SLRBankAccountNo: staff.BankAccountNo || '',
 SLREPF: staff.EPF || '', SLRPERKESO: staff.PERKESO || '', SLREIS: staff.EIS || '',
 TotalGajiKasar: 0, TotalPotongan: 0, TotalSalaryPay: 0, LastUpdated: ''
 };
-// fillForm 里会检测如果 OT 为 0 则自动从 OVERTIME 拉取最新数据填充
 fillForm(defaultObj);
 setSyncStatus('Data telah direset · Belum disimpan', '');
 alert('✅ Semua medan telah direset ke default.\nKlik "Simpan & Sync" untuk menyimpan perubahan ini.');
@@ -983,7 +1026,6 @@ btn.disabled = true;
 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menarik...';
 }
 try {
-  // 重新拉取 Overtime 数据
   await fetchOvertimeData();
 
   const res = await fetch(SCRIPT_URL, {
@@ -999,7 +1041,6 @@ try {
   
   const staff = activeStaffList.find(s => String(s.Code) === String(currentRaw.Code));
   
-  // 匹配 OVERTIME 记录
   let otRecord = null;
   if (allOvertimeData && allOvertimeData.length > 0) {
     otRecord = allOvertimeData.find(ot => String(ot['ID KOD'] || '').trim() === String(currentRaw.Code).trim());
@@ -1012,12 +1053,19 @@ try {
     const sheetData = result.data;
     const merged = { ...currentRaw, ...sheetData };
     
-    // 强制使用最新的 OVERTIME 数据覆盖
     if (otRecord) {
-      merged.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
-      merged.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
-      merged.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
-      merged.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
+      if (merged.TimeOTHour === undefined || merged.TimeOTHour === null || merged.TimeOTHour === '' || num(merged.TimeOTHour) === 0) {
+        merged.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
+      }
+      if (merged.TimeOTAmount === undefined || merged.TimeOTAmount === null || merged.TimeOTAmount === '' || num(merged.TimeOTAmount) === 0) {
+        merged.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
+      }
+      if (merged.DailyOTDay === undefined || merged.DailyOTDay === null || merged.DailyOTDay === '' || num(merged.DailyOTDay) === 0) {
+        merged.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
+      }
+      if (merged.DailyOTAmount === undefined || merged.DailyOTAmount === null || merged.DailyOTAmount === '' || num(merged.DailyOTAmount) === 0) {
+        merged.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
+      }
     }
 
     if (staff) {
@@ -1046,12 +1094,11 @@ try {
       alert('✅ Data berjaya dimuat dari LISTCALCULATION & OVERTIME.\nTerakhir dikemas kini: ' + lastUpdated);
     }
   } else {
-    // 没有 LISTCALCULATION 数据时，尝试用 OVERTIME 数据覆盖
     if (otRecord) {
-      currentRaw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
-      currentRaw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
-      currentRaw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
-      currentRaw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
+      if (currentRaw.TimeOTHour === undefined || currentRaw.TimeOTHour === null || currentRaw.TimeOTHour === '' || num(currentRaw.TimeOTHour) === 0) currentRaw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
+      if (currentRaw.TimeOTAmount === undefined || currentRaw.TimeOTAmount === null || currentRaw.TimeOTAmount === '' || num(currentRaw.TimeOTAmount) === 0) currentRaw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
+      if (currentRaw.DailyOTDay === undefined || currentRaw.DailyOTDay === null || currentRaw.DailyOTDay === '' || num(currentRaw.DailyOTDay) === 0) currentRaw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
+      if (currentRaw.DailyOTAmount === undefined || currentRaw.DailyOTAmount === null || currentRaw.DailyOTAmount === '' || num(currentRaw.DailyOTAmount) === 0) currentRaw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
     }
     
     if (staff) {
@@ -1109,11 +1156,48 @@ else fetchStaffBasics();
 });
 el('printBtn').addEventListener('click', () => window.print());
 el('autoCalcBtn').addEventListener('click', autoCalcStatutory);
+
+// 新增：Reset OT 按钮逻辑
+el('resetOTBtn').addEventListener('click', () => {
+    if (!currentRaw || !currentRaw.Code) { alert('Sila pilih pekerja dahulu.'); return; }
+    let otRecord = null;
+    if (allOvertimeData && allOvertimeData.length > 0) {
+        otRecord = allOvertimeData.find(ot => String(ot['ID KOD'] || '').trim() === String(currentRaw.Code).trim());
+        if (!otRecord) {
+            otRecord = allOvertimeData.find(ot => String(ot['NAME'] || '').trim().toUpperCase() === String(currentRaw.Name || '').trim().toUpperCase());
+        }
+    }
+    if (otRecord) {
+        currentRaw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
+        currentRaw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
+        currentRaw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
+        currentRaw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
+        
+        inputs.timeOTHour.value = currentRaw.TimeOTHour.toFixed(2);
+        inputs.timeOTAmount.value = currentRaw.TimeOTAmount.toFixed(2);
+        inputs.dailyOTDay.value = currentRaw.DailyOTDay.toFixed(2);
+        inputs.dailyOTAmount.value = currentRaw.DailyOTAmount.toFixed(2);
+        
+        updateCalc();
+        setSyncStatus('OT telah direset berdasarkan data OVERTIME terkini', 'success');
+    } else {
+        alert('⚠️ Tiada data OVERTIME untuk pekerja ini.');
+    }
+});
+
 MANUAL_FIELDS.forEach(field => {
 const inp = el(field.inputId);
 const btn = el(field.btnId);
 if (btn) btn.addEventListener('click', () => toggleEditField(field));
-if (inp) inp.addEventListener('input', (e) => { if (currentRaw) currentRaw[field.rawKey] = e.target.value; });
+if (inp) inp.addEventListener('input', (e) => { 
+    if (currentRaw) {
+        if (NUM_2DEC_FIELDS.has(field.inputId)) {
+            currentRaw[field.rawKey] = num(e.target.value);
+        } else {
+            currentRaw[field.rawKey] = e.target.value;
+        }
+    } 
+});
 });
 document.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === 's') { e.preventDefault(); saveAndSync(); } });
 window.addEventListener('storage', (e) => {
