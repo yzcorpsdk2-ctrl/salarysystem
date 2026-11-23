@@ -548,6 +548,17 @@ const editStates = {};
 const RM_FMT = new Intl.NumberFormat('ms-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 function num(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
 function fmtRM(v) { return 'RM ' + RM_FMT.format(num(v)); }
+
+// 新增：判断 4 个 OT 字段是否全部为 0 或空
+function isAllOtZero(raw) {
+    if (!raw) return true;
+    const v1 = num(raw.TimeOTHour);
+    const v2 = num(raw.TimeOTAmount);
+    const v3 = num(raw.DailyOTDay);
+    const v4 = num(raw.DailyOTAmount);
+    return v1 === 0 && v2 === 0 && v3 === 0 && v4 === 0;
+}
+
 function setSyncStatus(msg, type) {
 const s = el('syncStatus');
 if (!s) return;
@@ -805,20 +816,12 @@ if (allOvertimeData && allOvertimeData.length > 0) {
   }
 }
 
-// 优先 LISTCALCULATION，如果没有则用 OVERTIME
-if (otRecord) {
-  if (raw.TimeOTHour === undefined || raw.TimeOTHour === null || raw.TimeOTHour === '' || num(raw.TimeOTHour) === 0) {
-    raw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
-  }
-  if (raw.TimeOTAmount === undefined || raw.TimeOTAmount === null || raw.TimeOTAmount === '' || num(raw.TimeOTAmount) === 0) {
-    raw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
-  }
-  if (raw.DailyOTDay === undefined || raw.DailyOTDay === null || raw.DailyOTDay === '' || num(raw.DailyOTDay) === 0) {
-    raw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
-  }
-  if (raw.DailyOTAmount === undefined || raw.DailyOTAmount === null || raw.DailyOTAmount === '' || num(raw.DailyOTAmount) === 0) {
-    raw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
-  }
+// 【核心修改】判断 4 个 OT 字段是否全为 0，如果是，才从 OVERTIME 抓取
+if (isAllOtZero(raw) && otRecord) {
+  raw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
+  raw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
+  raw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
+  raw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
 }
 
 const staff = activeStaffList.find(s => String(s.Code) === String(raw.Code));
@@ -1053,19 +1056,12 @@ try {
     const sheetData = result.data;
     const merged = { ...currentRaw, ...sheetData };
     
-    if (otRecord) {
-      if (merged.TimeOTHour === undefined || merged.TimeOTHour === null || merged.TimeOTHour === '' || num(merged.TimeOTHour) === 0) {
-        merged.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
-      }
-      if (merged.TimeOTAmount === undefined || merged.TimeOTAmount === null || merged.TimeOTAmount === '' || num(merged.TimeOTAmount) === 0) {
-        merged.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
-      }
-      if (merged.DailyOTDay === undefined || merged.DailyOTDay === null || merged.DailyOTDay === '' || num(merged.DailyOTDay) === 0) {
-        merged.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
-      }
-      if (merged.DailyOTAmount === undefined || merged.DailyOTAmount === null || merged.DailyOTAmount === '' || num(merged.DailyOTAmount) === 0) {
-        merged.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
-      }
+    // 【核心修改】只有 merged 里的 4 个 OT 字段全为 0 时，才从 OVERTIME 抓取覆盖
+    if (isAllOtZero(merged) && otRecord) {
+      merged.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
+      merged.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
+      merged.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
+      merged.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
     }
 
     if (staff) {
@@ -1094,11 +1090,12 @@ try {
       alert('✅ Data berjaya dimuat dari LISTCALCULATION & OVERTIME.\nTerakhir dikemas kini: ' + lastUpdated);
     }
   } else {
-    if (otRecord) {
-      if (currentRaw.TimeOTHour === undefined || currentRaw.TimeOTHour === null || currentRaw.TimeOTHour === '' || num(currentRaw.TimeOTHour) === 0) currentRaw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
-      if (currentRaw.TimeOTAmount === undefined || currentRaw.TimeOTAmount === null || currentRaw.TimeOTAmount === '' || num(currentRaw.TimeOTAmount) === 0) currentRaw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
-      if (currentRaw.DailyOTDay === undefined || currentRaw.DailyOTDay === null || currentRaw.DailyOTDay === '' || num(currentRaw.DailyOTDay) === 0) currentRaw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
-      if (currentRaw.DailyOTAmount === undefined || currentRaw.DailyOTAmount === null || currentRaw.DailyOTAmount === '' || num(currentRaw.DailyOTAmount) === 0) currentRaw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
+    // 如果 LISTCALCULATION 没数据，默认 currentRaw 的 OT 可能是有值的（来自于本地缓存），但也做一次判断
+    if (isAllOtZero(currentRaw) && otRecord) {
+      currentRaw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
+      currentRaw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
+      currentRaw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
+      currentRaw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
     }
     
     if (staff) {
@@ -1168,6 +1165,7 @@ el('resetOTBtn').addEventListener('click', () => {
         }
     }
     if (otRecord) {
+        // 强制覆盖，不判断是否为0，因为这是手动重置按钮
         currentRaw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
         currentRaw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
         currentRaw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
