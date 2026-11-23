@@ -373,7 +373,8 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
 <div class="line-item"><label for="unpaidLeave"><i class="fas fa-calendar-times"></i> Cuti Tanpa Gaji</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="unpaidLeave" value="0"></div></div>
 <div class="line-item"><label for="pinjaman"><i class="fas fa-hand-holding-usd"></i> Pinjaman</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="pinjaman" value="0"></div></div>
 <div class="line-item"><label for="deductionLain"><i class="fas fa-ellipsis-h"></i> Potongan Lain</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="deductionLain" value="0"></div></div>
-<div class="line-item"><label for="halfDaysLeave"><i class="fas fa-hourglass-half"></i> Cuti Setengah Hari (RM)</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="halfDaysLeave" value="0"></div></div>
+<!-- 修改了这里：Cuti Setengah Hari 改为 Potongan Lain 2 -->
+<div class="line-item"><label for="potonganLain2"><i class="fas fa-file-invoice"></i> Potongan Lain 2</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="potonganLain2" value="0"></div></div>
 </div>
 <div class="panel-total"><span><i class="fas fa-calculator"></i> Jumlah Potongan</span><strong id="totalPotongan">RM 0.00</strong></div>
 </section>
@@ -511,8 +512,9 @@ const FIELD_MAP = {
 timeOTHour: 'TimeOTHour', timeOTAmount: 'TimeOTAmount',
 dailyOTDay: 'DailyOTDay', dailyOTAmount: 'DailyOTAmount',
 allowance: 'Allowance2', commision: 'Commission', incentives: 'Incentives',
-unpaidLeave: 'UnpaidLeave', pinjaman: 'Pinjaman', deductionLain: 'Deduction',
-halfDaysLeave: 'HalfDays', annualLeaveDays: 'AnnualLeaveDays', sickLeaveDays: 'SickLeaveDays',
+unpaidLeave: 'UnpaidLeave', pinjaman: 'Pinjaman', deductionLain: 'Deduction', 
+potonganLain2: 'PotonganLain2', // <-- 已更新
+annualLeaveDays: 'AnnualLeaveDays', sickLeaveDays: 'SickLeaveDays',
 salaryEpf: 'EPFSalary', salarySocso: 'SOCSOSalary', salaryEis: 'EISSalary', salary24jam: 'LindungSalary',
 epfEmployee: 'EPF_Employee', epfEmployer: 'EPF_Employer',
 socsoEmployee: 'SOCSO_Employee', socsoEmployer: 'SOCSO_Employer',
@@ -530,6 +532,8 @@ Object.keys(FIELD_MAP).forEach(id => { inputs[id] = el(id); });
 let currentRaw = null;
 let allEmployees = [];
 let allOvertimeData = [];
+let allSheetData = []; // 新增：保存 SHEET 数据
+let allAlslData = []; // 新增：保存 ALSLREMAIN 数据
 let activeStaffList = [];
 let SCRIPT_URL = '';
 
@@ -591,6 +595,30 @@ async function fetchOvertimeData() {
   }
 }
 
+// 新增：拉取 SHEET 数据
+async function fetchSheetData() {
+  if (!SCRIPT_URL) return;
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=getSheetData&_t=${Date.now()}`);
+    const data = await res.json();
+    if (data && data.status === 'success' && Array.isArray(data.data)) {
+      allSheetData = data.data;
+    }
+  } catch (e) { console.error('Fetch SHEET error:', e); }
+}
+
+// 新增：拉取 ALSLREMAIN 数据
+async function fetchALSLData() {
+  if (!SCRIPT_URL) return;
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=getALSLData&_t=${Date.now()}`);
+    const data = await res.json();
+    if (data && data.status === 'success' && Array.isArray(data.data)) {
+      allAlslData = data.data;
+    }
+  } catch (e) { console.error('Fetch ALSL error:', e); }
+}
+
 function updateCalc() {
 const basic = num(el('inputGajiAsas').value);
 const commission = num(inputs.commision.value);
@@ -612,8 +640,9 @@ const income = basic
 + allowance + commission
 + num(inputs.incentives.value);
 
+// 修改这里：去掉了 halfDaysLeave，改成了 potonganLain2
 const ded = num(inputs.unpaidLeave.value) + num(inputs.pinjaman.value)
-+ num(inputs.deductionLain.value) + num(inputs.halfDaysLeave.value);
++ num(inputs.deductionLain.value) + num(inputs.potonganLain2.value);
 
 const statutoryDed = num(inputs.epfEmployee.value) + num(inputs.socsoEmployee.value) 
 + num(inputs.eisEmployee.value) + num(inputs.lindung24jam.value);
@@ -673,7 +702,9 @@ async function fetchStaffBasics() {
 if (!SCRIPT_URL) { setSyncStatus('URL belum ditetapkan. Sila tetapkan di Dashboard.', 'error'); return; }
 setSyncStatus('Memuatkan data staf...', '');
 try {
-  await fetchOvertimeData();
+  // 同时拉取 OT, SHEET 和 ALSLREMAIN 数据
+  await Promise.all([fetchOvertimeData(), fetchSheetData(), fetchALSLData()]);
+  
   const res = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
   const data = await res.json();
   let staffRaw = [];
@@ -791,7 +822,7 @@ Code: staffObj.Code, Name: staffObj.Name, GroupName: staffObj.GroupName, Situati
 BasicSalary: staffObj.Salary, Basic: staffObj.Salary,
 TimeOTHour: 0, TimeOTAmount: 0, DailyOTDay: 0, DailyOTAmount: 0,
 Allowance2: 0, Commission: 0, Incentives: 0,
-UnpaidLeave: 0, Pinjaman: 0, Deduction: 0, HalfDays: 0,
+UnpaidLeave: 0, Pinjaman: 0, Deduction: 0, PotonganLain2: 0, // 这里改动
 AnnualLeaveDays: 0, SickLeaveDays: 0,
 EPFSalary: 0, SOCSOSalary: 0, EISSalary: 0, LindungSalary: 0,
 EPF_Employee: 0, EPF_Employer: 0, SOCSO_Employee: 0, SOCSO_Employer: 0,
@@ -823,6 +854,41 @@ if (isAllOtZero(raw) && otRecord) {
   raw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
   raw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
 }
+
+// ================= 新增：自动抓取 CUTI TANPA GAJI & LEAVE DAYS =================
+const targetName = String(raw.Name || '').trim().toUpperCase();
+const targetCode = String(raw.Code || '').trim();
+
+// 1. 从 SHEET 找 CUTI TANPA GAJI (TOTAL DEDUCTION 总和)
+if (allSheetData && allSheetData.length > 0) {
+  let totalDeduction = 0;
+  allSheetData.forEach(r => {
+    const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
+    const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
+    if ((targetName && rName === targetName) || (targetCode && rCode === targetCode)) {
+      totalDeduction += num(r['TOTAL DEDUCTION(RM)']);
+    }
+  });
+  
+  if (num(raw.UnpaidLeave) === 0 && totalDeduction > 0) {
+    raw.UnpaidLeave = totalDeduction;
+  }
+}
+
+// 2. 从 ALSLREMAIN 找 CUTI TAHUNAN & CUTI SAKIT
+if (allAlslData && allAlslData.length > 0) {
+  const alslRecord = allAlslData.find(r => {
+    const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
+    const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
+    return (targetName && rName === targetName) || (targetCode && rCode === targetCode);
+  });
+
+  if (alslRecord) {
+    if (num(raw.AnnualLeaveDays) === 0) raw.AnnualLeaveDays = num(alslRecord['THISAL']);
+    if (num(raw.SickLeaveDays) === 0) raw.SickLeaveDays = num(alslRecord['THISSL']);
+  }
+}
+// ================= 新增结束 =================
 
 const staff = activeStaffList.find(s => String(s.Code) === String(raw.Code));
 
@@ -903,7 +969,7 @@ Code: staff.Code, Name: staff.Name, GroupName: staff.GroupName, Situation: staff
 BasicSalary: staff.Salary, Basic: staff.Salary,
 TimeOTHour: 0, TimeOTAmount: 0, DailyOTDay: 0, DailyOTAmount: 0,
 Allowance2: 0, Commission: 0, Incentives: 0,
-UnpaidLeave: 0, Pinjaman: 0, Deduction: 0, HalfDays: 0,
+UnpaidLeave: 0, Pinjaman: 0, Deduction: 0, PotonganLain2: 0, // 这里改动
 AnnualLeaveDays: 0, SickLeaveDays: 0,
 EPFSalary: 0, SOCSOSalary: 0, EISSalary: 0, LindungSalary: 0,
 EPF_Employee: 0, EPF_Employer: 0, SOCSO_Employee: 0, SOCSO_Employer: 0,
@@ -1029,7 +1095,8 @@ btn.disabled = true;
 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menarik...';
 }
 try {
-  await fetchOvertimeData();
+  // 同时拉取最新数据
+  await Promise.all([fetchOvertimeData(), fetchSheetData(), fetchALSLData()]);
 
   const res = await fetch(SCRIPT_URL, {
   method: 'POST',
@@ -1062,6 +1129,34 @@ try {
       merged.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
       merged.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
       merged.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
+    }
+
+    // 强制覆盖 Cuti Tanpa Gaji (Sum of TOTAL DEDUCTION) 和 AL/SL
+    const targetName = String(merged.Name || '').trim().toUpperCase();
+    const targetCode = String(merged.Code || '').trim();
+    
+    let totalDed = 0;
+    if (allSheetData && allSheetData.length > 0) {
+      allSheetData.forEach(r => {
+        const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
+        const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
+        if ((targetName && rName === targetName) || (targetCode && rCode === targetCode)) {
+          totalDed += num(r['TOTAL DEDUCTION(RM)']);
+        }
+      });
+      if (totalDed > 0) merged.UnpaidLeave = totalDed;
+    }
+
+    if (allAlslData && allAlslData.length > 0) {
+      const alsl = allAlslData.find(r => {
+        const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
+        const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
+        return (targetName && rName === targetName) || (targetCode && rCode === targetCode);
+      });
+      if (alsl) {
+        merged.AnnualLeaveDays = num(alsl['THISAL']);
+        merged.SickLeaveDays = num(alsl['THISSL']);
+      }
     }
 
     if (staff) {
@@ -1098,6 +1193,34 @@ try {
       currentRaw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
     }
     
+    // 强制覆盖 AL/SL 和 Cuti Tanpa Gaji
+    const targetName = String(currentRaw.Name || '').trim().toUpperCase();
+    const targetCode = String(currentRaw.Code || '').trim();
+    
+    let totalDed = 0;
+    if (allSheetData && allSheetData.length > 0) {
+      allSheetData.forEach(r => {
+        const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
+        const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
+        if ((targetName && rName === targetName) || (targetCode && rCode === targetCode)) {
+          totalDed += num(r['TOTAL DEDUCTION(RM)']);
+        }
+      });
+      if (totalDed > 0) currentRaw.UnpaidLeave = totalDed;
+    }
+
+    if (allAlslData && allAlslData.length > 0) {
+      const alsl = allAlslData.find(r => {
+        const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
+        const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
+        return (targetName && rName === targetName) || (targetCode && rCode === targetCode);
+      });
+      if (alsl) {
+        currentRaw.AnnualLeaveDays = num(alsl['THISAL']);
+        currentRaw.SickLeaveDays = num(alsl['THISSL']);
+      }
+    }
+
     if (staff) {
       if (currentRaw.SLRBankNama === undefined || currentRaw.SLRBankNama === null || currentRaw.SLRBankNama === '') currentRaw.SLRBankNama = staff.BankNama || '';
       if (currentRaw.SLRBankAccountNo === undefined || currentRaw.SLRBankAccountNo === null || currentRaw.SLRBankAccountNo === '') currentRaw.SLRBankAccountNo = staff.BankAccountNo || '';
