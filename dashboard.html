@@ -28,11 +28,11 @@ font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 background: var(--epf-bg); color: var(--epf-text);
 min-height: 100vh; line-height: 1.5; font-size: 14px;
 -webkit-font-smoothing: antialiased;
-overflow: hidden; /* 防止整个页面滚动 */
+overflow: hidden; /* 防止整个页面滚动，由内部区域控制滚动 */
 }
 
 /* ============================================================
-     NEW NAVBAR STYLES
+     NAVBAR STYLES (保持原有样式)
      ============================================================ */
 .navbar {
 position: sticky; top: 0; z-index: 200;
@@ -181,29 +181,25 @@ cursor: pointer; transition: 0.15s; white-space: nowrap;
 .url-box button:hover { background: #15406f; }
 
 /* ============================================================
-     新版 LAYOUT：左侧栏 + 右侧内容区
+     新版 LAYOUT (蓝框/红框布局)
      ============================================================ */
 .main-layout { 
     display: flex; 
     align-items: stretch; 
-    height: calc(100vh - 120px); 
-    max-width: 1600px; 
+    height: calc(100vh - 120px); /* 减去 topbar 和 padding */
+    max-width: 1800px; 
     margin: 0 auto; 
     padding: 1rem 1.75rem; 
     gap: 20px; 
 }
 
-/* 左侧栏 */
+/* 左侧边栏 (对应您的红框) */
 .sidebar-left {
     width: 320px; 
     flex-shrink: 0;
     display: flex; flex-direction: column; gap: 1rem;
-    height: 100%;
-    overflow-y: auto;
+    height: 100%; /* 撑满整个高度 */
 }
-/* 隐藏左侧栏滚动条 */
-.sidebar-left::-webkit-scrollbar { width: 0; } 
-
 .search-box { position: relative; width: 100%; }
 .search-box input {
 width: 100%; padding: 0.7rem 0.85rem 0.7rem 2.2rem;
@@ -217,7 +213,8 @@ transition: 0.15s; box-shadow: var(--shadow-sm);
 .notice-board {
 background: #ffffff; border: 1px solid var(--epf-border); border-radius: 10px;
 box-shadow: var(--shadow-sm); overflow: hidden; display: flex; flex-direction: column;
-flex: 1; /* 占据剩余空间 */
+flex: 1; /* 剩余空间全部留给这个区域，或者让它自然高度 */
+max-height: 350px; /* 限制最高高度 */
 }
 .notice-header {
 background: #fef2f2; border-bottom: 1px solid #fecaca; padding: 0.8rem 1rem;
@@ -228,7 +225,7 @@ font-weight: 700; font-size: 0.85rem;
 background: #ef4444; color: #fff; font-size: 0.65rem;
 padding: 2px 6px; border-radius: 10px; margin-left: auto;
 }
-.notice-list { overflow-y: auto; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.notice-list { overflow-y: auto; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
 .notice-list::-webkit-scrollbar { width: 6px; }
 .notice-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
 .notice-item {
@@ -251,75 +248,74 @@ border-radius: 6px; padding: 0.7rem; font-size: 0.78rem; transition: 0.15s;
     height: 100%;
 }
 
-/* ✅ 新增：顶部固定高度数据面板 (替代原统计面板) */
-.top-fixed-panel {
-    height: 240px; /* 固定高度 */
+/* ✅ 顶部大蓝框：按钮 + LISTCALCULATION 表格 */
+.top-blue-box {
     display: flex;
+    height: 250px; /* 固定高度 */
+    flex-shrink: 0;
     gap: 1rem;
-    flex-shrink: 0; /* 防止被压缩 */
 }
 
-/* 最左侧：功能按钮框 */
+/* 蓝框左侧：功能按钮 */
 .action-buttons-box {
-    width: 160px;
+    width: 140px;
     background: #ffffff; border: 1px solid var(--epf-border); border-radius: 10px;
     box-shadow: var(--shadow-sm);
     display: flex; flex-direction: column; padding: 1rem; gap: 0.8rem;
 }
 .action-buttons-box .title {
     font-size: 0.8rem; font-weight: 700; color: var(--epf-muted);
-    text-transform: uppercase; letter-spacing: 0.05em;
     text-align: center; margin-bottom: 0.5rem;
     border-bottom: 1px solid var(--epf-border-soft); padding-bottom: 0.5rem;
 }
-.btn-action {
-    width: 100%; justify-content: center;
-    padding: 0.6rem 0; font-size: 0.85rem;
-}
+.btn-action { width: 100%; justify-content: center; padding: 0.6rem 0; font-size: 0.82rem; }
 
-/* 右侧：计入员工数据框 */
-.included-data-box {
+/* 蓝框右侧：表格容器 */
+.summary-table-wrapper {
     flex: 1;
     background: #ffffff; border: 1px solid var(--epf-border); border-radius: 10px;
     box-shadow: var(--shadow-sm);
     display: flex; flex-direction: column;
     overflow: hidden;
 }
-.included-data-box .title {
-    font-size: 0.85rem; font-weight: 700; color: var(--epf-blue);
+.summary-table-header {
     padding: 0.8rem 1rem; border-bottom: 1px solid var(--epf-border-soft);
     background: var(--epf-blue-soft);
     display: flex; justify-content: space-between; align-items: center;
+    font-weight: 700; color: var(--epf-blue); font-size: 0.85rem;
 }
-.included-data-box .title span { font-size: 0.75rem; color: var(--epf-muted); font-weight: 500;}
-.data-list {
-    flex: 1; overflow-y: auto; padding: 0.5rem;
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.5rem;
-    align-content: start;
+.summary-table-header span { font-size: 0.75rem; color: var(--epf-muted); font-weight: 500; }
+.table-scroll-area {
+    flex: 1; overflow: auto;
 }
-.data-list::-webkit-scrollbar { width: 6px; }
-.data-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-.data-item {
-    background: #f8fafc; border: 1px solid #e2e8f0;
-    border-radius: 6px; padding: 0.6rem; font-size: 0.75rem;
-    display: flex; justify-content: space-between; align-items: center;
-}
-.data-item .name-code { display: flex; flex-direction: column; gap: 2px; }
-.data-item .name { font-weight: 700; color: var(--epf-text); }
-.data-item .code { color: var(--epf-muted); font-size: 0.65rem; }
-.data-item .amount { font-weight: 700; color: #0f7a54; }
+.table-scroll-area::-webkit-scrollbar { width: 8px; height: 8px; }
+.table-scroll-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
-/* 员工列表滚动容器 */
-.scrollable-employee-container {
+/* 表格样式 */
+.summary-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; white-space: nowrap; }
+.summary-table th {
+    position: sticky; top: 0; background: #f8fafc;
+    padding: 0.6rem 0.8rem; text-align: left; font-weight: 600; color: var(--epf-muted);
+    border-bottom: 1px solid var(--epf-border); z-index: 1;
+}
+.summary-table td {
+    padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--epf-border-soft);
+    color: var(--epf-text);
+}
+.summary-table tr:hover td { background: #f4f8fd; }
+.summary-table .text-right { text-align: right; font-variant-numeric: tabular-nums; }
+.summary-table .text-green { color: #0f7a54; font-weight: 700; }
+
+/* 底部卡片区域 */
+.bottom-cards-container {
     flex: 1;
     overflow-y: auto;
-    background: transparent;
     padding-right: 5px;
 }
-.scrollable-employee-container::-webkit-scrollbar { width: 8px; }
-.scrollable-employee-container::-webkit-scrollbar-track { background: var(--epf-bg); }
-.scrollable-employee-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-.scrollable-employee-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+.bottom-cards-container::-webkit-scrollbar { width: 8px; }
+.bottom-cards-container::-webkit-scrollbar-track { background: var(--epf-bg); }
+.bottom-cards-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+.bottom-cards-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
 .employee-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; padding-bottom: 2rem; }
 .employee-card {
@@ -345,8 +341,6 @@ background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transi
 .card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--epf-border-soft); font-size: 0.72rem; color: var(--epf-muted); }
 .card-footer .status-badge { display: inline-block; padding: 0.2rem 0.7rem; border-radius: 20px; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.03em; }
 .status-badge.active { background: #c6f6d5; color: #22543d; }
-.status-badge.pending { background: #fefcbf; color: #975a16; }
-.status-badge.inactive { background: #fed7d7; color: #9b2c2c; }
 .card-footer .arrow { font-size: 1rem; color: var(--epf-muted); transition: transform 0.15s; }
 .employee-card:hover .arrow { transform: translateX(3px); color: var(--epf-blue); }
 .empty-state { grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: #a7b7c9; font-size: 0.85rem; }
@@ -360,14 +354,13 @@ background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transi
 @media (max-width: 900px) {
     body { overflow: auto; }
     .main-layout { flex-direction: column; height: auto; }
-    .sidebar-left { width: 100%; height: auto; overflow-y: visible; }
-    .notice-board { max-height: 300px; }
-    .scrollable-employee-container { overflow-y: visible; }
-    .top-fixed-panel { height: auto; flex-direction: column; }
+    .sidebar-left { width: 100%; height: auto; }
+    .top-blue-box { flex-direction: column; height: auto; }
     .action-buttons-box { width: 100%; flex-direction: row; justify-content: center; align-items: center; }
     .action-buttons-box .title { display: none; }
     .action-buttons-box .btn-action { width: auto; padding: 0.5rem 1rem; }
-    .included-data-box { height: 250px; }
+    .summary-table-wrapper { height: 250px; }
+    .bottom-cards-container { overflow-y: visible; }
 }
 @media (max-width: 768px) {
 .navbar { padding: 0 0.5rem; }
@@ -466,7 +459,7 @@ background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transi
 <!-- 新版主体布局 -->
 <div class="main-layout">
     
-    <!-- 左侧边栏 (移除了原顶部标题，直接放置搜索和提醒) -->
+    <!-- 左侧边栏 (红框区域) -->
     <div class="sidebar-left">
         <!-- 搜索框 -->
         <div class="search-box">
@@ -487,34 +480,52 @@ background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transi
                 </div>
             </div>
         </div>
+        <!-- 下方自然留白，形成您图片中的红框效果 -->
     </div>
 
     <!-- 右侧内容区 -->
     <div class="content-area">
         
-        <!-- ✅ 新增：固定大小框格 (替代原统计面板) -->
-        <div class="top-fixed-panel">
-            <!-- 最左侧：功能型按钮框 -->
+        <!-- 顶部大蓝框：快捷功能 + LISTCALCULATION 数据表格 -->
+        <div class="top-blue-box">
+            <!-- 左侧：功能按钮 -->
             <div class="action-buttons-box">
                 <div class="title">快捷功能</div>
-                <button class="btn btn-action" onclick="alert('查看报告功能开发中...')"><i class="fas fa-file-alt"></i> 查看报告</button>
+                <button class="btn btn-action" onclick="window.location.href='salarysumview.html'"><i class="fas fa-file-alt"></i> 查看报告</button>
                 <button class="btn btn-action" onclick="window.print()"><i class="fas fa-print"></i> 打印</button>
             </div>
-            <!-- 右侧：展示被计入的员工数据 -->
-            <div class="included-data-box">
-                <div class="title">
-                    LISTCALCULATION 计入员工数据
+            
+            <!-- 右侧：表格容器 -->
+            <div class="summary-table-wrapper">
+                <div class="summary-table-header">
+                    LISTCALCULATION 计入员工数据总结
                     <span id="includedCountText">(0 人)</span>
                 </div>
-                <div class="data-list" id="includedEmployeesList">
-                    <!-- 动态渲染 -->
-                    <div class="empty-state" style="padding: 1rem;">加载中...</div>
+                <div class="table-scroll-area">
+                    <table class="summary-table">
+                        <thead>
+                            <tr>
+                                <th>员工姓名 / 编号</th>
+                                <th class="text-right">基本薪资</th>
+                                <th class="text-right">总收入</th>
+                                <th class="text-right">总扣除</th>
+                                <th class="text-right">净薪资</th>
+                                <th class="text-right">EPF (员工)</th>
+                                <th class="text-right">SOCSO</th>
+                                <th class="text-right">EIS</th>
+                                <th class="text-right">Lindungan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summaryTableBody">
+                            <tr><td colspan="9" style="text-align: center; padding: 2rem; color: #94a3b8;">加载中...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <!-- 员工列表滑动区域 -->
-        <div class="scrollable-employee-container">
+        <!-- 底部员工卡片列表滑动区域 -->
+        <div class="bottom-cards-container">
             <div class="employee-grid" id="employeeGrid">
                 <div class="empty-state">
                     <span class="icon">⏳</span>
@@ -564,6 +575,7 @@ const DETAIL_URL = 'detail.html';
 let SCRIPT_URL = '';
 let allEmployees = [];
 let filteredEmployees = [];
+let allCalcData = []; // 新增：保存所有 LISTCALCULATION 数据
 
 function num(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
 function fmtRM(v) { return 'RM ' + Number(v || 0).toFixed(2); }
@@ -601,12 +613,13 @@ loadNoticeBoard();
 async function loadData() {
 if (!SCRIPT_URL) {
 document.getElementById('employeeGrid').innerHTML = `<div class="empty-state"><span class="icon">🔗</span>Sila masukkan URL Deploy Google Apps Script di toolbar di atas.</div>`;
+document.getElementById('summaryTableBody').innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 2rem;">请先设置 URL</td></tr>`;
 setSyncBadge('err', 'URL belum ditetapkan');
 return;
 }
 setSyncBadge('busy', 'Memuatkan data...');
 document.getElementById('employeeGrid').innerHTML = `<div class="empty-state"><span class="spinner"></span> Memuatkan data pekerja...</div>`;
-document.getElementById('includedEmployeesList').innerHTML = `<div class="empty-state" style="padding: 1rem;"><span class="spinner"></span> 加载中...</div>`;
+document.getElementById('summaryTableBody').innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 2rem;"><span class="spinner"></span> 加载中...</td></tr>`;
 
 try {
 const res = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
@@ -621,6 +634,7 @@ const resCalc = await fetch(`${SCRIPT_URL}?action=getListCalculation&_t=${Date.n
 const dataCalc = await resCalc.json();
 if (dataCalc.status === 'success' && Array.isArray(dataCalc.data)) listCalcData = dataCalc.data;
 } catch (e) { console.error('Load LISTCALCULATION error:', e); }
+allCalcData = listCalcData; // 保存用于表格展示
 
 const calcMap = {};
 listCalcData.forEach(item => {
@@ -636,7 +650,6 @@ Name: String(row.Name || '').trim(),
 GroupName: String(row.GroupName || '').trim(),
 Situation: String(row.Situation || 'ACTIVE').toUpperCase(),
 Salary: parseFloat(row.Salary) || 0,
-BankNama: row.BankNama || 'TIADA MAKLUMAT',
 BasicSalary: calcItem.BasicSalary || row.Salary || 0,
 TotalSalaryPay: calcItem.TotalSalaryPay || 0
 };
@@ -647,42 +660,63 @@ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees)); } catch (
 
 filteredEmployees = [...allEmployees];
 renderCards();
-renderIncludedData(); // 渲染顶部计入员工列表
+renderSummaryTable(); // 渲染顶部蓝色框的表格
 setSyncBadge('ok', 'Data dimuat (' + allEmployees.length + ' pekerja)');
 loadNoticeBoard();
 } catch (err) {
 console.error('Load error:', err);
 setSyncBadge('err', 'Gagal muat data');
 document.getElementById('employeeGrid').innerHTML = `<div class="empty-state"><span class="icon">⚠️</span>Gagal memuatkan data. Sila semak sambungan atau cuba lagi.<br><br><button class="btn" onclick="loadData()">🔄 Cuba Lagi</button></div>`;
-document.getElementById('includedEmployeesList').innerHTML = `<div class="empty-state" style="padding: 1rem; color: #ef4444;">加载失败</div>`;
+document.getElementById('summaryTableBody').innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 2rem; color: #ef4444;">加载失败</td></tr>`;
 }
 }
 
-// ✅ 渲染顶部固定框内的计入员工数据
-function renderIncludedData() {
-    const listEl = document.getElementById('includedEmployeesList');
-    const countEl = document.getElementById('includedCountText');
+// ✅ 渲染顶部表格 (来源于 LISTCALCULATION)
+function renderSummaryTable() {
+    const tbody = document.getElementById('summaryTableBody');
+    const countText = document.getElementById('includedCountText');
     
-    if (allEmployees.length === 0) {
-        listEl.innerHTML = '<div class="empty-state" style="padding: 1rem;">暂无计入员工</div>';
-        countEl.textContent = '(0 人)';
+    if (allCalcData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 2rem; color: #94a3b8;">暂无计入员工数据</td></tr>`;
+        countText.textContent = '(0 人)';
         return;
     }
 
-    countEl.textContent = `(${allEmployees.length} 人)`;
+    countText.textContent = `(${allCalcData.length} 人)`;
     let html = '';
-    allEmployees.forEach(emp => {
+    
+    // 根据 LIST_CALC_HEADERS 字段进行展示
+    allCalcData.forEach(emp => {
+        const name = escapeHtml(emp.Name || '-');
+        const code = escapeHtml(emp.Code || '-');
+        // 部分字段可能存在拼写差异，做兼容处理
+        const basic = num(emp.BasicSalary);
+        const gross = num(emp.TotalGajiKasar);
+        const deduction = num(emp.TotalPotongan);
+        const net = num(emp.TotalSalaryPay);
+        const epf = num(emp.EPF_Employee);
+        const socso = num(emp.SOCSO_Employee);
+        const eis = num(emp.EIS_Employee);
+        const lindung = num(emp.Lindung24Jam);
+
         html += `
-            <div class="data-item">
-                <div class="name-code">
-                    <span class="name">${escapeHtml(emp.Name)}</span>
-                    <span class="code">${escapeHtml(emp.Code)}</span>
-                </div>
-                <div class="amount">${fmtRM(emp.TotalSalaryPay)}</div>
-            </div>
+            <tr>
+                <td>
+                    <div style="font-weight: 700; color: var(--epf-blue);">${name}</div>
+                    <div style="font-size: 0.7rem; color: var(--epf-muted);">${code}</div>
+                </td>
+                <td class="text-right">${fmtRM(basic)}</td>
+                <td class="text-right">${fmtRM(gross)}</td>
+                <td class="text-right" style="color: #ef4444;">-${fmtRM(deduction)}</td>
+                <td class="text-right text-green">${fmtRM(net)}</td>
+                <td class="text-right">${fmtRM(epf)}</td>
+                <td class="text-right">${fmtRM(socso)}</td>
+                <td class="text-right">${fmtRM(eis)}</td>
+                <td class="text-right">${fmtRM(lindung)}</td>
+            </tr>
         `;
     });
-    listEl.innerHTML = html;
+    tbody.innerHTML = html;
 }
 
 async function loadNoticeBoard() {
@@ -725,6 +759,8 @@ let html = '';
 filteredEmployees.forEach(emp => {
 const sitLower = String(emp.Situation || '').toLowerCase();
 let badgeClass = 'active';
+if (sitLower === 'pending') badgeClass = 'pending';
+else if (sitLower === 'inactive') badgeClass = 'inactive';
 
 const displayBasic = num(emp.BasicSalary || emp.Salary);
 const displayNet = num(emp.TotalSalaryPay);
@@ -772,6 +808,7 @@ loadSavedUrl();
 if (SCRIPT_URL) { loadData(); } 
 else {
 document.getElementById('employeeGrid').innerHTML = `<div class="empty-state"><span class="icon">🔗</span>Sila masukkan URL Deploy Google Apps Script di toolbar di atas.</div>`;
+document.getElementById('summaryTableBody').innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 2rem;">请先设置 URL</td></tr>`;
 setSyncBadge('err', 'URL belum ditetapkan');
 loadNoticeBoard();
 }
