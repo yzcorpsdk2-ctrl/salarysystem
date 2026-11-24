@@ -28,7 +28,7 @@ font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 background: var(--epf-bg); color: var(--epf-text);
 min-height: 100vh; line-height: 1.5; font-size: 14px;
 -webkit-font-smoothing: antialiased;
-overflow: hidden; /* 防止整个页面滚动，由内部区域控制滚动 */
+overflow: hidden; /* 防止整个页面滚动 */
 }
 
 /* ============================================================
@@ -186,10 +186,10 @@ cursor: pointer; transition: 0.15s; white-space: nowrap;
 .main-layout { 
     display: flex; 
     align-items: stretch; 
-    height: calc(100vh - 120px); /* 减去 topbar 和 navbar 的高度 */
+    height: calc(100vh - 120px); 
     max-width: 1600px; 
     margin: 0 auto; 
-    padding: 1.5rem 1.75rem; 
+    padding: 1rem 1.75rem; 
     gap: 20px; 
 }
 
@@ -203,14 +203,6 @@ cursor: pointer; transition: 0.15s; white-space: nowrap;
 }
 /* 隐藏左侧栏滚动条 */
 .sidebar-left::-webkit-scrollbar { width: 0; } 
-
-.page-header {
-background: #ffffff; border: 1px solid var(--epf-border); border-radius: 8px;
-padding: 1.4rem 1.75rem;
-box-shadow: 0 1px 3px rgba(26,79,138,0.04);
-}
-.page-header h1 { font-size: 1.45rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--epf-blue); letter-spacing: -0.015em; }
-.page-header p { font-size: 0.85rem; color: var(--epf-muted); line-height: 1.6; }
 
 .search-box { position: relative; width: 100%; }
 .search-box input {
@@ -259,32 +251,70 @@ border-radius: 6px; padding: 0.7rem; font-size: 0.78rem; transition: 0.15s;
     height: 100%;
 }
 
-/* 顶部统计面板 (对应图片中的紫框/绿框) */
-.summary-panel {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+/* ✅ 新增：顶部固定高度数据面板 (替代原统计面板) */
+.top-fixed-panel {
+    height: 240px; /* 固定高度 */
+    display: flex;
     gap: 1rem;
+    flex-shrink: 0; /* 防止被压缩 */
 }
-.summary-card {
-    background: #ffffff; border: 1px solid var(--epf-border); border-radius: 10px;
-    padding: 1.25rem; box-shadow: var(--shadow-sm);
-    display: flex; flex-direction: column; gap: 0.5rem;
-}
-.summary-card .title { font-size: 0.8rem; font-weight: 600; color: var(--epf-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-.summary-card .value { font-size: 1.6rem; font-weight: 800; color: var(--epf-blue); font-variant-numeric: tabular-nums; }
-.summary-card .value.green { color: #0f7a54; }
-.summary-card .sub-list { margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.4rem; }
-.summary-card .sub-item { display: flex; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px dashed var(--epf-border-soft); padding-bottom: 0.2rem; }
-.summary-card .sub-item:last-child { border-bottom: none; }
-.summary-card .sub-item .bank-name { color: var(--epf-muted); }
-.summary-card .sub-item .bank-amount { font-weight: 600; color: var(--epf-text); }
 
-/* 员工列表滚动容器 (对应图片中的黄框) */
+/* 最左侧：功能按钮框 */
+.action-buttons-box {
+    width: 160px;
+    background: #ffffff; border: 1px solid var(--epf-border); border-radius: 10px;
+    box-shadow: var(--shadow-sm);
+    display: flex; flex-direction: column; padding: 1rem; gap: 0.8rem;
+}
+.action-buttons-box .title {
+    font-size: 0.8rem; font-weight: 700; color: var(--epf-muted);
+    text-transform: uppercase; letter-spacing: 0.05em;
+    text-align: center; margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--epf-border-soft); padding-bottom: 0.5rem;
+}
+.btn-action {
+    width: 100%; justify-content: center;
+    padding: 0.6rem 0; font-size: 0.85rem;
+}
+
+/* 右侧：计入员工数据框 */
+.included-data-box {
+    flex: 1;
+    background: #ffffff; border: 1px solid var(--epf-border); border-radius: 10px;
+    box-shadow: var(--shadow-sm);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+}
+.included-data-box .title {
+    font-size: 0.85rem; font-weight: 700; color: var(--epf-blue);
+    padding: 0.8rem 1rem; border-bottom: 1px solid var(--epf-border-soft);
+    background: var(--epf-blue-soft);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.included-data-box .title span { font-size: 0.75rem; color: var(--epf-muted); font-weight: 500;}
+.data-list {
+    flex: 1; overflow-y: auto; padding: 0.5rem;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.5rem;
+    align-content: start;
+}
+.data-list::-webkit-scrollbar { width: 6px; }
+.data-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+.data-item {
+    background: #f8fafc; border: 1px solid #e2e8f0;
+    border-radius: 6px; padding: 0.6rem; font-size: 0.75rem;
+    display: flex; justify-content: space-between; align-items: center;
+}
+.data-item .name-code { display: flex; flex-direction: column; gap: 2px; }
+.data-item .name { font-weight: 700; color: var(--epf-text); }
+.data-item .code { color: var(--epf-muted); font-size: 0.65rem; }
+.data-item .amount { font-weight: 700; color: #0f7a54; }
+
+/* 员工列表滚动容器 */
 .scrollable-employee-container {
     flex: 1;
     overflow-y: auto;
     background: transparent;
-    padding-right: 5px; /* 留出滚动条空间 */
+    padding-right: 5px;
 }
 .scrollable-employee-container::-webkit-scrollbar { width: 8px; }
 .scrollable-employee-container::-webkit-scrollbar-track { background: var(--epf-bg); }
@@ -328,11 +358,16 @@ background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transi
     .sidebar-left { width: 280px; } 
 }
 @media (max-width: 900px) {
-    body { overflow: auto; } /* 手机端恢复默认滚动 */
+    body { overflow: auto; }
     .main-layout { flex-direction: column; height: auto; }
     .sidebar-left { width: 100%; height: auto; overflow-y: visible; }
     .notice-board { max-height: 300px; }
     .scrollable-employee-container { overflow-y: visible; }
+    .top-fixed-panel { height: auto; flex-direction: column; }
+    .action-buttons-box { width: 100%; flex-direction: row; justify-content: center; align-items: center; }
+    .action-buttons-box .title { display: none; }
+    .action-buttons-box .btn-action { width: auto; padding: 0.5rem 1rem; }
+    .included-data-box { height: 250px; }
 }
 @media (max-width: 768px) {
 .navbar { padding: 0 0.5rem; }
@@ -431,21 +466,15 @@ background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transi
 <!-- 新版主体布局 -->
 <div class="main-layout">
     
-    <!-- 左侧边栏 -->
+    <!-- 左侧边栏 (移除了原顶部标题，直接放置搜索和提醒) -->
     <div class="sidebar-left">
-        <!-- 对应黄框：Dashboard Pekerja -->
-        <div class="page-header">
-            <h1>📊 Dashboard Pekerja</h1>
-            <p>Klik pada kad pekerja untuk membuka halaman detail &amp; sunting gaji.</p>
-        </div>
-
-        <!-- 对应黄框：搜索筛选 -->
+        <!-- 搜索框 -->
         <div class="search-box">
             <i class="fas fa-search"></i>
             <input type="text" id="searchInput" placeholder="Cari Nama / Kod / Kumpulan..." oninput="filterCards()">
         </div>
 
-        <!-- 对应红框/黄框：预设超时提醒 -->
+        <!-- 预设超时提醒 -->
         <div class="notice-board">
             <div class="notice-header">
                 <i class="fas fa-exclamation-triangle"></i> 预设超时提醒
@@ -463,34 +492,28 @@ background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transi
     <!-- 右侧内容区 -->
     <div class="content-area">
         
-        <!-- 对应紫框：数据统计面板 -->
-        <div class="summary-panel">
-            <!-- 统计卡片 1 -->
-            <div class="summary-card">
-                <div class="title">员工总薪资开销 (Gaji Bersih)</div>
-                <div class="value green" id="summaryTotalNet">RM 0.00</div>
-                <div style="font-size: 0.8rem; color: var(--epf-muted); margin-top: 0.2rem;">
-                    总基本薪资: <span id="summaryTotalBasic" style="font-weight: 600;">RM 0.00</span>
-                </div>
+        <!-- ✅ 新增：固定大小框格 (替代原统计面板) -->
+        <div class="top-fixed-panel">
+            <!-- 最左侧：功能型按钮框 -->
+            <div class="action-buttons-box">
+                <div class="title">快捷功能</div>
+                <button class="btn btn-action" onclick="alert('查看报告功能开发中...')"><i class="fas fa-file-alt"></i> 查看报告</button>
+                <button class="btn btn-action" onclick="window.print()"><i class="fas fa-print"></i> 打印</button>
             </div>
-            <!-- 统计卡片 2：不同付款类型 -->
-            <div class="summary-card">
-                <div class="title">按付款类型统计 (By Bank)</div>
-                <div class="sub-list" id="summaryBankList">
-                    <div class="sub-item"><span class="bank-name">加载中...</span><span class="bank-amount">-</span></div>
+            <!-- 右侧：展示被计入的员工数据 -->
+            <div class="included-data-box">
+                <div class="title">
+                    LISTCALCULATION 计入员工数据
+                    <span id="includedCountText">(0 人)</span>
                 </div>
-            </div>
-            <!-- 对应绿框：功能快捷按钮 (可选) -->
-            <div class="summary-card" style="justify-content: center; align-items: center; text-align: center;">
-                <div class="title" style="margin-bottom: 0.5rem;">快捷操作</div>
-                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;">
-                    <button class="btn" onclick="window.location.href='staffinfo.html'">👥 员工档案</button>
-                    <button class="btn" onclick="window.location.href='salarysumview.html'">📊 薪资总览</button>
+                <div class="data-list" id="includedEmployeesList">
+                    <!-- 动态渲染 -->
+                    <div class="empty-state" style="padding: 1rem;">加载中...</div>
                 </div>
             </div>
         </div>
 
-        <!-- 对应黄框：员工列表滑动区域 -->
+        <!-- 员工列表滑动区域 -->
         <div class="scrollable-employee-container">
             <div class="employee-grid" id="employeeGrid">
                 <div class="empty-state">
@@ -583,6 +606,7 @@ return;
 }
 setSyncBadge('busy', 'Memuatkan data...');
 document.getElementById('employeeGrid').innerHTML = `<div class="empty-state"><span class="spinner"></span> Memuatkan data pekerja...</div>`;
+document.getElementById('includedEmployeesList').innerHTML = `<div class="empty-state" style="padding: 1rem;"><span class="spinner"></span> 加载中...</div>`;
 
 try {
 const res = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
@@ -612,12 +636,9 @@ Name: String(row.Name || '').trim(),
 GroupName: String(row.GroupName || '').trim(),
 Situation: String(row.Situation || 'ACTIVE').toUpperCase(),
 Salary: parseFloat(row.Salary) || 0,
-Jantina: row.Jantina || '', TarikhLahir: row.TarikhLahir || '', IC: row.IC || '', Jawatan: row.Jawatan || '',
-BankNama: row.BankNama || 'TIADA MAKLUMAT', BankAccountNo: row.BankAccountNo || '',
-EPF: row.EPF || '', PERKESO: row.PERKESO || '', EIS: row.EIS || '', Lindungan: row.Lindungan || '',
+BankNama: row.BankNama || 'TIADA MAKLUMAT',
 BasicSalary: calcItem.BasicSalary || row.Salary || 0,
-TotalSalaryPay: calcItem.TotalSalaryPay || 0,
-LastUpdated: calcItem.LastUpdated || ''
+TotalSalaryPay: calcItem.TotalSalaryPay || 0
 };
 }).filter(s => s.Code && s.Name && s.Situation === 'ACTIVE');
 
@@ -626,57 +647,42 @@ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees)); } catch (
 
 filteredEmployees = [...allEmployees];
 renderCards();
-renderSummary(); // <--- 新增：计算并渲染统计数据
+renderIncludedData(); // 渲染顶部计入员工列表
 setSyncBadge('ok', 'Data dimuat (' + allEmployees.length + ' pekerja)');
 loadNoticeBoard();
 } catch (err) {
 console.error('Load error:', err);
 setSyncBadge('err', 'Gagal muat data');
 document.getElementById('employeeGrid').innerHTML = `<div class="empty-state"><span class="icon">⚠️</span>Gagal memuatkan data. Sila semak sambungan atau cuba lagi.<br><br><button class="btn" onclick="loadData()">🔄 Cuba Lagi</button></div>`;
+document.getElementById('includedEmployeesList').innerHTML = `<div class="empty-state" style="padding: 1rem; color: #ef4444;">加载失败</div>`;
 }
 }
 
-// ✅ 新增：计算总薪资和按银行分类的薪资
-function renderSummary() {
-    let totalBasic = 0;
-    let totalNet = 0;
-    let bankSummary = {};
-
-    allEmployees.forEach(emp => {
-        const basic = num(emp.BasicSalary || emp.Salary);
-        const net = num(emp.TotalSalaryPay);
-        totalBasic += basic;
-        totalNet += net;
-
-        let bank = emp.BankNama || 'TIADA MAKLUMAT';
-        if (!bankSummary[bank]) bankSummary[bank] = 0;
-        bankSummary[bank] += net;
-    });
-
-    // 更新总数
-    document.getElementById('summaryTotalNet').textContent = fmtRM(totalNet);
-    document.getElementById('summaryTotalBasic').textContent = fmtRM(totalBasic);
-
-    // 更新银行分类列表
-    const bankListEl = document.getElementById('summaryBankList');
-    const sortedBanks = Object.keys(bankSummary).sort((a, b) => bankSummary[b] - bankSummary[a]);
+// ✅ 渲染顶部固定框内的计入员工数据
+function renderIncludedData() {
+    const listEl = document.getElementById('includedEmployeesList');
+    const countEl = document.getElementById('includedCountText');
     
-    if (sortedBanks.length === 0) {
-        bankListEl.innerHTML = '<div class="sub-item"><span class="bank-name">Tiada data</span><span class="bank-amount">-</span></div>';
+    if (allEmployees.length === 0) {
+        listEl.innerHTML = '<div class="empty-state" style="padding: 1rem;">暂无计入员工</div>';
+        countEl.textContent = '(0 人)';
         return;
     }
 
+    countEl.textContent = `(${allEmployees.length} 人)`;
     let html = '';
-    sortedBanks.forEach(bank => {
-        // 如果金额为0，可以选择跳过不显示，这里保留显示
+    allEmployees.forEach(emp => {
         html += `
-            <div class="sub-item">
-                <span class="bank-name">${escapeHtml(bank)}</span>
-                <span class="bank-amount">${fmtRM(bankSummary[bank])}</span>
+            <div class="data-item">
+                <div class="name-code">
+                    <span class="name">${escapeHtml(emp.Name)}</span>
+                    <span class="code">${escapeHtml(emp.Code)}</span>
+                </div>
+                <div class="amount">${fmtRM(emp.TotalSalaryPay)}</div>
             </div>
         `;
     });
-    bankListEl.innerHTML = html;
+    listEl.innerHTML = html;
 }
 
 async function loadNoticeBoard() {
@@ -719,8 +725,6 @@ let html = '';
 filteredEmployees.forEach(emp => {
 const sitLower = String(emp.Situation || '').toLowerCase();
 let badgeClass = 'active';
-if (sitLower === 'pending') badgeClass = 'pending';
-else if (sitLower === 'inactive') badgeClass = 'inactive';
 
 const displayBasic = num(emp.BasicSalary || emp.Salary);
 const displayNet = num(emp.TotalSalaryPay);
