@@ -15,8 +15,6 @@
 --radius:14px;
 --shadow-sm:0 1px 2px rgba(16,32,56,.05), 0 2px 10px rgba(16,32,56,.05);
 --shadow-md:0 8px 24px rgba(16,32,56,.10);
-
-/* ✅ 统一使用 leave.html 的 Navbar 变量 */
 --nav-h: 52px;
 --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover2: #16345c;
 --nav-text: #cbd9ea; --nav-accent: #4d9fff;
@@ -33,7 +31,7 @@ padding: 0 18px 60px;
 display:flex; flex-direction: column; align-items: center; min-height:100vh;
 }
 
-/* ✅ 更新为 leave.html 的 Navbar 样式 */
+/* ===== Navbar (unchanged) ===== */
 .navbar {
 position: sticky; top: 0; z-index: 200;
 display: flex; align-items: stretch; flex-wrap: wrap;
@@ -66,8 +64,26 @@ width: calc(100% + 36px); margin-left: -18px; margin-right: -18px; margin-bottom
 .nav-chat .pulse { width: 7px; height: 7px; border-radius: 50%; background: #6ef0a8; box-shadow: 0 0 0 0 rgba(110,240,168,0.75); animation: pulse 2s infinite; }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(110,240,168,0.7); } 70% { box-shadow: 0 0 0 7px rgba(110,240,168,0); } 100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); } }
 
-.payslip-container{ width:100%; max-width:1280px; background:var(--card); border:1px solid #e2e9f1; border-radius:18px; box-shadow:0 1px 2px rgba(16,32,56,.06), 0 18px 48px rgba(16,32,56,.12); padding:30px 34px 34px; position:relative; overflow:hidden; margin-top: 8px; }
+/* ===== Container ===== */
+.payslip-container{ width:100%; max-width:1280px; background:var(--card); border:1px solid #e2e9f1; border-radius:18px; box-shadow:0 1px 2px rgba(16,32,56,.06), 0 18px 48px rgba(16,32,56,.12); padding:30px 34px 34px; position:relative; overflow:hidden; margin-top: 8px; transition: max-width .25s ease; }
 .payslip-container::before{ content:''; position:absolute; inset:0 0 auto 0; height:4px; background:linear-gradient(90deg, var(--navy) 0%, var(--navy) 58%, var(--green) 58%, var(--green) 100%); }
+
+/* ===== A4 / A5 paper preview (screen) ===== */
+body.paper-a4 .payslip-container{ max-width: 718px; }
+body.paper-a5 .payslip-container{ max-width: 514px; padding: 18px 14px 22px; font-size: 14px; }
+body.paper-a5 .payslip-header{ flex-direction: column; align-items: flex-start; }
+body.paper-a5 .header-badges{ justify-content: flex-start; }
+body.paper-a5 .brand h1{ font-size: 1.15rem; }
+body.paper-a5 .field-grid{ grid-template-columns: 1fr; }
+body.paper-a5 .meta-grid{ grid-template-columns: 1fr; }
+body.paper-a5 .columns{ grid-template-columns: 1fr 1fr; }
+body.paper-a5 .panel-cuti{ grid-column: 1 / -1; }
+body.paper-a5 .extra-grid{ grid-template-columns: 1fr; }
+body.paper-a5 .summary{ grid-template-columns: 1fr; }
+body.paper-a5 .basic-display{ font-size: 1.5rem; }
+body.paper-a5 .sum-value{ font-size: 1.2rem; }
+
+/* ===== Header ===== */
 .payslip-header{ display:flex; justify-content:space-between; align-items:flex-start; gap:18px; flex-wrap:wrap; padding-bottom:16px; margin-bottom:22px; border-bottom:1px solid var(--line); position:relative; }
 .payslip-header::after{ content:''; position:absolute; left:0; bottom:-1px; width:110px; height:2px; background:var(--green); }
 .brand{ display:flex; align-items:center; gap:14px; min-width:0; }
@@ -80,12 +96,36 @@ width: calc(100% + 36px); margin-left: -18px; margin-right: -18px; margin-bottom
 .sync-status::before{ content:''; width:7px; height:7px; border-radius:50%; background:currentColor; opacity:.75; flex-shrink:0; }
 .sync-status.success{ background:var(--green-light); color:#116b43; border-color:#bfe3cd; }
 .sync-status.error{ background:var(--red-light); color:#95201f; border-color:#f0c4c4; }
+
+/* URL bar */
 .url-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; background: #f8fafc; border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; font-size: 0.8rem; }
 .url-bar label { font-weight: 600; color: var(--ink-2); white-space: nowrap; }
 .url-bar input { flex: 1; border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; font-size: 0.78rem; color: var(--ink-3); background: #fff; outline: none; cursor: default; }
 .url-bar .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; flex-shrink: 0; }
 .url-bar .status-dot.ok { background: #22c55e; }
 .url-bar .status-dot.err { background: #ef4444; }
+
+/* ===== Action bar (moved above meta-grid) ===== */
+.action-bar{ display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; padding-bottom:20px; border-bottom:1px solid var(--line); margin-bottom: 22px; }
+.btn-group{ display:flex; gap:10px; flex-wrap:wrap; }
+.btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 22px; border-radius:10px; font-size:.86rem; font-weight:700; font-family:inherit; border:1px solid transparent; cursor:pointer; white-space:nowrap; transition:transform .12s, box-shadow .15s, background .15s, border-color .15s, color .15s; }
+.btn:active{ transform:translateY(1px); }
+.btn i{ font-size:.82rem; }
+.btn-primary{ background:var(--navy); color:#fff; box-shadow:0 4px 12px rgba(30,58,95,.25); }
+.btn-primary:hover{ background:var(--navy-dark); box-shadow:0 6px 16px rgba(30,58,95,.32); }
+.btn-outline{ background:#fff; border-color:#c6d5e6; color:var(--navy); }
+.btn-outline:hover{ background:#f2f7fd; border-color:var(--navy); }
+.btn-success{ background:var(--green); color:#fff; box-shadow:0 4px 12px rgba(15,122,77,.28); }
+.btn-success:hover{ background:var(--green-dark); box-shadow:0 6px 16px rgba(15,122,77,.34); }
+.btn-ghost{ background:#fff; border-color:#c6d5e6; color:var(--ink-2); }
+.btn-ghost:hover{ background:#f2f7fd; border-color:var(--navy); color:var(--navy); }
+.btn-reset{ background:#fff; border-color:#f0c4c4; color:var(--red); }
+.btn-reset:hover{ background:var(--red-light); border-color:var(--red); color:var(--red-dark); }
+.action-hint{ display:flex; align-items:center; gap:7px; font-size:.76rem; color:var(--ink-3); line-height:1.45; max-width:430px; }
+.action-hint > i{ color:#8ea4bc; flex-shrink:0; }
+kbd{ font-family:inherit; font-size:.68rem; font-weight:700; background:#eef3f9; border:1px solid #d3dfec; border-bottom-width:2px; border-radius:5px; padding:1px 5px; color:#3e5673; }
+
+/* Meta grid */
 .meta-grid{ display:grid; grid-template-columns:minmax(0,1.7fr) minmax(0,1fr); gap:16px; margin-bottom:22px; }
 .meta-card{ background:linear-gradient(180deg, #f9fbfe, #f2f7fc); border:1px solid #dae4f0; border-radius:var(--radius); padding:16px 18px 18px; box-shadow:0 1px 2px rgba(16,32,56,.03); min-width:0; }
 .card-head{ display:flex; align-items:center; gap:8px; font-size:.7rem; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:#4a6484; margin-bottom:14px; }
@@ -108,6 +148,8 @@ select.field-input { appearance: none; padding-right: 28px; cursor: pointer; bac
 .basic-input-wrap .cur{ font-size:.72rem; font-weight:800; letter-spacing:.06em; color:#bcd6ef; }
 .basic-input-wrap input{ flex:1; min-width:0; background:transparent; border:none; outline:none; color:#fff; font-size:1rem; font-weight:700; text-align:right; font-family:inherit; font-variant-numeric:tabular-nums; }
 .basic-input-wrap input[readonly]{ cursor: default; }
+
+/* Panels */
 .columns{ display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:20px; }
 .panel{ display:flex; flex-direction:column; border:1px solid var(--line); border-radius:var(--radius); background:#fff; overflow:hidden; box-shadow:var(--shadow-sm); }
 .panel-head{ display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid var(--line); background:#f7fafd; }
@@ -137,6 +179,7 @@ select.field-input { appearance: none; padding-right: 28px; cursor: pointer; bac
 .panel-total i{ margin-right:4px; opacity:.75; }
 .panel-total strong{ font-size:.95rem; font-variant-numeric:tabular-nums; }
 
+/* Extra grid */
 .extra-grid{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:16px; margin-bottom:22px; }
 .extra-card{ background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px 8px; box-shadow:var(--shadow-sm); min-width:0; transition:border-color .18s, box-shadow .18s; }
 .extra-card:hover{ border-color:#c2d4e6; box-shadow:var(--shadow-md); }
@@ -158,6 +201,14 @@ select.field-input { appearance: none; padding-right: 28px; cursor: pointer; bac
 .mini-edit-btn:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
 .mini-edit-btn.editing { background: #0f7a4d; color: #fff; border-color: #0f7a4d; }
 .mini-edit-btn.editing:hover { background: #0b5c3a; border-color: #0b5c3a; }
+
+/* ===== CASH / MECHANTRADE disabled visual ===== */
+.line-item.cash-disabled label{ color:#b0bccb; text-decoration: line-through; }
+.line-item.cash-disabled .amount{ opacity: 0.55; background: #eef1f5; }
+.mini-btn[disabled]{ opacity: .4; cursor: not-allowed; }
+.mini-btn[disabled]:hover{ background:#fff; color:var(--navy); border-color:#b9cfe4; }
+
+/* Summary */
 .summary{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:16px; margin-bottom:26px; }
 .sum-card{ position:relative; overflow:hidden; display:flex; flex-direction:column; gap:6px; padding:16px 20px; border-radius:var(--radius); color:#fff; box-shadow:var(--shadow-md); }
 .sum-card::after{ content:''; position:absolute; right:-34px; top:-34px; width:128px; height:128px; border-radius:50%; background:rgba(255,255,255,.07); }
@@ -166,29 +217,55 @@ select.field-input { appearance: none; padding-right: 28px; cursor: pointer; bac
 .sum-gross{ background:linear-gradient(150deg,#22456e,#1a3555); }
 .sum-ded{ background:linear-gradient(150deg,#a52222,#841a1a); }
 .sum-net{ background:linear-gradient(150deg,#128552,#0b6540); }
-.action-bar{ display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; padding-top:20px; border-top:1px solid var(--line); }
-.btn-group{ display:flex; gap:10px; flex-wrap:wrap; }
-.btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 22px; border-radius:10px; font-size:.86rem; font-weight:700; font-family:inherit; border:1px solid transparent; cursor:pointer; white-space:nowrap; transition:transform .12s, box-shadow .15s, background .15s, border-color .15s, color .15s; }
-.btn:active{ transform:translateY(1px); }
-.btn i{ font-size:.82rem; }
-.btn-primary{ background:var(--navy); color:#fff; box-shadow:0 4px 12px rgba(30,58,95,.25); }
-.btn-primary:hover{ background:var(--navy-dark); box-shadow:0 6px 16px rgba(30,58,95,.32); }
-.btn-outline{ background:#fff; border-color:#c6d5e6; color:var(--navy); }
-.btn-outline:hover{ background:#f2f7fd; border-color:var(--navy); }
-.btn-success{ background:var(--green); color:#fff; box-shadow:0 4px 12px rgba(15,122,77,.28); }
-.btn-success:hover{ background:var(--green-dark); box-shadow:0 6px 16px rgba(15,122,77,.34); }
-.btn-ghost{ background:#fff; border-color:#c6d5e6; color:var(--ink-2); }
-.btn-ghost:hover{ background:#f2f7fd; border-color:var(--navy); color:var(--navy); }
-.btn-reset{ background:#fff; border-color:#f0c4c4; color:var(--red); }
-.btn-reset:hover{ background:var(--red-light); border-color:var(--red); color:var(--red-dark); }
-.action-hint{ display:flex; align-items:center; gap:7px; font-size:.76rem; color:var(--ink-3); line-height:1.45; max-width:430px; }
-.action-hint > i{ color:#8ea4bc; flex-shrink:0; }
-kbd{ font-family:inherit; font-size:.68rem; font-weight:700; background:#eef3f9; border:1px solid #d3dfec; border-bottom-width:2px; border-radius:5px; padding:1px 5px; color:#3e5673; }
+
+/* Signature */
 .signature-area{ display:flex; justify-content:space-between; gap:24px; flex-wrap:wrap; margin-top:32px; padding-top:22px; border-top:1px dashed #d5e0ec; }
 .signature-line{ flex:1 1 180px; max-width:280px; display:flex; flex-direction:column; gap:6px; }
 .signature-line span:first-child{ font-size:.66rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); }
 .signature-line .line{ height:38px; border-bottom:1.5px solid #a8bcd2; }
 .signature-line .line-sub{ font-size:.68rem; color:#9aabc0; letter-spacing:.02em; }
+
+/* ===== Print modal ===== */
+.modal-overlay{
+  display:none; position:fixed; inset:0; z-index:1000;
+  background: rgba(16,32,56,.55); backdrop-filter: blur(3px);
+  align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.open{ display:flex; }
+.modal-box{
+  background:#fff; border-radius:14px; max-width:480px; width:100%;
+  max-height:85vh; overflow-y:auto; padding: 22px 24px;
+  box-shadow: 0 20px 60px rgba(16,32,56,.3);
+  animation: fadeSlide .18s ease;
+}
+.modal-box h3{ font-size:1rem; color:var(--navy); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+.modal-field{ margin-bottom:14px; }
+.modal-field > label{ display:block; font-size:.7rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px; }
+.modal-field select, .modal-field input[type="text"]{
+  width:100%; padding:8px 12px; border:1px solid var(--line); border-radius:8px;
+  font-size:.86rem; font-family:inherit; color:var(--ink); background:#fff; outline:none;
+}
+.modal-field select:focus{ border-color:var(--navy); box-shadow:0 0 0 3px rgba(30,58,95,.1); }
+.print-modes{ display:flex; flex-direction:column; gap:8px; }
+.print-modes label{
+  display:flex; align-items:center; gap:8px; padding:9px 12px;
+  border:1px solid var(--line); border-radius:8px;
+  font-size:.82rem; font-weight:600; color:var(--ink); cursor:pointer; transition:.15s;
+}
+.print-modes label:hover{ border-color:var(--navy); background:#f6f9fd; }
+.print-modes label.active{ border-color:var(--navy); background:var(--navy-soft); }
+.batch-list{
+  max-height:220px; overflow-y:auto; border:1px solid var(--line); border-radius:8px; padding:4px;
+}
+.batch-list label{
+  display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:6px;
+  font-size:.82rem; cursor:pointer;
+}
+.batch-list label:hover{ background:var(--navy-soft); }
+.modal-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--line); }
+.modal-hint{ font-size:.72rem; color:var(--ink-3); margin-top:6px; }
+
+/* ===== Responsive ===== */
 @media (max-width: 1100px){ .columns{ grid-template-columns:1fr 1fr; } .panel-cuti{ grid-column: 1 / -1; } .extra-grid{ grid-template-columns:repeat(2, minmax(0,1fr)); } }
 @media (max-width: 980px){ .meta-grid{ grid-template-columns:1fr; } .extra-grid{ grid-template-columns:1fr 1fr; } }
 @media (max-width: 760px){ .columns{ grid-template-columns:1fr; } .summary{ grid-template-columns:1fr; } .extra-grid{ grid-template-columns:1fr; } .payslip-container{ padding:24px 20px 28px; } .brand h1{ font-size:1.2rem; } }
@@ -201,24 +278,42 @@ kbd{ font-family:inherit; font-size:.68rem; font-weight:700; background:#eef3f9;
 .nav-chat { padding: 0.45rem 0.75rem; font-size: 0.66rem; }
 body { padding: 0 10px 40px; }
 }
+
+/* ===== PRINT ===== */
 @media print{
 *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
 body{ background:#fff; padding:0; display:block; font-size:12px; }
 .navbar { display: none !important; }
-.payslip-container{ box-shadow:none; border:none; border-radius:0; max-width:none; padding:0; margin-top: 0; }
+.action-bar, .mini-btn, .mini-edit-btn, .no-print, .url-bar, .modal-overlay{ display:none !important; }
+
+.payslip-container{ box-shadow:none; border:none; border-radius:0; max-width:none !important; padding:0; margin-top: 0; }
 .payslip-container::before{ display:none; }
-.action-bar, .mini-btn, .mini-edit-btn, .no-print, .url-bar{ display:none !important; }
 .sum-card, .meta-card.basic-card{ box-shadow:none; }
 .panel, .extra-card, .meta-card, .sum-card{ break-inside:avoid; page-break-inside:avoid; }
 .amount{ background:transparent !important; border-color:#dde5ee !important; box-shadow:none !important; }
 .field-input, select.field-input{ background:transparent !important; border-color: transparent !important; }
 .signature-area{ margin-top:22px; }
+
+.multi-print-wrapper .payslip-container{
+  page-break-after: always;
+  break-after: page;
+  padding-bottom: 20px;
+}
+.multi-print-wrapper .payslip-container:last-child{
+  page-break-after: auto;
+  break-after: auto;
+}
+}
+
+/* A4/A5 page size (dynamic via JS) */
+@media print {
+  /* Default A4, overridden by injected style */
 }
 </style>
 </head>
-<body>
+<body class="paper-a4">
 
-<!-- ✅ 顶端导航栏开始 -->
+<!-- Navbar -->
 <nav class="navbar">
     <div class="nav-brand"><span class="logo">Y</span><span class="brand-text">YZ Payroll</span></div>
     <div class="nav-links" id="navLinks">
@@ -279,7 +374,6 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
         <span class="pulse"></span> 💬 Request Chat
     </button>
 </nav>
-<!-- ✅ 顶端导航栏结束 -->
 
 <div class="payslip-container" id="payslipContainer">
 <header class="payslip-header">
@@ -295,12 +389,27 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
 <span class="sync-status" id="syncStatus">Sedia</span>
 </div>
 </header>
+
 <div class="url-bar no-print">
 <div class="status-dot" id="urlStatusDot"></div>
 <label for="deployUrlDisplay">🔗 Deploy URL:</label>
 <input type="text" id="deployUrlDisplay" readonly placeholder="Menunggu URL dari Dashboard..." title="URL ini diselaraskan secara automatik dari Dashboard">
 <span style="font-size:0.7rem; color:var(--ink-3);">(Auto-sync dari Dashboard)</span>
 </div>
+
+<!-- ============ ACTION BAR (moved above meta-grid) ============ -->
+<div class="action-bar no-print">
+<div class="btn-group">
+<button class="btn btn-outline" onclick="window.close()"><i class="fas fa-arrow-left"></i> Kembali</button>
+<button class="btn btn-primary" id="saveBtn"><i class="fas fa-save"></i> Simpan &amp; Sync</button>
+<button class="btn btn-ghost" id="syncSheetBtn"><i class="fas fa-cloud-download-alt"></i> Sync dari Sheet</button>
+<button class="btn btn-success" id="reloadBtn"><i class="fas fa-sync-alt"></i> Muat Semula</button>
+<button class="btn btn-reset" id="resetBtn" title="Reset semua medan ke default"><i class="fas fa-undo"></i> Reset</button>
+<button class="btn btn-ghost" id="printBtn"><i class="fas fa-print"></i> Cetak <i class="fas fa-caret-down" style="font-size:.7em;margin-left:2px;"></i></button>
+</div>
+<div class="action-hint"><i class="fas fa-info-circle"></i><span>Perubahan akan disimpan ke <strong>LISTCALCULATION</strong> Sheet. Tekan <kbd>Ctrl</kbd> + <kbd>S</kbd> untuk simpan pantas.</span></div>
+</div>
+
 <div class="meta-grid">
 <section class="meta-card">
 <div class="card-head"><i class="fas fa-id-card"></i> Maklumat Pekerja (Dari StaffInfo - Tidak Boleh Edit)</div>
@@ -461,35 +570,66 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
 <div class="sum-card sum-net"><span class="sum-label"><i class="fas fa-hand-holding-usd"></i> Gaji Bersih</span><span class="sum-value" id="gajiBersihDisplay">RM 0.00</span></div>
 </div>
 
-<div class="action-bar">
-<div class="btn-group">
-<button class="btn btn-outline" onclick="window.close()"><i class="fas fa-arrow-left"></i> Kembali</button>
-<button class="btn btn-primary" id="saveBtn"><i class="fas fa-save"></i> Simpan &amp; Sync</button>
-<button class="btn btn-ghost" id="syncSheetBtn"><i class="fas fa-cloud-download-alt"></i> Sync dari Sheet</button>
-<button class="btn btn-success" id="reloadBtn"><i class="fas fa-sync-alt"></i> Muat Semula</button>
-<button class="btn btn-reset" id="resetBtn" title="Reset semua medan ke default"><i class="fas fa-undo"></i> Reset</button>
-<button class="btn btn-ghost" id="printBtn"><i class="fas fa-print"></i> Cetak</button>
-</div>
-<div class="action-hint"><i class="fas fa-info-circle"></i><span>Perubahan akan disimpan ke <strong>LISTCALCULATION</strong> Sheet. Tekan <kbd>Ctrl</kbd> + <kbd>S</kbd> untuk simpan pantas.</span></div>
-</div>
-
 <div class="signature-area">
 <div class="signature-line"><span>Approved By</span><div class="line"></div><span class="line-sub">Tarikh: ____ / ____ / ______</span></div>
 <div class="signature-line"><span>Received By</span><div class="line"></div><span class="line-sub">Tarikh: ____ / ____ / ______</span></div>
 </div>
 </div>
 
+<!-- ============ PRINT MODAL ============ -->
+<div class="modal-overlay no-print" id="printModal">
+  <div class="modal-box">
+    <h3><i class="fas fa-print"></i> Pilihan Cetakan</h3>
+    
+    <div class="modal-field">
+      <label>Saiz Kertas</label>
+      <select id="paperSizeSelect">
+        <option value="A4">A4 (210 × 297 mm)</option>
+        <option value="A5">A5 (148 × 210 mm)</option>
+      </select>
+      <div class="modal-hint">Pratonton di skrin akan mengikut saiz kertas yang dipilih.</div>
+    </div>
+    
+    <div class="modal-field">
+      <label>Mod Cetak</label>
+      <div class="print-modes">
+        <label class="active"><input type="radio" name="printMode" value="current" checked> <i class="fas fa-file"></i> Cetak Semasa (Pekerja Ini)</label>
+        <label><input type="radio" name="printMode" value="all"> <i class="fas fa-layer-group"></i> Cetak Semua Pekerja</label>
+        <label><input type="radio" name="printMode" value="batch"> <i class="fas fa-check-square"></i> Batch (Pilih Pekerja)</label>
+        <label><input type="radio" name="printMode" value="filter"> <i class="fas fa-filter"></i> Mengikut Kumpulan</label>
+      </div>
+    </div>
+    
+    <div class="modal-field" id="batchField" style="display:none;">
+      <label>Pilih Pekerja (Boleh Pilih Berbilang)</label>
+      <div class="batch-list" id="batchList"></div>
+      <div class="modal-hint"><a href="#" id="batchSelectAll" style="color:var(--navy);font-weight:600;">Pilih Semua</a> · <a href="#" id="batchSelectNone" style="color:var(--red);font-weight:600;">Kosongkan</a></div>
+    </div>
+    
+    <div class="modal-field" id="filterField" style="display:none;">
+      <label>Pilih Kumpulan</label>
+      <select id="filterGroupSelect">
+        <option value="">-- Semua Kumpulan --</option>
+      </select>
+    </div>
+    
+    <div class="modal-actions">
+      <button class="btn btn-outline" id="cancelPrintBtn">Batal</button>
+      <button class="btn btn-primary" id="doPrintBtn"><i class="fas fa-print"></i> Cetak</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function () {
 'use strict';
 
-// ✅ 统一的 Navbar 交互逻辑
+// ✅ Navbar interaction
 document.addEventListener('DOMContentLoaded', function() {
   const backBtn = document.getElementById('backBtn');
   if (backBtn) backBtn.addEventListener('click', function(e) { e.preventDefault(); window.history.back(); });
   
-  const dropdownToggles = document.querySelectorAll('[data-dropdown-toggle]');
-  dropdownToggles.forEach(function(toggle) {
+  document.querySelectorAll('[data-dropdown-toggle]').forEach(function(toggle) {
     toggle.addEventListener('click', function(e) {
       e.stopPropagation();
       const dropdownId = this.getAttribute('data-dropdown-toggle');
@@ -514,6 +654,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 const STORAGE_KEY = 'payrollEmployees';
 const URL_KEY = 'payrollScriptUrl';
+const PAPER_KEY = 'payrollPaperSize';
+
 const FIELD_MAP = {
 timeOTHour: 'TimeOTHour', timeOTAmount: 'TimeOTAmount',
 dailyOTDay: 'DailyOTDay', dailyOTAmount: 'DailyOTAmount',
@@ -531,6 +673,7 @@ epfNo: 'SLREPF', socsoNo: 'SLRPERKESO', eisNo: 'SLREIS'
 };
 const TEXT_FIELDS = new Set(['bankNama', 'bankAcc', 'epfNo', 'socsoNo', 'eisNo']);
 const NUM_2DEC_FIELDS = new Set(['unpaidLeave', 'timeOTHour', 'timeOTAmount', 'dailyOTDay', 'dailyOTAmount']);
+const STATUTORY_FIELDS = ['epfEmployee','epfEmployer','socsoEmployee','socsoEmployer','eisEmployee','eisEmployer','lindung24jam'];
 
 const el = id => document.getElementById(id);
 const inputs = {};
@@ -560,13 +703,71 @@ const RM_FMT = new Intl.NumberFormat('ms-MY', { minimumFractionDigits: 2, maximu
 function num(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
 function fmtRM(v) { return 'RM ' + RM_FMT.format(num(v)); }
 
+/* ====== CASH / MECHANTRADE logic ====== */
+function isCashBankValue(val) {
+  const u = String(val || '').trim().toUpperCase();
+  return u === 'CASH' || u === 'MECHANTRADE';
+}
+
+function applyBankBasedStatutory() {
+  const cash = isCashBankValue(inputs.bankNama ? inputs.bankNama.value : '');
+  
+  STATUTORY_FIELDS.forEach(id => {
+    const inp = inputs[id];
+    if (!inp) return;
+    const row = inp.closest('.line-item');
+    if (cash) {
+      if (String(inp.value) !== '0.00' && String(inp.value) !== '0') inp.value = '0.00';
+      inp.readOnly = true;
+      inp.disabled = true;
+      if (currentRaw) currentRaw[FIELD_MAP[id]] = 0;
+      if (row) row.classList.add('cash-disabled');
+    } else {
+      inp.readOnly = false;
+      inp.disabled = false;
+      if (row) row.classList.remove('cash-disabled');
+    }
+  });
+
+  const autoBtn = el('autoCalcBtn');
+  if (autoBtn) {
+    if (cash) {
+      autoBtn.disabled = true;
+      autoBtn.style.opacity = '0.4';
+      autoBtn.style.cursor = 'not-allowed';
+      autoBtn.title = 'Tidak tersedia untuk bank CASH/MECHANTRADE';
+    } else {
+      autoBtn.disabled = false;
+      autoBtn.style.opacity = '';
+      autoBtn.style.cursor = '';
+      autoBtn.title = 'Kira anggaran caruman berdasarkan Gaji Caruman';
+    }
+  }
+}
+
+/* ====== Paper size ====== */
+function applyPaperSize(size) {
+  const s = (size || 'A4').toUpperCase();
+  document.body.classList.remove('paper-a4', 'paper-a5');
+  document.body.classList.add('paper-' + s.toLowerCase());
+  
+  let style = document.getElementById('dynamicPageSize');
+  if (!style) {
+    style = document.createElement('style');
+    style.id = 'dynamicPageSize';
+    document.head.appendChild(style);
+  }
+  if (s === 'A5') {
+    style.textContent = '@media print { @page { size: A5; margin: 6mm; } }';
+  } else {
+    style.textContent = '@media print { @page { size: A4; margin: 10mm; } }';
+  }
+  try { localStorage.setItem(PAPER_KEY, s); } catch (e) {}
+}
+
 function isAllOtZero(raw) {
     if (!raw) return true;
-    const v1 = num(raw.TimeOTHour);
-    const v2 = num(raw.TimeOTAmount);
-    const v3 = num(raw.DailyOTDay);
-    const v4 = num(raw.DailyOTAmount);
-    return v1 === 0 && v2 === 0 && v3 === 0 && v4 === 0;
+    return num(raw.TimeOTHour) === 0 && num(raw.TimeOTAmount) === 0 && num(raw.DailyOTDay) === 0 && num(raw.DailyOTAmount) === 0;
 }
 
 function setSyncStatus(msg, type) {
@@ -593,112 +794,109 @@ async function fetchOvertimeData() {
   try {
     const res = await fetch(`${SCRIPT_URL}?action=getOvertimeData&_t=${Date.now()}`);
     const data = await res.json();
-    if (data && data.status === 'success' && Array.isArray(data.data)) {
-      allOvertimeData = data.data;
-    }
-  } catch (e) {
-    console.error('Fetch OT data error:', e);
-  }
+    if (data && data.status === 'success' && Array.isArray(data.data)) allOvertimeData = data.data;
+  } catch (e) { console.error('Fetch OT data error:', e); }
 }
-
 async function fetchSheetData() {
   if (!SCRIPT_URL) return;
   try {
     const res = await fetch(`${SCRIPT_URL}?action=getSheetData&_t=${Date.now()}`);
     const data = await res.json();
-    if (data && data.status === 'success' && Array.isArray(data.data)) {
-      allSheetData = data.data;
-    }
+    if (data && data.status === 'success' && Array.isArray(data.data)) allSheetData = data.data;
   } catch (e) { console.error('Fetch SHEET error:', e); }
 }
-
 async function fetchALSLData() {
   if (!SCRIPT_URL) return;
   try {
     const res = await fetch(`${SCRIPT_URL}?action=getALSLData&_t=${Date.now()}`);
     const data = await res.json();
-    if (data && data.status === 'success' && Array.isArray(data.data)) {
-      allAlslData = data.data;
-    }
+    if (data && data.status === 'success' && Array.isArray(data.data)) allAlslData = data.data;
   } catch (e) { console.error('Fetch ALSL error:', e); }
 }
 
 function updateCalc() {
-const basic = num(el('inputGajiAsas').value);
-const commission = num(inputs.commision.value);
-const allowance = num(inputs.allowance.value);
-const otTotal = num(inputs.timeOTAmount.value) + num(inputs.dailyOTAmount.value);
+  // ✅ Always apply bank rule first
+  applyBankBasedStatutory();
 
-const epfBase = basic + commission + allowance;
-const socsoBase = basic + commission + allowance + otTotal;
-const eisBase = basic + commission + allowance + otTotal;
-const lindungBase = basic + commission + allowance + otTotal;
+  const basic = num(el('inputGajiAsas').value);
+  const commission = num(inputs.commision.value);
+  const allowance = num(inputs.allowance.value);
+  const otTotal = num(inputs.timeOTAmount.value) + num(inputs.dailyOTAmount.value);
 
-inputs.salaryEpf.value = epfBase.toFixed(2);
-inputs.salarySocso.value = socsoBase.toFixed(2);
-inputs.salaryEis.value = eisBase.toFixed(2);
-inputs.salary24jam.value = lindungBase.toFixed(2);
+  const epfBase = basic + commission + allowance;
+  const socsoBase = basic + commission + allowance + otTotal;
+  const eisBase = basic + commission + allowance + otTotal;
+  const lindungBase = basic + commission + allowance + otTotal;
 
-const income = basic
-+ num(inputs.timeOTAmount.value) + num(inputs.dailyOTAmount.value)
-+ allowance + commission
-+ num(inputs.incentives.value);
+  inputs.salaryEpf.value = epfBase.toFixed(2);
+  inputs.salarySocso.value = socsoBase.toFixed(2);
+  inputs.salaryEis.value = eisBase.toFixed(2);
+  inputs.salary24jam.value = lindungBase.toFixed(2);
 
-const ded = num(inputs.unpaidLeave.value) + num(inputs.pinjaman.value)
-+ num(inputs.deductionLain.value) + num(inputs.potonganLain2.value);
+  const income = basic
+  + num(inputs.timeOTAmount.value) + num(inputs.dailyOTAmount.value)
+  + allowance + commission
+  + num(inputs.incentives.value);
 
-const statutoryDed = num(inputs.epfEmployee.value) + num(inputs.socsoEmployee.value) 
-+ num(inputs.eisEmployee.value) + num(inputs.lindung24jam.value);
+  const ded = num(inputs.unpaidLeave.value) + num(inputs.pinjaman.value)
+  + num(inputs.deductionLain.value) + num(inputs.potonganLain2.value);
 
-const totalPotongan = ded + statutoryDed;
-const totalGajiKasar = income;
-const totalSalaryPay = totalGajiKasar - totalPotongan;
+  const statutoryDed = num(inputs.epfEmployee.value) + num(inputs.socsoEmployee.value) 
+  + num(inputs.eisEmployee.value) + num(inputs.lindung24jam.value);
 
-const totalDays = num(inputs.annualLeaveDays.value) + num(inputs.sickLeaveDays.value);
+  const totalPotongan = ded + statutoryDed;
+  const totalGajiKasar = income;
+  const totalSalaryPay = totalGajiKasar - totalPotongan;
 
-el('infoGajiAsas').innerText = fmtRM(basic);
-el('firstCalcTotal').innerText = fmtRM(income);
-el('totalPotongan').innerText = fmtRM(totalPotongan);
-el('totalHariCuti').innerText = totalDays + ' Hari';
+  const totalDays = num(inputs.annualLeaveDays.value) + num(inputs.sickLeaveDays.value);
 
-el('gajiKasarDisplay').innerText = fmtRM(totalGajiKasar);
-el('totalPotonganDisplay').innerText = fmtRM(totalPotongan);
-el('gajiBersihDisplay').innerText = fmtRM(totalSalaryPay);
+  el('infoGajiAsas').innerText = fmtRM(basic);
+  el('firstCalcTotal').innerText = fmtRM(income);
+  el('totalPotongan').innerText = fmtRM(totalPotongan);
+  el('totalHariCuti').innerText = totalDays + ' Hari';
 
-if (currentRaw) {
-currentRaw.TotalGajiKasar = totalGajiKasar;
-currentRaw.TotalPotongan = totalPotongan;
-currentRaw.TotalSalaryPay = totalSalaryPay;
-}
+  el('gajiKasarDisplay').innerText = fmtRM(totalGajiKasar);
+  el('totalPotonganDisplay').innerText = fmtRM(totalPotongan);
+  el('gajiBersihDisplay').innerText = fmtRM(totalSalaryPay);
+
+  if (currentRaw) {
+    currentRaw.TotalGajiKasar = totalGajiKasar;
+    currentRaw.TotalPotongan = totalPotongan;
+    currentRaw.TotalSalaryPay = totalSalaryPay;
+  }
 }
 
 function autoCalcStatutory() {
-const epfBase = num(inputs.salaryEpf.value);
-const socsoBase = num(inputs.salarySocso.value);
-const eisBase = num(inputs.salaryEis.value);
+  // ✅ Block for CASH/MECHANTRADE
+  if (isCashBankValue(inputs.bankNama.value)) {
+    alert('Caruman statutori tidak dikira untuk bank CASH/MECHANTRADE.');
+    return;
+  }
+  const epfBase = num(inputs.salaryEpf.value);
+  const socsoBase = num(inputs.salarySocso.value);
+  const eisBase = num(inputs.salaryEis.value);
 
-if (epfBase <= 0 && socsoBase <= 0 && eisBase <= 0) {
-alert('Sila masukkan Gaji Asas terlebih dahulu.');
-return;
-}
+  if (epfBase <= 0 && socsoBase <= 0 && eisBase <= 0) {
+    alert('Sila masukkan Gaji Asas terlebih dahulu.');
+    return;
+  }
 
-inputs.epfEmployee.value = Math.ceil(epfBase * 0.11);
-inputs.epfEmployer.value = Math.ceil(epfBase * (epfBase <= 5000 ? 0.13 : 0.12));
+  inputs.epfEmployee.value = Math.ceil(epfBase * 0.11);
+  inputs.epfEmployer.value = Math.ceil(epfBase * (epfBase <= 5000 ? 0.13 : 0.12));
 
-const socsoCap = Math.min(socsoBase, 6000);
-inputs.socsoEmployee.value = Math.round(socsoCap * 0.005 * 100) / 100;
-inputs.socsoEmployer.value = Math.round(socsoCap * 0.0175 * 100) / 100;
+  const socsoCap = Math.min(socsoBase, 6000);
+  inputs.socsoEmployee.value = Math.round(socsoCap * 0.005 * 100) / 100;
+  inputs.socsoEmployer.value = Math.round(socsoCap * 0.0175 * 100) / 100;
 
-const eisCap = Math.min(eisBase, 6000);
-inputs.eisEmployee.value = Math.round(eisCap * 0.002 * 100) / 100;
-inputs.eisEmployer.value = Math.round(eisCap * 0.002 * 100) / 100;
+  const eisCap = Math.min(eisBase, 6000);
+  inputs.eisEmployee.value = Math.round(eisCap * 0.002 * 100) / 100;
+  inputs.eisEmployer.value = Math.round(eisCap * 0.002 * 100) / 100;
 
-if (num(inputs.lindung24jam.value) === 0) {
-inputs.lindung24jam.value = 10.00;
-}
-
-updateCalc();
-setSyncStatus('Caruman dikira berdasarkan Gaji Caruman', 'success');
+  if (num(inputs.lindung24jam.value) === 0) {
+    inputs.lindung24jam.value = 10.00;
+  }
+  updateCalc();
+  setSyncStatus('Caruman dikira berdasarkan Gaji Caruman', 'success');
 }
 
 async function fetchStaffBasics() {
@@ -706,7 +904,6 @@ if (!SCRIPT_URL) { setSyncStatus('URL belum ditetapkan. Sila tetapkan di Dashboa
 setSyncStatus('Memuatkan data staf...', '');
 try {
   await Promise.all([fetchOvertimeData(), fetchSheetData(), fetchALSLData()]);
-  
   const res = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
   const data = await res.json();
   let staffRaw = [];
@@ -772,29 +969,15 @@ async function autoSelectFromStorage() {
 const urlParams = new URLSearchParams(window.location.search);
 const codeFromUrl = urlParams.get('code');
 const nameFromUrl = urlParams.get('name');
-
-const code = codeFromUrl
-|| localStorage.getItem('payrollSelectedCode')
-|| localStorage.getItem('selectedCode')
-|| localStorage.getItem('selectedEmployeeCode');
-const name = nameFromUrl
-|| localStorage.getItem('payrollSelectedName')
-|| localStorage.getItem('selectedName')
-|| localStorage.getItem('selectedEmployeeName');
-
+const code = codeFromUrl || localStorage.getItem('payrollSelectedCode') || localStorage.getItem('selectedCode') || localStorage.getItem('selectedEmployeeCode');
+const name = nameFromUrl || localStorage.getItem('payrollSelectedName') || localStorage.getItem('selectedName') || localStorage.getItem('selectedEmployeeName');
 let emp = null;
 if (code) {
 emp = activeStaffList.find(s => String(s.Code) === String(code));
-if (!emp) {
-emp = activeStaffList.find(s => String(s.Name).toUpperCase() === String(code).toUpperCase());
+if (!emp) emp = activeStaffList.find(s => String(s.Name).toUpperCase() === String(code).toUpperCase());
 }
-}
-if (!emp && name) {
-emp = activeStaffList.find(s => String(s.Name).toUpperCase() === String(name).toUpperCase());
-}
-
+if (!emp && name) emp = activeStaffList.find(s => String(s.Name).toUpperCase() === String(name).toUpperCase());
 if (!emp) return;
-
 el('infoKumpulan').value = emp.GroupName || '';
 populateKodAndNama(emp.GroupName || '', emp.Code);
 el('infoNama').value = emp.Name || '';
@@ -844,9 +1027,7 @@ if (!raw) return;
 let otRecord = null;
 if (allOvertimeData && allOvertimeData.length > 0) {
   otRecord = allOvertimeData.find(ot => String(ot['ID KOD'] || '').trim() === String(raw.Code).trim());
-  if (!otRecord) {
-    otRecord = allOvertimeData.find(ot => String(ot['NAME'] || '').trim().toUpperCase() === String(raw.Name || '').trim().toUpperCase());
-  }
+  if (!otRecord) otRecord = allOvertimeData.find(ot => String(ot['NAME'] || '').trim().toUpperCase() === String(raw.Name || '').trim().toUpperCase());
 }
 
 if (isAllOtZero(raw) && otRecord) {
@@ -868,10 +1049,7 @@ if (allSheetData && allSheetData.length > 0) {
       totalDeduction += num(r['TOTAL DEDUCTION(RM)']);
     }
   });
-  
-  if (num(raw.UnpaidLeave) === 0 && totalDeduction > 0) {
-    raw.UnpaidLeave = totalDeduction;
-  }
+  if (num(raw.UnpaidLeave) === 0 && totalDeduction > 0) raw.UnpaidLeave = totalDeduction;
 }
 
 if (allAlslData && allAlslData.length > 0) {
@@ -880,7 +1058,6 @@ if (allAlslData && allAlslData.length > 0) {
     const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
     return (targetName && rName === targetName) || (targetCode && rCode === targetCode);
   });
-
   if (alslRecord) {
     if (num(raw.AnnualLeaveDays) === 0) raw.AnnualLeaveDays = num(alslRecord['THISAL']);
     if (num(raw.SickLeaveDays) === 0) raw.SickLeaveDays = num(alslRecord['THISSL']);
@@ -888,18 +1065,13 @@ if (allAlslData && allAlslData.length > 0) {
 }
 
 const staff = activeStaffList.find(s => String(s.Code) === String(raw.Code));
-
 if (staff) {
 raw.Name = staff.Name;
 raw.GroupName = staff.GroupName;
 raw.Situation = staff.Situation;
-
 if (raw.Basic === undefined || raw.Basic === null || raw.Basic === '' || num(raw.Basic) === 0) {
-if (raw.BasicSalary !== undefined && raw.BasicSalary !== null && num(raw.BasicSalary) > 0) {
-raw.Basic = num(raw.BasicSalary);
-} else {
-raw.Basic = staff.Salary;
-}
+if (raw.BasicSalary !== undefined && raw.BasicSalary !== null && num(raw.BasicSalary) > 0) raw.Basic = num(raw.BasicSalary);
+else raw.Basic = staff.Salary;
 }
 if (raw.SLRBankNama === undefined || raw.SLRBankNama === null) raw.SLRBankNama = staff.BankNama || '';
 if (raw.SLRBankAccountNo === undefined || raw.SLRBankAccountNo === null) raw.SLRBankAccountNo = staff.BankAccountNo || '';
@@ -915,13 +1087,9 @@ Object.entries(FIELD_MAP).forEach(([id, key]) => {
 const inp = inputs[id];
 if (!inp) return;
 const v = raw[key];
-if (TEXT_FIELDS.has(id)) {
-  inp.value = (v === undefined || v === null || v === '') ? '—' : String(v);
-} else if (NUM_2DEC_FIELDS.has(id)) {
-  inp.value = num(v).toFixed(2); 
-} else {
-  inp.value = (v === undefined || v === null || v === '') ? 0 : num(v);
-}
+if (TEXT_FIELDS.has(id)) inp.value = (v === undefined || v === null || v === '') ? '—' : String(v);
+else if (NUM_2DEC_FIELDS.has(id)) inp.value = num(v).toFixed(2); 
+else inp.value = (v === undefined || v === null || v === '') ? 0 : num(v);
 });
 MANUAL_FIELDS.forEach(f => {
 const inp = el(f.inputId);
@@ -930,7 +1098,7 @@ editStates[f.inputId] = false;
 if (inp) inp.readOnly = true;
 if (btn) { btn.classList.remove('editing'); btn.innerHTML = '<i class="fas fa-pen"></i>'; }
 });
-updateCalc();
+updateCalc(); // this calls applyBankBasedStatutory inside
 }
 
 function toggleEditField(field) {
@@ -952,6 +1120,10 @@ if (currentRaw) {
   } else {
     currentRaw[field.rawKey] = inp.value;
   }
+}
+// ✅ Re-check bank rule when bank name edited
+if (field.inputId === 'bankNama') {
+  updateCalc();
 }
 }
 }
@@ -981,10 +1153,7 @@ alert('✅ Semua medan telah direset ke default.\nKlik "Simpan & Sync" untuk men
 }
 
 async function saveAndSync() {
-if (!currentRaw || !currentRaw.Code) {
-alert('Tiada pekerja dipilih. Sila pilih KOD terlebih dahulu.');
-return;
-}
+if (!currentRaw || !currentRaw.Code) { alert('Tiada pekerja dipilih. Sila pilih KOD terlebih dahulu.'); return; }
 const btn = el('saveBtn');
 const originalText = btn.innerHTML;
 btn.disabled = true;
@@ -1005,9 +1174,13 @@ if (TEXT_FIELDS.has(id)) updated[key] = inp.value;
 else updated[key] = num(inp.value);
 });
 
+// ✅ Force statutory to 0 for CASH/MECHANTRADE
+if (isCashBankValue(updated.SLRBankNama)) {
+  STATUTORY_FIELDS.forEach(id => { updated[FIELD_MAP[id]] = 0; });
+}
+
 updated.BasicSalary = updated.Basic;
 updated.Code = String(updated.Code).trim();
-
 updated.TotalGajiKasar = num(el('gajiKasarDisplay').innerText.replace(/[^0-9.\-]/g,''));
 updated.TotalPotongan = num(el('totalPotonganDisplay').innerText.replace(/[^0-9.\-]/g,''));
 updated.TotalSalaryPay = num(el('gajiBersihDisplay').innerText.replace(/[^0-9.\-]/g,''));
@@ -1023,17 +1196,13 @@ headers: { 'Content-Type': 'text/plain;charset=utf-8' },
 body: JSON.stringify(payload)
 });
 const result = await res.json();
-if (result.status === 'success') {
-sheetSuccess = true;
-} else {
-throw new Error(result.message || 'Gagal sync ke Sheet');
-}
+if (result.status === 'success') sheetSuccess = true;
+else throw new Error(result.message || 'Gagal sync ke Sheet');
 } catch (err) {
 console.error('Sync to sheet error:', err);
 const proceed = confirm(`⚠️ Gagal sync ke Google Sheet: ${err.message}\nAdakah anda mahu tetap simpan di LocalStorage sahaja?`);
 if (!proceed) {
-btn.disabled = false;
-btn.innerHTML = originalText;
+btn.disabled = false; btn.innerHTML = originalText;
 setSyncStatus('Batal simpan', 'error');
 return;
 }
@@ -1052,16 +1221,12 @@ else all.push(updated);
 try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); } catch (e) { console.error(e); }
 allEmployees = all;
 currentRaw = updated;
-
 try {
 localStorage.setItem('payrollSelectedCode', String(updated.Code));
 localStorage.setItem('payrollSelectedName', String(updated.Name || ''));
 } catch (e) {}
-
 try {
-if (window.opener && !window.opener.closed) {
-window.opener.postMessage({ type: 'PAYROLL_UPDATE', employees: all }, '*');
-}
+if (window.opener && !window.opener.closed) window.opener.postMessage({ type: 'PAYROLL_UPDATE', employees: all }, '*');
 } catch (e) {}
 
 btn.disabled = false;
@@ -1077,42 +1242,25 @@ alert('✅ Data disimpan di LocalStorage. (Gagal sync ke Sheet)');
 }
 
 async function syncFromSheet(silent = false) {
-if (!currentRaw || !currentRaw.Code) {
-if (!silent) alert('Sila pilih pekerja dahulu.');
-return;
-}
-if (!SCRIPT_URL) {
-if (!silent) alert('Sila tetapkan URL Deploy terlebih dahulu di Dashboard.');
-return;
-}
+if (!currentRaw || !currentRaw.Code) { if (!silent) alert('Sila pilih pekerja dahulu.'); return; }
+if (!SCRIPT_URL) { if (!silent) alert('Sila tetapkan URL Deploy terlebih dahulu di Dashboard.'); return; }
 const btn = el('syncSheetBtn');
 const originalText = btn.innerHTML;
-if (btn) {
-btn.disabled = true;
-btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menarik...';
-}
+if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menarik...'; }
 try {
   await Promise.all([fetchOvertimeData(), fetchSheetData(), fetchALSLData()]);
-
   const res = await fetch(SCRIPT_URL, {
   method: 'POST',
   headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-  body: JSON.stringify({
-  action: 'getEmployeeDetail',
-  Code: currentRaw.Code,
-  Name: currentRaw.Name
-  })
+  body: JSON.stringify({ action: 'getEmployeeDetail', Code: currentRaw.Code, Name: currentRaw.Name })
   });
   const result = await res.json();
-  
   const staff = activeStaffList.find(s => String(s.Code) === String(currentRaw.Code));
   
   let otRecord = null;
   if (allOvertimeData && allOvertimeData.length > 0) {
     otRecord = allOvertimeData.find(ot => String(ot['ID KOD'] || '').trim() === String(currentRaw.Code).trim());
-    if (!otRecord) {
-      otRecord = allOvertimeData.find(ot => String(ot['NAME'] || '').trim().toUpperCase() === String(currentRaw.Name || '').trim().toUpperCase());
-    }
+    if (!otRecord) otRecord = allOvertimeData.find(ot => String(ot['NAME'] || '').trim().toUpperCase() === String(currentRaw.Name || '').trim().toUpperCase());
   }
 
   if (result.status === 'success' && result.data) {
@@ -1125,62 +1273,41 @@ try {
       merged.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
       merged.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
     }
-
     const targetName = String(merged.Name || '').trim().toUpperCase();
     const targetCode = String(merged.Code || '').trim();
-    
     let totalDed = 0;
     if (allSheetData && allSheetData.length > 0) {
       allSheetData.forEach(r => {
         const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
         const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
-        if ((targetName && rName === targetName) || (targetCode && rCode === targetCode)) {
-          totalDed += num(r['TOTAL DEDUCTION(RM)']);
-        }
+        if ((targetName && rName === targetName) || (targetCode && rCode === targetCode)) totalDed += num(r['TOTAL DEDUCTION(RM)']);
       });
-      // 修改：如果 merged.UnpaidLeave 为0，才用 SHEET 的数据
-      if (num(merged.UnpaidLeave) === 0 && totalDed > 0) {
-        merged.UnpaidLeave = totalDed;
-      }
+      if (num(merged.UnpaidLeave) === 0 && totalDed > 0) merged.UnpaidLeave = totalDed;
     }
-
     if (allAlslData && allAlslData.length > 0) {
       const alsl = allAlslData.find(r => {
         const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
         const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
         return (targetName && rName === targetName) || (targetCode && rCode === targetCode);
       });
-      if (alsl) {
-        merged.AnnualLeaveDays = num(alsl['THISAL']);
-        merged.SickLeaveDays = num(alsl['THISSL']);
-      }
+      if (alsl) { merged.AnnualLeaveDays = num(alsl['THISAL']); merged.SickLeaveDays = num(alsl['THISSL']); }
     }
-
     if (staff) {
       merged.Name = staff.Name;
       merged.GroupName = staff.GroupName;
       merged.Situation = staff.Situation;
-      if (merged.Basic === undefined || merged.Basic === null || merged.Basic === '' || num(merged.Basic) === 0) {
-        merged.Basic = staff.Salary;
-      }
+      if (merged.Basic === undefined || merged.Basic === null || merged.Basic === '' || num(merged.Basic) === 0) merged.Basic = staff.Salary;
     }
-
     if (merged.BasicSalary !== undefined && merged.BasicSalary !== null && merged.BasicSalary !== '') {
-      if (num(merged.Basic) === 0 && num(merged.BasicSalary) > 0) {
-        merged.Basic = num(merged.BasicSalary);
-      }
+      if (num(merged.Basic) === 0 && num(merged.BasicSalary) > 0) merged.Basic = num(merged.BasicSalary);
     }
-
     fillForm(merged);
     const idx = allEmployees.findIndex(e => String(e.Code) === String(currentRaw.Code));
-    if (idx !== -1) allEmployees[idx] = merged;
-    else allEmployees.push(merged);
+    if (idx !== -1) allEmployees[idx] = merged; else allEmployees.push(merged);
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees)); } catch(e) {}
     const lastUpdated = sheetData.LastUpdated || '—';
     setSyncStatus('Data dari Sheet & Overtime dimuat · ' + lastUpdated, 'success');
-    if (!silent) {
-      alert('✅ Data berjaya dimuat dari LISTCALCULATION & OVERTIME.\nTerakhir dikemas kini: ' + lastUpdated);
-    }
+    if (!silent) alert('✅ Data berjaya dimuat dari LISTCALCULATION & OVERTIME.\nTerakhir dikemas kini: ' + lastUpdated);
   } else {
     if (isAllOtZero(currentRaw) && otRecord) {
       currentRaw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
@@ -1188,37 +1315,25 @@ try {
       currentRaw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
       currentRaw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
     }
-    
     const targetName = String(currentRaw.Name || '').trim().toUpperCase();
     const targetCode = String(currentRaw.Code || '').trim();
-    
     let totalDed = 0;
     if (allSheetData && allSheetData.length > 0) {
       allSheetData.forEach(r => {
         const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
         const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
-        if ((targetName && rName === targetName) || (targetCode && rCode === targetCode)) {
-          totalDed += num(r['TOTAL DEDUCTION(RM)']);
-        }
+        if ((targetName && rName === targetName) || (targetCode && rCode === targetCode)) totalDed += num(r['TOTAL DEDUCTION(RM)']);
       });
-      // 修改：如果 currentRaw.UnpaidLeave 为0，才用 SHEET 的数据
-      if (num(currentRaw.UnpaidLeave) === 0 && totalDed > 0) {
-        currentRaw.UnpaidLeave = totalDed;
-      }
+      if (num(currentRaw.UnpaidLeave) === 0 && totalDed > 0) currentRaw.UnpaidLeave = totalDed;
     }
-
     if (allAlslData && allAlslData.length > 0) {
       const alsl = allAlslData.find(r => {
         const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
         const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
         return (targetName && rName === targetName) || (targetCode && rCode === targetCode);
       });
-      if (alsl) {
-        currentRaw.AnnualLeaveDays = num(alsl['THISAL']);
-        currentRaw.SickLeaveDays = num(alsl['THISSL']);
-      }
+      if (alsl) { currentRaw.AnnualLeaveDays = num(alsl['THISAL']); currentRaw.SickLeaveDays = num(alsl['THISSL']); }
     }
-
     if (staff) {
       if (currentRaw.SLRBankNama === undefined || currentRaw.SLRBankNama === null || currentRaw.SLRBankNama === '') currentRaw.SLRBankNama = staff.BankNama || '';
       if (currentRaw.SLRBankAccountNo === undefined || currentRaw.SLRBankAccountNo === null || currentRaw.SLRBankAccountNo === '') currentRaw.SLRBankAccountNo = staff.BankAccountNo || '';
@@ -1235,10 +1350,7 @@ try {
   setSyncStatus('Gagal sync dari Sheet', 'error');
   if (!silent) alert('❌ Gagal sync dari Sheet: ' + err.message);
 } finally {
-  if (btn) {
-  btn.disabled = false;
-  btn.innerHTML = originalText;
-  }
+  if (btn) { btn.disabled = false; btn.innerHTML = originalText; }
 }
 }
 
@@ -1263,39 +1375,209 @@ return;
 setSyncStatus('Tiada data', 'error');
 }
 
+/* ============ PRINTING ============ */
+
+function buildDefaultPrintData(emp) {
+  return {
+    Code: emp.Code, Name: emp.Name, GroupName: emp.GroupName, Situation: emp.Situation,
+    BasicSalary: emp.Salary, Basic: emp.Salary,
+    TimeOTHour: 0, TimeOTAmount: 0, DailyOTDay: 0, DailyOTAmount: 0,
+    Allowance2: 0, Commission: 0, Incentives: 0,
+    UnpaidLeave: 0, Pinjaman: 0, Deduction: 0, PotonganLain2: 0,
+    AnnualLeaveDays: 0, SickLeaveDays: 0,
+    EPFSalary: 0, SOCSOSalary: 0, EISSalary: 0, LindungSalary: 0,
+    EPF_Employee: 0, EPF_Employer: 0, SOCSO_Employee: 0, SOCSO_Employer: 0,
+    EIS_Employee: 0, EIS_Employer: 0, Lindung24Jam: 0,
+    SLRBankNama: emp.BankNama || '', SLRBankAccountNo: emp.BankAccountNo || '',
+    SLREPF: emp.EPF || '', SLRPERKESO: emp.PERKESO || '', SLREIS: emp.EIS || '',
+    TotalGajiKasar: 0, TotalPotongan: 0, TotalSalaryPay: 0, LastUpdated: ''
+  };
+}
+
+async function printEmployees(codes) {
+  if (!codes || codes.length === 0) return;
+  
+  // Single employee = current view
+  if (codes.length === 1 && currentRaw && String(codes[0]) === String(currentRaw.Code)) {
+    setTimeout(() => window.print(), 100);
+    return;
+  }
+  
+  const container = el('payslipContainer');
+  const savedRaw = currentRaw ? { ...currentRaw } : null;
+  const savedCode = el('infoKod').value;
+  const savedName = el('infoNama').value;
+  const savedGroup = el('infoKumpulan').value;
+  
+  // Pre-gather job data
+  const jobs = [];
+  for (const code of codes) {
+    const emp = activeStaffList.find(s => String(s.Code) === String(code));
+    if (!emp) continue;
+    let data = allEmployees.find(e => String(e.Code) === String(code));
+    if (!data) data = buildDefaultPrintData(emp);
+    jobs.push({ emp, data });
+  }
+  if (jobs.length === 0) {
+    alert('Tiada pekerja dipilih untuk dicetak.');
+    return;
+  }
+  
+  const wrapper = document.createElement('div');
+  wrapper.className = 'multi-print-wrapper';
+  
+  for (const job of jobs) {
+    fillForm(job.data);
+    const clone = container.cloneNode(true);
+    clone.removeAttribute('id');
+    clone.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+    clone.querySelectorAll('.no-print').forEach(n => n.remove());
+    wrapper.appendChild(clone);
+  }
+  
+  const originalDisplay = container.style.display;
+  container.style.display = 'none';
+  document.body.appendChild(wrapper);
+  
+  await new Promise(r => setTimeout(r, 180));
+  window.print();
+  await new Promise(r => setTimeout(r, 250));
+  
+  // Cleanup
+  wrapper.remove();
+  container.style.display = originalDisplay;
+  
+  // Restore
+  if (savedRaw) {
+    fillForm(savedRaw);
+    if (savedCode) el('infoKod').value = savedCode;
+    if (savedName) el('infoNama').value = savedName;
+    if (savedGroup !== undefined) el('infoKumpulan').value = savedGroup;
+  }
+}
+
+/* ============ MODAL handlers ============ */
+function populateBatchList() {
+  const list = el('batchList');
+  if (!list) return;
+  const employees = activeStaffList.slice().sort((a, b) => String(a.Code).localeCompare(String(b.Code)));
+  if (employees.length === 0) {
+    list.innerHTML = '<div style="padding:12px;text-align:center;color:var(--ink-3);font-size:.78rem;">Tiada pekerja tersedia.</div>';
+    return;
+  }
+  list.innerHTML = employees.map(s => `
+    <label>
+      <input type="checkbox" value="${String(s.Code).replace(/"/g,'&quot;')}">
+      <span><strong>${s.Code}</strong> — ${s.Name}</span>
+    </label>
+  `).join('');
+}
+
+function populateFilterGroups() {
+  const sel = el('filterGroupSelect');
+  if (!sel) return;
+  const groups = [...new Set(activeStaffList.map(s => s.GroupName).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">-- Semua Kumpulan --</option>' + groups.map(g => `<option value="${g}">${g}</option>`).join('');
+}
+
+function openPrintModal() {
+  const ps = el('paperSizeSelect');
+  try {
+    const saved = localStorage.getItem(PAPER_KEY) || 'A4';
+    ps.value = saved;
+    applyPaperSize(saved);
+  } catch(e) { ps.value = 'A4'; }
+  
+  populateBatchList();
+  populateFilterGroups();
+  updatePrintModeUI('current');
+  el('printModal').classList.add('open');
+}
+function closePrintModal() {
+  el('printModal').classList.remove('open');
+}
+function updatePrintModeUI(mode) {
+  el('batchField').style.display = (mode === 'batch') ? '' : 'none';
+  el('filterField').style.display = (mode === 'filter') ? '' : 'none';
+  document.querySelectorAll('.print-modes label').forEach(l => l.classList.remove('active'));
+  const activeLabel = document.querySelector(`.print-modes input[value="${mode}"]`)?.closest('label');
+  if (activeLabel) activeLabel.classList.add('active');
+}
+
+/* ============ Event wire-up ============ */
 Object.values(inputs).forEach(inp => { if (inp) { inp.addEventListener('input', updateCalc); inp.addEventListener('change', updateCalc); } });
 el('saveBtn').addEventListener('click', saveAndSync);
 el('syncSheetBtn').addEventListener('click', () => syncFromSheet(false));
 el('resetBtn').addEventListener('click', resetToDefault);
 el('reloadBtn').addEventListener('click', () => {
-const code = el('infoKod').value;
-if (code) { const emp = activeStaffList.find(s => String(s.Code) === String(code)); if (emp) { switchEmployee(emp); syncFromSheet(true); } }
-else fetchStaffBasics();
+  const code = el('infoKod').value;
+  if (code) { const emp = activeStaffList.find(s => String(s.Code) === String(code)); if (emp) { switchEmployee(emp); syncFromSheet(true); } }
+  else fetchStaffBasics();
 });
-el('printBtn').addEventListener('click', () => window.print());
 el('autoCalcBtn').addEventListener('click', autoCalcStatutory);
 
-// 重置 OT 按钮
+// Print modal
+el('printBtn').addEventListener('click', openPrintModal);
+el('cancelPrintBtn').addEventListener('click', closePrintModal);
+el('printModal').addEventListener('click', (e) => {
+  if (e.target === el('printModal')) closePrintModal();
+});
+el('paperSizeSelect').addEventListener('change', (e) => {
+  applyPaperSize(e.target.value);
+});
+document.querySelectorAll('.print-modes input[name="printMode"]').forEach(r => {
+  r.addEventListener('change', (e) => updatePrintModeUI(e.target.value));
+});
+el('batchSelectAll')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  el('batchList').querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = true);
+});
+el('batchSelectNone')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  el('batchList').querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);
+});
+el('doPrintBtn').addEventListener('click', () => {
+  const mode = document.querySelector('.print-modes input[name="printMode"]:checked')?.value || 'current';
+  let codes = [];
+  
+  if (mode === 'current') {
+    if (!currentRaw || !currentRaw.Code) { alert('Sila pilih pekerja dahulu.'); return; }
+    codes = [currentRaw.Code];
+  } else if (mode === 'all') {
+    codes = activeStaffList.map(s => s.Code);
+    if (codes.length === 0) { alert('Tiada pekerja tersedia.'); return; }
+  } else if (mode === 'batch') {
+    const checked = el('batchList').querySelectorAll('input[type=checkbox]:checked');
+    codes = Array.from(checked).map(cb => cb.value);
+    if (codes.length === 0) { alert('Sila pilih sekurang-kurangnya seorang pekerja.'); return; }
+  } else if (mode === 'filter') {
+    const group = el('filterGroupSelect').value;
+    const filtered = group ? activeStaffList.filter(s => s.GroupName === group) : activeStaffList;
+    codes = filtered.map(s => s.Code);
+    if (codes.length === 0) { alert('Tiada pekerja dalam kumpulan ini.'); return; }
+  }
+  
+  closePrintModal();
+  setTimeout(() => printEmployees(codes), 150);
+});
+
+// Reset OT
 el('resetOTBtn').addEventListener('click', () => {
     if (!currentRaw || !currentRaw.Code) { alert('Sila pilih pekerja dahulu.'); return; }
     let otRecord = null;
     if (allOvertimeData && allOvertimeData.length > 0) {
         otRecord = allOvertimeData.find(ot => String(ot['ID KOD'] || '').trim() === String(currentRaw.Code).trim());
-        if (!otRecord) {
-            otRecord = allOvertimeData.find(ot => String(ot['NAME'] || '').trim().toUpperCase() === String(currentRaw.Name || '').trim().toUpperCase());
-        }
+        if (!otRecord) otRecord = allOvertimeData.find(ot => String(ot['NAME'] || '').trim().toUpperCase() === String(currentRaw.Name || '').trim().toUpperCase());
     }
     if (otRecord) {
         currentRaw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
         currentRaw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
         currentRaw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
         currentRaw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
-        
         inputs.timeOTHour.value = currentRaw.TimeOTHour.toFixed(2);
         inputs.timeOTAmount.value = currentRaw.TimeOTAmount.toFixed(2);
         inputs.dailyOTDay.value = currentRaw.DailyOTDay.toFixed(2);
         inputs.dailyOTAmount.value = currentRaw.DailyOTAmount.toFixed(2);
-        
         updateCalc();
         setSyncStatus('OT telah direset berdasarkan data OVERTIME terkini', 'success');
     } else {
@@ -1303,7 +1585,7 @@ el('resetOTBtn').addEventListener('click', () => {
     }
 });
 
-// 新增：重置 Cuti Tanpa Gaji 按钮
+// Reset Unpaid Leave
 el('resetUnpaidBtn').addEventListener('click', () => {
     if (!currentRaw || !currentRaw.Code) { alert('Sila pilih pekerja dahulu.'); return; }
     const targetName = String(currentRaw.Name || '').trim().toUpperCase();
@@ -1313,9 +1595,7 @@ el('resetUnpaidBtn').addEventListener('click', () => {
         allSheetData.forEach(r => {
             const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
             const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
-            if ((targetName && rName === targetName) || (targetCode && rCode === targetCode)) {
-                totalDed += num(r['TOTAL DEDUCTION(RM)']);
-            }
+            if ((targetName && rName === targetName) || (targetCode && rCode === targetCode)) totalDed += num(r['TOTAL DEDUCTION(RM)']);
         });
     }
     if (totalDed > 0) {
@@ -1329,29 +1609,30 @@ el('resetUnpaidBtn').addEventListener('click', () => {
 });
 
 MANUAL_FIELDS.forEach(field => {
-const inp = el(field.inputId);
-const btn = el(field.btnId);
-if (btn) btn.addEventListener('click', () => toggleEditField(field));
-if (inp) inp.addEventListener('input', (e) => { 
+  const inp = el(field.inputId);
+  const btn = el(field.btnId);
+  if (btn) btn.addEventListener('click', () => toggleEditField(field));
+  if (inp) inp.addEventListener('input', (e) => { 
     if (currentRaw) {
-        if (NUM_2DEC_FIELDS.has(field.inputId)) {
-            currentRaw[field.rawKey] = num(e.target.value);
-        } else {
-            currentRaw[field.rawKey] = e.target.value;
-        }
+      if (NUM_2DEC_FIELDS.has(field.inputId)) currentRaw[field.rawKey] = num(e.target.value);
+      else currentRaw[field.rawKey] = e.target.value;
     } 
-});
+  });
 });
 document.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === 's') { e.preventDefault(); saveAndSync(); } });
 window.addEventListener('storage', (e) => {
-if (e.key === URL_KEY && e.newValue) {
-SCRIPT_URL = e.newValue; el('deployUrlDisplay').value = e.newValue; el('urlStatusDot').className = 'status-dot ok';
-setSyncStatus('URL dikemas kini, memuat semula...', 'success'); fetchStaffBasics();
-}
+  if (e.key === URL_KEY && e.newValue) {
+    SCRIPT_URL = e.newValue; el('deployUrlDisplay').value = e.newValue; el('urlStatusDot').className = 'status-dot ok';
+    setSyncStatus('URL dikemas kini, memuat semula...', 'success'); fetchStaffBasics();
+  }
 });
 
+// Init
 setPeriod();
 loadSavedUrl();
+applyPaperSize(localStorage.getItem(PAPER_KEY) || 'A4');
+try { el('paperSizeSelect').value = localStorage.getItem(PAPER_KEY) || 'A4'; } catch(e) {}
+
 if (SCRIPT_URL) fetchStaffBasics();
 else setSyncStatus('Sila tetapkan URL di Dashboard terlebih dahulu.', 'error');
 })();
