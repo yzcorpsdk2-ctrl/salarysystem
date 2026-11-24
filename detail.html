@@ -31,7 +31,7 @@ padding: 0 18px 60px;
 display:flex; flex-direction: column; align-items: center; min-height:100vh;
 }
 
-/* ===== Navbar (unchanged) ===== */
+/* ===== Navbar ===== */
 .navbar {
 position: sticky; top: 0; z-index: 200;
 display: flex; align-items: stretch; flex-wrap: wrap;
@@ -64,24 +64,9 @@ width: calc(100% + 36px); margin-left: -18px; margin-right: -18px; margin-bottom
 .nav-chat .pulse { width: 7px; height: 7px; border-radius: 50%; background: #6ef0a8; box-shadow: 0 0 0 0 rgba(110,240,168,0.75); animation: pulse 2s infinite; }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(110,240,168,0.7); } 70% { box-shadow: 0 0 0 7px rgba(110,240,168,0); } 100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); } }
 
-/* ===== Container ===== */
-.payslip-container{ width:100%; max-width:1280px; background:var(--card); border:1px solid #e2e9f1; border-radius:18px; box-shadow:0 1px 2px rgba(16,32,56,.06), 0 18px 48px rgba(16,32,56,.12); padding:30px 34px 34px; position:relative; overflow:hidden; margin-top: 8px; transition: max-width .25s ease; }
+/* ===== Container (screen 保持原样 1280px) ===== */
+.payslip-container{ width:100%; max-width:1280px; background:var(--card); border:1px solid #e2e9f1; border-radius:18px; box-shadow:0 1px 2px rgba(16,32,56,.06), 0 18px 48px rgba(16,32,56,.12); padding:30px 34px 34px; position:relative; overflow:hidden; margin-top: 8px; }
 .payslip-container::before{ content:''; position:absolute; inset:0 0 auto 0; height:4px; background:linear-gradient(90deg, var(--navy) 0%, var(--navy) 58%, var(--green) 58%, var(--green) 100%); }
-
-/* ===== A4 / A5 paper preview (screen) ===== */
-body.paper-a4 .payslip-container{ max-width: 718px; }
-body.paper-a5 .payslip-container{ max-width: 514px; padding: 18px 14px 22px; font-size: 14px; }
-body.paper-a5 .payslip-header{ flex-direction: column; align-items: flex-start; }
-body.paper-a5 .header-badges{ justify-content: flex-start; }
-body.paper-a5 .brand h1{ font-size: 1.15rem; }
-body.paper-a5 .field-grid{ grid-template-columns: 1fr; }
-body.paper-a5 .meta-grid{ grid-template-columns: 1fr; }
-body.paper-a5 .columns{ grid-template-columns: 1fr 1fr; }
-body.paper-a5 .panel-cuti{ grid-column: 1 / -1; }
-body.paper-a5 .extra-grid{ grid-template-columns: 1fr; }
-body.paper-a5 .summary{ grid-template-columns: 1fr; }
-body.paper-a5 .basic-display{ font-size: 1.5rem; }
-body.paper-a5 .sum-value{ font-size: 1.2rem; }
 
 /* ===== Header ===== */
 .payslip-header{ display:flex; justify-content:space-between; align-items:flex-start; gap:18px; flex-wrap:wrap; padding-bottom:16px; margin-bottom:22px; border-bottom:1px solid var(--line); position:relative; }
@@ -105,7 +90,7 @@ body.paper-a5 .sum-value{ font-size: 1.2rem; }
 .url-bar .status-dot.ok { background: #22c55e; }
 .url-bar .status-dot.err { background: #ef4444; }
 
-/* ===== Action bar (moved above meta-grid) ===== */
+/* Action bar (moved above meta-grid) */
 .action-bar{ display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; padding-bottom:20px; border-bottom:1px solid var(--line); margin-bottom: 22px; }
 .btn-group{ display:flex; gap:10px; flex-wrap:wrap; }
 .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 22px; border-radius:10px; font-size:.86rem; font-weight:700; font-family:inherit; border:1px solid transparent; cursor:pointer; white-space:nowrap; transition:transform .12s, box-shadow .15s, background .15s, border-color .15s, color .15s; }
@@ -202,7 +187,7 @@ select.field-input { appearance: none; padding-right: 28px; cursor: pointer; bac
 .mini-edit-btn.editing { background: #0f7a4d; color: #fff; border-color: #0f7a4d; }
 .mini-edit-btn.editing:hover { background: #0b5c3a; border-color: #0b5c3a; }
 
-/* ===== CASH / MECHANTRADE disabled visual ===== */
+/* CASH / MECHANTRADE disabled visual */
 .line-item.cash-disabled label{ color:#b0bccb; text-decoration: line-through; }
 .line-item.cash-disabled .amount{ opacity: 0.55; background: #eef1f5; }
 .mini-btn[disabled]{ opacity: .4; cursor: not-allowed; }
@@ -265,7 +250,7 @@ select.field-input { appearance: none; padding-right: 28px; cursor: pointer; bac
 .modal-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--line); }
 .modal-hint{ font-size:.72rem; color:var(--ink-3); margin-top:6px; }
 
-/* ===== Responsive ===== */
+/* ===== Responsive (screen unchanged) ===== */
 @media (max-width: 1100px){ .columns{ grid-template-columns:1fr 1fr; } .panel-cuti{ grid-column: 1 / -1; } .extra-grid{ grid-template-columns:repeat(2, minmax(0,1fr)); } }
 @media (max-width: 980px){ .meta-grid{ grid-template-columns:1fr; } .extra-grid{ grid-template-columns:1fr 1fr; } }
 @media (max-width: 760px){ .columns{ grid-template-columns:1fr; } .summary{ grid-template-columns:1fr; } .extra-grid{ grid-template-columns:1fr; } .payslip-container{ padding:24px 20px 28px; } .brand h1{ font-size:1.2rem; } }
@@ -279,7 +264,7 @@ select.field-input { appearance: none; padding-right: 28px; cursor: pointer; bac
 body { padding: 0 10px 40px; }
 }
 
-/* ===== PRINT ===== */
+/* ===== PRINT (only @page injected via JS, 屏幕不变) ===== */
 @media print{
 *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
 body{ background:#fff; padding:0; display:block; font-size:12px; }
@@ -304,14 +289,9 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
   break-after: auto;
 }
 }
-
-/* A4/A5 page size (dynamic via JS) */
-@media print {
-  /* Default A4, overridden by injected style */
-}
 </style>
 </head>
-<body class="paper-a4">
+<body>
 
 <!-- Navbar -->
 <nav class="navbar">
@@ -582,12 +562,12 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
     <h3><i class="fas fa-print"></i> Pilihan Cetakan</h3>
     
     <div class="modal-field">
-      <label>Saiz Kertas</label>
+      <label>Saiz Kertas (Untuk Cetakan Sahaja)</label>
       <select id="paperSizeSelect">
         <option value="A4">A4 (210 × 297 mm)</option>
         <option value="A5">A5 (148 × 210 mm)</option>
       </select>
-      <div class="modal-hint">Pratonton di skrin akan mengikut saiz kertas yang dipilih.</div>
+      <div class="modal-hint">Pratonton di skrin tidak berubah. Saiz ini hanya digunakan semasa mencetak.</div>
     </div>
     
     <div class="modal-field">
@@ -624,7 +604,7 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
 (function () {
 'use strict';
 
-// ✅ Navbar interaction
+// Navbar interaction
 document.addEventListener('DOMContentLoaded', function() {
   const backBtn = document.getElementById('backBtn');
   if (backBtn) backBtn.addEventListener('click', function(e) { e.preventDefault(); window.history.back(); });
@@ -745,12 +725,9 @@ function applyBankBasedStatutory() {
   }
 }
 
-/* ====== Paper size ====== */
+/* ====== Paper size (只影响打印，屏幕不变) ====== */
 function applyPaperSize(size) {
   const s = (size || 'A4').toUpperCase();
-  document.body.classList.remove('paper-a4', 'paper-a5');
-  document.body.classList.add('paper-' + s.toLowerCase());
-  
   let style = document.getElementById('dynamicPageSize');
   if (!style) {
     style = document.createElement('style');
@@ -815,7 +792,6 @@ async function fetchALSLData() {
 }
 
 function updateCalc() {
-  // ✅ Always apply bank rule first
   applyBankBasedStatutory();
 
   const basic = num(el('inputGajiAsas').value);
@@ -867,7 +843,6 @@ function updateCalc() {
 }
 
 function autoCalcStatutory() {
-  // ✅ Block for CASH/MECHANTRADE
   if (isCashBankValue(inputs.bankNama.value)) {
     alert('Caruman statutori tidak dikira untuk bank CASH/MECHANTRADE.');
     return;
@@ -1098,7 +1073,7 @@ editStates[f.inputId] = false;
 if (inp) inp.readOnly = true;
 if (btn) { btn.classList.remove('editing'); btn.innerHTML = '<i class="fas fa-pen"></i>'; }
 });
-updateCalc(); // this calls applyBankBasedStatutory inside
+updateCalc();
 }
 
 function toggleEditField(field) {
@@ -1121,7 +1096,6 @@ if (currentRaw) {
     currentRaw[field.rawKey] = inp.value;
   }
 }
-// ✅ Re-check bank rule when bank name edited
 if (field.inputId === 'bankNama') {
   updateCalc();
 }
@@ -1174,7 +1148,6 @@ if (TEXT_FIELDS.has(id)) updated[key] = inp.value;
 else updated[key] = num(inp.value);
 });
 
-// ✅ Force statutory to 0 for CASH/MECHANTRADE
 if (isCashBankValue(updated.SLRBankNama)) {
   STATUTORY_FIELDS.forEach(id => { updated[FIELD_MAP[id]] = 0; });
 }
@@ -1397,7 +1370,6 @@ function buildDefaultPrintData(emp) {
 async function printEmployees(codes) {
   if (!codes || codes.length === 0) return;
   
-  // Single employee = current view
   if (codes.length === 1 && currentRaw && String(codes[0]) === String(currentRaw.Code)) {
     setTimeout(() => window.print(), 100);
     return;
@@ -1409,7 +1381,6 @@ async function printEmployees(codes) {
   const savedName = el('infoNama').value;
   const savedGroup = el('infoKumpulan').value;
   
-  // Pre-gather job data
   const jobs = [];
   for (const code of codes) {
     const emp = activeStaffList.find(s => String(s.Code) === String(code));
@@ -1443,11 +1414,9 @@ async function printEmployees(codes) {
   window.print();
   await new Promise(r => setTimeout(r, 250));
   
-  // Cleanup
   wrapper.remove();
   container.style.display = originalDisplay;
   
-  // Restore
   if (savedRaw) {
     fillForm(savedRaw);
     if (savedCode) el('infoKod').value = savedCode;
@@ -1516,7 +1485,6 @@ el('reloadBtn').addEventListener('click', () => {
 });
 el('autoCalcBtn').addEventListener('click', autoCalcStatutory);
 
-// Print modal
 el('printBtn').addEventListener('click', openPrintModal);
 el('cancelPrintBtn').addEventListener('click', closePrintModal);
 el('printModal').addEventListener('click', (e) => {
@@ -1561,7 +1529,6 @@ el('doPrintBtn').addEventListener('click', () => {
   setTimeout(() => printEmployees(codes), 150);
 });
 
-// Reset OT
 el('resetOTBtn').addEventListener('click', () => {
     if (!currentRaw || !currentRaw.Code) { alert('Sila pilih pekerja dahulu.'); return; }
     let otRecord = null;
@@ -1585,7 +1552,6 @@ el('resetOTBtn').addEventListener('click', () => {
     }
 });
 
-// Reset Unpaid Leave
 el('resetUnpaidBtn').addEventListener('click', () => {
     if (!currentRaw || !currentRaw.Code) { alert('Sila pilih pekerja dahulu.'); return; }
     const targetName = String(currentRaw.Name || '').trim().toUpperCase();
