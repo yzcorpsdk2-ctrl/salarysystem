@@ -64,7 +64,7 @@ width: calc(100% + 36px); margin-left: -18px; margin-right: -18px; margin-bottom
 .nav-chat .pulse { width: 7px; height: 7px; border-radius: 50%; background: #6ef0a8; box-shadow: 0 0 0 0 rgba(110,240,168,0.75); animation: pulse 2s infinite; }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(110,240,168,0.7); } 70% { box-shadow: 0 0 0 7px rgba(110,240,168,0); } 100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); } }
 
-/* ===== Container (screen 保持原样 1280px) ===== */
+/* ===== Container ===== */
 .payslip-container{ width:100%; max-width:1280px; background:var(--card); border:1px solid #e2e9f1; border-radius:18px; box-shadow:0 1px 2px rgba(16,32,56,.06), 0 18px 48px rgba(16,32,56,.12); padding:30px 34px 34px; position:relative; overflow:hidden; margin-top: 8px; }
 .payslip-container::before{ content:''; position:absolute; inset:0 0 auto 0; height:4px; background:linear-gradient(90deg, var(--navy) 0%, var(--navy) 58%, var(--green) 58%, var(--green) 100%); }
 
@@ -90,7 +90,7 @@ width: calc(100% + 36px); margin-left: -18px; margin-right: -18px; margin-bottom
 .url-bar .status-dot.ok { background: #22c55e; }
 .url-bar .status-dot.err { background: #ef4444; }
 
-/* Action bar (moved above meta-grid) */
+/* Action bar (above meta-grid) */
 .action-bar{ display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; padding-bottom:20px; border-bottom:1px solid var(--line); margin-bottom: 22px; }
 .btn-group{ display:flex; gap:10px; flex-wrap:wrap; }
 .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 22px; border-radius:10px; font-size:.86rem; font-weight:700; font-family:inherit; border:1px solid transparent; cursor:pointer; white-space:nowrap; transition:transform .12s, box-shadow .15s, background .15s, border-color .15s, color .15s; }
@@ -210,7 +210,7 @@ select.field-input { appearance: none; padding-right: 28px; cursor: pointer; bac
 .signature-line .line{ height:38px; border-bottom:1.5px solid #a8bcd2; }
 .signature-line .line-sub{ font-size:.68rem; color:#9aabc0; letter-spacing:.02em; }
 
-/* ===== Print modal ===== */
+/* Print modal */
 .modal-overlay{
   display:none; position:fixed; inset:0; z-index:1000;
   background: rgba(16,32,56,.55); backdrop-filter: blur(3px);
@@ -250,7 +250,7 @@ select.field-input { appearance: none; padding-right: 28px; cursor: pointer; bac
 .modal-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--line); }
 .modal-hint{ font-size:.72rem; color:var(--ink-3); margin-top:6px; }
 
-/* ===== Responsive (screen unchanged) ===== */
+/* Responsive */
 @media (max-width: 1100px){ .columns{ grid-template-columns:1fr 1fr; } .panel-cuti{ grid-column: 1 / -1; } .extra-grid{ grid-template-columns:repeat(2, minmax(0,1fr)); } }
 @media (max-width: 980px){ .meta-grid{ grid-template-columns:1fr; } .extra-grid{ grid-template-columns:1fr 1fr; } }
 @media (max-width: 760px){ .columns{ grid-template-columns:1fr; } .summary{ grid-template-columns:1fr; } .extra-grid{ grid-template-columns:1fr; } .payslip-container{ padding:24px 20px 28px; } .brand h1{ font-size:1.2rem; } }
@@ -264,25 +264,23 @@ select.field-input { appearance: none; padding-right: 28px; cursor: pointer; bac
 body { padding: 0 10px 40px; }
 }
 
-/* ===== PRINT (only @page injected via JS, 屏幕不变) ===== */
+/* ===== PRINT base (细调由 applyPaperSize 动态注入) ===== */
 @media print{
 *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
-body{ background:#fff; padding:0; display:block; font-size:12px; }
+body{ background:#fff; padding:0 !important; display:block !important; }
 .navbar { display: none !important; }
 .action-bar, .mini-btn, .mini-edit-btn, .no-print, .url-bar, .modal-overlay{ display:none !important; }
 
-.payslip-container{ box-shadow:none; border:none; border-radius:0; max-width:none !important; padding:0; margin-top: 0; }
-.payslip-container::before{ display:none; }
-.sum-card, .meta-card.basic-card{ box-shadow:none; }
-.panel, .extra-card, .meta-card, .sum-card{ break-inside:avoid; page-break-inside:avoid; }
+.payslip-container{ box-shadow:none !important; border:none !important; border-radius:0 !important; padding:0 !important; margin:0 !important; }
+.payslip-container::before{ display:none !important; }
+.sum-card, .meta-card.basic-card{ box-shadow:none !important; }
+.panel, .extra-card, .meta-card, .sum-card, .signature-area, .summary, .columns{ break-inside:avoid; page-break-inside:avoid; }
 .amount{ background:transparent !important; border-color:#dde5ee !important; box-shadow:none !important; }
-.field-input, select.field-input{ background:transparent !important; border-color: transparent !important; }
-.signature-area{ margin-top:22px; }
+.field-input, select.field-input{ background:transparent !important; border-color:transparent !important; }
 
 .multi-print-wrapper .payslip-container{
   page-break-after: always;
   break-after: page;
-  padding-bottom: 20px;
 }
 .multi-print-wrapper .payslip-container:last-child{
   page-break-after: auto;
@@ -293,12 +291,10 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
 </head>
 <body>
 
-<!-- Navbar -->
 <nav class="navbar">
     <div class="nav-brand"><span class="logo">Y</span><span class="brand-text">YZ Payroll</span></div>
     <div class="nav-links" id="navLinks">
         <button class="nav-back" id="backBtn" title="返回上一页">⏎</button>
-        
         <div class="nav-dropdown" id="filesDropdown">
             <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
             <div class="dropdown-menu">
@@ -319,12 +315,10 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
                 <a href="GoogleSheetBackupURL.html">🔗 Google Sheet Backup URL</a>
             </div>
         </div>
-
         <a class="nav-item active" href="dashboard.html">DASHBOARD</a>
         <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
         <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
         <a class="nav-item" href="overtime.html">OVERTIME</a>
-
         <div class="nav-dropdown" id="carumanDropdown">
             <button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
             <div class="dropdown-menu">
@@ -334,9 +328,7 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
                 <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
             </div>
         </div>
-
         <a class="nav-item" href="companysetting.html">SETTING</a>
-
         <div class="nav-dropdown" id="othersDropdown">
             <button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
             <div class="dropdown-menu">
@@ -349,7 +341,6 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
             </div>
         </div>
     </div>
-
     <button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')">
         <span class="pulse"></span> 💬 Request Chat
     </button>
@@ -377,7 +368,6 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
 <span style="font-size:0.7rem; color:var(--ink-3);">(Auto-sync dari Dashboard)</span>
 </div>
 
-<!-- ============ ACTION BAR (moved above meta-grid) ============ -->
 <div class="action-bar no-print">
 <div class="btn-group">
 <button class="btn btn-outline" onclick="window.close()"><i class="fas fa-arrow-left"></i> Kembali</button>
@@ -556,11 +546,9 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
 </div>
 </div>
 
-<!-- ============ PRINT MODAL ============ -->
 <div class="modal-overlay no-print" id="printModal">
   <div class="modal-box">
     <h3><i class="fas fa-print"></i> Pilihan Cetakan</h3>
-    
     <div class="modal-field">
       <label>Saiz Kertas (Untuk Cetakan Sahaja)</label>
       <select id="paperSizeSelect">
@@ -569,7 +557,6 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
       </select>
       <div class="modal-hint">Pratonton di skrin tidak berubah. Saiz ini hanya digunakan semasa mencetak.</div>
     </div>
-    
     <div class="modal-field">
       <label>Mod Cetak</label>
       <div class="print-modes">
@@ -579,20 +566,17 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
         <label><input type="radio" name="printMode" value="filter"> <i class="fas fa-filter"></i> Mengikut Kumpulan</label>
       </div>
     </div>
-    
     <div class="modal-field" id="batchField" style="display:none;">
       <label>Pilih Pekerja (Boleh Pilih Berbilang)</label>
       <div class="batch-list" id="batchList"></div>
       <div class="modal-hint"><a href="#" id="batchSelectAll" style="color:var(--navy);font-weight:600;">Pilih Semua</a> · <a href="#" id="batchSelectNone" style="color:var(--red);font-weight:600;">Kosongkan</a></div>
     </div>
-    
     <div class="modal-field" id="filterField" style="display:none;">
       <label>Pilih Kumpulan</label>
       <select id="filterGroupSelect">
         <option value="">-- Semua Kumpulan --</option>
       </select>
     </div>
-    
     <div class="modal-actions">
       <button class="btn btn-outline" id="cancelPrintBtn">Batal</button>
       <button class="btn btn-primary" id="doPrintBtn"><i class="fas fa-print"></i> Cetak</button>
@@ -604,31 +588,27 @@ body{ background:#fff; padding:0; display:block; font-size:12px; }
 (function () {
 'use strict';
 
-// Navbar interaction
 document.addEventListener('DOMContentLoaded', function() {
   const backBtn = document.getElementById('backBtn');
   if (backBtn) backBtn.addEventListener('click', function(e) { e.preventDefault(); window.history.back(); });
-  
   document.querySelectorAll('[data-dropdown-toggle]').forEach(function(toggle) {
     toggle.addEventListener('click', function(e) {
       e.stopPropagation();
       const dropdownId = this.getAttribute('data-dropdown-toggle');
-      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { 
-        if (dd.id !== dropdownId + 'Dropdown') dd.classList.remove('open'); 
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) {
+        if (dd.id !== dropdownId + 'Dropdown') dd.classList.remove('open');
       });
       const wrapper = this.closest('.nav-dropdown');
       if (wrapper) wrapper.classList.toggle('open');
     });
   });
-
-  document.addEventListener('click', function(e) { 
-    if (!e.target.closest('.nav-dropdown')) 
-      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); }); 
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.nav-dropdown'))
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); });
   });
-
-  document.addEventListener('keydown', function(e) { 
-    if (e.key === 'Escape') 
-      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); }); 
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape')
+      document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); });
   });
 });
 
@@ -640,8 +620,8 @@ const FIELD_MAP = {
 timeOTHour: 'TimeOTHour', timeOTAmount: 'TimeOTAmount',
 dailyOTDay: 'DailyOTDay', dailyOTAmount: 'DailyOTAmount',
 allowance: 'Allowance2', commision: 'Commission', incentives: 'Incentives',
-unpaidLeave: 'UnpaidLeave', pinjaman: 'Pinjaman', deductionLain: 'Deduction', 
-potonganLain2: 'PotonganLain2', 
+unpaidLeave: 'UnpaidLeave', pinjaman: 'Pinjaman', deductionLain: 'Deduction',
+potonganLain2: 'PotonganLain2',
 annualLeaveDays: 'AnnualLeaveDays', sickLeaveDays: 'SickLeaveDays',
 salaryEpf: 'EPFSalary', salarySocso: 'SOCSOSalary', salaryEis: 'EISSalary', salary24jam: 'LindungSalary',
 epfEmployee: 'EPF_Employee', epfEmployer: 'EPF_Employer',
@@ -661,8 +641,8 @@ Object.keys(FIELD_MAP).forEach(id => { inputs[id] = el(id); });
 let currentRaw = null;
 let allEmployees = [];
 let allOvertimeData = [];
-let allSheetData = []; 
-let allAlslData = []; 
+let allSheetData = [];
+let allAlslData = [];
 let activeStaffList = [];
 let SCRIPT_URL = '';
 
@@ -683,15 +663,13 @@ const RM_FMT = new Intl.NumberFormat('ms-MY', { minimumFractionDigits: 2, maximu
 function num(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
 function fmtRM(v) { return 'RM ' + RM_FMT.format(num(v)); }
 
-/* ====== CASH / MECHANTRADE logic ====== */
+/* ====== CASH / MECHANTRADE ====== */
 function isCashBankValue(val) {
   const u = String(val || '').trim().toUpperCase();
   return u === 'CASH' || u === 'MECHANTRADE';
 }
-
 function applyBankBasedStatutory() {
   const cash = isCashBankValue(inputs.bankNama ? inputs.bankNama.value : '');
-  
   STATUTORY_FIELDS.forEach(id => {
     const inp = inputs[id];
     if (!inp) return;
@@ -708,7 +686,6 @@ function applyBankBasedStatutory() {
       if (row) row.classList.remove('cash-disabled');
     }
   });
-
   const autoBtn = el('autoCalcBtn');
   if (autoBtn) {
     if (cash) {
@@ -725,7 +702,7 @@ function applyBankBasedStatutory() {
   }
 }
 
-/* ====== Paper size (只影响打印，屏幕不变) ====== */
+/* ====== Paper size (打印时使用 mm + pt 精确定位) ====== */
 function applyPaperSize(size) {
   const s = (size || 'A4').toUpperCase();
   let style = document.getElementById('dynamicPageSize');
@@ -734,36 +711,111 @@ function applyPaperSize(size) {
     style.id = 'dynamicPageSize';
     document.head.appendChild(style);
   }
-  if (s === 'A5') {
-    style.textContent = '@media print { @page { size: A5; margin: 6mm; } }';
-  } else {
-    style.textContent = '@media print { @page { size: A4; margin: 10mm; } }';
-  }
+  const cfg = (s === 'A5')
+    ? { page: 'A5', margin: 6, content: 136, basePt: 9, titlePt: 13, bigPt: 15, compact: true }
+    : { page: 'A4', margin: 10, content: 190, basePt: 11, titlePt: 16, bigPt: 20, compact: false };
+
+  style.textContent = `
+    @media print {
+      @page { size: ${cfg.page}; margin: ${cfg.margin}mm; }
+
+      html, body {
+        width: ${cfg.content}mm !important;
+        max-width: ${cfg.content}mm !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        background: #fff !important;
+        font-size: ${cfg.basePt}pt !important;
+        line-height: 1.35 !important;
+      }
+
+      .payslip-container,
+      .multi-print-wrapper .payslip-container {
+        width: 100% !important;
+        max-width: ${cfg.content}mm !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        font-size: ${cfg.basePt}pt !important;
+      }
+
+      .brand h1 { font-size: ${cfg.titlePt}pt !important; }
+      .brand p  { font-size: ${(cfg.basePt * 0.75).toFixed(1)}pt !important; }
+      .basic-display { font-size: ${cfg.bigPt}pt !important; }
+      .sum-value { font-size: ${(cfg.bigPt * 0.85).toFixed(1)}pt !important; }
+      .sum-label, .field-label, .card-head,
+      .panel-head h2, .extra-card h4 { font-size: ${(cfg.basePt * 0.72).toFixed(1)}pt !important; }
+      .line-item label { font-size: ${(cfg.basePt * 0.82).toFixed(1)}pt !important; }
+      .amount input { font-size: ${(cfg.basePt * 0.82).toFixed(1)}pt !important; }
+      .amount .cur { font-size: ${(cfg.basePt * 0.6).toFixed(1)}pt !important; }
+      .panel-total strong { font-size: ${(cfg.basePt * 0.95).toFixed(1)}pt !important; }
+      .field-static, .field-input, select.field-input { font-size: ${(cfg.basePt * 0.9).toFixed(1)}pt !important; }
+
+      .multi-print-wrapper .payslip-container {
+        page-break-after: always;
+        break-after: page;
+        padding-bottom: 6mm !important;
+      }
+      .multi-print-wrapper .payslip-container:last-child {
+        page-break-after: auto;
+        break-after: auto;
+      }
+
+      .panel, .extra-card, .meta-card, .sum-card,
+      .signature-area, .summary, .columns {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      ${cfg.compact ? `
+        .payslip-header { flex-direction: column !important; align-items: flex-start !important; gap: 4mm !important; }
+        .header-badges { justify-content: flex-start !important; }
+        .meta-grid { grid-template-columns: 1fr !important; }
+        .columns { grid-template-columns: 1fr 1fr !important; }
+        .panel-cuti { grid-column: 1 / -1 !important; }
+        .extra-grid { grid-template-columns: 1fr !important; }
+        .summary { grid-template-columns: repeat(3, 1fr) !important; gap: 3mm !important; }
+        .sum-card { padding: 4mm !important; }
+      ` : ''}
+    }
+  `;
   try { localStorage.setItem(PAPER_KEY, s); } catch (e) {}
 }
 
 function isAllOtZero(raw) {
-    if (!raw) return true;
-    return num(raw.TimeOTHour) === 0 && num(raw.TimeOTAmount) === 0 && num(raw.DailyOTDay) === 0 && num(raw.DailyOTAmount) === 0;
+  if (!raw) return true;
+  return num(raw.TimeOTHour) === 0 && num(raw.TimeOTAmount) === 0 && num(raw.DailyOTDay) === 0 && num(raw.DailyOTAmount) === 0;
 }
-
 function setSyncStatus(msg, type) {
-const s = el('syncStatus');
-if (!s) return;
-s.textContent = msg;
-s.className = 'sync-status ' + (type || '');
+  const s = el('syncStatus');
+  if (!s) return;
+  s.textContent = msg;
+  s.className = 'sync-status ' + (type || '');
 }
 function setPeriod() {
-const now = new Date();
-const label = now.toLocaleDateString('ms-MY', { month: 'long', year: 'numeric' });
-el('periodBadge').innerText = label.toUpperCase();
+  const now = new Date();
+  const label = now.toLocaleDateString('ms-MY', { month: 'long', year: 'numeric' });
+  el('periodBadge').innerText = label.toUpperCase();
 }
 function loadSavedUrl() {
-try {
-const saved = localStorage.getItem(URL_KEY);
-if (saved) { SCRIPT_URL = saved; el('deployUrlDisplay').value = saved; el('urlStatusDot').className = 'status-dot ok'; }
-else { SCRIPT_URL = ''; el('deployUrlDisplay').value = ''; el('deployUrlDisplay').placeholder = 'Menunggu URL dari Dashboard...'; el('urlStatusDot').className = 'status-dot err'; }
-} catch (e) { SCRIPT_URL = ''; el('urlStatusDot').className = 'status-dot err'; }
+  try {
+    const saved = localStorage.getItem(URL_KEY);
+    if (saved) {
+      SCRIPT_URL = saved;
+      el('deployUrlDisplay').value = saved;
+      el('urlStatusDot').className = 'status-dot ok';
+    } else {
+      SCRIPT_URL = '';
+      el('deployUrlDisplay').value = '';
+      el('deployUrlDisplay').placeholder = 'Menunggu URL dari Dashboard...';
+      el('urlStatusDot').className = 'status-dot err';
+    }
+  } catch (e) {
+    SCRIPT_URL = '';
+    el('urlStatusDot').className = 'status-dot err';
+  }
 }
 
 async function fetchOvertimeData() {
@@ -793,7 +845,6 @@ async function fetchALSLData() {
 
 function updateCalc() {
   applyBankBasedStatutory();
-
   const basic = num(el('inputGajiAsas').value);
   const commission = num(inputs.commision.value);
   const allowance = num(inputs.allowance.value);
@@ -810,27 +861,25 @@ function updateCalc() {
   inputs.salary24jam.value = lindungBase.toFixed(2);
 
   const income = basic
-  + num(inputs.timeOTAmount.value) + num(inputs.dailyOTAmount.value)
-  + allowance + commission
-  + num(inputs.incentives.value);
+    + num(inputs.timeOTAmount.value) + num(inputs.dailyOTAmount.value)
+    + allowance + commission
+    + num(inputs.incentives.value);
 
   const ded = num(inputs.unpaidLeave.value) + num(inputs.pinjaman.value)
-  + num(inputs.deductionLain.value) + num(inputs.potonganLain2.value);
+    + num(inputs.deductionLain.value) + num(inputs.potonganLain2.value);
 
-  const statutoryDed = num(inputs.epfEmployee.value) + num(inputs.socsoEmployee.value) 
-  + num(inputs.eisEmployee.value) + num(inputs.lindung24jam.value);
+  const statutoryDed = num(inputs.epfEmployee.value) + num(inputs.socsoEmployee.value)
+    + num(inputs.eisEmployee.value) + num(inputs.lindung24jam.value);
 
   const totalPotongan = ded + statutoryDed;
   const totalGajiKasar = income;
   const totalSalaryPay = totalGajiKasar - totalPotongan;
-
   const totalDays = num(inputs.annualLeaveDays.value) + num(inputs.sickLeaveDays.value);
 
   el('infoGajiAsas').innerText = fmtRM(basic);
   el('firstCalcTotal').innerText = fmtRM(income);
   el('totalPotongan').innerText = fmtRM(totalPotongan);
   el('totalHariCuti').innerText = totalDays + ' Hari';
-
   el('gajiKasarDisplay').innerText = fmtRM(totalGajiKasar);
   el('totalPotonganDisplay').innerText = fmtRM(totalPotongan);
   el('gajiBersihDisplay').innerText = fmtRM(totalSalaryPay);
@@ -850,506 +899,492 @@ function autoCalcStatutory() {
   const epfBase = num(inputs.salaryEpf.value);
   const socsoBase = num(inputs.salarySocso.value);
   const eisBase = num(inputs.salaryEis.value);
-
   if (epfBase <= 0 && socsoBase <= 0 && eisBase <= 0) {
     alert('Sila masukkan Gaji Asas terlebih dahulu.');
     return;
   }
-
   inputs.epfEmployee.value = Math.ceil(epfBase * 0.11);
   inputs.epfEmployer.value = Math.ceil(epfBase * (epfBase <= 5000 ? 0.13 : 0.12));
-
   const socsoCap = Math.min(socsoBase, 6000);
   inputs.socsoEmployee.value = Math.round(socsoCap * 0.005 * 100) / 100;
   inputs.socsoEmployer.value = Math.round(socsoCap * 0.0175 * 100) / 100;
-
   const eisCap = Math.min(eisBase, 6000);
   inputs.eisEmployee.value = Math.round(eisCap * 0.002 * 100) / 100;
   inputs.eisEmployer.value = Math.round(eisCap * 0.002 * 100) / 100;
-
-  if (num(inputs.lindung24jam.value) === 0) {
-    inputs.lindung24jam.value = 10.00;
-  }
+  if (num(inputs.lindung24jam.value) === 0) inputs.lindung24jam.value = 10.00;
   updateCalc();
   setSyncStatus('Caruman dikira berdasarkan Gaji Caruman', 'success');
 }
 
 async function fetchStaffBasics() {
-if (!SCRIPT_URL) { setSyncStatus('URL belum ditetapkan. Sila tetapkan di Dashboard.', 'error'); return; }
-setSyncStatus('Memuatkan data staf...', '');
-try {
-  await Promise.all([fetchOvertimeData(), fetchSheetData(), fetchALSLData()]);
-  const res = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
-  const data = await res.json();
-  let staffRaw = [];
-  if (data && data.result === 'success' && Array.isArray(data.data)) staffRaw = data.data;
-  else if (Array.isArray(data)) staffRaw = data;
-  else throw new Error('Format data tidak dikenali.');
+  if (!SCRIPT_URL) { setSyncStatus('URL belum ditetapkan. Sila tetapkan di Dashboard.', 'error'); return; }
+  setSyncStatus('Memuatkan data staf...', '');
+  try {
+    await Promise.all([fetchOvertimeData(), fetchSheetData(), fetchALSLData()]);
+    const res = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
+    const data = await res.json();
+    let staffRaw = [];
+    if (data && data.result === 'success' && Array.isArray(data.data)) staffRaw = data.data;
+    else if (Array.isArray(data)) staffRaw = data;
+    else throw new Error('Format data tidak dikenali.');
 
-  activeStaffList = staffRaw.map(row => {
-  const code = String(row.Code || '').trim();
-  const name = String(row.Name || '').trim();
-  const group = String(row.GroupName || '').trim();
-  const situation = String(row.Situation || 'ACTIVE').toUpperCase();
-  const salary = parseFloat(row.Salary) || 0;
-  return {
-  Code: code, Name: name, GroupName: group, Situation: situation, Salary: salary,
-  BankNama: String(row.BankNama || '').trim(), BankAccountNo: String(row.BankAccountNo || '').trim(),
-  EPF: String(row.EPF || '').trim(), PERKESO: String(row.PERKESO || '').trim(), EIS: String(row.EIS || '').trim()
-  };
-  }).filter(s => s.Code && s.Name && s.Situation === 'ACTIVE');
-  buildDropdowns();
-  setSyncStatus('Data staf dimuat', 'success');
-} catch (err) {
-  console.error('Fetch staff error:', err);
-  setSyncStatus('Gagal muat data staf', 'error');
-  loadFallbackFromStorage();
-}
+    activeStaffList = staffRaw.map(row => {
+      const code = String(row.Code || '').trim();
+      const name = String(row.Name || '').trim();
+      const group = String(row.GroupName || '').trim();
+      const situation = String(row.Situation || 'ACTIVE').toUpperCase();
+      const salary = parseFloat(row.Salary) || 0;
+      return {
+        Code: code, Name: name, GroupName: group, Situation: situation, Salary: salary,
+        BankNama: String(row.BankNama || '').trim(), BankAccountNo: String(row.BankAccountNo || '').trim(),
+        EPF: String(row.EPF || '').trim(), PERKESO: String(row.PERKESO || '').trim(), EIS: String(row.EIS || '').trim()
+      };
+    }).filter(s => s.Code && s.Name && s.Situation === 'ACTIVE');
+    buildDropdowns();
+    setSyncStatus('Data staf dimuat', 'success');
+  } catch (err) {
+    console.error('Fetch staff error:', err);
+    setSyncStatus('Gagal muat data staf', 'error');
+    loadFallbackFromStorage();
+  }
 }
 
 function buildDropdowns() {
-const selGroup = el('infoKumpulan');
-const selKod = el('infoKod');
-const selNama = el('infoNama');
-const groups = [...new Set(activeStaffList.map(s => s.GroupName))].sort();
-selGroup.innerHTML = '<option value="">Semua Kumpulan</option>' + groups.map(g => `<option value="${g}">${g}</option>`).join('');
-populateKodAndNama('', '');
-selGroup.addEventListener('change', () => populateKodAndNama(selGroup.value, ''));
-selKod.addEventListener('change', () => {
-const emp = activeStaffList.find(s => String(s.Code) === String(selKod.value));
-if (emp) { selNama.value = emp.Name; selGroup.value = emp.GroupName; el('infoSituation').innerText = emp.Situation; switchEmployee(emp); }
-});
-selNama.addEventListener('change', () => {
-const emp = activeStaffList.find(s => String(s.Name).toUpperCase() === String(selNama.value).toUpperCase());
-if (emp) { selKod.value = emp.Code; selGroup.value = emp.GroupName; el('infoSituation').innerText = emp.Situation; switchEmployee(emp); }
-});
-autoSelectFromStorage();
+  const selGroup = el('infoKumpulan');
+  const selKod = el('infoKod');
+  const selNama = el('infoNama');
+  const groups = [...new Set(activeStaffList.map(s => s.GroupName))].sort();
+  selGroup.innerHTML = '<option value="">Semua Kumpulan</option>' + groups.map(g => `<option value="${g}">${g}</option>`).join('');
+  populateKodAndNama('', '');
+  selGroup.addEventListener('change', () => populateKodAndNama(selGroup.value, ''));
+  selKod.addEventListener('change', () => {
+    const emp = activeStaffList.find(s => String(s.Code) === String(selKod.value));
+    if (emp) { selNama.value = emp.Name; selGroup.value = emp.GroupName; el('infoSituation').innerText = emp.Situation; switchEmployee(emp); }
+  });
+  selNama.addEventListener('change', () => {
+    const emp = activeStaffList.find(s => String(s.Name).toUpperCase() === String(selNama.value).toUpperCase());
+    if (emp) { selKod.value = emp.Code; selGroup.value = emp.GroupName; el('infoSituation').innerText = emp.Situation; switchEmployee(emp); }
+  });
+  autoSelectFromStorage();
 }
 
 function populateKodAndNama(groupFilter, keepCode) {
-const selKod = el('infoKod');
-const selNama = el('infoNama');
-let filtered = groupFilter ? activeStaffList.filter(s => s.GroupName === groupFilter) : activeStaffList;
-filtered.sort((a, b) => String(a.Code).localeCompare(String(b.Code)));
-selKod.innerHTML = '<option value="">Pilih Kod</option>' + filtered.map(s => `<option value="${s.Code}">${s.Code}</option>`).join('');
-selNama.innerHTML = '<option value="">Pilih Nama</option>' + filtered.map(s => `<option value="${s.Name}">${s.Name}</option>`).join('');
-if (keepCode && filtered.some(s => String(s.Code) === String(keepCode))) {
-selKod.value = String(keepCode);
-const emp = filtered.find(s => String(s.Code) === String(keepCode));
-if (emp) { selNama.value = emp.Name; el('infoSituation').innerText = emp.Situation; }
-}
+  const selKod = el('infoKod');
+  const selNama = el('infoNama');
+  let filtered = groupFilter ? activeStaffList.filter(s => s.GroupName === groupFilter) : activeStaffList;
+  filtered.sort((a, b) => String(a.Code).localeCompare(String(b.Code)));
+  selKod.innerHTML = '<option value="">Pilih Kod</option>' + filtered.map(s => `<option value="${s.Code}">${s.Code}</option>`).join('');
+  selNama.innerHTML = '<option value="">Pilih Nama</option>' + filtered.map(s => `<option value="${s.Name}">${s.Name}</option>`).join('');
+  if (keepCode && filtered.some(s => String(s.Code) === String(keepCode))) {
+    selKod.value = String(keepCode);
+    const emp = filtered.find(s => String(s.Code) === String(keepCode));
+    if (emp) { selNama.value = emp.Name; el('infoSituation').innerText = emp.Situation; }
+  }
 }
 
 async function autoSelectFromStorage() {
-const urlParams = new URLSearchParams(window.location.search);
-const codeFromUrl = urlParams.get('code');
-const nameFromUrl = urlParams.get('name');
-const code = codeFromUrl || localStorage.getItem('payrollSelectedCode') || localStorage.getItem('selectedCode') || localStorage.getItem('selectedEmployeeCode');
-const name = nameFromUrl || localStorage.getItem('payrollSelectedName') || localStorage.getItem('selectedName') || localStorage.getItem('selectedEmployeeName');
-let emp = null;
-if (code) {
-emp = activeStaffList.find(s => String(s.Code) === String(code));
-if (!emp) emp = activeStaffList.find(s => String(s.Name).toUpperCase() === String(code).toUpperCase());
-}
-if (!emp && name) emp = activeStaffList.find(s => String(s.Name).toUpperCase() === String(name).toUpperCase());
-if (!emp) return;
-el('infoKumpulan').value = emp.GroupName || '';
-populateKodAndNama(emp.GroupName || '', emp.Code);
-el('infoNama').value = emp.Name || '';
-el('infoSituation').innerText = emp.Situation || 'ACTIVE';
-switchEmployee(emp);
-await syncFromSheet(true);
+  const urlParams = new URLSearchParams(window.location.search);
+  const codeFromUrl = urlParams.get('code');
+  const nameFromUrl = urlParams.get('name');
+  const code = codeFromUrl || localStorage.getItem('payrollSelectedCode') || localStorage.getItem('selectedCode') || localStorage.getItem('selectedEmployeeCode');
+  const name = nameFromUrl || localStorage.getItem('payrollSelectedName') || localStorage.getItem('selectedName') || localStorage.getItem('selectedEmployeeName');
+  let emp = null;
+  if (code) {
+    emp = activeStaffList.find(s => String(s.Code) === String(code));
+    if (!emp) emp = activeStaffList.find(s => String(s.Name).toUpperCase() === String(code).toUpperCase());
+  }
+  if (!emp && name) emp = activeStaffList.find(s => String(s.Name).toUpperCase() === String(name).toUpperCase());
+  if (!emp) return;
+  el('infoKumpulan').value = emp.GroupName || '';
+  populateKodAndNama(emp.GroupName || '', emp.Code);
+  el('infoNama').value = emp.Name || '';
+  el('infoSituation').innerText = emp.Situation || 'ACTIVE';
+  switchEmployee(emp);
+  await syncFromSheet(true);
 }
 
 function switchEmployee(staffObj) {
-const code = String(staffObj.Code);
-try {
-const stored = localStorage.getItem(STORAGE_KEY);
-allEmployees = stored ? JSON.parse(stored) : [];
-if (!Array.isArray(allEmployees)) allEmployees = [];
-} catch (e) { allEmployees = []; }
-const existing = allEmployees.find(e => String(e.Code) === String(code));
-if (existing) {
-fillForm(existing);
-if (!existing.Basic || existing.Basic === 0) {
-existing.Basic = staffObj.Salary;
-el('inputGajiAsas').value = staffObj.Salary;
-updateCalc();
-}
-} else {
-const newObj = {
-Code: staffObj.Code, Name: staffObj.Name, GroupName: staffObj.GroupName, Situation: staffObj.Situation,
-BasicSalary: staffObj.Salary, Basic: staffObj.Salary,
-TimeOTHour: 0, TimeOTAmount: 0, DailyOTDay: 0, DailyOTAmount: 0,
-Allowance2: 0, Commission: 0, Incentives: 0,
-UnpaidLeave: 0, Pinjaman: 0, Deduction: 0, PotonganLain2: 0, 
-AnnualLeaveDays: 0, SickLeaveDays: 0,
-EPFSalary: 0, SOCSOSalary: 0, EISSalary: 0, LindungSalary: 0,
-EPF_Employee: 0, EPF_Employer: 0, SOCSO_Employee: 0, SOCSO_Employer: 0,
-EIS_Employee: 0, EIS_Employer: 0, Lindung24Jam: 0,
-SLRBankNama: staffObj.BankNama || '', SLRBankAccountNo: staffObj.BankAccountNo || '',
-SLREPF: staffObj.EPF || '', SLRPERKESO: staffObj.PERKESO || '', SLREIS: staffObj.EIS || '',
-TotalGajiKasar: 0, TotalPotongan: 0, TotalSalaryPay: 0, LastUpdated: ''
-};
-fillForm(newObj);
-}
-setSyncStatus('Data dimuat untuk ' + code, 'success');
+  const code = String(staffObj.Code);
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    allEmployees = stored ? JSON.parse(stored) : [];
+    if (!Array.isArray(allEmployees)) allEmployees = [];
+  } catch (e) { allEmployees = []; }
+  const existing = allEmployees.find(e => String(e.Code) === String(code));
+  if (existing) {
+    fillForm(existing);
+    if (!existing.Basic || existing.Basic === 0) {
+      existing.Basic = staffObj.Salary;
+      el('inputGajiAsas').value = staffObj.Salary;
+      updateCalc();
+    }
+  } else {
+    const newObj = {
+      Code: staffObj.Code, Name: staffObj.Name, GroupName: staffObj.GroupName, Situation: staffObj.Situation,
+      BasicSalary: staffObj.Salary, Basic: staffObj.Salary,
+      TimeOTHour: 0, TimeOTAmount: 0, DailyOTDay: 0, DailyOTAmount: 0,
+      Allowance2: 0, Commission: 0, Incentives: 0,
+      UnpaidLeave: 0, Pinjaman: 0, Deduction: 0, PotonganLain2: 0,
+      AnnualLeaveDays: 0, SickLeaveDays: 0,
+      EPFSalary: 0, SOCSOSalary: 0, EISSalary: 0, LindungSalary: 0,
+      EPF_Employee: 0, EPF_Employer: 0, SOCSO_Employee: 0, SOCSO_Employer: 0,
+      EIS_Employee: 0, EIS_Employer: 0, Lindung24Jam: 0,
+      SLRBankNama: staffObj.BankNama || '', SLRBankAccountNo: staffObj.BankAccountNo || '',
+      SLREPF: staffObj.EPF || '', SLRPERKESO: staffObj.PERKESO || '', SLREIS: staffObj.EIS || '',
+      TotalGajiKasar: 0, TotalPotongan: 0, TotalSalaryPay: 0, LastUpdated: ''
+    };
+    fillForm(newObj);
+  }
+  setSyncStatus('Data dimuat untuk ' + code, 'success');
 }
 
 function fillForm(raw) {
-if (!raw) return;
+  if (!raw) return;
 
-let otRecord = null;
-if (allOvertimeData && allOvertimeData.length > 0) {
-  otRecord = allOvertimeData.find(ot => String(ot['ID KOD'] || '').trim() === String(raw.Code).trim());
-  if (!otRecord) otRecord = allOvertimeData.find(ot => String(ot['NAME'] || '').trim().toUpperCase() === String(raw.Name || '').trim().toUpperCase());
-}
-
-if (isAllOtZero(raw) && otRecord) {
-  raw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
-  raw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
-  raw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
-  raw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
-}
-
-const targetName = String(raw.Name || '').trim().toUpperCase();
-const targetCode = String(raw.Code || '').trim();
-
-if (allSheetData && allSheetData.length > 0) {
-  let totalDeduction = 0;
-  allSheetData.forEach(r => {
-    const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
-    const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
-    if ((targetName && rName === targetName) || (targetCode && rCode === targetCode)) {
-      totalDeduction += num(r['TOTAL DEDUCTION(RM)']);
-    }
-  });
-  if (num(raw.UnpaidLeave) === 0 && totalDeduction > 0) raw.UnpaidLeave = totalDeduction;
-}
-
-if (allAlslData && allAlslData.length > 0) {
-  const alslRecord = allAlslData.find(r => {
-    const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
-    const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
-    return (targetName && rName === targetName) || (targetCode && rCode === targetCode);
-  });
-  if (alslRecord) {
-    if (num(raw.AnnualLeaveDays) === 0) raw.AnnualLeaveDays = num(alslRecord['THISAL']);
-    if (num(raw.SickLeaveDays) === 0) raw.SickLeaveDays = num(alslRecord['THISSL']);
+  let otRecord = null;
+  if (allOvertimeData && allOvertimeData.length > 0) {
+    otRecord = allOvertimeData.find(ot => String(ot['ID KOD'] || '').trim() === String(raw.Code).trim());
+    if (!otRecord) otRecord = allOvertimeData.find(ot => String(ot['NAME'] || '').trim().toUpperCase() === String(raw.Name || '').trim().toUpperCase());
   }
-}
+  if (isAllOtZero(raw) && otRecord) {
+    raw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
+    raw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
+    raw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
+    raw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
+  }
 
-const staff = activeStaffList.find(s => String(s.Code) === String(raw.Code));
-if (staff) {
-raw.Name = staff.Name;
-raw.GroupName = staff.GroupName;
-raw.Situation = staff.Situation;
-if (raw.Basic === undefined || raw.Basic === null || raw.Basic === '' || num(raw.Basic) === 0) {
-if (raw.BasicSalary !== undefined && raw.BasicSalary !== null && num(raw.BasicSalary) > 0) raw.Basic = num(raw.BasicSalary);
-else raw.Basic = staff.Salary;
-}
-if (raw.SLRBankNama === undefined || raw.SLRBankNama === null) raw.SLRBankNama = staff.BankNama || '';
-if (raw.SLRBankAccountNo === undefined || raw.SLRBankAccountNo === null) raw.SLRBankAccountNo = staff.BankAccountNo || '';
-if (raw.SLREPF === undefined || raw.SLREPF === null) raw.SLREPF = staff.EPF || '';
-if (raw.SLRPERKESO === undefined || raw.SLRPERKESO === null) raw.SLRPERKESO = staff.PERKESO || '';
-if (raw.SLREIS === undefined || raw.SLREIS === null) raw.SLREIS = staff.EIS || '';
-}
+  const targetName = String(raw.Name || '').trim().toUpperCase();
+  const targetCode = String(raw.Code || '').trim();
 
-currentRaw = raw;
-el('infoSituation').innerText = raw.Situation || 'ACTIVE';
-el('inputGajiAsas').value = (raw.Basic != null) ? raw.Basic : 0;
-Object.entries(FIELD_MAP).forEach(([id, key]) => {
-const inp = inputs[id];
-if (!inp) return;
-const v = raw[key];
-if (TEXT_FIELDS.has(id)) inp.value = (v === undefined || v === null || v === '') ? '—' : String(v);
-else if (NUM_2DEC_FIELDS.has(id)) inp.value = num(v).toFixed(2); 
-else inp.value = (v === undefined || v === null || v === '') ? 0 : num(v);
-});
-MANUAL_FIELDS.forEach(f => {
-const inp = el(f.inputId);
-const btn = el(f.btnId);
-editStates[f.inputId] = false;
-if (inp) inp.readOnly = true;
-if (btn) { btn.classList.remove('editing'); btn.innerHTML = '<i class="fas fa-pen"></i>'; }
-});
-updateCalc();
+  if (allSheetData && allSheetData.length > 0) {
+    let totalDeduction = 0;
+    allSheetData.forEach(r => {
+      const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
+      const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
+      if ((targetName && rName === targetName) || (targetCode && rCode === targetCode)) {
+        totalDeduction += num(r['TOTAL DEDUCTION(RM)']);
+      }
+    });
+    if (num(raw.UnpaidLeave) === 0 && totalDeduction > 0) raw.UnpaidLeave = totalDeduction;
+  }
+
+  if (allAlslData && allAlslData.length > 0) {
+    const alslRecord = allAlslData.find(r => {
+      const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
+      const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
+      return (targetName && rName === targetName) || (targetCode && rCode === targetCode);
+    });
+    if (alslRecord) {
+      if (num(raw.AnnualLeaveDays) === 0) raw.AnnualLeaveDays = num(alslRecord['THISAL']);
+      if (num(raw.SickLeaveDays) === 0) raw.SickLeaveDays = num(alslRecord['THISSL']);
+    }
+  }
+
+  const staff = activeStaffList.find(s => String(s.Code) === String(raw.Code));
+  if (staff) {
+    raw.Name = staff.Name;
+    raw.GroupName = staff.GroupName;
+    raw.Situation = staff.Situation;
+    if (raw.Basic === undefined || raw.Basic === null || raw.Basic === '' || num(raw.Basic) === 0) {
+      if (raw.BasicSalary !== undefined && raw.BasicSalary !== null && num(raw.BasicSalary) > 0) raw.Basic = num(raw.BasicSalary);
+      else raw.Basic = staff.Salary;
+    }
+    if (raw.SLRBankNama === undefined || raw.SLRBankNama === null) raw.SLRBankNama = staff.BankNama || '';
+    if (raw.SLRBankAccountNo === undefined || raw.SLRBankAccountNo === null) raw.SLRBankAccountNo = staff.BankAccountNo || '';
+    if (raw.SLREPF === undefined || raw.SLREPF === null) raw.SLREPF = staff.EPF || '';
+    if (raw.SLRPERKESO === undefined || raw.SLRPERKESO === null) raw.SLRPERKESO = staff.PERKESO || '';
+    if (raw.SLREIS === undefined || raw.SLREIS === null) raw.SLREIS = staff.EIS || '';
+  }
+
+  currentRaw = raw;
+  el('infoSituation').innerText = raw.Situation || 'ACTIVE';
+  el('inputGajiAsas').value = (raw.Basic != null) ? raw.Basic : 0;
+  Object.entries(FIELD_MAP).forEach(([id, key]) => {
+    const inp = inputs[id];
+    if (!inp) return;
+    const v = raw[key];
+    if (TEXT_FIELDS.has(id)) inp.value = (v === undefined || v === null || v === '') ? '—' : String(v);
+    else if (NUM_2DEC_FIELDS.has(id)) inp.value = num(v).toFixed(2);
+    else inp.value = (v === undefined || v === null || v === '') ? 0 : num(v);
+  });
+  MANUAL_FIELDS.forEach(f => {
+    const inp = el(f.inputId);
+    const btn = el(f.btnId);
+    editStates[f.inputId] = false;
+    if (inp) inp.readOnly = true;
+    if (btn) { btn.classList.remove('editing'); btn.innerHTML = '<i class="fas fa-pen"></i>'; }
+  });
+  updateCalc();
 }
 
 function toggleEditField(field) {
-const inp = el(field.inputId);
-const btn = el(field.btnId);
-if (!inp || !btn) return;
-editStates[field.inputId] = !editStates[field.inputId];
-const editing = editStates[field.inputId];
-inp.readOnly = !editing;
-if (editing) {
-inp.focus(); if (inp.select) inp.select();
-btn.classList.add('editing'); btn.innerHTML = '<i class="fas fa-check"></i>';
-} else {
-btn.classList.remove('editing'); btn.innerHTML = '<i class="fas fa-pen"></i>';
-if (currentRaw) {
-  if (NUM_2DEC_FIELDS.has(field.inputId)) {
-    currentRaw[field.rawKey] = num(inp.value);
-    inp.value = num(inp.value).toFixed(2); 
+  const inp = el(field.inputId);
+  const btn = el(field.btnId);
+  if (!inp || !btn) return;
+  editStates[field.inputId] = !editStates[field.inputId];
+  const editing = editStates[field.inputId];
+  inp.readOnly = !editing;
+  if (editing) {
+    inp.focus(); if (inp.select) inp.select();
+    btn.classList.add('editing'); btn.innerHTML = '<i class="fas fa-check"></i>';
   } else {
-    currentRaw[field.rawKey] = inp.value;
+    btn.classList.remove('editing'); btn.innerHTML = '<i class="fas fa-pen"></i>';
+    if (currentRaw) {
+      if (NUM_2DEC_FIELDS.has(field.inputId)) {
+        currentRaw[field.rawKey] = num(inp.value);
+        inp.value = num(inp.value).toFixed(2);
+      } else {
+        currentRaw[field.rawKey] = inp.value;
+      }
+    }
+    if (field.inputId === 'bankNama') updateCalc();
   }
-}
-if (field.inputId === 'bankNama') {
-  updateCalc();
-}
-}
 }
 
 function resetToDefault() {
-if (!currentRaw || !currentRaw.Code) { alert('Tiada pekerja dipilih.'); return; }
-const staff = activeStaffList.find(s => String(s.Code) === String(currentRaw.Code));
-if (!staff) { alert('Data staff tidak dijumpai.'); return; }
-if (!confirm('Reset semua medan ke default?')) return;
-const defaultObj = {
-Code: staff.Code, Name: staff.Name, GroupName: staff.GroupName, Situation: staff.Situation,
-BasicSalary: staff.Salary, Basic: staff.Salary,
-TimeOTHour: 0, TimeOTAmount: 0, DailyOTDay: 0, DailyOTAmount: 0,
-Allowance2: 0, Commission: 0, Incentives: 0,
-UnpaidLeave: 0, Pinjaman: 0, Deduction: 0, PotonganLain2: 0,
-AnnualLeaveDays: 0, SickLeaveDays: 0,
-EPFSalary: 0, SOCSOSalary: 0, EISSalary: 0, LindungSalary: 0,
-EPF_Employee: 0, EPF_Employer: 0, SOCSO_Employee: 0, SOCSO_Employer: 0,
-EIS_Employee: 0, EIS_Employer: 0, Lindung24Jam: 0,
-SLRBankNama: staff.BankNama || '', SLRBankAccountNo: staff.BankAccountNo || '',
-SLREPF: staff.EPF || '', SLRPERKESO: staff.PERKESO || '', SLREIS: staff.EIS || '',
-TotalGajiKasar: 0, TotalPotongan: 0, TotalSalaryPay: 0, LastUpdated: ''
-};
-fillForm(defaultObj);
-setSyncStatus('Data telah direset · Belum disimpan', '');
-alert('✅ Semua medan telah direset ke default.\nKlik "Simpan & Sync" untuk menyimpan perubahan ini.');
+  if (!currentRaw || !currentRaw.Code) { alert('Tiada pekerja dipilih.'); return; }
+  const staff = activeStaffList.find(s => String(s.Code) === String(currentRaw.Code));
+  if (!staff) { alert('Data staff tidak dijumpai.'); return; }
+  if (!confirm('Reset semua medan ke default?')) return;
+  const defaultObj = {
+    Code: staff.Code, Name: staff.Name, GroupName: staff.GroupName, Situation: staff.Situation,
+    BasicSalary: staff.Salary, Basic: staff.Salary,
+    TimeOTHour: 0, TimeOTAmount: 0, DailyOTDay: 0, DailyOTAmount: 0,
+    Allowance2: 0, Commission: 0, Incentives: 0,
+    UnpaidLeave: 0, Pinjaman: 0, Deduction: 0, PotonganLain2: 0,
+    AnnualLeaveDays: 0, SickLeaveDays: 0,
+    EPFSalary: 0, SOCSOSalary: 0, EISSalary: 0, LindungSalary: 0,
+    EPF_Employee: 0, EPF_Employer: 0, SOCSO_Employee: 0, SOCSO_Employer: 0,
+    EIS_Employee: 0, EIS_Employer: 0, Lindung24Jam: 0,
+    SLRBankNama: staff.BankNama || '', SLRBankAccountNo: staff.BankAccountNo || '',
+    SLREPF: staff.EPF || '', SLRPERKESO: staff.PERKESO || '', SLREIS: staff.EIS || '',
+    TotalGajiKasar: 0, TotalPotongan: 0, TotalSalaryPay: 0, LastUpdated: ''
+  };
+  fillForm(defaultObj);
+  setSyncStatus('Data telah direset · Belum disimpan', '');
+  alert('✅ Semua medan telah direset ke default.\nKlik "Simpan & Sync" untuk menyimpan perubahan ini.');
 }
 
 async function saveAndSync() {
-if (!currentRaw || !currentRaw.Code) { alert('Tiada pekerja dipilih. Sila pilih KOD terlebih dahulu.'); return; }
-const btn = el('saveBtn');
-const originalText = btn.innerHTML;
-btn.disabled = true;
-btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+  if (!currentRaw || !currentRaw.Code) { alert('Tiada pekerja dipilih. Sila pilih KOD terlebih dahulu.'); return; }
+  const btn = el('saveBtn');
+  const originalText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
 
-const updated = { ...currentRaw };
-const staff = activeStaffList.find(s => String(s.Code) === String(updated.Code));
-if (staff) {
-updated.Name = staff.Name;
-updated.GroupName = staff.GroupName;
-updated.Situation = staff.Situation;
-updated.Basic = staff.Salary;
-}
-Object.entries(FIELD_MAP).forEach(([id, key]) => {
-const inp = inputs[id];
-if (!inp) return;
-if (TEXT_FIELDS.has(id)) updated[key] = inp.value;
-else updated[key] = num(inp.value);
-});
+  const updated = { ...currentRaw };
+  const staff = activeStaffList.find(s => String(s.Code) === String(updated.Code));
+  if (staff) {
+    updated.Name = staff.Name;
+    updated.GroupName = staff.GroupName;
+    updated.Situation = staff.Situation;
+    updated.Basic = staff.Salary;
+  }
+  Object.entries(FIELD_MAP).forEach(([id, key]) => {
+    const inp = inputs[id];
+    if (!inp) return;
+    if (TEXT_FIELDS.has(id)) updated[key] = inp.value;
+    else updated[key] = num(inp.value);
+  });
+  if (isCashBankValue(updated.SLRBankNama)) {
+    STATUTORY_FIELDS.forEach(id => { updated[FIELD_MAP[id]] = 0; });
+  }
+  updated.BasicSalary = updated.Basic;
+  updated.Code = String(updated.Code).trim();
+  updated.TotalGajiKasar = num(el('gajiKasarDisplay').innerText.replace(/[^0-9.\-]/g, ''));
+  updated.TotalPotongan = num(el('totalPotonganDisplay').innerText.replace(/[^0-9.\-]/g, ''));
+  updated.TotalSalaryPay = num(el('gajiBersihDisplay').innerText.replace(/[^0-9.\-]/g, ''));
+  updated.LastUpdated = new Date().toISOString();
 
-if (isCashBankValue(updated.SLRBankNama)) {
-  STATUTORY_FIELDS.forEach(id => { updated[FIELD_MAP[id]] = 0; });
-}
+  let sheetSuccess = false;
+  if (SCRIPT_URL) {
+    try {
+      const payload = { ...updated, action: 'saveEmployeeDetail' };
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      const result = await res.json();
+      if (result.status === 'success') sheetSuccess = true;
+      else throw new Error(result.message || 'Gagal sync ke Sheet');
+    } catch (err) {
+      console.error('Sync to sheet error:', err);
+      const proceed = confirm(`⚠️ Gagal sync ke Google Sheet: ${err.message}\nAdakah anda mahu tetap simpan di LocalStorage sahaja?`);
+      if (!proceed) {
+        btn.disabled = false; btn.innerHTML = originalText;
+        setSyncStatus('Batal simpan', 'error');
+        return;
+      }
+    }
+  }
 
-updated.BasicSalary = updated.Basic;
-updated.Code = String(updated.Code).trim();
-updated.TotalGajiKasar = num(el('gajiKasarDisplay').innerText.replace(/[^0-9.\-]/g,''));
-updated.TotalPotongan = num(el('totalPotonganDisplay').innerText.replace(/[^0-9.\-]/g,''));
-updated.TotalSalaryPay = num(el('gajiBersihDisplay').innerText.replace(/[^0-9.\-]/g,''));
-updated.LastUpdated = new Date().toISOString();
+  let all = [];
+  try {
+    const allJson = localStorage.getItem(STORAGE_KEY);
+    if (allJson) all = JSON.parse(allJson) || [];
+  } catch (e) {}
+  if (!Array.isArray(all)) all = [];
+  const idx = all.findIndex(e => String(e.Code) === String(updated.Code));
+  if (idx !== -1) all[idx] = { ...all[idx], ...updated };
+  else all.push(updated);
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); } catch (e) { console.error(e); }
+  allEmployees = all;
+  currentRaw = updated;
+  try {
+    localStorage.setItem('payrollSelectedCode', String(updated.Code));
+    localStorage.setItem('payrollSelectedName', String(updated.Name || ''));
+  } catch (e) {}
+  try {
+    if (window.opener && !window.opener.closed) window.opener.postMessage({ type: 'PAYROLL_UPDATE', employees: all }, '*');
+  } catch (e) {}
 
-let sheetSuccess = false;
-if (SCRIPT_URL) {
-try {
-const payload = { ...updated, action: 'saveEmployeeDetail' };
-const res = await fetch(SCRIPT_URL, {
-method: 'POST',
-headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-body: JSON.stringify(payload)
-});
-const result = await res.json();
-if (result.status === 'success') sheetSuccess = true;
-else throw new Error(result.message || 'Gagal sync ke Sheet');
-} catch (err) {
-console.error('Sync to sheet error:', err);
-const proceed = confirm(`⚠️ Gagal sync ke Google Sheet: ${err.message}\nAdakah anda mahu tetap simpan di LocalStorage sahaja?`);
-if (!proceed) {
-btn.disabled = false; btn.innerHTML = originalText;
-setSyncStatus('Batal simpan', 'error');
-return;
-}
-}
-}
-
-let all = [];
-try {
-const allJson = localStorage.getItem(STORAGE_KEY);
-if (allJson) all = JSON.parse(allJson) || [];
-} catch (e) {}
-if (!Array.isArray(all)) all = [];
-const idx = all.findIndex(e => String(e.Code) === String(updated.Code));
-if (idx !== -1) all[idx] = { ...all[idx], ...updated };
-else all.push(updated);
-try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); } catch (e) { console.error(e); }
-allEmployees = all;
-currentRaw = updated;
-try {
-localStorage.setItem('payrollSelectedCode', String(updated.Code));
-localStorage.setItem('payrollSelectedName', String(updated.Name || ''));
-} catch (e) {}
-try {
-if (window.opener && !window.opener.closed) window.opener.postMessage({ type: 'PAYROLL_UPDATE', employees: all }, '*');
-} catch (e) {}
-
-btn.disabled = false;
-btn.innerHTML = originalText;
-const time = new Date().toLocaleTimeString('ms-MY', { hour12: false });
-if (sheetSuccess) {
-setSyncStatus('Disimpan & Sync ke Sheet · ' + time, 'success');
-alert('✅ Data berjaya disimpan & disegerakkan ke LISTCALCULATION untuk ' + (updated.Name || updated.Code));
-} else {
-setSyncStatus('Disimpan (Local sahaja) · ' + time, 'success');
-alert('✅ Data disimpan di LocalStorage. (Gagal sync ke Sheet)');
-}
+  btn.disabled = false;
+  btn.innerHTML = originalText;
+  const time = new Date().toLocaleTimeString('ms-MY', { hour12: false });
+  if (sheetSuccess) {
+    setSyncStatus('Disimpan & Sync ke Sheet · ' + time, 'success');
+    alert('✅ Data berjaya disimpan & disegerakkan ke LISTCALCULATION untuk ' + (updated.Name || updated.Code));
+  } else {
+    setSyncStatus('Disimpan (Local sahaja) · ' + time, 'success');
+    alert('✅ Data disimpan di LocalStorage. (Gagal sync ke Sheet)');
+  }
 }
 
 async function syncFromSheet(silent = false) {
-if (!currentRaw || !currentRaw.Code) { if (!silent) alert('Sila pilih pekerja dahulu.'); return; }
-if (!SCRIPT_URL) { if (!silent) alert('Sila tetapkan URL Deploy terlebih dahulu di Dashboard.'); return; }
-const btn = el('syncSheetBtn');
-const originalText = btn.innerHTML;
-if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menarik...'; }
-try {
-  await Promise.all([fetchOvertimeData(), fetchSheetData(), fetchALSLData()]);
-  const res = await fetch(SCRIPT_URL, {
-  method: 'POST',
-  headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-  body: JSON.stringify({ action: 'getEmployeeDetail', Code: currentRaw.Code, Name: currentRaw.Name })
-  });
-  const result = await res.json();
-  const staff = activeStaffList.find(s => String(s.Code) === String(currentRaw.Code));
-  
-  let otRecord = null;
-  if (allOvertimeData && allOvertimeData.length > 0) {
-    otRecord = allOvertimeData.find(ot => String(ot['ID KOD'] || '').trim() === String(currentRaw.Code).trim());
-    if (!otRecord) otRecord = allOvertimeData.find(ot => String(ot['NAME'] || '').trim().toUpperCase() === String(currentRaw.Name || '').trim().toUpperCase());
-  }
+  if (!currentRaw || !currentRaw.Code) { if (!silent) alert('Sila pilih pekerja dahulu.'); return; }
+  if (!SCRIPT_URL) { if (!silent) alert('Sila tetapkan URL Deploy terlebih dahulu di Dashboard.'); return; }
+  const btn = el('syncSheetBtn');
+  const originalText = btn.innerHTML;
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menarik...'; }
+  try {
+    await Promise.all([fetchOvertimeData(), fetchSheetData(), fetchALSLData()]);
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'getEmployeeDetail', Code: currentRaw.Code, Name: currentRaw.Name })
+    });
+    const result = await res.json();
+    const staff = activeStaffList.find(s => String(s.Code) === String(currentRaw.Code));
 
-  if (result.status === 'success' && result.data) {
-    const sheetData = result.data;
-    const merged = { ...currentRaw, ...sheetData };
-    
-    if (isAllOtZero(merged) && otRecord) {
-      merged.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
-      merged.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
-      merged.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
-      merged.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
+    let otRecord = null;
+    if (allOvertimeData && allOvertimeData.length > 0) {
+      otRecord = allOvertimeData.find(ot => String(ot['ID KOD'] || '').trim() === String(currentRaw.Code).trim());
+      if (!otRecord) otRecord = allOvertimeData.find(ot => String(ot['NAME'] || '').trim().toUpperCase() === String(currentRaw.Name || '').trim().toUpperCase());
     }
-    const targetName = String(merged.Name || '').trim().toUpperCase();
-    const targetCode = String(merged.Code || '').trim();
-    let totalDed = 0;
-    if (allSheetData && allSheetData.length > 0) {
-      allSheetData.forEach(r => {
-        const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
-        const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
-        if ((targetName && rName === targetName) || (targetCode && rCode === targetCode)) totalDed += num(r['TOTAL DEDUCTION(RM)']);
-      });
-      if (num(merged.UnpaidLeave) === 0 && totalDed > 0) merged.UnpaidLeave = totalDed;
+
+    if (result.status === 'success' && result.data) {
+      const sheetData = result.data;
+      const merged = { ...currentRaw, ...sheetData };
+      if (isAllOtZero(merged) && otRecord) {
+        merged.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
+        merged.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
+        merged.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
+        merged.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
+      }
+      const targetName = String(merged.Name || '').trim().toUpperCase();
+      const targetCode = String(merged.Code || '').trim();
+      let totalDed = 0;
+      if (allSheetData && allSheetData.length > 0) {
+        allSheetData.forEach(r => {
+          const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
+          const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
+          if ((targetName && rName === targetName) || (targetCode && rCode === targetCode)) totalDed += num(r['TOTAL DEDUCTION(RM)']);
+        });
+        if (num(merged.UnpaidLeave) === 0 && totalDed > 0) merged.UnpaidLeave = totalDed;
+      }
+      if (allAlslData && allAlslData.length > 0) {
+        const alsl = allAlslData.find(r => {
+          const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
+          const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
+          return (targetName && rName === targetName) || (targetCode && rCode === targetCode);
+        });
+        if (alsl) { merged.AnnualLeaveDays = num(alsl['THISAL']); merged.SickLeaveDays = num(alsl['THISSL']); }
+      }
+      if (staff) {
+        merged.Name = staff.Name;
+        merged.GroupName = staff.GroupName;
+        merged.Situation = staff.Situation;
+        if (merged.Basic === undefined || merged.Basic === null || merged.Basic === '' || num(merged.Basic) === 0) merged.Basic = staff.Salary;
+      }
+      if (merged.BasicSalary !== undefined && merged.BasicSalary !== null && merged.BasicSalary !== '') {
+        if (num(merged.Basic) === 0 && num(merged.BasicSalary) > 0) merged.Basic = num(merged.BasicSalary);
+      }
+      fillForm(merged);
+      const idx = allEmployees.findIndex(e => String(e.Code) === String(currentRaw.Code));
+      if (idx !== -1) allEmployees[idx] = merged; else allEmployees.push(merged);
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees)); } catch (e) {}
+      const lastUpdated = sheetData.LastUpdated || '—';
+      setSyncStatus('Data dari Sheet & Overtime dimuat · ' + lastUpdated, 'success');
+      if (!silent) alert('✅ Data berjaya dimuat dari LISTCALCULATION & OVERTIME.\nTerakhir dikemas kini: ' + lastUpdated);
+    } else {
+      if (isAllOtZero(currentRaw) && otRecord) {
+        currentRaw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
+        currentRaw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
+        currentRaw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
+        currentRaw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
+      }
+      const targetName = String(currentRaw.Name || '').trim().toUpperCase();
+      const targetCode = String(currentRaw.Code || '').trim();
+      let totalDed = 0;
+      if (allSheetData && allSheetData.length > 0) {
+        allSheetData.forEach(r => {
+          const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
+          const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
+          if ((targetName && rName === targetName) || (targetCode && rCode === targetCode)) totalDed += num(r['TOTAL DEDUCTION(RM)']);
+        });
+        if (num(currentRaw.UnpaidLeave) === 0 && totalDed > 0) currentRaw.UnpaidLeave = totalDed;
+      }
+      if (allAlslData && allAlslData.length > 0) {
+        const alsl = allAlslData.find(r => {
+          const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
+          const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
+          return (targetName && rName === targetName) || (targetCode && rCode === targetCode);
+        });
+        if (alsl) { currentRaw.AnnualLeaveDays = num(alsl['THISAL']); currentRaw.SickLeaveDays = num(alsl['THISSL']); }
+      }
+      if (staff) {
+        if (currentRaw.SLRBankNama === undefined || currentRaw.SLRBankNama === null || currentRaw.SLRBankNama === '') currentRaw.SLRBankNama = staff.BankNama || '';
+        if (currentRaw.SLRBankAccountNo === undefined || currentRaw.SLRBankAccountNo === null || currentRaw.SLRBankAccountNo === '') currentRaw.SLRBankAccountNo = staff.BankAccountNo || '';
+        if (currentRaw.SLREPF === undefined || currentRaw.SLREPF === null || currentRaw.SLREPF === '') currentRaw.SLREPF = staff.EPF || '';
+        if (currentRaw.SLRPERKESO === undefined || currentRaw.SLRPERKESO === null || currentRaw.SLRPERKESO === '') currentRaw.SLRPERKESO = staff.PERKESO || '';
+        if (currentRaw.SLREIS === undefined || currentRaw.SLREIS === null || currentRaw.SLREIS === '') currentRaw.SLREIS = staff.EIS || '';
+      }
+      fillForm(currentRaw);
+      setSyncStatus('Tiada data LISTCALCULATION · Guna data Overtime & StaffInfo', '');
+      if (!silent) alert('Tiada data di LISTCALCULATION untuk pekerja ini. Menggunakan data dari Overtime dan StaffInfo.');
     }
-    if (allAlslData && allAlslData.length > 0) {
-      const alsl = allAlslData.find(r => {
-        const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
-        const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
-        return (targetName && rName === targetName) || (targetCode && rCode === targetCode);
-      });
-      if (alsl) { merged.AnnualLeaveDays = num(alsl['THISAL']); merged.SickLeaveDays = num(alsl['THISSL']); }
-    }
-    if (staff) {
-      merged.Name = staff.Name;
-      merged.GroupName = staff.GroupName;
-      merged.Situation = staff.Situation;
-      if (merged.Basic === undefined || merged.Basic === null || merged.Basic === '' || num(merged.Basic) === 0) merged.Basic = staff.Salary;
-    }
-    if (merged.BasicSalary !== undefined && merged.BasicSalary !== null && merged.BasicSalary !== '') {
-      if (num(merged.Basic) === 0 && num(merged.BasicSalary) > 0) merged.Basic = num(merged.BasicSalary);
-    }
-    fillForm(merged);
-    const idx = allEmployees.findIndex(e => String(e.Code) === String(currentRaw.Code));
-    if (idx !== -1) allEmployees[idx] = merged; else allEmployees.push(merged);
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees)); } catch(e) {}
-    const lastUpdated = sheetData.LastUpdated || '—';
-    setSyncStatus('Data dari Sheet & Overtime dimuat · ' + lastUpdated, 'success');
-    if (!silent) alert('✅ Data berjaya dimuat dari LISTCALCULATION & OVERTIME.\nTerakhir dikemas kini: ' + lastUpdated);
-  } else {
-    if (isAllOtZero(currentRaw) && otRecord) {
-      currentRaw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
-      currentRaw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
-      currentRaw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
-      currentRaw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
-    }
-    const targetName = String(currentRaw.Name || '').trim().toUpperCase();
-    const targetCode = String(currentRaw.Code || '').trim();
-    let totalDed = 0;
-    if (allSheetData && allSheetData.length > 0) {
-      allSheetData.forEach(r => {
-        const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
-        const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
-        if ((targetName && rName === targetName) || (targetCode && rCode === targetCode)) totalDed += num(r['TOTAL DEDUCTION(RM)']);
-      });
-      if (num(currentRaw.UnpaidLeave) === 0 && totalDed > 0) currentRaw.UnpaidLeave = totalDed;
-    }
-    if (allAlslData && allAlslData.length > 0) {
-      const alsl = allAlslData.find(r => {
-        const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
-        const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
-        return (targetName && rName === targetName) || (targetCode && rCode === targetCode);
-      });
-      if (alsl) { currentRaw.AnnualLeaveDays = num(alsl['THISAL']); currentRaw.SickLeaveDays = num(alsl['THISSL']); }
-    }
-    if (staff) {
-      if (currentRaw.SLRBankNama === undefined || currentRaw.SLRBankNama === null || currentRaw.SLRBankNama === '') currentRaw.SLRBankNama = staff.BankNama || '';
-      if (currentRaw.SLRBankAccountNo === undefined || currentRaw.SLRBankAccountNo === null || currentRaw.SLRBankAccountNo === '') currentRaw.SLRBankAccountNo = staff.BankAccountNo || '';
-      if (currentRaw.SLREPF === undefined || currentRaw.SLREPF === null || currentRaw.SLREPF === '') currentRaw.SLREPF = staff.EPF || '';
-      if (currentRaw.SLRPERKESO === undefined || currentRaw.SLRPERKESO === null || currentRaw.SLRPERKESO === '') currentRaw.SLRPERKESO = staff.PERKESO || '';
-      if (currentRaw.SLREIS === undefined || currentRaw.SLREIS === null || currentRaw.SLREIS === '') currentRaw.SLREIS = staff.EIS || '';
-    }
-    fillForm(currentRaw);
-    setSyncStatus('Tiada data LISTCALCULATION · Guna data Overtime & StaffInfo', '');
-    if (!silent) alert('Tiada data di LISTCALCULATION untuk pekerja ini. Menggunakan data dari Overtime dan StaffInfo.');
+  } catch (err) {
+    console.error('Sync from sheet error:', err);
+    setSyncStatus('Gagal sync dari Sheet', 'error');
+    if (!silent) alert('❌ Gagal sync dari Sheet: ' + err.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = originalText; }
   }
-} catch (err) {
-  console.error('Sync from sheet error:', err);
-  setSyncStatus('Gagal sync dari Sheet', 'error');
-  if (!silent) alert('❌ Gagal sync dari Sheet: ' + err.message);
-} finally {
-  if (btn) { btn.disabled = false; btn.innerHTML = originalText; }
-}
 }
 
 function loadFallbackFromStorage() {
-try {
-const stored = localStorage.getItem(STORAGE_KEY);
-if (stored) {
-allEmployees = JSON.parse(stored) || [];
-if (Array.isArray(allEmployees) && allEmployees.length > 0) {
-activeStaffList = allEmployees.map(e => ({
-Code: e.Code, Name: e.Name, GroupName: e.GroupName || 'Tidak Diketahui',
-Situation: 'ACTIVE', Salary: e.Basic || 0,
-BankNama: e.SLRBankNama || '', BankAccountNo: e.SLRBankAccountNo || '',
-EPF: e.SLREPF || '', PERKESO: e.SLRPERKESO || '', EIS: e.SLREIS || ''
-}));
-buildDropdowns();
-setSyncStatus('Data fallback dimuat', 'success');
-return;
-}
-}
-} catch (e) {}
-setSyncStatus('Tiada data', 'error');
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      allEmployees = JSON.parse(stored) || [];
+      if (Array.isArray(allEmployees) && allEmployees.length > 0) {
+        activeStaffList = allEmployees.map(e => ({
+          Code: e.Code, Name: e.Name, GroupName: e.GroupName || 'Tidak Diketahui',
+          Situation: 'ACTIVE', Salary: e.Basic || 0,
+          BankNama: e.SLRBankNama || '', BankAccountNo: e.SLRBankAccountNo || '',
+          EPF: e.SLREPF || '', PERKESO: e.SLRPERKESO || '', EIS: e.SLREIS || ''
+        }));
+        buildDropdowns();
+        setSyncStatus('Data fallback dimuat', 'success');
+        return;
+      }
+    }
+  } catch (e) {}
+  setSyncStatus('Tiada data', 'error');
 }
 
 /* ============ PRINTING ============ */
-
 function buildDefaultPrintData(emp) {
   return {
     Code: emp.Code, Name: emp.Name, GroupName: emp.GroupName, Situation: emp.Situation,
@@ -1369,18 +1404,18 @@ function buildDefaultPrintData(emp) {
 
 async function printEmployees(codes) {
   if (!codes || codes.length === 0) return;
-  
+
   if (codes.length === 1 && currentRaw && String(codes[0]) === String(currentRaw.Code)) {
     setTimeout(() => window.print(), 100);
     return;
   }
-  
+
   const container = el('payslipContainer');
   const savedRaw = currentRaw ? { ...currentRaw } : null;
   const savedCode = el('infoKod').value;
   const savedName = el('infoNama').value;
   const savedGroup = el('infoKumpulan').value;
-  
+
   const jobs = [];
   for (const code of codes) {
     const emp = activeStaffList.find(s => String(s.Code) === String(code));
@@ -1393,10 +1428,10 @@ async function printEmployees(codes) {
     alert('Tiada pekerja dipilih untuk dicetak.');
     return;
   }
-  
+
   const wrapper = document.createElement('div');
   wrapper.className = 'multi-print-wrapper';
-  
+
   for (const job of jobs) {
     fillForm(job.data);
     const clone = container.cloneNode(true);
@@ -1405,18 +1440,18 @@ async function printEmployees(codes) {
     clone.querySelectorAll('.no-print').forEach(n => n.remove());
     wrapper.appendChild(clone);
   }
-  
+
   const originalDisplay = container.style.display;
   container.style.display = 'none';
   document.body.appendChild(wrapper);
-  
+
   await new Promise(r => setTimeout(r, 180));
   window.print();
   await new Promise(r => setTimeout(r, 250));
-  
+
   wrapper.remove();
   container.style.display = originalDisplay;
-  
+
   if (savedRaw) {
     fillForm(savedRaw);
     if (savedCode) el('infoKod').value = savedCode;
@@ -1425,7 +1460,7 @@ async function printEmployees(codes) {
   }
 }
 
-/* ============ MODAL handlers ============ */
+/* ============ MODAL ============ */
 function populateBatchList() {
   const list = el('batchList');
   if (!list) return;
@@ -1436,35 +1471,30 @@ function populateBatchList() {
   }
   list.innerHTML = employees.map(s => `
     <label>
-      <input type="checkbox" value="${String(s.Code).replace(/"/g,'&quot;')}">
+      <input type="checkbox" value="${String(s.Code).replace(/"/g, '&quot;')}">
       <span><strong>${s.Code}</strong> — ${s.Name}</span>
     </label>
   `).join('');
 }
-
 function populateFilterGroups() {
   const sel = el('filterGroupSelect');
   if (!sel) return;
   const groups = [...new Set(activeStaffList.map(s => s.GroupName).filter(Boolean))].sort();
   sel.innerHTML = '<option value="">-- Semua Kumpulan --</option>' + groups.map(g => `<option value="${g}">${g}</option>`).join('');
 }
-
 function openPrintModal() {
   const ps = el('paperSizeSelect');
   try {
     const saved = localStorage.getItem(PAPER_KEY) || 'A4';
     ps.value = saved;
     applyPaperSize(saved);
-  } catch(e) { ps.value = 'A4'; }
-  
+  } catch (e) { ps.value = 'A4'; }
   populateBatchList();
   populateFilterGroups();
   updatePrintModeUI('current');
   el('printModal').classList.add('open');
 }
-function closePrintModal() {
-  el('printModal').classList.remove('open');
-}
+function closePrintModal() { el('printModal').classList.remove('open'); }
 function updatePrintModeUI(mode) {
   el('batchField').style.display = (mode === 'batch') ? '' : 'none';
   el('filterField').style.display = (mode === 'filter') ? '' : 'none';
@@ -1474,7 +1504,9 @@ function updatePrintModeUI(mode) {
 }
 
 /* ============ Event wire-up ============ */
-Object.values(inputs).forEach(inp => { if (inp) { inp.addEventListener('input', updateCalc); inp.addEventListener('change', updateCalc); } });
+Object.values(inputs).forEach(inp => {
+  if (inp) { inp.addEventListener('input', updateCalc); inp.addEventListener('change', updateCalc); }
+});
 el('saveBtn').addEventListener('click', saveAndSync);
 el('syncSheetBtn').addEventListener('click', () => syncFromSheet(false));
 el('resetBtn').addEventListener('click', resetToDefault);
@@ -1487,12 +1519,8 @@ el('autoCalcBtn').addEventListener('click', autoCalcStatutory);
 
 el('printBtn').addEventListener('click', openPrintModal);
 el('cancelPrintBtn').addEventListener('click', closePrintModal);
-el('printModal').addEventListener('click', (e) => {
-  if (e.target === el('printModal')) closePrintModal();
-});
-el('paperSizeSelect').addEventListener('change', (e) => {
-  applyPaperSize(e.target.value);
-});
+el('printModal').addEventListener('click', (e) => { if (e.target === el('printModal')) closePrintModal(); });
+el('paperSizeSelect').addEventListener('change', (e) => { applyPaperSize(e.target.value); });
 document.querySelectorAll('.print-modes input[name="printMode"]').forEach(r => {
   r.addEventListener('change', (e) => updatePrintModeUI(e.target.value));
 });
@@ -1507,7 +1535,6 @@ el('batchSelectNone')?.addEventListener('click', (e) => {
 el('doPrintBtn').addEventListener('click', () => {
   const mode = document.querySelector('.print-modes input[name="printMode"]:checked')?.value || 'current';
   let codes = [];
-  
   if (mode === 'current') {
     if (!currentRaw || !currentRaw.Code) { alert('Sila pilih pekerja dahulu.'); return; }
     codes = [currentRaw.Code];
@@ -1524,80 +1551,90 @@ el('doPrintBtn').addEventListener('click', () => {
     codes = filtered.map(s => s.Code);
     if (codes.length === 0) { alert('Tiada pekerja dalam kumpulan ini.'); return; }
   }
-  
   closePrintModal();
   setTimeout(() => printEmployees(codes), 150);
 });
 
 el('resetOTBtn').addEventListener('click', () => {
-    if (!currentRaw || !currentRaw.Code) { alert('Sila pilih pekerja dahulu.'); return; }
-    let otRecord = null;
-    if (allOvertimeData && allOvertimeData.length > 0) {
-        otRecord = allOvertimeData.find(ot => String(ot['ID KOD'] || '').trim() === String(currentRaw.Code).trim());
-        if (!otRecord) otRecord = allOvertimeData.find(ot => String(ot['NAME'] || '').trim().toUpperCase() === String(currentRaw.Name || '').trim().toUpperCase());
-    }
-    if (otRecord) {
-        currentRaw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
-        currentRaw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
-        currentRaw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
-        currentRaw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
-        inputs.timeOTHour.value = currentRaw.TimeOTHour.toFixed(2);
-        inputs.timeOTAmount.value = currentRaw.TimeOTAmount.toFixed(2);
-        inputs.dailyOTDay.value = currentRaw.DailyOTDay.toFixed(2);
-        inputs.dailyOTAmount.value = currentRaw.DailyOTAmount.toFixed(2);
-        updateCalc();
-        setSyncStatus('OT telah direset berdasarkan data OVERTIME terkini', 'success');
-    } else {
-        alert('⚠️ Tiada data OVERTIME untuk pekerja ini.');
-    }
+  if (!currentRaw || !currentRaw.Code) { alert('Sila pilih pekerja dahulu.'); return; }
+  let otRecord = null;
+  if (allOvertimeData && allOvertimeData.length > 0) {
+    otRecord = allOvertimeData.find(ot => String(ot['ID KOD'] || '').trim() === String(currentRaw.Code).trim());
+    if (!otRecord) otRecord = allOvertimeData.find(ot => String(ot['NAME'] || '').trim().toUpperCase() === String(currentRaw.Name || '').trim().toUpperCase());
+  }
+  if (otRecord) {
+    currentRaw.TimeOTHour = num(otRecord['TOTAL_OT_TIME_H']);
+    currentRaw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
+    currentRaw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
+    currentRaw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
+    inputs.timeOTHour.value = currentRaw.TimeOTHour.toFixed(2);
+    inputs.timeOTAmount.value = currentRaw.TimeOTAmount.toFixed(2);
+    inputs.dailyOTDay.value = currentRaw.DailyOTDay.toFixed(2);
+    inputs.dailyOTAmount.value = currentRaw.DailyOTAmount.toFixed(2);
+    updateCalc();
+    setSyncStatus('OT telah direset berdasarkan data OVERTIME terkini', 'success');
+  } else {
+    alert('⚠️ Tiada data OVERTIME untuk pekerja ini.');
+  }
 });
 
 el('resetUnpaidBtn').addEventListener('click', () => {
-    if (!currentRaw || !currentRaw.Code) { alert('Sila pilih pekerja dahulu.'); return; }
-    const targetName = String(currentRaw.Name || '').trim().toUpperCase();
-    const targetCode = String(currentRaw.Code || '').trim();
-    let totalDed = 0;
-    if (allSheetData && allSheetData.length > 0) {
-        allSheetData.forEach(r => {
-            const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
-            const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
-            if ((targetName && rName === targetName) || (targetCode && rCode === targetCode)) totalDed += num(r['TOTAL DEDUCTION(RM)']);
-        });
-    }
-    if (totalDed > 0) {
-        currentRaw.UnpaidLeave = totalDed;
-        inputs.unpaidLeave.value = totalDed.toFixed(2);
-        updateCalc();
-        setSyncStatus('Cuti Tanpa Gaji telah direset berdasarkan data SHEET', 'success');
-    } else {
-        alert('⚠️ Tiada data CUTI TANPA GAJI (TOTAL DEDUCTION) di SHEET untuk pekerja ini.');
-    }
+  if (!currentRaw || !currentRaw.Code) { alert('Sila pilih pekerja dahulu.'); return; }
+  const targetName = String(currentRaw.Name || '').trim().toUpperCase();
+  const targetCode = String(currentRaw.Code || '').trim();
+  let totalDed = 0;
+  if (allSheetData && allSheetData.length > 0) {
+    allSheetData.forEach(r => {
+      const rName = String(r['NAME'] || r['Name'] || '').trim().toUpperCase();
+      const rCode = String(r['ID KOD'] || r['Code'] || '').trim();
+      if ((targetName && rName === targetName) || (targetCode && rCode === targetCode)) totalDed += num(r['TOTAL DEDUCTION(RM)']);
+    });
+  }
+  if (totalDed > 0) {
+    currentRaw.UnpaidLeave = totalDed;
+    inputs.unpaidLeave.value = totalDed.toFixed(2);
+    updateCalc();
+    setSyncStatus('Cuti Tanpa Gaji telah direset berdasarkan data SHEET', 'success');
+  } else {
+    alert('⚠️ Tiada data CUTI TANPA GAJI (TOTAL DEDUCTION) di SHEET untuk pekerja ini.');
+  }
 });
 
 MANUAL_FIELDS.forEach(field => {
   const inp = el(field.inputId);
   const btn = el(field.btnId);
   if (btn) btn.addEventListener('click', () => toggleEditField(field));
-  if (inp) inp.addEventListener('input', (e) => { 
+  if (inp) inp.addEventListener('input', (e) => {
     if (currentRaw) {
       if (NUM_2DEC_FIELDS.has(field.inputId)) currentRaw[field.rawKey] = num(e.target.value);
       else currentRaw[field.rawKey] = e.target.value;
-    } 
+    }
   });
 });
-document.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === 's') { e.preventDefault(); saveAndSync(); } });
+
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === 's') { e.preventDefault(); saveAndSync(); }
+});
 window.addEventListener('storage', (e) => {
   if (e.key === URL_KEY && e.newValue) {
-    SCRIPT_URL = e.newValue; el('deployUrlDisplay').value = e.newValue; el('urlStatusDot').className = 'status-dot ok';
-    setSyncStatus('URL dikemas kini, memuat semula...', 'success'); fetchStaffBasics();
+    SCRIPT_URL = e.newValue;
+    el('deployUrlDisplay').value = e.newValue;
+    el('urlStatusDot').className = 'status-dot ok';
+    setSyncStatus('URL dikemas kini, memuat semula...', 'success');
+    fetchStaffBasics();
   }
 });
+/* ✅ beforeprint 正确放在初始化区域 */
+window.addEventListener('beforeprint', () => {
+  const saved = localStorage.getItem(PAPER_KEY) || 'A4';
+  applyPaperSize(saved);
+});
 
-// Init
+/* Init */
 setPeriod();
 loadSavedUrl();
 applyPaperSize(localStorage.getItem(PAPER_KEY) || 'A4');
-try { el('paperSizeSelect').value = localStorage.getItem(PAPER_KEY) || 'A4'; } catch(e) {}
+try { el('paperSizeSelect').value = localStorage.getItem(PAPER_KEY) || 'A4'; } catch (e) {}
 
 if (SCRIPT_URL) fetchStaffBasics();
 else setSyncStatus('Sila tetapkan URL di Dashboard terlebih dahulu.', 'error');
