@@ -28,6 +28,7 @@ font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 background: var(--epf-bg); color: var(--epf-text);
 min-height: 100vh; line-height: 1.5; font-size: 14px;
 -webkit-font-smoothing: antialiased;
+overflow: hidden; /* 防止整个页面滚动，由内部区域控制滚动 */
 }
 
 /* ============================================================
@@ -125,9 +126,9 @@ box-shadow: 0 0 0 0 rgba(110,240,168,0.75); animation: pulse 2s infinite;
 100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); }
 }
 
-/* TOPBAR & CONTENT STYLES (Original) */
+/* TOPBAR & CONTENT STYLES */
 .topbar {
-position: sticky; top: var(--nav-h); z-index: 100; background: #ffffff;
+position: sticky; top: 0; z-index: 100; background: #ffffff;
 border-bottom: 1px solid var(--epf-border); padding: 0.65rem 1.75rem;
 display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
 box-shadow: 0 1px 2px rgba(26,79,138,0.04);
@@ -142,15 +143,6 @@ width: 32px; height: 32px; background: var(--epf-blue); border-radius: 6px;
 display: flex; align-items: center; justify-content: center;
 color: #fff; font-size: 0.95rem; font-weight: 800;
 }
-.search-box { flex: 1; max-width: 320px; position: relative; }
-.search-box input {
-width: 100%; padding: 0.5rem 0.85rem 0.5rem 2.2rem;
-border: 1px solid var(--epf-border); border-radius: 6px;
-font-size: 0.82rem; font-family: inherit; color: var(--epf-text);
-transition: 0.15s;
-}
-.search-box input:focus { outline: none; border-color: var(--epf-blue); box-shadow: 0 0 0 2px rgba(26,79,138,0.10); }
-.search-box i { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--epf-muted); font-size: 0.8rem; }
 .btn {
 background: #ffffff; border: 1px solid var(--epf-border);
 padding: 0.42rem 0.9rem; border-radius: 5px; font-size: 0.78rem;
@@ -187,13 +179,53 @@ background: var(--epf-blue); color: #fff; font-size: 0.72rem; font-weight: 600;
 cursor: pointer; transition: 0.15s; white-space: nowrap;
 }
 .url-box button:hover { background: #15406f; }
-.main-layout { display: flex; align-items: flex-start; max-width: 1400px; margin: 0 auto; padding: 1.5rem 1.75rem 3rem; gap: 20px; }
-.content-area { flex: 1; min-width: 0; }
+
+/* ============================================================
+     新版 LAYOUT：左侧栏 + 右侧内容区
+     ============================================================ */
+.main-layout { 
+    display: flex; 
+    align-items: stretch; 
+    height: calc(100vh - 120px); /* 减去 topbar 和 navbar 的高度 */
+    max-width: 1600px; 
+    margin: 0 auto; 
+    padding: 1.5rem 1.75rem; 
+    gap: 20px; 
+}
+
+/* 左侧栏 */
+.sidebar-left {
+    width: 320px; 
+    flex-shrink: 0;
+    display: flex; flex-direction: column; gap: 1rem;
+    height: 100%;
+    overflow-y: auto;
+}
+/* 隐藏左侧栏滚动条 */
+.sidebar-left::-webkit-scrollbar { width: 0; } 
+
+.page-header {
+background: #ffffff; border: 1px solid var(--epf-border); border-radius: 8px;
+padding: 1.4rem 1.75rem;
+box-shadow: 0 1px 3px rgba(26,79,138,0.04);
+}
+.page-header h1 { font-size: 1.45rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--epf-blue); letter-spacing: -0.015em; }
+.page-header p { font-size: 0.85rem; color: var(--epf-muted); line-height: 1.6; }
+
+.search-box { position: relative; width: 100%; }
+.search-box input {
+width: 100%; padding: 0.7rem 0.85rem 0.7rem 2.2rem;
+border: 1px solid var(--epf-border); border-radius: 6px;
+font-size: 0.85rem; font-family: inherit; color: var(--epf-text);
+transition: 0.15s; box-shadow: var(--shadow-sm);
+}
+.search-box input:focus { outline: none; border-color: var(--epf-blue); box-shadow: 0 0 0 2px rgba(26,79,138,0.10); }
+.search-box i { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--epf-muted); font-size: 0.9rem; }
+
 .notice-board {
-position: sticky; top: calc(var(--nav-h) + 70px); width: 300px; flex-shrink: 0;
 background: #ffffff; border: 1px solid var(--epf-border); border-radius: 10px;
 box-shadow: var(--shadow-sm); overflow: hidden; display: flex; flex-direction: column;
-max-height: calc(100vh - var(--nav-h) - 90px);
+flex: 1; /* 占据剩余空间 */
 }
 .notice-header {
 background: #fef2f2; border-bottom: 1px solid #fecaca; padding: 0.8rem 1rem;
@@ -219,16 +251,47 @@ border-radius: 6px; padding: 0.7rem; font-size: 0.78rem; transition: 0.15s;
 .notice-target { font-size: 0.72rem; background: #fefcbf; color: #975a16; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 0.3rem; font-weight: 600; }
 .notice-empty { text-align: center; padding: 2rem 1rem; color: var(--epf-muted); font-size: 0.8rem; }
 .notice-empty .icon { font-size: 2rem; display: block; margin-bottom: 0.5rem; color: #cbd5e1; }
-.page-header {
-background: #ffffff; border: 1px solid var(--epf-border); border-radius: 8px;
-padding: 1.4rem 1.75rem; margin-bottom: 1.5rem;
-display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
-justify-content: space-between; box-shadow: 0 1px 3px rgba(26,79,138,0.04);
+
+/* 右侧内容区 */
+.content-area { 
+    flex: 1; min-width: 0; 
+    display: flex; flex-direction: column; gap: 1rem;
+    height: 100%;
 }
-.page-header .info { flex: 1; min-width: 240px; }
-.page-header h1 { font-size: 1.45rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--epf-blue); letter-spacing: -0.015em; }
-.page-header p { font-size: 0.85rem; color: var(--epf-muted); line-height: 1.6; }
-.employee-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+
+/* 顶部统计面板 (对应图片中的紫框/绿框) */
+.summary-panel {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+.summary-card {
+    background: #ffffff; border: 1px solid var(--epf-border); border-radius: 10px;
+    padding: 1.25rem; box-shadow: var(--shadow-sm);
+    display: flex; flex-direction: column; gap: 0.5rem;
+}
+.summary-card .title { font-size: 0.8rem; font-weight: 600; color: var(--epf-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.summary-card .value { font-size: 1.6rem; font-weight: 800; color: var(--epf-blue); font-variant-numeric: tabular-nums; }
+.summary-card .value.green { color: #0f7a54; }
+.summary-card .sub-list { margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.summary-card .sub-item { display: flex; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px dashed var(--epf-border-soft); padding-bottom: 0.2rem; }
+.summary-card .sub-item:last-child { border-bottom: none; }
+.summary-card .sub-item .bank-name { color: var(--epf-muted); }
+.summary-card .sub-item .bank-amount { font-weight: 600; color: var(--epf-text); }
+
+/* 员工列表滚动容器 (对应图片中的黄框) */
+.scrollable-employee-container {
+    flex: 1;
+    overflow-y: auto;
+    background: transparent;
+    padding-right: 5px; /* 留出滚动条空间 */
+}
+.scrollable-employee-container::-webkit-scrollbar { width: 8px; }
+.scrollable-employee-container::-webkit-scrollbar-track { background: var(--epf-bg); }
+.scrollable-employee-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+.scrollable-employee-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+.employee-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; padding-bottom: 2rem; }
 .employee-card {
 background: #ffffff; border: 1px solid var(--epf-border); border-radius: 10px; padding: 20px;
 cursor: pointer; transition: transform 0.15s, box-shadow 0.2s, border-color 0.15s;
@@ -260,10 +323,16 @@ background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transi
 .empty-state .icon { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; }
 .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(26,79,138,0.2); border-top: 2px solid var(--epf-blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 6px; vertical-align: middle; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-@media (max-width: 1024px) { .notice-board { width: 250px; } }
+
+@media (max-width: 1024px) { 
+    .sidebar-left { width: 280px; } 
+}
 @media (max-width: 900px) {
-.main-layout { flex-direction: column; }
-.notice-board { position: relative; top: 0; width: 100%; max-height: 300px; margin-bottom: 1rem; }
+    body { overflow: auto; } /* 手机端恢复默认滚动 */
+    .main-layout { flex-direction: column; height: auto; }
+    .sidebar-left { width: 100%; height: auto; overflow-y: visible; }
+    .notice-board { max-height: 300px; }
+    .scrollable-employee-container { overflow-y: visible; }
 }
 @media (max-width: 768px) {
 .navbar { padding: 0 0.5rem; }
@@ -273,8 +342,6 @@ background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transi
 .nav-chat { padding: 0.45rem 0.75rem; font-size: 0.66rem; }
 .topbar { padding: 0.6rem 1rem; }
 .main-layout { padding: 1rem; }
-.page-header { padding: 1.2rem; }
-.page-header h1 { font-size: 1.2rem; }
 .employee-grid { grid-template-columns: 1fr; }
 .url-box { max-width: 100%; flex: 1 1 100%; }
 }
@@ -309,7 +376,6 @@ background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transi
 </div>
 </div>
 
-<!-- ✅ 修正：当前是 Dashboard 页面，所以这里加 active -->
 <a class="nav-item active" href="dashboard.html">DASHBOARD</a>
 <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
 <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
@@ -349,10 +415,6 @@ background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transi
 <div class="topbar">
 <div class="brand"><div class="logo">P</div> Payroll Dashboard</div>
 <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
-<div class="search-box">
-<i class="fas fa-search"></i>
-<input type="text" id="searchInput" placeholder="Cari Nama / Kod / Kumpulan..." oninput="filterCards()">
-</div>
 <span class="spacer" style="flex:1;"></span>
 <div class="url-box">
 <input type="text" id="deployUrlInput" placeholder="Paste Deploy URL di sini..." onkeydown="if(event.key==='Enter') applyUrl()">
@@ -366,39 +428,79 @@ background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transi
 </button>
 </div>
 
+<!-- 新版主体布局 -->
 <div class="main-layout">
-<div class="notice-board">
-<div class="notice-header">
-<i class="fas fa-exclamation-triangle"></i> 预设超时提醒
-<span class="count-badge" id="noticeCount">0</span>
-</div>
-<div class="notice-list" id="noticeList">
-<div class="notice-empty">
-<span class="icon">✅</span>
-暂无超时未处理的预设
-</div>
-</div>
-</div>
+    
+    <!-- 左侧边栏 -->
+    <div class="sidebar-left">
+        <!-- 对应黄框：Dashboard Pekerja -->
+        <div class="page-header">
+            <h1>📊 Dashboard Pekerja</h1>
+            <p>Klik pada kad pekerja untuk membuka halaman detail &amp; sunting gaji.</p>
+        </div>
 
-<div class="content-area">
-<div class="page-header">
-<div class="info">
-<h1>📊 Dashboard Pekerja</h1>
-<p>Klik pada kad pekerja untuk membuka halaman detail &amp; sunting gaji.</p>
-</div>
-<div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
-<div class="sync-badge" id="countBadge">
-<span class="dot ok"></span><span id="countText">Memuatkan...</span>
-</div>
-</div>
-</div>
-<div class="employee-grid" id="employeeGrid">
-<div class="empty-state">
-<span class="icon">⏳</span>
-Memuatkan data pekerja...
-</div>
-</div>
-</div>
+        <!-- 对应黄框：搜索筛选 -->
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Cari Nama / Kod / Kumpulan..." oninput="filterCards()">
+        </div>
+
+        <!-- 对应红框/黄框：预设超时提醒 -->
+        <div class="notice-board">
+            <div class="notice-header">
+                <i class="fas fa-exclamation-triangle"></i> 预设超时提醒
+                <span class="count-badge" id="noticeCount">0</span>
+            </div>
+            <div class="notice-list" id="noticeList">
+                <div class="notice-empty">
+                    <span class="icon">✅</span>
+                    暂无超时未处理的预设
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右侧内容区 -->
+    <div class="content-area">
+        
+        <!-- 对应紫框：数据统计面板 -->
+        <div class="summary-panel">
+            <!-- 统计卡片 1 -->
+            <div class="summary-card">
+                <div class="title">员工总薪资开销 (Gaji Bersih)</div>
+                <div class="value green" id="summaryTotalNet">RM 0.00</div>
+                <div style="font-size: 0.8rem; color: var(--epf-muted); margin-top: 0.2rem;">
+                    总基本薪资: <span id="summaryTotalBasic" style="font-weight: 600;">RM 0.00</span>
+                </div>
+            </div>
+            <!-- 统计卡片 2：不同付款类型 -->
+            <div class="summary-card">
+                <div class="title">按付款类型统计 (By Bank)</div>
+                <div class="sub-list" id="summaryBankList">
+                    <div class="sub-item"><span class="bank-name">加载中...</span><span class="bank-amount">-</span></div>
+                </div>
+            </div>
+            <!-- 对应绿框：功能快捷按钮 (可选) -->
+            <div class="summary-card" style="justify-content: center; align-items: center; text-align: center;">
+                <div class="title" style="margin-bottom: 0.5rem;">快捷操作</div>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;">
+                    <button class="btn" onclick="window.location.href='staffinfo.html'">👥 员工档案</button>
+                    <button class="btn" onclick="window.location.href='salarysumview.html'">📊 薪资总览</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 对应黄框：员工列表滑动区域 -->
+        <div class="scrollable-employee-container">
+            <div class="employee-grid" id="employeeGrid">
+                <div class="empty-state">
+                    <span class="icon">⏳</span>
+                    Memuatkan data pekerja...
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>
 
 <script>
@@ -477,7 +579,6 @@ async function loadData() {
 if (!SCRIPT_URL) {
 document.getElementById('employeeGrid').innerHTML = `<div class="empty-state"><span class="icon">🔗</span>Sila masukkan URL Deploy Google Apps Script di toolbar di atas.</div>`;
 setSyncBadge('err', 'URL belum ditetapkan');
-document.getElementById('countText').textContent = '0 pekerja';
 return;
 }
 setSyncBadge('busy', 'Memuatkan data...');
@@ -512,7 +613,7 @@ GroupName: String(row.GroupName || '').trim(),
 Situation: String(row.Situation || 'ACTIVE').toUpperCase(),
 Salary: parseFloat(row.Salary) || 0,
 Jantina: row.Jantina || '', TarikhLahir: row.TarikhLahir || '', IC: row.IC || '', Jawatan: row.Jawatan || '',
-BankNama: row.BankNama || '', BankAccountNo: row.BankAccountNo || '',
+BankNama: row.BankNama || 'TIADA MAKLUMAT', BankAccountNo: row.BankAccountNo || '',
 EPF: row.EPF || '', PERKESO: row.PERKESO || '', EIS: row.EIS || '', Lindungan: row.Lindungan || '',
 BasicSalary: calcItem.BasicSalary || row.Salary || 0,
 TotalSalaryPay: calcItem.TotalSalaryPay || 0,
@@ -525,14 +626,57 @@ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees)); } catch (
 
 filteredEmployees = [...allEmployees];
 renderCards();
+renderSummary(); // <--- 新增：计算并渲染统计数据
 setSyncBadge('ok', 'Data dimuat (' + allEmployees.length + ' pekerja)');
-document.getElementById('countText').textContent = allEmployees.length + ' pekerja aktif';
 loadNoticeBoard();
 } catch (err) {
 console.error('Load error:', err);
 setSyncBadge('err', 'Gagal muat data');
 document.getElementById('employeeGrid').innerHTML = `<div class="empty-state"><span class="icon">⚠️</span>Gagal memuatkan data. Sila semak sambungan atau cuba lagi.<br><br><button class="btn" onclick="loadData()">🔄 Cuba Lagi</button></div>`;
 }
+}
+
+// ✅ 新增：计算总薪资和按银行分类的薪资
+function renderSummary() {
+    let totalBasic = 0;
+    let totalNet = 0;
+    let bankSummary = {};
+
+    allEmployees.forEach(emp => {
+        const basic = num(emp.BasicSalary || emp.Salary);
+        const net = num(emp.TotalSalaryPay);
+        totalBasic += basic;
+        totalNet += net;
+
+        let bank = emp.BankNama || 'TIADA MAKLUMAT';
+        if (!bankSummary[bank]) bankSummary[bank] = 0;
+        bankSummary[bank] += net;
+    });
+
+    // 更新总数
+    document.getElementById('summaryTotalNet').textContent = fmtRM(totalNet);
+    document.getElementById('summaryTotalBasic').textContent = fmtRM(totalBasic);
+
+    // 更新银行分类列表
+    const bankListEl = document.getElementById('summaryBankList');
+    const sortedBanks = Object.keys(bankSummary).sort((a, b) => bankSummary[b] - bankSummary[a]);
+    
+    if (sortedBanks.length === 0) {
+        bankListEl.innerHTML = '<div class="sub-item"><span class="bank-name">Tiada data</span><span class="bank-amount">-</span></div>';
+        return;
+    }
+
+    let html = '';
+    sortedBanks.forEach(bank => {
+        // 如果金额为0，可以选择跳过不显示，这里保留显示
+        html += `
+            <div class="sub-item">
+                <span class="bank-name">${escapeHtml(bank)}</span>
+                <span class="bank-amount">${fmtRM(bankSummary[bank])}</span>
+            </div>
+        `;
+    });
+    bankListEl.innerHTML = html;
 }
 
 async function loadNoticeBoard() {
@@ -625,7 +769,6 @@ if (SCRIPT_URL) { loadData(); }
 else {
 document.getElementById('employeeGrid').innerHTML = `<div class="empty-state"><span class="icon">🔗</span>Sila masukkan URL Deploy Google Apps Script di toolbar di atas.</div>`;
 setSyncBadge('err', 'URL belum ditetapkan');
-document.getElementById('countText').textContent = '0 pekerja';
 loadNoticeBoard();
 }
 });
