@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard · 员工薪资仪表盘</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -193,7 +194,7 @@ gap: 0.75rem;
 /* ============ 统计仪表盘 ============ */
 .dashboard-stats {
 flex-shrink: 0;
-max-height: 44vh;
+max-height: 62vh;
 overflow-y: auto;
 padding-right: 4px;
 }
@@ -209,6 +210,103 @@ margin: 0.4rem 0 0.35rem;
 .stats-section-title::after {
 content: ''; flex: 1; height: 1px; background: var(--epf-border-soft);
 }
+
+/* ---------- KPI 卡片 ---------- */
+.kpi-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+gap: 10px;
+}
+.kpi-card {
+background: #fff;
+border: 1px solid var(--epf-border);
+border-radius: 10px;
+padding: 10px 12px;
+box-shadow: var(--shadow-sm);
+display: flex; align-items: center; gap: 10px;
+position: relative; overflow: hidden;
+transition: transform .12s, box-shadow .15s;
+}
+.kpi-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.kpi-icon {
+width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+display: flex; align-items: center; justify-content: center;
+font-size: 0.95rem; color: #fff;
+background: linear-gradient(135deg, var(--kpi-c1, #4d9fff), var(--kpi-c2, #1a4f8a));
+box-shadow: 0 3px 8px rgba(26,79,138,.18);
+}
+.kpi-body { min-width: 0; flex: 1; }
+.kpi-label {
+font-size: 0.64rem; font-weight: 700; color: var(--epf-muted);
+text-transform: uppercase; letter-spacing: 0.05em;
+white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.kpi-value {
+font-size: 1.02rem; font-weight: 800; color: var(--epf-text);
+font-variant-numeric: tabular-nums; line-height: 1.25;
+white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.kpi-sub { font-size: 0.62rem; color: var(--epf-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kpi-card.c-blue   { --kpi-c1: #4d9fff; --kpi-c2: #1a4f8a; }
+.kpi-card.c-green  { --kpi-c1: #34d399; --kpi-c2: #0f7a54; }
+.kpi-card.c-red    { --kpi-c1: #fb7185; --kpi-c2: #dc2626; }
+.kpi-card.c-purple { --kpi-c1: #a78bfa; --kpi-c2: #7c3aed; }
+.kpi-card.c-orange { --kpi-c1: #fbbf24; --kpi-c2: #ea580c; }
+.kpi-card.c-cyan   { --kpi-c1: #22d3ee; --kpi-c2: #0891b2; }
+
+/* ---------- 图表卡片 ---------- */
+.charts-grid {
+display: grid;
+grid-template-columns: repeat(2, minmax(0, 1fr));
+gap: 10px;
+}
+.chart-card {
+background: #fff;
+border: 1px solid var(--epf-border);
+border-radius: 10px;
+box-shadow: var(--shadow-sm);
+padding: 10px 12px 8px;
+display: flex; flex-direction: column; min-width: 0;
+transition: box-shadow .15s;
+}
+.chart-card:hover { box-shadow: var(--shadow-md); }
+.chart-card-head {
+display: flex; align-items: center; justify-content: space-between;
+gap: 8px; margin-bottom: 6px; flex-wrap: wrap;
+}
+.chart-title {
+font-size: 0.73rem; font-weight: 800; color: var(--epf-text);
+display: flex; align-items: center; gap: 6px; white-space: nowrap;
+}
+.chart-title i { color: var(--epf-blue); font-size: 0.72rem; }
+.chart-sub { font-size: 0.62rem; color: var(--epf-muted); white-space: nowrap; }
+.chart-body { position: relative; height: 172px; }
+
+/* 分段切换 */
+.seg {
+display: inline-flex; background: var(--epf-blue-soft);
+border: 1px solid var(--epf-border-soft); border-radius: 6px; padding: 2px; gap: 2px;
+}
+.seg button {
+border: none; background: transparent; font-family: inherit;
+font-size: 0.62rem; font-weight: 700; color: var(--epf-muted);
+padding: 3px 8px; border-radius: 4px; cursor: pointer; transition: .12s; white-space: nowrap;
+}
+.seg button:hover { color: var(--epf-blue); }
+.seg button.active { background: #fff; color: var(--epf-blue); box-shadow: 0 1px 3px rgba(16,32,56,.12); }
+
+/* ---------- 可折叠详细统计 ---------- */
+.stats-details { margin-top: 10px; border-top: 1px solid var(--epf-border-soft); padding-top: 6px; }
+.stats-details > summary {
+cursor: pointer; font-size: 0.72rem; font-weight: 700; color: var(--epf-muted);
+text-transform: uppercase; letter-spacing: 0.08em;
+display: flex; align-items: center; gap: 6px; padding: 4px 0;
+user-select: none; list-style: none;
+}
+.stats-details > summary::-webkit-details-marker { display: none; }
+.stats-details > summary::after { content: '▾'; margin-left: auto; transition: transform .15s; }
+.stats-details[open] > summary::after { transform: rotate(180deg); }
+.stats-details > summary:hover { color: var(--epf-blue); }
 
 .stats-grid {
 display: grid;
@@ -263,7 +361,7 @@ display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;
 background: #fff; border: 1px solid var(--epf-border); border-radius: 8px;
 padding: 0.55rem 0.75rem; box-shadow: var(--shadow-sm);
 }
-.search-box { position: relative; flex: 1 1 240px; min-width: 200px; max-width: 360px; }
+.search-box { position: relative; flex: 1 1 220px; min-width: 180px; max-width: 320px; }
 .search-box input {
 width: 100%; padding: 0.5rem 0.75rem 0.5rem 2rem;
 border: 1px solid var(--epf-border); border-radius: 6px;
@@ -273,14 +371,54 @@ background: #fff; transition: 0.15s;
 .search-box input:focus { outline: none; border-color: var(--epf-blue); box-shadow: 0 0 0 2px rgba(26,79,138,0.10); }
 .search-box i { position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%); color: var(--epf-muted); font-size: 0.82rem; }
 
-.group-select {
-padding: 0.5rem 0.75rem; border: 1px solid var(--epf-border);
-border-radius: 6px; font-size: 0.8rem; font-family: inherit;
-color: var(--epf-text); background: #fff; cursor: pointer;
-max-width: 240px; min-width: 160px;
+/* ---------- 多选 KUMPULAN ---------- */
+.group-filter-wrap { position: relative; }
+.group-btn {
+display: inline-flex; align-items: center; gap: 0.4rem;
+padding: 0.5rem 0.7rem; border: 1px solid var(--epf-border); border-radius: 6px;
+background: #fff; font-family: inherit; font-size: 0.8rem; color: var(--epf-text);
+cursor: pointer; min-width: 170px; max-width: 250px;
+transition: .15s;
 }
-.group-select:focus { outline: none; border-color: var(--epf-blue); }
+.group-btn:hover { border-color: #b8cfe8; background: var(--epf-blue-soft); }
+.group-btn > i:first-child { color: var(--epf-muted); font-size: 0.75rem; }
+.group-btn .gtext { flex: 1; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.group-btn .fa-caret-down { font-size: 0.6rem; opacity: 0.65; }
+.group-badge {
+background: var(--epf-blue); color: #fff; font-size: 0.62rem; font-weight: 800;
+padding: 1px 6px; border-radius: 10px; min-width: 18px; text-align: center;
+}
+.group-panel {
+display: none; position: absolute; top: calc(100% + 4px); left: 0; z-index: 250;
+width: 268px; background: #fff; border: 1px solid var(--epf-border); border-radius: 8px;
+box-shadow: var(--dropdown-shadow); padding: 0.5rem;
+}
+.group-panel.open { display: block; animation: fadeSlide 0.15s ease; }
+.group-panel-head input {
+width: 100%; padding: 0.38rem 0.55rem; border: 1px solid var(--epf-border);
+border-radius: 5px; font-size: 0.76rem; font-family: inherit; outline: none;
+margin-bottom: 0.4rem; color: var(--epf-text);
+}
+.group-panel-head input:focus { border-color: var(--epf-blue); }
+.group-panel-actions { display: flex; gap: 0.4rem; margin-bottom: 0.4rem; }
+.group-panel-actions button {
+flex: 1; padding: 0.28rem; border: 1px solid var(--epf-border); border-radius: 5px;
+background: #fff; font-family: inherit; font-size: 0.68rem; font-weight: 700;
+color: var(--epf-blue); cursor: pointer; transition: .12s;
+}
+.group-panel-actions button:hover { background: var(--epf-blue-soft); }
+.group-list { max-height: 208px; overflow-y: auto; }
+.group-list label {
+display: flex; align-items: center; gap: 0.45rem;
+padding: 0.3rem 0.35rem; border-radius: 4px;
+font-size: 0.75rem; cursor: pointer; color: var(--epf-text);
+}
+.group-list label:hover { background: var(--epf-blue-soft); }
+.group-list input[type=checkbox] { accent-color: var(--epf-blue); cursor: pointer; }
+.group-list .gtext { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.group-list .gcount { font-size: 0.64rem; color: var(--epf-muted); font-weight: 700; }
 
+/* ---------- 付款类型 chips ---------- */
 .payment-chips {
 display: flex; flex-wrap: wrap; gap: 5px; align-items: center;
 flex: 1 1 auto;
@@ -299,6 +437,14 @@ transition: 0.12s; user-select: none; white-space: nowrap;
 }
 .chip:hover { border-color: var(--epf-blue); color: var(--epf-blue); }
 .chip.active { background: var(--epf-blue); color: #fff; border-color: var(--epf-blue); }
+
+.btn-clear {
+background: #fff; border: 1px solid var(--epf-border); color: var(--epf-muted);
+padding: 0.42rem 0.7rem; border-radius: 5px; font-size: 0.72rem; font-weight: 600;
+cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 0.3rem;
+transition: .12s; white-space: nowrap;
+}
+.btn-clear:hover { background: #fef2f2; border-color: #fecaca; color: #dc2626; }
 
 .filter-stats {
 display: flex; gap: 0.55rem; align-items: center; margin-left: auto;
@@ -348,6 +494,7 @@ color: var(--epf-blue); text-decoration: none;
 border-bottom: 1px dashed transparent; transition: 0.15s; cursor: pointer;
 }
 .name-link:hover { border-bottom-color: var(--epf-blue); }
+mark { background: #fde68a; color: inherit; border-radius: 2px; padding: 0 1px; }
 .code-badge {
 display: inline-block; background: var(--epf-blue-soft); color: var(--epf-muted);
 padding: 1px 6px; border-radius: 3px; font-size: 0.7rem; font-weight: 700;
@@ -372,6 +519,9 @@ margin-right: 6px; vertical-align: middle;
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
 /* RESPONSIVE */
+@media (max-width: 1200px) {
+.charts-grid { grid-template-columns: 1fr; }
+}
 @media (max-width: 1100px) {
 .dashboard-stats { max-height: none; }
 .stats-grid { grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); }
@@ -394,6 +544,8 @@ body { overflow: auto; }
 .url-box { max-width: 100%; flex: 1 1 100%; }
 .stats-grid { grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 8px; }
 .stat-card .stat-value { font-size: 1.05rem; }
+.kpi-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+.chart-body { height: 200px; }
 }
 </style>
 </head>
@@ -481,30 +633,112 @@ body { overflow: auto; }
 <!-- ================= MAIN ================= -->
 <div class="main-layout">
 
-    <!-- 统计仪表盘 -->
+    <!-- ===== 统计仪表盘 ===== -->
     <div class="dashboard-stats" id="dashboardStats">
-        <div class="stats-section-title"><i class="fas fa-chart-line"></i> 薪资概览</div>
-        <div class="stats-grid" id="statsGridSalary">
-            <div class="stat-card neutral"><div class="stat-label">加载中…</div><div class="stat-value">—</div></div>
+
+        <div class="stats-section-title"><i class="fas fa-chart-pie"></i> 关键指标</div>
+        <div class="kpi-grid" id="kpiGrid">
+            <div class="kpi-card c-blue">
+                <div class="kpi-icon"><i class="fas fa-spinner fa-spin"></i></div>
+                <div class="kpi-body">
+                    <div class="kpi-label">加载中</div>
+                    <div class="kpi-value">—</div>
+                </div>
+            </div>
         </div>
 
-        <div class="stats-section-title"><i class="fas fa-shield-alt"></i> 缴纳与保障</div>
-        <div class="stats-grid" id="statsGridCaruman"></div>
+        <div class="stats-section-title"><i class="fas fa-chart-bar"></i> 数据可视化</div>
+        <div class="charts-grid">
 
-        <div class="stats-section-title"><i class="fas fa-calendar-check"></i> 假期 / 加班 / 自定义付款</div>
-        <div class="stats-grid" id="statsGridOthers"></div>
+            <!-- 图1：开销分布 -->
+            <div class="chart-card">
+                <div class="chart-card-head">
+                    <span class="chart-title"><i class="fas fa-coins"></i> 开销分布对比</span>
+                    <div class="seg" id="expenseSeg">
+                        <button type="button" class="active" data-mode="payment">付款类型</button>
+                        <button type="button" data-mode="bank">付款银行</button>
+                    </div>
+                </div>
+                <div class="chart-body"><canvas id="chartExpense"></canvas></div>
+            </div>
+
+            <!-- 图2：各 KUMPULAN 薪资对比 -->
+            <div class="chart-card">
+                <div class="chart-card-head">
+                    <span class="chart-title"><i class="fas fa-building"></i> 各 KUMPULAN 薪资对比</span>
+                    <span class="chart-sub">净薪资 / 基本薪资 / 总扣除</span>
+                </div>
+                <div class="chart-body"><canvas id="chartSalary"></canvas></div>
+            </div>
+
+            <!-- 图3：各 KUMPULAN 缴纳对比 -->
+            <div class="chart-card">
+                <div class="chart-card-head">
+                    <span class="chart-title"><i class="fas fa-shield-alt"></i> 各 KUMPULAN 缴纳对比</span>
+                    <div class="seg" id="carumanSeg">
+                        <button type="button" class="active" data-metric="epf">EPF</button>
+                        <button type="button" data-metric="socso">SOCSO</button>
+                        <button type="button" data-metric="eis">EIS</button>
+                        <button type="button" data-metric="lindung">24H</button>
+                    </div>
+                </div>
+                <div class="chart-body"><canvas id="chartCaruman"></canvas></div>
+            </div>
+
+            <!-- 图4：各 KUMPULAN 假期对比 -->
+            <div class="chart-card">
+                <div class="chart-card-head">
+                    <span class="chart-title"><i class="fas fa-calendar-check"></i> 各 KUMPULAN 假期对比</span>
+                    <span class="chart-sub">年假 / 病假（天数 · 含人均）</span>
+                </div>
+                <div class="chart-body"><canvas id="chartLeave"></canvas></div>
+            </div>
+
+        </div>
+
+        <!-- 详细统计（可折叠） -->
+        <details class="stats-details">
+            <summary><i class="fas fa-table-list"></i> 详细统计</summary>
+            <div class="stats-section-title"><i class="fas fa-shield-alt"></i> 缴纳与保障</div>
+            <div class="stats-grid" id="statsGridCaruman"></div>
+            <div class="stats-section-title"><i class="fas fa-calendar-check"></i> 假期 / 加班 / 自定义付款</div>
+            <div class="stats-grid" id="statsGridOthers"></div>
+        </details>
+
     </div>
 
-    <!-- 筛选行 -->
+    <!-- ===== 筛选行（智能筛选） ===== -->
     <div class="filter-row">
         <div class="search-box">
             <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="搜索 姓名 / 编号（仅过滤表格）" oninput="applyFilter()">
+            <input type="text" id="searchInput" placeholder="搜索 姓名 / 编号 / 小组 / 银行…（Ctrl+K）">
         </div>
-        <select class="group-select" id="groupFilter" onchange="applyFilter()" title="按 KUMPULAN 筛选（影响统计与表格）">
-            <option value="">全部 KUMPULAN</option>
-        </select>
+
+        <div class="group-filter-wrap" id="groupFilterWrap">
+            <button class="group-btn" id="groupBtn" type="button" title="按 KUMPULAN 多选筛选（影响统计与表格）">
+                <i class="fas fa-layer-group"></i>
+                <span class="gtext" id="groupBtnText">全部 KUMPULAN</span>
+                <span class="group-badge" id="groupBadge" hidden>0</span>
+                <i class="fas fa-caret-down"></i>
+            </button>
+            <div class="group-panel" id="groupPanel">
+                <div class="group-panel-head">
+                    <input type="text" id="groupSearch" placeholder="搜索小组…">
+                </div>
+                <div class="group-panel-actions">
+                    <button type="button" onclick="selectAllGroups(true)">全选</button>
+                    <button type="button" onclick="selectAllGroups(false)">清除</button>
+                </div>
+                <div class="group-list" id="groupList"></div>
+            </div>
+        </div>
+
         <div class="payment-chips" id="paymentChips"></div>
+
+        <button class="btn-clear" type="button" onclick="clearAllFilters()">
+            <i class="fas fa-eraser"></i> 清除
+        </button>
+
         <div class="filter-stats">
             <span><i class="fas fa-users"></i> 共 <strong id="totalCount">0</strong> 人</span>
             <span style="color:#cbd5e1;">|</span>
@@ -512,7 +746,7 @@ body { overflow: auto; }
         </div>
     </div>
 
-    <!-- 数据表格 -->
+    <!-- ===== 数据表格 ===== -->
     <div class="table-wrapper">
         <div class="table-scroll">
             <table class="data-table">
@@ -583,23 +817,40 @@ const BASIC_FIELDS_KEEP = new Set(['Situation','GroupName','Code','Name','BasicS
 
 /* 付款类型多选配置 */
 const PAYMENT_TYPES = [
-    { field: 'BasicSalary',   label: '基本薪资' },
-    { field: 'TimeOTAmount',  label: 'OT金额' },
-    { field: 'DailyOTAmount', label: '日OT金额' },
-    { field: 'Allowance2',    label: '津贴2' },
-    { field: 'Commission',    label: '佣金' },
-    { field: 'Incentives',    label: '奖励' }
+    { field: 'BasicSalary',   label: '基本薪资', color: '#1a4f8a' },
+    { field: 'TimeOTAmount',  label: 'OT金额',   color: '#2f7fe0' },
+    { field: 'DailyOTAmount', label: '日OT金额', color: '#0891b2' },
+    { field: 'Allowance2',    label: '津贴2',    color: '#0f7a54' },
+    { field: 'Commission',    label: '佣金',     color: '#d97706' },
+    { field: 'Incentives',    label: '奖励',     color: '#7c3aed' }
 ];
 let selectedPayments = new Set(PAYMENT_TYPES.map(p => p.field));
+
+/* 缴纳指标配置（图表切换用） */
+const CARUMAN_METRICS = {
+    epf:     { label: 'EPF',       color: '#7c3aed', emp: c => c.epfEmp,   er: c => c.epfEr },
+    socso:   { label: 'SOCSO',     color: '#ea580c', emp: c => c.socsoEmp, er: c => c.socsoEr },
+    eis:     { label: 'EIS',       color: '#0891b2', emp: c => c.eisEmp,   er: c => c.eisEr },
+    lindung: { label: '24 JAM',    color: '#64748b', emp: c => c.lindung,  er: () => 0 }
+};
 
 /* ============================================================
    状态
    ============================================================ */
 let SCRIPT_URL = '';
 let mergedRows = [];      // 去重合并后全部行
-let filteredRows = [];    // 应用于表格的行（含搜索）
+let filteredRows = [];    // 应用于表格的行（KUMPULAN + 搜索）
 let statsRows = [];       // 应用于统计的行（仅 KUMPULAN 筛选）
 let headerInitialized = false;
+
+let selectedGroups = new Set();   // 空 = 全部
+let searchTerm = '';
+let searchDebounceTimer = null;
+let lastFilterSig = null;
+
+let charts = {};
+let expenseMode = 'payment';
+let carumanMetric = 'epf';
 
 /* ============================================================
    工具函数
@@ -628,6 +879,20 @@ function fmtDate(v) {
         if (!isNaN(d.getTime())) return d.toLocaleString('zh-CN', { hour12: false });
     } catch (e) {}
     return String(v);
+}
+function shortMoney(v) {
+    const n = Number(v) || 0;
+    const a = Math.abs(n);
+    if (a >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+    if (a >= 1000) return (n / 1000).toFixed(0) + 'k';
+    return String(n);
+}
+function highlight(text, q) {
+    const safe = escapeHtml(text);
+    if (!q) return safe;
+    const idx = safe.toLowerCase().indexOf(q);
+    if (idx === -1) return safe;
+    return safe.slice(0, idx) + '<mark>' + safe.slice(idx, idx + q.length) + '</mark>' + safe.slice(idx + q.length);
 }
 function setSyncBadge(state, text) {
     const badge = document.getElementById('syncBadge');
@@ -692,7 +957,6 @@ async function loadData() {
         `<tr><td colspan="${HEADERS.length}" style="text-align:center;padding:2rem;"><span class="spinner"></span> 加载中...</td></tr>`;
 
     try {
-        // 并行请求：STAFF / LISTCALCULATION / ALSLREMAIN / OVERTIME
         const [staffJson, calcJson, alsJson, otJson] = await Promise.all([
             fetchJson('getData'),
             fetchJson('getListCalculation'),
@@ -705,7 +969,6 @@ async function loadData() {
         const alsRaw   = extractArray(alsJson);
         const otRaw    = extractArray(otJson);
 
-        // 仅保留 ACTIVE 员工（STAFF 侧）
         const activeStaff = staffRaw
             .map(r => ({
                 Code: String(r.Code || '').trim(),
@@ -716,7 +979,6 @@ async function loadData() {
             }))
             .filter(s => s.Code && s.Name && s.Situation === 'ACTIVE');
 
-        // ALSLREMAIN 聚合（按 Code 或 Name）
         const alsMap = {};
         alsRaw.forEach(r => {
             const code = String(r.Code || '').trim();
@@ -728,7 +990,6 @@ async function loadData() {
             alsMap[key].sick   += num(pick(r, ['SickLeaveRemain','SickLeave','SickLeaveDays','SL','SLDays']));
         });
 
-        // OVERTIME 聚合（可能多条）
         const otMap = {};
         otRaw.forEach(r => {
             const code = String(r.Code || '').trim();
@@ -742,18 +1003,13 @@ async function loadData() {
             otMap[key].dayAmount += num(pick(r, ['DailyOTAmount','OTDayAmount','DayAmount']));
         });
 
-        // 合并去重（Name 为主去重键，LISTCALCULATION 优先）
         mergedRows = mergeData(activeStaff, calcRaw);
-
-        // 用 ALSLREMAIN / OVERTIME 补充 LISTCALCULATION 中缺失的值
         mergedRows.forEach(row => enrichRow(row, alsMap, otMap));
 
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedRows)); } catch (e) {}
 
-        // 填充 KUMPULAN 下拉
         populateGroupFilter();
-
-        // 应用筛选
+        lastFilterSig = null;
         applyFilter();
 
         setSyncBadge('ok', `已加载 ${mergedRows.length} 人`);
@@ -769,12 +1025,6 @@ async function loadData() {
     }
 }
 
-/**
- * 合并 LISTCALCULATION 与 STAFF。
- * 去重规则：Name（不区分大小写）为优先去重键，同时兼容 Code。
- * - LISTCALCULATION 中有记录的员工 → 不再从 STAFF 提取
- * - LISTCALCULATION 缺失的 ACTIVE 员工 → 从 STAFF 补充，标记为占位行
- */
 function mergeData(activeStaff, calcData) {
     const activeByCode = {};
     const activeByName = {};
@@ -788,7 +1038,6 @@ function mergeData(activeStaff, calcData) {
     const seenCodes = new Set();
     const seenNames = new Set();
 
-    // 1) LISTCALCULATION 优先
     calcData.forEach(c => {
         const code = String(c.Code || '').trim();
         const nk = String(c.Name || '').trim().toLowerCase();
@@ -816,7 +1065,6 @@ function mergeData(activeStaff, calcData) {
         }
     });
 
-    // 2) STAFF 补充（按 Name 去重）
     activeStaff.forEach(emp => {
         const nk = emp.Name.toLowerCase();
         if (seenCodes.has(emp.Code) || seenNames.has(nk)) return;
@@ -835,10 +1083,6 @@ function mergeData(activeStaff, calcData) {
     return result;
 }
 
-/**
- * 用 ALSLREMAIN / OVERTIME 补充 LISTCALCULATION 中为 0 的字段
- * （LISTCALCULATION 已计算的值优先）
- */
 function enrichRow(row, alsMap, otMap) {
     const code = String(row.Code || '').trim();
     const nk = String(row.Name || '').trim().toLowerCase();
@@ -858,50 +1102,135 @@ function enrichRow(row, alsMap, otMap) {
 }
 
 /* ============================================================
-   KUMPULAN 下拉
+   KUMPULAN 多选下拉
    ============================================================ */
+function groupKey(r) {
+    return String(r.GroupName || '').trim() || '(未分组)';
+}
+
 function populateGroupFilter() {
-    const sel = document.getElementById('groupFilter');
-    const groups = [...new Set(
-        mergedRows.map(r => String(r.GroupName || '').trim()).filter(Boolean)
-    )].sort();
-    const prev = sel.value;
-    sel.innerHTML = '<option value="">全部 KUMPULAN</option>' +
-        groups.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(g)}</option>`).join('');
-    if (groups.includes(prev)) sel.value = prev;
+    const listEl = document.getElementById('groupList');
+    if (!listEl) return;
+
+    const counts = new Map();
+    mergedRows.forEach(r => {
+        const g = groupKey(r);
+        counts.set(g, (counts.get(g) || 0) + 1);
+    });
+    const groups = [...counts.keys()].sort();
+
+    // 清理已不存在的小组选择
+    selectedGroups = new Set([...selectedGroups].filter(g => counts.has(g)));
+
+    listEl.innerHTML = groups.length
+        ? groups.map(g => `
+            <label>
+                <input type="checkbox" value="${escapeHtml(g)}" ${selectedGroups.has(g) ? 'checked' : ''} onchange="onGroupToggle(this)">
+                <span class="gtext">${escapeHtml(g)}</span>
+                <span class="gcount">${counts.get(g)}</span>
+            </label>`).join('')
+        : '<div style="padding:.5rem;color:#94a3b8;font-size:.74rem;">无可用小组</div>';
+
+    updateGroupBtn();
+}
+
+function updateGroupBtn() {
+    const btnText = document.getElementById('groupBtnText');
+    const badge = document.getElementById('groupBadge');
+    if (!btnText) return;
+    const total = document.querySelectorAll('#groupList input[type=checkbox]').length;
+
+    if (selectedGroups.size === 0 || selectedGroups.size === total) {
+        btnText.textContent = '全部 KUMPULAN';
+        badge.hidden = true;
+    } else {
+        const arr = [...selectedGroups];
+        btnText.textContent = arr.slice(0, 2).join(', ') + (arr.length > 2 ? ` +${arr.length - 2}` : '');
+        badge.hidden = false;
+        badge.textContent = selectedGroups.size;
+    }
+}
+
+function onGroupToggle(cb) {
+    if (cb.checked) selectedGroups.add(cb.value);
+    else selectedGroups.delete(cb.value);
+    updateGroupBtn();
+    applyFilter();
+}
+
+function selectAllGroups(v) {
+    document.querySelectorAll('#groupList label').forEach(l => {
+        if (l.style.display === 'none') return;
+        const cb = l.querySelector('input');
+        cb.checked = v;
+        if (v) selectedGroups.add(cb.value); else selectedGroups.delete(cb.value);
+    });
+    updateGroupBtn();
+    applyFilter();
+}
+
+function filterGroupList(q) {
+    q = q.trim().toLowerCase();
+    document.querySelectorAll('#groupList label').forEach(l => {
+        l.style.display = (!q || l.textContent.toLowerCase().includes(q)) ? '' : 'none';
+    });
 }
 
 /* ============================================================
-   筛选（KUMPULAN 影响统计；搜索只影响表格）
+   筛选逻辑
    ============================================================ */
+function rowMatchesSearch(r, q) {
+    return [r.Name, r.Code, r.GroupName, r.SLRBankNama, r.SLRBankAccountNo, r.Situation]
+        .some(v => String(v || '').toLowerCase().includes(q));
+}
+
 function applyFilter() {
-    const q = document.getElementById('searchInput').value.trim().toLowerCase();
-    const group = document.getElementById('groupFilter').value;
+    const q = searchTerm;
+    const useGroups = selectedGroups.size > 0;
 
     // 统计行：仅 KUMPULAN 筛选
-    statsRows = group
-        ? mergedRows.filter(r => String(r.GroupName || '') === group)
+    statsRows = useGroups
+        ? mergedRows.filter(r => selectedGroups.has(groupKey(r)))
         : [...mergedRows];
 
     // 表格行：KUMPULAN + 搜索
     filteredRows = q
-        ? statsRows.filter(r =>
-            String(r.Name || '').toLowerCase().includes(q) ||
-            String(r.Code || '').toLowerCase().includes(q))
+        ? statsRows.filter(r => rowMatchesSearch(r, q))
         : [...statsRows];
 
     renderTable();
-    renderDashboard();
     updateStats();
+
+    // 只有 KUMPULAN 变化时才重绘统计/图表，避免搜索时闪烁
+    const sig = [...selectedGroups].sort().join('|');
+    if (sig !== lastFilterSig) {
+        lastFilterSig = sig;
+        renderDashboard();
+    }
 }
 
 function updateStats() {
-    document.getElementById('totalCount').textContent = statsRows.length;
-    document.getElementById('shownCount').textContent = filteredRows.length;
+    const t = document.getElementById('totalCount');
+    const s = document.getElementById('shownCount');
+    if (t) t.textContent = statsRows.length;
+    if (s) s.textContent = filteredRows.length;
+}
+
+function clearAllFilters() {
+    searchTerm = '';
+    const si = document.getElementById('searchInput');
+    if (si) si.value = '';
+    selectedGroups.clear();
+    document.querySelectorAll('#groupList input[type=checkbox]').forEach(cb => { cb.checked = false; });
+    const gs = document.getElementById('groupSearch');
+    if (gs) { gs.value = ''; filterGroupList(''); }
+    updateGroupBtn();
+    lastFilterSig = null;
+    applyFilter();
 }
 
 /* ============================================================
-   统计仪表盘
+   统计计算
    ============================================================ */
 function computeStats(rows) {
     const s = {
@@ -936,6 +1265,81 @@ function computeStats(rows) {
     return s;
 }
 
+/* 按 KUMPULAN 聚合 */
+function aggregateByCompany(rows) {
+    const map = new Map();
+    rows.forEach(r => {
+        const g = groupKey(r);
+        let o = map.get(g);
+        if (!o) {
+            o = {
+                name: g, count: 0,
+                basic: 0, gross: 0, deduction: 0, net: 0,
+                epfEmp: 0, epfEr: 0, socsoEmp: 0, socsoEr: 0,
+                eisEmp: 0, eisEr: 0, lindung: 0,
+                annual: 0, sick: 0, otAmount: 0
+            };
+            map.set(g, o);
+        }
+        o.count++;
+        o.basic     += num(r.BasicSalary);
+        o.gross     += num(r.TotalGajiKasar);
+        o.deduction += num(r.TotalPotongan);
+        o.net       += num(r.TotalSalaryPay);
+        o.epfEmp    += num(r.EPF_Employee);
+        o.epfEr     += num(r.EPF_Employer);
+        o.socsoEmp  += num(r.SOCSO_Employee);
+        o.socsoEr   += num(r.SOCSO_Employer);
+        o.eisEmp    += num(r.EIS_Employee);
+        o.eisEr     += num(r.EIS_Employer);
+        o.lindung   += num(r.Lindung24Jam);
+        o.annual    += num(r.AnnualLeaveDays);
+        o.sick      += num(r.SickLeaveDays);
+        o.otAmount  += num(r.TimeOTAmount) + num(r.DailyOTAmount);
+    });
+    return [...map.values()].sort((a, b) => b.net - a.net);
+}
+
+/* 按银行聚合 */
+function aggregateByBank(rows) {
+    const map = new Map();
+    rows.forEach(r => {
+        const b = String(r.SLRBankNama || '').trim() || '(未指定)';
+        let o = map.get(b);
+        if (!o) { o = { name: b, count: 0, net: 0, gross: 0 }; map.set(b, o); }
+        o.count++;
+        o.net   += num(r.TotalSalaryPay);
+        o.gross += num(r.TotalGajiKasar);
+    });
+    return [...map.values()].sort((a, b) => b.net - a.net);
+}
+
+/* ============================================================
+   KPI / 详细统计渲染
+   ============================================================ */
+function kpiCard(label, value, sub, cls, icon) {
+    return `<div class="kpi-card ${cls || 'c-blue'}">
+        <div class="kpi-icon"><i class="fas ${icon || 'fa-chart-simple'}"></i></div>
+        <div class="kpi-body">
+            <div class="kpi-label">${escapeHtml(label)}</div>
+            <div class="kpi-value">${value}</div>
+            ${sub ? `<div class="kpi-sub">${escapeHtml(sub)}</div>` : ''}
+        </div>
+    </div>`;
+}
+
+function renderKpi(s) {
+    const grid = document.getElementById('kpiGrid');
+    if (!grid) return;
+    grid.innerHTML =
+        kpiCard('员工总数', fmtNum(s.count) + ' 人', '当前筛选范围', 'c-blue', 'fa-users') +
+        kpiCard('总基本薪资', fmtRM(s.basic), '', 'c-cyan', 'fa-money-bill-wave') +
+        kpiCard('总毛收入', fmtRM(s.gross), '', 'c-green', 'fa-wallet') +
+        kpiCard('总扣除', fmtRM(s.deduction), '', 'c-red', 'fa-minus-circle') +
+        kpiCard('总净薪资', fmtRM(s.net), '', 'c-purple', 'fa-hand-holding-usd') +
+        kpiCard('OT 补贴', fmtRM(s.otAmount), `OT ${fmtNum(s.otHour)} 小时`, 'c-orange', 'fa-bolt');
+}
+
 function statCard(label, value, sub, colorClass, icon) {
     return `<div class="stat-card ${colorClass || 'neutral'}">
         <div class="stat-label">${icon ? `<i class="fas ${icon}"></i>` : ''}${escapeHtml(label)}</div>
@@ -944,19 +1348,12 @@ function statCard(label, value, sub, colorClass, icon) {
     </div>`;
 }
 
-function renderDashboard() {
-    const s = computeStats(statsRows);
+function renderStatGrids(s) {
+    const carumanEl = document.getElementById('statsGridCaruman');
+    const othersEl = document.getElementById('statsGridOthers');
+    if (!carumanEl || !othersEl) return;
 
-    // 薪资概览
-    document.getElementById('statsGridSalary').innerHTML =
-        statCard('员工总数', fmtNum(s.count) + ' 人', '', 'neutral', 'fa-users') +
-        statCard('总基本薪资', fmtRM(s.basic), '', 'income', 'fa-money-bill-wave') +
-        statCard('总毛收入', fmtRM(s.gross), '', 'income', 'fa-wallet') +
-        statCard('总扣除', fmtRM(s.deduction), '', 'deduction', 'fa-minus-circle') +
-        statCard('总净薪资', fmtRM(s.net), '', 'net', 'fa-hand-holding-usd');
-
-    // 缴纳与保障
-    document.getElementById('statsGridCaruman').innerHTML =
+    carumanEl.innerHTML =
         statCard('EPF 员工', fmtRM(s.epfEmp), '', 'epf', 'fa-piggy-bank') +
         statCard('EPF 雇主', fmtRM(s.epfEr), '', 'epf', 'fa-building') +
         statCard('SOCSO 员工', fmtRM(s.socsoEmp), '', 'socso', 'fa-shield-alt') +
@@ -965,14 +1362,13 @@ function renderDashboard() {
         statCard('EIS 雇主', fmtRM(s.eisEr), '', 'eis', 'fa-building') +
         statCard('24小时保障', fmtRM(s.lindung), '', 'neutral', 'fa-clock');
 
-    // 假期 / 加班 / 自定义付款
     const customLabel = selectedPayments.size === 0
         ? '（未选择任何付款类型）'
         : Array.from(selectedPayments)
-            .map(f => PAYMENT_TYPES.find(p => p.field === f).label)
+            .map(f => (PAYMENT_TYPES.find(p => p.field === f) || {}).label || f)
             .join(' + ');
 
-    document.getElementById('statsGridOthers').innerHTML =
+    othersEl.innerHTML =
         statCard('年假总天数', fmtNum(s.annualLeave) + ' 天', '', 'leave', 'fa-calendar-check') +
         statCard('病假总天数', fmtNum(s.sickLeave) + ' 天', '', 'leave', 'fa-thermometer-half') +
         statCard('OT 总时数', fmtNum(s.otHour) + ' 小时', s.otDay ? `含日OT ${fmtNum(s.otDay)} 天` : '', 'ot', 'fa-clock') +
@@ -981,10 +1377,287 @@ function renderDashboard() {
 }
 
 /* ============================================================
+   图表渲染
+   ============================================================ */
+function destroyChart(key) {
+    if (charts[key]) {
+        try { charts[key].destroy(); } catch (e) {}
+        charts[key] = null;
+    }
+}
+
+function chartsReady() {
+    return typeof window.Chart !== 'undefined';
+}
+
+function showChartFallback() {
+    document.querySelectorAll('.chart-body canvas').forEach(cv => {
+        const body = cv.parentElement;
+        if (body.dataset.fallback === '1') return;
+        body.dataset.fallback = '1';
+        body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:.75rem;">图表库未加载，请检查网络</div>';
+    });
+}
+
+function baseScales(yCallback) {
+    return {
+        x: {
+            grid: { display: false },
+            ticks: { font: { size: 9 }, maxRotation: 0, autoSkip: false }
+        },
+        y: {
+            beginAtZero: true,
+            grid: { color: '#eef4fb' },
+            ticks: { font: { size: 9 }, callback: yCallback || shortMoney }
+        }
+    };
+}
+
+/* 图1：开销分布（付款类型 / 银行） */
+function renderExpenseChart(rows) {
+    const cv = document.getElementById('chartExpense');
+    if (!cv || !chartsReady()) return;
+    destroyChart('expense');
+
+    let labels, data, colors, tipLabel;
+
+    if (expenseMode === 'bank') {
+        const banks = aggregateByBank(rows).slice(0, 8);
+        labels = banks.map(b => b.name);
+        data = banks.map(b => +b.net.toFixed(2));
+        colors = banks.map(() => '#1a4f8a');
+        tipLabel = '净薪资';
+    } else {
+        const fields = PAYMENT_TYPES.filter(p => selectedPayments.has(p.field));
+        labels = fields.map(p => p.label);
+        data = fields.map(p => +rows.reduce((s, r) => s + num(r[p.field]), 0).toFixed(2));
+        colors = fields.map(p => p.color);
+        tipLabel = '金额';
+    }
+
+    if (!labels.length) { labels = ['无数据']; data = [0]; colors = ['#cbd5e1']; }
+
+    charts.expense = new Chart(cv, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                data,
+                backgroundColor: colors,
+                borderRadius: 4,
+                maxBarThickness: 16
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 350 },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: c => `${tipLabel}: ${fmtRM(c.raw)}`
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: { color: '#eef4fb' },
+                    ticks: { font: { size: 9 }, callback: v => shortMoney(v) }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: { font: { size: 9.5 }, autoSkip: false }
+                }
+            }
+        }
+    });
+}
+
+/* 图2：各 KUMPULAN 薪资对比 */
+function renderSalaryChart(rows) {
+    const cv = document.getElementById('chartSalary');
+    if (!cv || !chartsReady()) return;
+    destroyChart('salary');
+
+    const companies = aggregateByCompany(rows);
+    const labels = companies.length ? companies.map(c => c.name) : ['无数据'];
+
+    charts.salary = new Chart(cv, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: '净薪资',
+                    data: companies.map(c => +c.net.toFixed(2)),
+                    backgroundColor: '#1a4f8a',
+                    borderRadius: 3,
+                    maxBarThickness: 20
+                },
+                {
+                    label: '基本薪资',
+                    data: companies.map(c => +c.basic.toFixed(2)),
+                    backgroundColor: '#7fb3ec',
+                    borderRadius: 3,
+                    maxBarThickness: 20
+                },
+                {
+                    label: '总扣除',
+                    data: companies.map(c => +c.deduction.toFixed(2)),
+                    backgroundColor: '#ef4444',
+                    borderRadius: 3,
+                    maxBarThickness: 20
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 350 },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { boxWidth: 8, boxHeight: 8, usePointStyle: true, pointStyle: 'circle', font: { size: 9 } }
+                },
+                tooltip: {
+                    callbacks: { label: c => `${c.dataset.label}: ${fmtRM(c.raw)}` }
+                }
+            },
+            scales: baseScales(shortMoney)
+        }
+    });
+}
+
+/* 图3：各 KUMPULAN 缴纳对比 */
+function renderCarumanChart(rows) {
+    const cv = document.getElementById('chartCaruman');
+    if (!cv || !chartsReady()) return;
+    destroyChart('caruman');
+
+    const companies = aggregateByCompany(rows);
+    const m = CARUMAN_METRICS[carumanMetric];
+    const labels = companies.length ? companies.map(c => c.name) : ['无数据'];
+
+    charts.caruman = new Chart(cv, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: m.label,
+                data: companies.map(c => +(m.emp(c) + m.er(c)).toFixed(2)),
+                backgroundColor: m.color,
+                borderRadius: 4,
+                maxBarThickness: 26
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 350 },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => {
+                            const c = companies[ctx.dataIndex];
+                            if (!c) return `${m.label}: ${fmtRM(ctx.raw)}`;
+                            const e = m.emp(c), r = m.er(c);
+                            return r > 0
+                                ? `${m.label} 合计: ${fmtRM(ctx.raw)}（员工 ${fmtRM(e)} / 雇主 ${fmtRM(r)}）`
+                                : `${m.label}: ${fmtRM(ctx.raw)}`;
+                        }
+                    }
+                }
+            },
+            scales: baseScales(shortMoney)
+        }
+    });
+}
+
+/* 图4：各 KUMPULAN 假期对比 */
+function renderLeaveChart(rows) {
+    const cv = document.getElementById('chartLeave');
+    if (!cv || !chartsReady()) return;
+    destroyChart('leave');
+
+    const companies = aggregateByCompany(rows);
+    const labels = companies.length ? companies.map(c => c.name) : ['无数据'];
+
+    charts.leave = new Chart(cv, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: '年假(天)',
+                    data: companies.map(c => +c.annual.toFixed(1)),
+                    backgroundColor: '#0ea5e9',
+                    borderRadius: 3,
+                    maxBarThickness: 20
+                },
+                {
+                    label: '病假(天)',
+                    data: companies.map(c => +c.sick.toFixed(1)),
+                    backgroundColor: '#f59e0b',
+                    borderRadius: 3,
+                    maxBarThickness: 20
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 350 },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { boxWidth: 8, boxHeight: 8, usePointStyle: true, pointStyle: 'circle', font: { size: 9 } }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => {
+                            const c = companies[ctx.dataIndex];
+                            const avg = c && c.count ? (ctx.raw / c.count) : 0;
+                            return `${ctx.dataset.label}: ${fmtNum(ctx.raw)} 天（人均 ${avg.toFixed(2)} 天）`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { size: 9 }, maxRotation: 0, autoSkip: false } },
+                y: { beginAtZero: true, grid: { color: '#eef4fb' }, ticks: { font: { size: 9 } } }
+            }
+        }
+    });
+}
+
+function renderCharts(rows) {
+    if (!chartsReady()) { showChartFallback(); return; }
+    renderExpenseChart(rows);
+    renderSalaryChart(rows);
+    renderCarumanChart(rows);
+    renderLeaveChart(rows);
+}
+
+/* ============================================================
+   主渲染
+   ============================================================ */
+function renderDashboard() {
+    const s = computeStats(statsRows);
+    renderKpi(s);
+    renderStatGrids(s);
+    renderCharts(statsRows);
+}
+
+/* ============================================================
    付款类型 chips
    ============================================================ */
 function renderPaymentChips() {
     const el = document.getElementById('paymentChips');
+    if (!el) return;
     let html = '<span class="chips-label">付款类型合计:</span>';
     PAYMENT_TYPES.forEach(p => {
         const active = selectedPayments.has(p.field) ? 'active' : '';
@@ -996,7 +1669,8 @@ function togglePayment(field) {
     if (selectedPayments.has(field)) selectedPayments.delete(field);
     else selectedPayments.add(field);
     renderPaymentChips();
-    renderDashboard();
+    renderExpenseChart(statsRows);
+    renderStatGrids(computeStats(statsRows));
 }
 
 /* ============================================================
@@ -1033,11 +1707,12 @@ function formatCell(value, field) {
 function renderTable() {
     renderTableHeader();
     const tbody = document.getElementById('dataTableBody');
+    if (!tbody) return;
 
     if (filteredRows.length === 0) {
         const msg = mergedRows.length === 0
             ? '暂无员工数据，请确认 STAFF 登录记录中有 ACTIVE 员工。'
-            : '没有匹配的结果。';
+            : '没有匹配的结果，试试调整筛选条件。';
         tbody.innerHTML = `<tr><td colspan="${HEADERS.length}" style="text-align:center;padding:2rem;color:#94a3b8;">${msg}</td></tr>`;
         return;
     }
@@ -1051,13 +1726,15 @@ function renderTable() {
             if (MONEY_FIELDS.has(h) || COUNT_FIELDS.has(h)) extraCls = 'text-right';
 
             if (h === 'Name') {
-                cell = `<a class="name-link" href="javascript:void(0)" data-code="${escapeHtml(emp.Code || '')}">${escapeHtml(emp.Name || '-')}</a>`;
+                cell = `<a class="name-link" href="javascript:void(0)" data-code="${escapeHtml(emp.Code || '')}">${highlight(emp.Name || '-', searchTerm)}</a>`;
             } else if (h === 'Situation') {
                 const st = String(emp.Situation || '').toUpperCase();
                 const badgeCls = st === 'ACTIVE' ? 'active' : (st === 'PENDING' ? 'pending' : 'inactive');
                 cell = `<span class="status-badge ${badgeCls}">${escapeHtml(emp.Situation || '-')}</span>`;
             } else if (h === 'Code') {
-                cell = `<span class="code-badge">${escapeHtml(emp.Code || '-')}</span>`;
+                cell = `<span class="code-badge">${highlight(emp.Code || '-', searchTerm)}</span>`;
+            } else if (h === 'GroupName') {
+                cell = highlight(emp.GroupName || '-', searchTerm);
             } else if (h === 'LastUpdated') {
                 cell = fmtDate(emp[h]);
             } else if (emp._placeholder && !BASIC_FIELDS_KEEP.has(h)) {
@@ -1137,14 +1814,23 @@ function toggleNoticeDetail() {
    空状态
    ============================================================ */
 function showEmptyState() {
-    document.getElementById('dataTableBody').innerHTML =
-        `<tr><td colspan="${HEADERS.length}" style="text-align:center;padding:2rem;color:#94a3b8;">
-            请先在顶部输入 Deploy URL 并点击 Apply。
-        </td></tr>`;
-    document.getElementById('statsGridSalary').innerHTML =
-        `<div class="stat-card neutral"><div class="stat-label">尚未连接</div><div class="stat-value">—</div></div>`;
-    document.getElementById('statsGridCaruman').innerHTML = '';
-    document.getElementById('statsGridOthers').innerHTML = '';
+    const tbody = document.getElementById('dataTableBody');
+    if (tbody) {
+        tbody.innerHTML =
+            `<tr><td colspan="${HEADERS.length}" style="text-align:center;padding:2rem;color:#94a3b8;">
+                请先在顶部输入 Deploy URL 并点击 Apply。
+            </td></tr>`;
+    }
+    const kpi = document.getElementById('kpiGrid');
+    if (kpi) {
+        kpi.innerHTML = kpiCard('尚未连接', '—', '请输入 Deploy URL', 'c-blue', 'fa-plug');
+    }
+    const c1 = document.getElementById('statsGridCaruman');
+    const c2 = document.getElementById('statsGridOthers');
+    if (c1) c1.innerHTML = '';
+    if (c2) c2.innerHTML = '';
+
+    Object.keys(charts).forEach(k => destroyChart(k));
     setSyncBadge('err', 'URL belum ditetapkan');
     updateStats();
 }
@@ -1183,27 +1869,97 @@ function initNavbar() {
 }
 
 /* ============================================================
+   筛选交互初始化
+   ============================================================ */
+function initFilters() {
+    // 搜索（防抖 + 多字段）
+    const si = document.getElementById('searchInput');
+    if (si) {
+        si.addEventListener('input', e => {
+            const v = e.target.value.trim().toLowerCase();
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => {
+                searchTerm = v;
+                applyFilter();
+            }, 180);
+        });
+    }
+
+    // KUMPULAN 多选面板
+    const groupBtn = document.getElementById('groupBtn');
+    const groupPanel = document.getElementById('groupPanel');
+    if (groupBtn && groupPanel) {
+        groupBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            groupPanel.classList.toggle('open');
+            if (groupPanel.classList.contains('open')) {
+                const gs = document.getElementById('groupSearch');
+                if (gs) { gs.value = ''; filterGroupList(''); gs.focus(); }
+            }
+        });
+        document.addEventListener('click', e => {
+            if (!e.target.closest('#groupFilterWrap')) groupPanel.classList.remove('open');
+        });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') groupPanel.classList.remove('open');
+        });
+    }
+
+    const gs = document.getElementById('groupSearch');
+    if (gs) gs.addEventListener('input', e => filterGroupList(e.target.value));
+
+    // 开销分布切换（付款类型 / 银行）
+    const expenseSeg = document.getElementById('expenseSeg');
+    if (expenseSeg) {
+        expenseSeg.addEventListener('click', e => {
+            const btn = e.target.closest('button[data-mode]');
+            if (!btn) return;
+            expenseMode = btn.dataset.mode;
+            expenseSeg.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+            renderExpenseChart(statsRows);
+        });
+    }
+
+    // 缴纳指标切换
+    const carumanSeg = document.getElementById('carumanSeg');
+    if (carumanSeg) {
+        carumanSeg.addEventListener('click', e => {
+            const btn = e.target.closest('button[data-metric]');
+            if (!btn) return;
+            carumanMetric = btn.dataset.metric;
+            carumanSeg.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+            renderCarumanChart(statsRows);
+        });
+    }
+}
+
+/* ============================================================
    初始化
    ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
     initNavbar();
+    initFilters();
     renderPaymentChips();
 
     // 姓名点击跳转
-    document.getElementById('dataTableBody').addEventListener('click', (e) => {
-        const link = e.target.closest('.name-link');
-        if (link) {
-            e.preventDefault();
-            const code = link.dataset.code;
-            if (code) openDetail(code);
-        }
-    });
+    const tbody = document.getElementById('dataTableBody');
+    if (tbody) {
+        tbody.addEventListener('click', (e) => {
+            const link = e.target.closest('.name-link');
+            if (link) {
+                e.preventDefault();
+                const code = link.dataset.code;
+                if (code) openDetail(code);
+            }
+        });
+    }
 
     // Ctrl/Cmd + K 聚焦搜索
     document.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
             e.preventDefault();
-            document.getElementById('searchInput').focus();
+            const si = document.getElementById('searchInput');
+            if (si) si.focus();
         }
     });
 
@@ -1211,7 +1967,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('storage', (e) => {
         if (e.key === URL_KEY && e.newValue) {
             SCRIPT_URL = e.newValue;
-            document.getElementById('deployUrlInput').value = e.newValue;
+            const inp = document.getElementById('deployUrlInput');
+            if (inp) inp.value = e.newValue;
             loadData();
         }
     });
