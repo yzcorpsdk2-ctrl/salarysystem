@@ -613,11 +613,13 @@ const READONLY_COLS = ['ID KOD','SITUATION','GROUP','NAME','SHIF','GAJI',
   'Total Break Time(h)','Total Work Time(h)','Total Over/Less Time (h)',
   'SITUATION WORK TIME','TOTAL DEDUCTION(RM)','THIS AL REMAIN','THIS SL REMAIN'];
 
-const STATUS_OPTIONS = ['', 'ANNUAL LEAVE','UNPAID LEAVE','HALF DAY LEAVE','SICK LEAVE','OFF DAY','UNDEDUCTION LEAVE','MATERNITY LEAVE'];
+// ✅ 修复：在 STATUS_OPTIONS 中添加 HALF ANNUAL LEAVE
+const STATUS_OPTIONS = ['', 'ANNUAL LEAVE','UNPAID LEAVE','HALF DAY LEAVE','HALF ANNUAL LEAVE','SICK LEAVE','OFF DAY','UNDEDUCTION LEAVE','MATERNITY LEAVE'];
 const STATUS_COLORS = {
   'ANNUAL LEAVE': { bg: '#fca5a5', color: '#7f1d1d' },
   'UNPAID LEAVE': { bg: '#bbf7d0', color: '#14532d' },
   'HALF DAY LEAVE': { bg: '#bae6fd', color: '#0c4a6e' },
+  'HALF ANNUAL LEAVE': { bg: '#fed7aa', color: '#7c2d12' }, // 新增：半日年假颜色
   'SICK LEAVE': { bg: '#fef08a', color: '#713f12' },
   'OFF DAY': { bg: '#1e3a8a', color: '#ffffff' },
   'UNDEDUCTION LEAVE': { bg: '#c7d2fe', color: '#312e81' },
@@ -939,6 +941,7 @@ function computeRow(r) {
     const hourly = (gaji/30)/7.5;
     deduct = hourly * hrs;
   }
+  // ✅ 修复：HALF ANNUAL LEAVE 不扣款，只扣年假
 
   return { segH, workMin, otMin: overLessMin, swt, hl, deduct };
 }
@@ -1058,11 +1061,16 @@ function updateDashboardStats() {
       if (s === 'UNPAID LEAVE') countUNPL++;
       if (s === 'OFF DAY') countOFF++;
       if (s === 'HALF DAY LEAVE') countHALF++;
+      // ✅ 修复：HALF ANNUAL LEAVE 算作 0.5 天年假
+      if (s === 'HALF ANNUAL LEAVE') {
+        countAL += 0.5;
+        countHALF++; // 也计入 HALF 统计
+      }
       if (s === 'UNDEDUCTION LEAVE') countUNDD++;
       if (s === 'MATERNITY LEAVE') countMTNT++;
 
       if (s && s !== 'OFF DAY') {
-        if (s === 'HALF DAY LEAVE') {
+        if (s === 'HALF DAY LEAVE' || s === 'HALF ANNUAL LEAVE') {
           totalDays += 0.5;
           totalHours += parseFloat(r['HALF TT JAM']) || 0;
           totalMinutes += parseFloat(r['HALF TT MIN']) || 0;
@@ -1209,7 +1217,7 @@ function buildRow(r, i) {
       const inp = document.createElement('input');
       inp.className = 'cell' + (h === 'REMARK' ? ' wide' : '');
       inp.value = r[h] || '';
-      if ((h === 'HALF TT JAM' || h === 'HALF TT MIN') && statusVal !== 'HALF DAY LEAVE') inp.disabled = true;
+      if ((h === 'HALF TT JAM' || h === 'HALF TT MIN') && statusVal !== 'HALF DAY LEAVE' && statusVal !== 'HALF ANNUAL LEAVE') inp.disabled = true;
       inp.addEventListener('input', () => { r[h] = h === 'Date' ? normalizeDate(inp.value) : inp.value.trim(); markDirty(); });
       inp.addEventListener('change', () => {
         if (h === 'Date') inp.value = normalizeDate(inp.value);
