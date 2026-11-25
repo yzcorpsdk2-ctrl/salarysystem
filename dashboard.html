@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard · 员工薪资仪表盘</title>
-<!-- ✅ 添加 Font Awesome 图标库 -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -28,11 +27,11 @@ font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 background: var(--epf-bg); color: var(--epf-text);
 min-height: 100vh; line-height: 1.5; font-size: 14px;
 -webkit-font-smoothing: antialiased;
-overflow: hidden; /* 防止整个页面滚动，由内部区域控制滚动 */
+overflow: hidden;
 }
 
 /* ============================================================
-     NAVBAR STYLES (保持原有样式)
+     NAVBAR STYLES
      ============================================================ */
 .navbar {
 position: sticky; top: 0; z-index: 200;
@@ -103,7 +102,6 @@ font-weight: 500; transition: background 0.12s; white-space: nowrap;
 .dropdown-menu a:hover { background: var(--epf-blue-soft); color: var(--epf-blue); }
 .dropdown-menu .divider { height: 1px; background: var(--epf-border-soft); margin: 0.3rem 0.5rem; }
 
-/* TIPS / CHAT BUTTON */
 .nav-chat {
 margin-left: auto; align-self: center;
 display: inline-flex; align-items: center; gap: 0.45rem;
@@ -126,7 +124,7 @@ box-shadow: 0 0 0 0 rgba(110,240,168,0.75); animation: pulse 2s infinite;
 100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); }
 }
 
-/* TOPBAR & CONTENT STYLES */
+/* TOPBAR */
 .topbar {
 position: sticky; top: 0; z-index: 100; background: #ffffff;
 border-bottom: 1px solid var(--epf-border); padding: 0.65rem 1.75rem;
@@ -181,186 +179,189 @@ cursor: pointer; transition: 0.15s; white-space: nowrap;
 .url-box button:hover { background: #15406f; }
 
 /* ============================================================
-     新版 LAYOUT (蓝框/红框布局)
+     MAIN LAYOUT — 单列全宽
      ============================================================ */
-.main-layout { 
-    display: flex; 
-    align-items: stretch; 
-    height: calc(100vh - 120px); /* 减去 topbar 和 padding */
-    max-width: 1800px; 
-    margin: 0 auto; 
-    padding: 1rem 1.75rem; 
-    gap: 20px; 
+.main-layout {
+display: flex;
+flex-direction: column;
+height: calc(100vh - 120px);
+max-width: 1900px;
+margin: 0 auto;
+padding: 1rem 1.75rem;
+gap: 0.75rem;
 }
 
-/* 左侧边栏 (对应您的红框) */
-.sidebar-left {
-    width: 320px; 
-    flex-shrink: 0;
-    display: flex; flex-direction: column; gap: 1rem;
-    height: 100%; /* 撑满整个高度 */
+/* 工具栏：搜索 + 统计 */
+.toolbar-row {
+display: flex;
+gap: 0.75rem;
+align-items: center;
+flex-wrap: wrap;
 }
-.search-box { position: relative; width: 100%; }
+.search-box { position: relative; flex: 1; min-width: 260px; max-width: 520px; }
 .search-box input {
-width: 100%; padding: 0.7rem 0.85rem 0.7rem 2.2rem;
+width: 100%; padding: 0.65rem 0.85rem 0.65rem 2.2rem;
 border: 1px solid var(--epf-border); border-radius: 6px;
 font-size: 0.85rem; font-family: inherit; color: var(--epf-text);
-transition: 0.15s; box-shadow: var(--shadow-sm);
+background: #fff; transition: 0.15s; box-shadow: var(--shadow-sm);
 }
 .search-box input:focus { outline: none; border-color: var(--epf-blue); box-shadow: 0 0 0 2px rgba(26,79,138,0.10); }
 .search-box i { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--epf-muted); font-size: 0.9rem; }
 
-.notice-board {
-background: #ffffff; border: 1px solid var(--epf-border); border-radius: 10px;
-box-shadow: var(--shadow-sm); overflow: hidden; display: flex; flex-direction: column;
-flex: 1; /* 剩余空间全部留给这个区域，或者让它自然高度 */
-max-height: 350px; /* 限制最高高度 */
-}
-.notice-header {
-background: #fef2f2; border-bottom: 1px solid #fecaca; padding: 0.8rem 1rem;
-display: flex; align-items: center; gap: 0.5rem; color: #991b1b;
-font-weight: 700; font-size: 0.85rem;
-}
-.notice-header .count-badge {
-background: #ef4444; color: #fff; font-size: 0.65rem;
-padding: 2px 6px; border-radius: 10px; margin-left: auto;
-}
-.notice-list { overflow-y: auto; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
-.notice-list::-webkit-scrollbar { width: 6px; }
-.notice-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-.notice-item {
-background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #ef4444;
-border-radius: 6px; padding: 0.7rem; font-size: 0.78rem; transition: 0.15s;
-}
-.notice-item:hover { background: #fff; border-color: #cbd5e1; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-.notice-name { font-weight: 700; color: var(--epf-blue); margin-bottom: 0.2rem; display: flex; justify-content: space-between; align-items: center; }
-.notice-code { font-size: 0.65rem; background: var(--epf-blue-soft); color: var(--epf-muted); padding: 1px 5px; border-radius: 3px; font-weight: 600; }
-.notice-info { color: var(--epf-muted); margin-bottom: 0.2rem; }
-.notice-info span { color: #c53030; font-weight: 600; }
-.notice-target { font-size: 0.72rem; background: #fefcbf; color: #975a16; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 0.3rem; font-weight: 600; }
-.notice-empty { text-align: center; padding: 2rem 1rem; color: var(--epf-muted); font-size: 0.8rem; }
-.notice-empty .icon { font-size: 2rem; display: block; margin-bottom: 0.5rem; color: #cbd5e1; }
-
-/* 右侧内容区 */
-.content-area { 
-    flex: 1; min-width: 0; 
-    display: flex; flex-direction: column; gap: 1rem;
-    height: 100%;
-}
-
-/* ✅ 顶部大蓝框：按钮 + LISTCALCULATION 表格 */
-.top-blue-box {
-    display: flex;
-    height: 250px; /* 固定高度 */
-    flex-shrink: 0;
-    gap: 1rem;
-}
-
-/* 蓝框左侧：功能按钮 */
-.action-buttons-box {
-    width: 140px;
-    background: #ffffff; border: 1px solid var(--epf-border); border-radius: 10px;
-    box-shadow: var(--shadow-sm);
-    display: flex; flex-direction: column; padding: 1rem; gap: 0.8rem;
-}
-.action-buttons-box .title {
-    font-size: 0.8rem; font-weight: 700; color: var(--epf-muted);
-    text-align: center; margin-bottom: 0.5rem;
-    border-bottom: 1px solid var(--epf-border-soft); padding-bottom: 0.5rem;
-}
-.btn-action { width: 100%; justify-content: center; padding: 0.6rem 0; font-size: 0.82rem; }
-
-/* 蓝框右侧：表格容器 */
-.summary-table-wrapper {
-    flex: 1;
-    background: #ffffff; border: 1px solid var(--epf-border); border-radius: 10px;
-    box-shadow: var(--shadow-sm);
-    display: flex; flex-direction: column;
-    overflow: hidden;
-}
-.summary-table-header {
-    padding: 0.8rem 1rem; border-bottom: 1px solid var(--epf-border-soft);
-    background: var(--epf-blue-soft);
-    display: flex; justify-content: space-between; align-items: center;
-    font-weight: 700; color: var(--epf-blue); font-size: 0.85rem;
-}
-.summary-table-header span { font-size: 0.75rem; color: var(--epf-muted); font-weight: 500; }
-.table-scroll-area {
-    flex: 1; overflow: auto;
-}
-.table-scroll-area::-webkit-scrollbar { width: 8px; height: 8px; }
-.table-scroll-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-
-/* 表格样式 */
-.summary-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; white-space: nowrap; }
-.summary-table th {
-    position: sticky; top: 0; background: #f8fafc;
-    padding: 0.6rem 0.8rem; text-align: left; font-weight: 600; color: var(--epf-muted);
-    border-bottom: 1px solid var(--epf-border); z-index: 1;
-}
-.summary-table td {
-    padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--epf-border-soft);
-    color: var(--epf-text);
-}
-.summary-table tr:hover td { background: #f4f8fd; }
-.summary-table .text-right { text-align: right; font-variant-numeric: tabular-nums; }
-.summary-table .text-green { color: #0f7a54; font-weight: 700; }
-
-/* 底部卡片区域 */
-.bottom-cards-container {
-    flex: 1;
-    overflow-y: auto;
-    padding-right: 5px;
-}
-.bottom-cards-container::-webkit-scrollbar { width: 8px; }
-.bottom-cards-container::-webkit-scrollbar-track { background: var(--epf-bg); }
-.bottom-cards-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-.bottom-cards-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-.employee-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; padding-bottom: 2rem; }
-.employee-card {
-background: #ffffff; border: 1px solid var(--epf-border); border-radius: 10px; padding: 20px;
-cursor: pointer; transition: transform 0.15s, box-shadow 0.2s, border-color 0.15s;
-display: flex; flex-direction: column; gap: 14px; position: relative; overflow: hidden;
+.toolbar-stats {
+display: flex; gap: 0.75rem; align-items: center; margin-left: auto;
+font-size: 0.78rem; color: var(--epf-muted);
+background: #fff; border: 1px solid var(--epf-border);
+padding: 0.45rem 0.9rem; border-radius: 6px;
 box-shadow: var(--shadow-sm);
 }
-.employee-card:hover { border-color: var(--epf-blue); box-shadow: var(--shadow-md); transform: translateY(-2px); }
-.employee-card::before {
-content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transition: opacity 0.2s;
+.toolbar-stats strong { color: var(--epf-blue); font-weight: 800; }
+.toolbar-stats i { font-size: 0.75rem; }
+
+/* 超时提醒横幅 */
+.notice-banner {
+display: none;
+background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;
+overflow: hidden; box-shadow: var(--shadow-sm);
 }
-.employee-card:hover::before { opacity: 1; }
-.card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-.card-name { font-size: 1.05rem; font-weight: 700; color: var(--epf-blue); word-break: break-word; line-height: 1.3; }
-.card-code { font-size: 0.72rem; font-weight: 700; color: var(--epf-muted); background: var(--epf-blue-soft); padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
-.card-body { display: flex; flex-direction: column; gap: 8px; }
-.card-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--epf-text); }
-.card-row .label { color: var(--epf-muted); font-weight: 500; }
-.card-row .value { font-weight: 600; text-align: right; }
-.card-row .value.salary { font-size: 1.1rem; font-weight: 800; color: #0f7a54; font-variant-numeric: tabular-nums; }
-.card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--epf-border-soft); font-size: 0.72rem; color: var(--epf-muted); }
-.card-footer .status-badge { display: inline-block; padding: 0.2rem 0.7rem; border-radius: 20px; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.03em; }
+.notice-banner.show { display: block; }
+.notice-toggle {
+display: flex; align-items: center; gap: 0.5rem;
+padding: 0.6rem 1rem; width: 100%;
+background: transparent; border: none; cursor: pointer;
+color: #991b1b; font-weight: 700; font-size: 0.82rem;
+font-family: inherit; text-align: left;
+}
+.notice-toggle:hover { background: #fee2e2; }
+.notice-toggle .icon { font-size: 1rem; }
+.notice-caret { margin-left: auto; transition: transform 0.2s; }
+.notice-banner.expanded .notice-caret { transform: rotate(180deg); }
+.notice-details {
+display: none; padding: 0.6rem 1rem 0.9rem;
+border-top: 1px solid #fecaca;
+max-height: 220px; overflow-y: auto;
+flex-wrap: wrap; gap: 0.5rem;
+}
+.notice-banner.expanded .notice-details { display: flex; }
+.notice-chip {
+background: #fff; border: 1px solid #fecaca; border-left: 3px solid #ef4444;
+border-radius: 4px; padding: 0.45rem 0.7rem; font-size: 0.75rem;
+color: var(--epf-text); min-width: 200px;
+}
+.notice-chip .nc-name { font-weight: 700; color: var(--epf-blue); }
+.notice-chip .nc-code { font-size: 0.68rem; color: var(--epf-muted); margin-left: 4px; }
+.notice-chip .nc-info { font-size: 0.7rem; color: #c53030; margin-top: 2px; }
+
+/* 表格容器 */
+.table-wrapper {
+flex: 1;
+background: #ffffff;
+border: 1px solid var(--epf-border);
+border-radius: 10px;
+box-shadow: var(--shadow-sm);
+display: flex;
+flex-direction: column;
+overflow: hidden;
+min-height: 0;
+}
+.table-scroll {
+flex: 1;
+overflow: auto;
+}
+.table-scroll::-webkit-scrollbar { width: 10px; height: 10px; }
+.table-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+.table-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 5px; border: 2px solid #f1f5f9; }
+.table-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* 数据表 */
+.data-table {
+border-collapse: separate;
+border-spacing: 0;
+font-size: 0.78rem;
+width: max-content;
+min-width: 100%;
+}
+.data-table th {
+position: sticky; top: 0; z-index: 3;
+background: #f8fafc;
+padding: 0.6rem 0.7rem;
+text-align: left;
+font-weight: 600;
+color: var(--epf-muted);
+border-bottom: 1px solid var(--epf-border);
+white-space: nowrap;
+font-size: 0.74rem;
+letter-spacing: 0.02em;
+}
+.data-table th:first-child { padding-left: 1rem; }
+.data-table th:last-child { padding-right: 1rem; }
+.data-table td {
+padding: 0.55rem 0.7rem;
+border-bottom: 1px solid var(--epf-border-soft);
+white-space: nowrap;
+color: var(--epf-text);
+}
+.data-table td:first-child { padding-left: 1rem; }
+.data-table td:last-child { padding-right: 1rem; }
+.data-table tbody tr:hover td { background: #f4f8fd; }
+.data-table .text-right { text-align: right; font-variant-numeric: tabular-nums; }
+.data-table .col-name { font-weight: 600; }
+
+.name-link {
+color: var(--epf-blue);
+text-decoration: none;
+border-bottom: 1px dashed transparent;
+transition: 0.15s;
+cursor: pointer;
+}
+.name-link:hover { border-bottom-color: var(--epf-blue); }
+.code-badge {
+display: inline-block;
+background: var(--epf-blue-soft);
+color: var(--epf-muted);
+padding: 1px 6px;
+border-radius: 3px;
+font-size: 0.7rem;
+font-weight: 700;
+font-family: 'SFMono-Regular', Consolas, monospace;
+}
+.status-badge {
+display: inline-block;
+padding: 0.15rem 0.6rem;
+border-radius: 20px;
+font-size: 0.66rem;
+font-weight: 700;
+letter-spacing: 0.03em;
+white-space: nowrap;
+}
 .status-badge.active { background: #c6f6d5; color: #22543d; }
-.card-footer .arrow { font-size: 1rem; color: var(--epf-muted); transition: transform 0.15s; }
-.employee-card:hover .arrow { transform: translateX(3px); color: var(--epf-blue); }
-.empty-state { grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: #a7b7c9; font-size: 0.85rem; }
+.status-badge.pending { background: #fefcbf; color: #975a16; }
+.status-badge.inactive { background: #fee2e2; color: #991b1b; }
+.placeholder { color: #a7b7c9; font-style: italic; font-size: 0.72rem; }
+
+/* 空状态 / 加载 */
+.empty-state {
+text-align: center;
+padding: 3rem 1rem;
+color: #a7b7c9;
+font-size: 0.85rem;
+}
 .empty-state .icon { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; }
-.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(26,79,138,0.2); border-top: 2px solid var(--epf-blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 6px; vertical-align: middle; }
+.spinner {
+display: inline-block; width: 16px; height: 16px;
+border: 2px solid rgba(26,79,138,0.2);
+border-top: 2px solid var(--epf-blue);
+border-radius: 50%;
+animation: spin 0.8s linear infinite;
+margin-right: 6px; vertical-align: middle;
+}
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-@media (max-width: 1024px) { 
-    .sidebar-left { width: 280px; } 
-}
+/* RESPONSIVE */
 @media (max-width: 900px) {
-    body { overflow: auto; }
-    .main-layout { flex-direction: column; height: auto; }
-    .sidebar-left { width: 100%; height: auto; }
-    .top-blue-box { flex-direction: column; height: auto; }
-    .action-buttons-box { width: 100%; flex-direction: row; justify-content: center; align-items: center; }
-    .action-buttons-box .title { display: none; }
-    .action-buttons-box .btn-action { width: auto; padding: 0.5rem 1rem; }
-    .summary-table-wrapper { height: 250px; }
-    .bottom-cards-container { overflow-y: visible; }
+body { overflow: auto; }
+.main-layout { height: auto; padding: 1rem; }
+.table-wrapper { height: 60vh; }
 }
 @media (max-width: 768px) {
 .navbar { padding: 0 0.5rem; }
@@ -369,15 +370,14 @@ background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transi
 .nav-item { padding: 0 0.6rem; font-size: 0.68rem; }
 .nav-chat { padding: 0.45rem 0.75rem; font-size: 0.66rem; }
 .topbar { padding: 0.6rem 1rem; }
-.main-layout { padding: 1rem; }
-.employee-grid { grid-template-columns: 1fr; }
 .url-box { max-width: 100%; flex: 1 1 100%; }
+.toolbar-stats { width: 100%; margin-left: 0; justify-content: center; }
 }
 </style>
 </head>
 <body>
 
-<!-- ✅ 新版导航栏开始 -->
+<!-- ================= NAVBAR ================= -->
 <nav class="navbar">
 <div class="nav-brand"><span class="logo">Y</span><span class="brand-text">YZ Payroll</span></div>
 <div class="nav-links" id="navLinks">
@@ -438,8 +438,8 @@ background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transi
 <span class="pulse"></span> 💬 Request Chat
 </button>
 </nav>
-<!-- ✅ 新版导航栏结束 -->
 
+<!-- ================= TOPBAR ================= -->
 <div class="topbar">
 <div class="brand"><div class="logo">P</div> Payroll Dashboard</div>
 <span style="width:1px;height:22px;background:var(--epf-border);margin:0 6px;"></span>
@@ -456,365 +456,511 @@ background: linear-gradient(90deg, var(--epf-blue), #4d9fff); opacity: 0; transi
 </button>
 </div>
 
-<!-- 新版主体布局 -->
+<!-- ================= MAIN ================= -->
 <div class="main-layout">
-    
-    <!-- 左侧边栏 (红框区域) -->
-    <div class="sidebar-left">
-        <!-- 搜索框 -->
+
+    <!-- 工具栏：搜索 + 统计 -->
+    <div class="toolbar-row">
         <div class="search-box">
             <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="Cari Nama / Kod / Kumpulan..." oninput="filterCards()">
+            <input type="text" id="searchInput" placeholder="搜索 姓名 / 编号 / 小组..." oninput="applyFilter()">
         </div>
-
-        <!-- 预设超时提醒 -->
-        <div class="notice-board">
-            <div class="notice-header">
-                <i class="fas fa-exclamation-triangle"></i> 预设超时提醒
-                <span class="count-badge" id="noticeCount">0</span>
-            </div>
-            <div class="notice-list" id="noticeList">
-                <div class="notice-empty">
-                    <span class="icon">✅</span>
-                    暂无超时未处理的预设
-                </div>
-            </div>
+        <div class="toolbar-stats">
+            <span><i class="fas fa-users"></i> 共 <strong id="totalCount">0</strong> 人</span>
+            <span style="color:#cbd5e1;">|</span>
+            <span><i class="fas fa-filter"></i> 显示 <strong id="shownCount">0</strong></span>
         </div>
-        <!-- 下方自然留白，形成您图片中的红框效果 -->
     </div>
 
-    <!-- 右侧内容区 -->
-    <div class="content-area">
-        
-        <!-- 顶部大蓝框：快捷功能 + LISTCALCULATION 数据表格 -->
-        <div class="top-blue-box">
-            <!-- 左侧：功能按钮 -->
-            <div class="action-buttons-box">
-                <div class="title">快捷功能</div>
-                <button class="btn btn-action" onclick="window.location.href='salarysumview.html'"><i class="fas fa-file-alt"></i> 查看报告</button>
-                <button class="btn btn-action" onclick="window.print()"><i class="fas fa-print"></i> 打印</button>
-            </div>
-            
-            <!-- 右侧：表格容器 -->
-            <div class="summary-table-wrapper">
-                <div class="summary-table-header">
-                    LISTCALCULATION 计入员工数据总结
-                    <span id="includedCountText">(0 人)</span>
-                </div>
-                <div class="table-scroll-area">
-                    <table class="summary-table">
-                        <thead>
-                            <tr>
-                                <th>员工姓名 / 编号</th>
-                                <th class="text-right">基本薪资</th>
-                                <th class="text-right">总收入</th>
-                                <th class="text-right">总扣除</th>
-                                <th class="text-right">净薪资</th>
-                                <th class="text-right">EPF (员工)</th>
-                                <th class="text-right">SOCSO</th>
-                                <th class="text-right">EIS</th>
-                                <th class="text-right">Lindungan</th>
-                            </tr>
-                        </thead>
-                        <tbody id="summaryTableBody">
-                            <tr><td colspan="9" style="text-align: center; padding: 2rem; color: #94a3b8;">加载中...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- 底部员工卡片列表滑动区域 -->
-        <div class="bottom-cards-container">
-            <div class="employee-grid" id="employeeGrid">
-                <div class="empty-state">
-                    <span class="icon">⏳</span>
-                    Memuatkan data pekerja...
-                </div>
-            </div>
-        </div>
-
+    <!-- 超时提醒横幅 -->
+    <div class="notice-banner" id="noticeBanner">
+        <button class="notice-toggle" onclick="toggleNoticeDetail()">
+            <span class="icon">⚠️</span>
+            <span id="noticeSummary">0 项超时预设未处理</span>
+            <span class="notice-caret" id="noticeCaret">▾</span>
+        </button>
+        <div class="notice-details" id="noticeDetails"></div>
     </div>
+
+    <!-- 数据表格 -->
+    <div class="table-wrapper">
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead id="dataTableHead"></thead>
+                <tbody id="dataTableBody">
+                    <tr><td style="text-align:center;padding:2rem;color:#94a3b8;">加载中...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-const backBtn = document.getElementById('backBtn');
-if (backBtn) backBtn.addEventListener('click', function(e) { e.preventDefault(); window.history.back(); });
-
-// 下拉菜单交互逻辑
-const dropdownToggles = document.querySelectorAll('[data-dropdown-toggle]');
-dropdownToggles.forEach(function(toggle) {
-toggle.addEventListener('click', function(e) {
-e.stopPropagation();
-const dropdownId = this.getAttribute('data-dropdown-toggle');
-document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { 
-if (dd.id !== dropdownId + 'Dropdown') dd.classList.remove('open'); 
-});
-const wrapper = this.closest('.nav-dropdown');
-if (wrapper) wrapper.classList.toggle('open');
-});
-});
-
-document.addEventListener('click', function(e) { 
-if (!e.target.closest('.nav-dropdown')) 
-document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); }); 
-});
-
-document.addEventListener('keydown', function(e) { 
-if (e.key === 'Escape') 
-document.querySelectorAll('.nav-dropdown.open').forEach(function(dd) { dd.classList.remove('open'); }); 
-});
-});
-
-const URL_KEY = 'payrollScriptUrl';
-const STORAGE_KEY = 'payrollEmployees';
+/* ============================================================
+   常量与配置
+   ============================================================ */
+const URL_KEY          = 'payrollScriptUrl';
+const STORAGE_KEY      = 'payrollEmployees';
 const SELECTED_CODE_KEY = 'payrollSelectedCode';
-const SELECTED_EMP_KEY = 'payrollSelectedEmployee';
-const DETAIL_URL = 'detail.html';
-let SCRIPT_URL = '';
-let allEmployees = [];
-let filteredEmployees = [];
-let allCalcData = []; // 新增：保存所有 LISTCALCULATION 数据
+const SELECTED_EMP_KEY  = 'payrollSelectedEmployee';
+const DETAIL_URL       = 'detail.html';
 
+const HEADERS = [
+    'Situation','GroupName','Code','Name','BasicSalary','TimeOTHour','TimeOTAmount',
+    'DailyOTDay','DailyOTAmount','Allowance2','Commission','Incentives','UnpaidLeave',
+    'Pinjaman','Deduction','PotonganLain2','AnnualLeaveDays','SickLeaveDays',
+    'EPFSalary','SOCSOSalary','EISSalary','LindungSalary','EPF_Employee','EPF_Employer',
+    'SOCSO_Employee','SOCSO_Employer','EIS_Employee','EIS_Employer','Lindung24Jam',
+    'SLRBankNama','SLRBankAccountNo','SLREPF','SLRPERKESO','SLREIS',
+    'TotalGajiKasar','TotalPotongan','TotalSalaryPay','LastUpdated'
+];
+
+const HEADER_LABELS = {
+    Situation: '状态', GroupName: '小组', Code: '编号', Name: '姓名',
+    BasicSalary: '基本薪资',
+    TimeOTHour: 'OT时数', TimeOTAmount: 'OT金额',
+    DailyOTDay: '日OT天数', DailyOTAmount: '日OT金额',
+    Allowance2: '津贴2', Commission: '佣金', Incentives: '奖励',
+    UnpaidLeave: '无薪假',
+    Pinjaman: '贷款', Deduction: '扣除', PotonganLain2: '其他扣除',
+    AnnualLeaveDays: '年假天数', SickLeaveDays: '病假天数',
+    EPFSalary: 'EPF薪资', SOCSOSalary: 'SOCSO薪资', EISSalary: 'EIS薪资',
+    LindungSalary: '保障薪资',
+    EPF_Employee: 'EPF(员工)', EPF_Employer: 'EPF(雇主)',
+    SOCSO_Employee: 'SOCSO(员工)', SOCSO_Employer: 'SOCSO(雇主)',
+    EIS_Employee: 'EIS(员工)', EIS_Employer: 'EIS(雇主)',
+    Lindung24Jam: '24小时保障',
+    SLRBankNama: '银行名称', SLRBankAccountNo: '银行账号',
+    SLREPF: 'EPF参考', SLRPERKESO: 'PERKESO参考', SLREIS: 'EIS参考',
+    TotalGajiKasar: '总毛收入', TotalPotongan: '总扣除', TotalSalaryPay: '净薪资',
+    LastUpdated: '最后更新'
+};
+
+const MONEY_FIELDS = new Set([
+    'BasicSalary','TimeOTAmount','DailyOTAmount','Allowance2','Commission','Incentives',
+    'Pinjaman','Deduction','PotonganLain2','EPFSalary','SOCSOSalary','EISSalary',
+    'LindungSalary','EPF_Employee','EPF_Employer','SOCSO_Employee','SOCSO_Employer',
+    'EIS_Employee','EIS_Employer','Lindung24Jam','SLREPF','SLRPERKESO','SLREIS',
+    'TotalGajiKasar','TotalPotongan','TotalSalaryPay'
+]);
+
+const COUNT_FIELDS = new Set([
+    'TimeOTHour','DailyOTDay','UnpaidLeave','AnnualLeaveDays','SickLeaveDays'
+]);
+
+/* 占位行中保留真实值的字段 */
+const BASIC_FIELDS_KEEP = new Set(['Situation','GroupName','Code','Name','BasicSalary']);
+
+/* ============================================================
+   状态
+   ============================================================ */
+let SCRIPT_URL = '';
+let mergedRows = [];
+let filteredRows = [];
+let headerInitialized = false;
+
+/* ============================================================
+   工具函数
+   ============================================================ */
 function num(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
-function fmtRM(v) { return 'RM ' + Number(v || 0).toFixed(2); }
 function escapeHtml(s) {
-if (s === null || s === undefined) return '';
-return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    if (s === null || s === undefined) return '';
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
 function setSyncBadge(state, text) {
-const badge = document.getElementById('syncBadge');
-const txt = document.getElementById('syncBadgeText');
-if (!badge || !txt) return;
-badge.className = 'sync-badge ' + (state || '');
-txt.textContent = text;
+    const badge = document.getElementById('syncBadge');
+    const txt = document.getElementById('syncBadgeText');
+    if (!badge || !txt) return;
+    badge.className = 'sync-badge ' + (state || '');
+    txt.textContent = text;
 }
+
+/* ============================================================
+   URL 管理
+   ============================================================ */
 function loadSavedUrl() {
-try {
-const saved = localStorage.getItem(URL_KEY);
-if (saved) { SCRIPT_URL = saved; document.getElementById('deployUrlInput').value = saved; }
-else { SCRIPT_URL = ''; document.getElementById('deployUrlInput').value = ''; }
-} catch (e) { SCRIPT_URL = ''; }
+    try {
+        const saved = localStorage.getItem(URL_KEY);
+        if (saved) { SCRIPT_URL = saved; document.getElementById('deployUrlInput').value = saved; }
+        else { SCRIPT_URL = ''; document.getElementById('deployUrlInput').value = ''; }
+    } catch (e) { SCRIPT_URL = ''; }
 }
 function applyUrl() {
-const input = document.getElementById('deployUrlInput');
-const url = input.value.trim();
-if (!url) { alert('Sila masukkan URL terlebih dahulu.'); return; }
-try {
-localStorage.setItem(URL_KEY, url);
-SCRIPT_URL = url;
-setSyncBadge('ok', 'URL disimpan');
-loadData();
-loadNoticeBoard();
-} catch (e) { alert('Gagal menyimpan URL.'); }
+    const input = document.getElementById('deployUrlInput');
+    const url = input.value.trim();
+    if (!url) { alert('Sila masukkan URL terlebih dahulu.'); return; }
+    try {
+        localStorage.setItem(URL_KEY, url);
+        SCRIPT_URL = url;
+        setSyncBadge('ok', 'URL disimpan');
+        loadData();
+        loadNoticeBoard();
+    } catch (e) { alert('Gagal menyimpan URL.'); }
 }
 
+/* ============================================================
+   数据加载与合并
+   ============================================================ */
 async function loadData() {
-if (!SCRIPT_URL) {
-document.getElementById('employeeGrid').innerHTML = `<div class="empty-state"><span class="icon">🔗</span>Sila masukkan URL Deploy Google Apps Script di toolbar di atas.</div>`;
-document.getElementById('summaryTableBody').innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 2rem;">请先设置 URL</td></tr>`;
-setSyncBadge('err', 'URL belum ditetapkan');
-return;
-}
-setSyncBadge('busy', 'Memuatkan data...');
-document.getElementById('employeeGrid').innerHTML = `<div class="empty-state"><span class="spinner"></span> Memuatkan data pekerja...</div>`;
-document.getElementById('summaryTableBody').innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 2rem;"><span class="spinner"></span> 加载中...</td></tr>`;
+    if (!SCRIPT_URL) { showEmptyState(); return; }
 
-try {
-const res = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
-const data = await res.json();
-let staffRaw = [];
-if (data && data.result === 'success' && Array.isArray(data.data)) staffRaw = data.data;
-else if (Array.isArray(data)) staffRaw = data;
+    setSyncBadge('busy', '加载数据中...');
+    document.getElementById('dataTableBody').innerHTML =
+        `<tr><td colspan="${HEADERS.length}" style="text-align:center;padding:2rem;"><span class="spinner"></span> 加载中...</td></tr>`;
 
-let listCalcData = [];
-try {
-const resCalc = await fetch(`${SCRIPT_URL}?action=getListCalculation&_t=${Date.now()}`);
-const dataCalc = await resCalc.json();
-if (dataCalc.status === 'success' && Array.isArray(dataCalc.data)) listCalcData = dataCalc.data;
-} catch (e) { console.error('Load LISTCALCULATION error:', e); }
-allCalcData = listCalcData; // 保存用于表格展示
+    try {
+        // 并行请求 STAFF 与 LISTCALCULATION
+        const [staffResp, calcResp] = await Promise.all([
+            fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`),
+            fetch(`${SCRIPT_URL}?action=getListCalculation&_t=${Date.now()}`).catch(() => null)
+        ]);
 
-const calcMap = {};
-listCalcData.forEach(item => {
-if (item.Code) calcMap[String(item.Code).trim()] = item;
-});
+        const staffJson = await staffResp.json();
+        let staffRaw = [];
+        if (staffJson && staffJson.result === 'success' && Array.isArray(staffJson.data)) staffRaw = staffJson.data;
+        else if (Array.isArray(staffJson)) staffRaw = staffJson;
 
-const activeStaff = staffRaw.map(row => {
-const code = String(row.Code || '').trim();
-const calcItem = calcMap[code] || {};
-return {
-Code: code,
-Name: String(row.Name || '').trim(),
-GroupName: String(row.GroupName || '').trim(),
-Situation: String(row.Situation || 'ACTIVE').toUpperCase(),
-Salary: parseFloat(row.Salary) || 0,
-BasicSalary: calcItem.BasicSalary || row.Salary || 0,
-TotalSalaryPay: calcItem.TotalSalaryPay || 0
-};
-}).filter(s => s.Code && s.Name && s.Situation === 'ACTIVE');
+        let calcData = [];
+        if (calcResp) {
+            try {
+                const calcJson = await calcResp.json();
+                if (calcJson.status === 'success' && Array.isArray(calcJson.data)) calcData = calcJson.data;
+            } catch (e) { console.warn('LISTCALCULATION parse error:', e); }
+        }
 
-allEmployees = activeStaff;
-try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees)); } catch (e) {}
+        // 只保留 ACTIVE 员工
+        const activeStaff = staffRaw
+            .map(r => ({
+                Code: String(r.Code || '').trim(),
+                Name: String(r.Name || '').trim(),
+                GroupName: String(r.GroupName || '').trim(),
+                Situation: String(r.Situation || 'ACTIVE').toUpperCase(),
+                Salary: parseFloat(r.Salary) || 0
+            }))
+            .filter(s => s.Code && s.Name && s.Situation === 'ACTIVE');
 
-filteredEmployees = [...allEmployees];
-renderCards();
-renderSummaryTable(); // 渲染顶部蓝色框的表格
-setSyncBadge('ok', 'Data dimuat (' + allEmployees.length + ' pekerja)');
-loadNoticeBoard();
-} catch (err) {
-console.error('Load error:', err);
-setSyncBadge('err', 'Gagal muat data');
-document.getElementById('employeeGrid').innerHTML = `<div class="empty-state"><span class="icon">⚠️</span>Gagal memuatkan data. Sila semak sambungan atau cuba lagi.<br><br><button class="btn" onclick="loadData()">🔄 Cuba Lagi</button></div>`;
-document.getElementById('summaryTableBody').innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 2rem; color: #ef4444;">加载失败</td></tr>`;
-}
+        mergedRows = mergeData(activeStaff, calcData);
+
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedRows)); } catch (e) {}
+
+        filteredRows = [...mergedRows];
+        renderTable();
+        updateStats();
+        setSyncBadge('ok', `已加载 ${mergedRows.length} 人`);
+    } catch (err) {
+        console.error('Load error:', err);
+        setSyncBadge('err', '加载失败');
+        document.getElementById('dataTableBody').innerHTML =
+            `<tr><td colspan="${HEADERS.length}" style="text-align:center;padding:2rem;color:#ef4444;">
+                加载失败，请检查网络或 URL 配置<br><br>
+                <button class="btn" onclick="loadData()">🔄 重试</button>
+            </td></tr>`;
+    }
 }
 
-// ✅ 渲染顶部表格 (来源于 LISTCALCULATION)
-function renderSummaryTable() {
-    const tbody = document.getElementById('summaryTableBody');
-    const countText = document.getElementById('includedCountText');
-    
-    if (allCalcData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 2rem; color: #94a3b8;">暂无计入员工数据</td></tr>`;
-        countText.textContent = '(0 人)';
+/**
+ * 合并 LISTCALCULATION 与 STAFF 数据。
+ * - LISTCALCULATION 中有记录 → 使用完整数据
+ * - LISTCALCULATION 中无记录 → 使用 STAFF 的 ACTIVE 资料，非基本字段显示"未创建记录"
+ */
+function mergeData(activeStaff, calcData) {
+    const activeByCode = {};
+    activeStaff.forEach(e => { activeByCode[e.Code] = e; });
+
+    const calcByCode = {};
+    calcData.forEach(c => {
+        const code = String(c.Code || '').trim();
+        if (code) calcByCode[code] = c;
+    });
+
+    const result = [];
+    const seen = new Set();
+
+    // 1) 先处理 LISTCALCULATION 记录
+    calcData.forEach(c => {
+        const code = String(c.Code || '').trim();
+        if (!code) return;
+        const emp = activeByCode[code];
+        const situation = String(c.Situation || (emp ? emp.Situation : '') || '').toUpperCase();
+
+        if (emp) {
+            result.push({
+                ...emp,
+                ...c,
+                Situation: situation || emp.Situation,
+                GroupName: c.GroupName || emp.GroupName,
+                Code: code,
+                Name: c.Name || emp.Name,
+                BasicSalary: (c.BasicSalary !== undefined && c.BasicSalary !== null && c.BasicSalary !== '')
+                    ? c.BasicSalary : emp.Salary,
+                _placeholder: false
+            });
+            seen.add(code);
+        } else if (situation === 'ACTIVE') {
+            // 不在 STAFF 但 LISTCALCULATION 中标记为 ACTIVE
+            result.push({ ...c, _placeholder: false });
+            seen.add(code);
+        }
+    });
+
+    // 2) 补充 LISTCALCULATION 中缺失的 ACTIVE 员工
+    activeStaff.forEach(emp => {
+        if (seen.has(emp.Code)) return;
+        result.push({
+            Situation: emp.Situation,
+            GroupName: emp.GroupName,
+            Code: emp.Code,
+            Name: emp.Name,
+            BasicSalary: emp.Salary,
+            _placeholder: true
+        });
+    });
+
+    return result;
+}
+
+/* ============================================================
+   表格渲染
+   ============================================================ */
+function renderTableHeader() {
+    if (headerInitialized) return;
+    const thead = document.getElementById('dataTableHead');
+    let html = '<tr>';
+    HEADERS.forEach(h => {
+        let cls = '';
+        if (MONEY_FIELDS.has(h) || COUNT_FIELDS.has(h)) cls = 'text-right';
+        else if (h === 'Name') cls = 'col-name';
+        html += `<th class="${cls}">${HEADER_LABELS[h] || h}</th>`;
+    });
+    html += '</tr>';
+    thead.innerHTML = html;
+    headerInitialized = true;
+}
+
+function formatCell(value, field) {
+    if (value === null || value === undefined || value === '') {
+        if (MONEY_FIELDS.has(field)) return 'RM 0.00';
+        if (COUNT_FIELDS.has(field)) return '0';
+        return '-';
+    }
+    const n = Number(value);
+    if (isNaN(n)) return escapeHtml(String(value));
+    if (MONEY_FIELDS.has(field)) return 'RM ' + n.toFixed(2);
+    if (COUNT_FIELDS.has(field)) return String(n);
+    return escapeHtml(String(value));
+}
+
+function renderTable() {
+    renderTableHeader();
+
+    const tbody = document.getElementById('dataTableBody');
+
+    if (filteredRows.length === 0) {
+        const msg = mergedRows.length === 0
+            ? '暂无员工数据，请确认 STAFF 登录记录中有 ACTIVE 员工。'
+            : '没有匹配的结果。';
+        tbody.innerHTML = `<tr><td colspan="${HEADERS.length}" style="text-align:center;padding:2rem;color:#94a3b8;">${msg}</td></tr>`;
         return;
     }
 
-    countText.textContent = `(${allCalcData.length} 人)`;
     let html = '';
-    
-    // 根据 LIST_CALC_HEADERS 字段进行展示
-    allCalcData.forEach(emp => {
-        const name = escapeHtml(emp.Name || '-');
-        const code = escapeHtml(emp.Code || '-');
-        // 部分字段可能存在拼写差异，做兼容处理
-        const basic = num(emp.BasicSalary);
-        const gross = num(emp.TotalGajiKasar);
-        const deduction = num(emp.TotalPotongan);
-        const net = num(emp.TotalSalaryPay);
-        const epf = num(emp.EPF_Employee);
-        const socso = num(emp.SOCSO_Employee);
-        const eis = num(emp.EIS_Employee);
-        const lindung = num(emp.Lindung24Jam);
+    filteredRows.forEach(emp => {
+        html += '<tr>';
+        HEADERS.forEach(h => {
+            let cell = '';
+            let extraCls = '';
+            if (MONEY_FIELDS.has(h) || COUNT_FIELDS.has(h)) extraCls = 'text-right';
 
-        html += `
-            <tr>
-                <td>
-                    <div style="font-weight: 700; color: var(--epf-blue);">${name}</div>
-                    <div style="font-size: 0.7rem; color: var(--epf-muted);">${code}</div>
-                </td>
-                <td class="text-right">${fmtRM(basic)}</td>
-                <td class="text-right">${fmtRM(gross)}</td>
-                <td class="text-right" style="color: #ef4444;">-${fmtRM(deduction)}</td>
-                <td class="text-right text-green">${fmtRM(net)}</td>
-                <td class="text-right">${fmtRM(epf)}</td>
-                <td class="text-right">${fmtRM(socso)}</td>
-                <td class="text-right">${fmtRM(eis)}</td>
-                <td class="text-right">${fmtRM(lindung)}</td>
-            </tr>
-        `;
+            if (h === 'Name') {
+                cell = `<a class="name-link" href="javascript:void(0)" data-code="${escapeHtml(emp.Code || '')}">${escapeHtml(emp.Name || '-')}</a>`;
+            } else if (h === 'Situation') {
+                const s = String(emp.Situation || '').toUpperCase();
+                const badgeCls = s === 'ACTIVE' ? 'active' : (s === 'PENDING' ? 'pending' : 'inactive');
+                cell = `<span class="status-badge ${badgeCls}">${escapeHtml(emp.Situation || '-')}</span>`;
+            } else if (h === 'Code') {
+                cell = `<span class="code-badge">${escapeHtml(emp.Code || '-')}</span>`;
+            } else if (emp._placeholder && !BASIC_FIELDS_KEEP.has(h)) {
+                cell = '<span class="placeholder">未创建记录</span>';
+            } else {
+                cell = formatCell(emp[h], h);
+            }
+
+            html += `<td class="${extraCls}">${cell}</td>`;
+        });
+        html += '</tr>';
     });
     tbody.innerHTML = html;
 }
 
-async function loadNoticeBoard() {
-const listEl = document.getElementById('noticeList');
-const countEl = document.getElementById('noticeCount');
-if (!SCRIPT_URL) { listEl.innerHTML = '<div class="notice-empty"><span class="icon">🔗</span>请先设置 URL</div>'; countEl.textContent = '0'; return; }
-listEl.innerHTML = '<div class="notice-empty"><span class="spinner"></span> 加载中...</div>';
-try {
-const res = await fetch(`${SCRIPT_URL}?action=getOverduePresets&_t=${Date.now()}`);
-const result = await res.json();
-if (result.status !== 'success') throw new Error(result.message || '请求失败');
-const overdueStaff = result.data || [];
-if (overdueStaff.length === 0) {
-listEl.innerHTML = `<div class="notice-empty"><span class="icon">✅</span>暂无超时未处理的预设</div>`;
-countEl.textContent = '0';
-return;
-}
-countEl.textContent = overdueStaff.length;
-let html = '';
-overdueStaff.forEach(s => {
-let displayTime = s.PresetDateTime;
-try { const d = new Date(s.PresetDateTime); if (!isNaN(d.getTime())) displayTime = d.toLocaleString('zh-CN', { hour12: false }); } catch(e) {}
-html += `<div class="notice-item"><div class="notice-name">${escapeHtml(s.Name)}<span class="notice-code">${escapeHtml(s.Code)}</span></div><div class="notice-info">原状态: ${escapeHtml(s.Situation)}</div><div class="notice-info">到期时间: <span>${escapeHtml(displayTime)}</span></div><div class="notice-target">需设为: ${escapeHtml(s.PresetSituation)}</div></div>`;
-});
-listEl.innerHTML = html;
-} catch (err) {
-console.error('Notice board error:', err);
-listEl.innerHTML = '<div class="notice-empty"><span class="icon">⚠️</span>加载失败，请检查网络或后端部署</div>';
-countEl.textContent = '0';
-}
+/* ============================================================
+   搜索 / 统计
+   ============================================================ */
+function applyFilter() {
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
+    if (!q) {
+        filteredRows = [...mergedRows];
+    } else {
+        filteredRows = mergedRows.filter(r =>
+            String(r.Name || '').toLowerCase().includes(q) ||
+            String(r.Code || '').toLowerCase().includes(q) ||
+            String(r.GroupName || '').toLowerCase().includes(q)
+        );
+    }
+    renderTable();
+    updateStats();
 }
 
-function renderCards() {
-const grid = document.getElementById('employeeGrid');
-if (filteredEmployees.length === 0) {
-grid.innerHTML = `<div class="empty-state"><span class="icon">📭</span> Tiada pekerja ditemui.</div>`;
-return;
-}
-let html = '';
-filteredEmployees.forEach(emp => {
-const sitLower = String(emp.Situation || '').toLowerCase();
-let badgeClass = 'active';
-if (sitLower === 'pending') badgeClass = 'pending';
-else if (sitLower === 'inactive') badgeClass = 'inactive';
-
-const displayBasic = num(emp.BasicSalary || emp.Salary);
-const displayNet = num(emp.TotalSalaryPay);
-
-html += `
-<div class="employee-card" onclick="openDetail('${escapeHtml(emp.Code)}')">
-<div class="card-header">
-<div class="card-name">${escapeHtml(emp.Name || 'Tiada Nama')}</div>
-<div class="card-code">${escapeHtml(emp.Code || '-')}</div>
-</div>
-<div class="card-body">
-<div class="card-row"><span class="label">Kumpulan</span><span class="value">${escapeHtml(emp.GroupName || '-')}</span></div>
-<div class="card-row"><span class="label">Gaji Asas</span><span class="value">${fmtRM(displayBasic)}</span></div>
-<div class="card-row"><span class="label">Gaji Bersih</span><span class="value salary">${fmtRM(displayNet)}</span></div>
-</div>
-<div class="card-footer">
-<span class="status-badge ${badgeClass}">${escapeHtml(emp.Situation || 'ACTIVE')}</span>
-<span class="arrow">›</span>
-</div>
-</div>`;
-});
-grid.innerHTML = html;
+function updateStats() {
+    document.getElementById('totalCount').textContent = mergedRows.length;
+    document.getElementById('shownCount').textContent = filteredRows.length;
 }
 
-function filterCards() {
-const q = document.getElementById('searchInput').value.trim().toLowerCase();
-if (!q) filteredEmployees = [...allEmployees];
-else filteredEmployees = allEmployees.filter(emp => String(emp.Name || '').toLowerCase().includes(q) || String(emp.Code || '').toLowerCase().includes(q) || String(emp.GroupName || '').toLowerCase().includes(q));
-renderCards();
-}
-
+/* ============================================================
+   跳转详情页
+   ============================================================ */
 function openDetail(code) {
-const emp = allEmployees.find(e => e.Code === code);
-if (!emp) return;
-try {
-localStorage.setItem(STORAGE_KEY, JSON.stringify(allEmployees));
-localStorage.setItem(SELECTED_CODE_KEY, emp.Code || '');
-localStorage.setItem(SELECTED_EMP_KEY, JSON.stringify(emp));
-} catch (err) { console.error('localStorage save failed:', err); }
-window.open(DETAIL_URL, '_blank');
+    const emp = mergedRows.find(r => String(r.Code) === String(code));
+    if (!emp) return;
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedRows));
+        localStorage.setItem(SELECTED_CODE_KEY, emp.Code || '');
+        localStorage.setItem(SELECTED_EMP_KEY, JSON.stringify(emp));
+    } catch (err) { console.error('localStorage save failed:', err); }
+    window.open(DETAIL_URL, '_blank');
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-loadSavedUrl();
-if (SCRIPT_URL) { loadData(); } 
-else {
-document.getElementById('employeeGrid').innerHTML = `<div class="empty-state"><span class="icon">🔗</span>Sila masukkan URL Deploy Google Apps Script di toolbar di atas.</div>`;
-document.getElementById('summaryTableBody').innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 2rem;">请先设置 URL</td></tr>`;
-setSyncBadge('err', 'URL belum ditetapkan');
-loadNoticeBoard();
+/* ============================================================
+   超时提醒
+   ============================================================ */
+async function loadNoticeBoard() {
+    const banner = document.getElementById('noticeBanner');
+    const details = document.getElementById('noticeDetails');
+    const summary = document.getElementById('noticeSummary');
+
+    if (!SCRIPT_URL) { banner.classList.remove('show'); return; }
+
+    try {
+        const res = await fetch(`${SCRIPT_URL}?action=getOverduePresets&_t=${Date.now()}`);
+        const result = await res.json();
+        if (result.status !== 'success') throw new Error(result.message || '请求失败');
+
+        const items = result.data || [];
+        if (items.length === 0) {
+            banner.classList.remove('show', 'expanded');
+            return;
+        }
+
+        banner.classList.add('show');
+        summary.textContent = `⚠️ ${items.length} 项超时预设未处理`;
+
+        details.innerHTML = items.map(s => {
+            let displayTime = s.PresetDateTime;
+            try {
+                const d = new Date(s.PresetDateTime);
+                if (!isNaN(d.getTime())) displayTime = d.toLocaleString('zh-CN', { hour12: false });
+            } catch (e) {}
+            return `<div class="notice-chip">
+                <div><span class="nc-name">${escapeHtml(s.Name)}</span><span class="nc-code">${escapeHtml(s.Code)}</span></div>
+                <div class="nc-info">到期：${escapeHtml(displayTime)} · 需设为：${escapeHtml(s.PresetSituation)}</div>
+            </div>`;
+        }).join('');
+    } catch (err) {
+        console.error('Notice board error:', err);
+        banner.classList.remove('show');
+    }
 }
+
+function toggleNoticeDetail() {
+    document.getElementById('noticeBanner').classList.toggle('expanded');
+}
+
+/* ============================================================
+   空状态
+   ============================================================ */
+function showEmptyState() {
+    document.getElementById('dataTableBody').innerHTML =
+        `<tr><td colspan="${HEADERS.length}" style="text-align:center;padding:2rem;color:#94a3b8;">
+            请先在顶部输入 Deploy URL 并点击 Apply。
+        </td></tr>`;
+    setSyncBadge('err', 'URL belum ditetapkan');
+    updateStats();
+    loadNoticeBoard();
+}
+
+/* ============================================================
+   导航栏交互
+   ============================================================ */
+function initNavbar() {
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) backBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        window.history.back();
+    });
+
+    const dropdownToggles = document.querySelectorAll('[data-dropdown-toggle]');
+    dropdownToggles.forEach(function (toggle) {
+        toggle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const dropdownId = this.getAttribute('data-dropdown-toggle');
+            document.querySelectorAll('.nav-dropdown.open').forEach(function (dd) {
+                if (dd.id !== dropdownId + 'Dropdown') dd.classList.remove('open');
+            });
+            const wrapper = this.closest('.nav-dropdown');
+            if (wrapper) wrapper.classList.toggle('open');
+        });
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.nav-dropdown'))
+            document.querySelectorAll('.nav-dropdown.open').forEach(dd => dd.classList.remove('open'));
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape')
+            document.querySelectorAll('.nav-dropdown.open').forEach(dd => dd.classList.remove('open'));
+    });
+}
+
+/* ============================================================
+   初始化
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+    initNavbar();
+
+    // 姓名点击跳转（事件委托，避免 XSS / 引号问题）
+    document.getElementById('dataTableBody').addEventListener('click', (e) => {
+        const link = e.target.closest('.name-link');
+        if (link) {
+            e.preventDefault();
+            const code = link.dataset.code;
+            if (code) openDetail(code);
+        }
+    });
+
+    // 快捷键 Ctrl/Cmd + K 聚焦搜索
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            document.getElementById('searchInput').focus();
+        }
+    });
+
+    // 跨标签页同步 URL
+    window.addEventListener('storage', (e) => {
+        if (e.key === URL_KEY && e.newValue) {
+            SCRIPT_URL = e.newValue;
+            document.getElementById('deployUrlInput').value = e.newValue;
+            loadData();
+        }
+    });
+
+    loadSavedUrl();
+    if (SCRIPT_URL) {
+        loadData();
+    } else {
+        showEmptyState();
+    }
 });
-document.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); document.getElementById('searchInput').focus(); } });
-window.addEventListener('storage', (e) => { if (e.key === URL_KEY && e.newValue) { SCRIPT_URL = e.newValue; document.getElementById('deployUrlInput').value = e.newValue; loadData(); } });
 </script>
 </body>
 </html>
