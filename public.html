@@ -7,18 +7,21 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
 /* ============================================================
-   复用 Dashboard 的核心样式 (Navbar, Topbar, Variables)
+   1. 核心变量与重置 (复用 Dashboard 风格)
    ============================================================ */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
     --epf-blue: #1a4f8a; --epf-blue-light: #e8f0fa; --epf-blue-soft: #f4f8fd;
     --epf-border: #d4e0ee; --epf-border-soft: #e6eef7;
     --epf-text: #1f2d3d; --epf-muted: #64748b; --epf-bg: #f7fafd;
+    
+    /* Navbar Variables */
     --nav-h: 52px;
     --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover: #16345c;
     --nav-text: #cbd9ea; --nav-accent: #4d9fff;
     --dropdown-bg: #ffffff;
     --dropdown-shadow: 0 8px 24px rgba(16,32,56,.15);
+    
     --shadow-sm: 0 1px 2px rgba(16,32,56,.05), 0 2px 10px rgba(16,32,56,.05);
     --shadow-md: 0 8px 24px rgba(16,32,56,.10);
 }
@@ -29,7 +32,9 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* Navbar & Topbar Styles (Same as Dashboard) */
+/* ============================================================
+   2. Navbar & Topbar (原封不动保留)
+   ============================================================ */
 .navbar {
     position: sticky; top: 0; z-index: 200;
     display: flex; align-items: stretch; flex-wrap: wrap;
@@ -120,7 +125,7 @@ body {
 .btn-danger:hover { background: #b91c1c; }
 
 /* ============================================================
-   Calendar Specific Styles
+   3. Calendar Specific Styles
    ============================================================ */
 .main-container {
     max-width: 1200px;
@@ -150,8 +155,17 @@ body {
     padding: 4px 10px; border-radius: 20px;
     background: var(--epf-blue-soft); color: var(--epf-blue);
     border: 1px solid var(--epf-border-soft);
+    transition: all 0.3s;
 }
-.limit-badge.full { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+.limit-badge.full { 
+    background: #fee2e2; color: #991b1b; border-color: #fecaca; 
+    animation: pulse-red 2s infinite;
+}
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
 
 .calendar-grid {
     display: grid;
@@ -295,6 +309,7 @@ body {
 .toast.show { transform: translateY(0); opacity: 1; }
 .toast.success { border-left: 4px solid #22c55e; }
 .toast.error { border-left: 4px solid #ef4444; }
+.toast.normal { border-left: 4px solid var(--epf-blue); }
 
 @media (max-width: 768px) {
     .calendar-grid { gap: 4px; padding: 0.5rem; }
@@ -306,36 +321,66 @@ body {
 </head>
 <body>
 
-<!-- ================= NAVBAR ================= -->
+<!-- ================= NAVBAR (Original) ================= -->
 <nav class="navbar">
 <div class="nav-brand"><span class="logo">Y</span><span class="brand-text">YZ Payroll</span></div>
-<div class="nav-links">
-    <!-- Back Button -->
-    <button class="nav-item" onclick="window.history.back()" title="Kembali" style="min-width:44px;justify-content:center;">
-        <i class="fas fa-arrow-left"></i>
-    </button>
+<div class="nav-links" id="navLinks">
+<button class="nav-back" id="backBtn" title="Kembali" onclick="window.history.back()">⏎</button>
 
-    <!-- Files Dropdown -->
-    <div class="nav-dropdown">
-        <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
-        <div class="dropdown-menu">
-            <a href="dashboard.html">📊 DASHBOARD</a>
-            <a href="staffinfo.html">👥 EMPLOYEES</a>
-            <a href="leave.html">📅 TIMECARD REPORT</a>
-            <a href="overtime.html">⏱️ OVERTIME SHEET</a>
-            <div class="divider"></div>
-            <a href="epf.html">🏦 EPF</a>
-            <a href="socso.html">🛡️ SOCSO</a>
-            <a href="eis.html">📋 EIS</a>
-        </div>
-    </div>
-
-    <a class="nav-item" href="dashboard.html">DASHBOARD</a>
-    <a class="nav-item" href="companysetting.html">SETTING</a>
-    
-    <!-- Active Item -->
-    <a class="nav-item active" href="public.html">PUBLIC HOLIDAYS</a>
+<div class="nav-dropdown" id="filesDropdown">
+<button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
+<div class="dropdown-menu">
+<a href="dashboard.html">📊 DASHBOARD</a>
+<a href="staffinfo.html">👥 EMPLOYEES</a>
+<a href="leave.html">📅 TIMECARD REPORT</a>
+<a href="overtime.html">⏱️ OVERTIME SHEET</a>
+<div class="divider"></div>
+<a href="epf.html">🏦 EPF</a>
+<a href="socso.html">🛡️ SOCSO</a>
+<a href="eis.html">📋 EIS</a>
+<a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+<div class="divider"></div>
+<a href="companysetting.html">⚙️ COMPANY SETTING</a>
+<a href="public.html">📰 Public Days Setting</a>
+<a href="hrdcorp.html">📓 HRD Corp</a>
+<a href="salarysumview.html">📊 Salary View</a>
+<a href="GoogleSheetBackupURL.html">🔗 Google Sheet Backup URL</a>
 </div>
+</div>
+
+<a class="nav-item" href="dashboard.html">DASHBOARD</a>
+<a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
+<a class="nav-item" href="leave.html">TIMECARD REPORT</a>
+<a class="nav-item" href="overtime.html">OVERTIME</a>
+
+<div class="nav-dropdown" id="carumanDropdown">
+<button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
+<div class="dropdown-menu">
+<a href="epf.html">🏦 EPF</a>
+<a href="socso.html">🛡️ SOCSO</a>
+<a href="eis.html">📋 EIS</a>
+<a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+</div>
+</div>
+
+<a class="nav-item" href="companysetting.html">SETTING</a>
+
+<div class="nav-dropdown" id="othersDropdown">
+<button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
+<div class="dropdown-menu">
+<a href="companysetting.html">⚙️ COMPANY SETTING</a>
+<div class="divider"></div>
+<a href="public.html">📰 Public Days Setting</a>
+   <a href="hrdcorp.html">📓 HRD Corp</a>
+<a href="salarysumview.html">📊 Salary View</a>
+<a href="GoogleSheetBackupURL.html">🔗 Google Sheet Backup URL</a>
+</div>
+</div>
+</div>
+
+<button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')">
+<span class="pulse" style="width:7px;height:7px;border-radius:50%;background:#6ef0a8;box-shadow:0 0 0 0 rgba(110,240,168,0.75);animation:pulse 2s infinite;"></span> 💬 Request Chat
+</button>
 </nav>
 
 <!-- ================= TOPBAR ================= -->
@@ -422,9 +467,12 @@ body {
 
 <script>
 /* ============================================================
-   State & Config
+   Configuration
    ============================================================ */
+// Hardcoded URL for this specific Google Sheet
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzu0kpS-H8bUKe4KInQbi8x_cR8T4qg2YRiJD9EL1McCE1xZ6O4YwlJdHhUBseXIp2a2w/exec';
 const MAX_HOLIDAYS = 25;
+
 let currentYear = new Date().getFullYear();
 let currentMonth = new Date().getMonth(); // 0-11
 let holidaysMap = {}; // Key: "YYYY-MM-DD", Value: {name, multiplier, note}
@@ -455,12 +503,14 @@ function initNavbar() {
 }
 
 /* ============================================================
-   Data Handling
+   Data Handling (Fetch/Save to Google Sheet)
    ============================================================ */
 function loadData() {
     showToast('Loading data...', 'normal');
-    google.script.run
-        .withSuccessHandler(data => {
+    
+    fetch(`${SCRIPT_URL}?action=getPublicHolidays&_t=${Date.now()}`)
+        .then(res => res.json())
+        .then(data => {
             holidaysMap = {};
             if(Array.isArray(data)) {
                 data.forEach(h => {
@@ -471,11 +521,10 @@ function loadData() {
             updateCount();
             showToast('Data loaded successfully', 'success');
         })
-        .withFailureHandler(err => {
+        .catch(err => {
             console.error(err);
             showToast('Failed to load data', 'error');
-        })
-        .getPublicHolidays();
+        });
 }
 
 function saveData() {
@@ -488,15 +537,27 @@ function saveData() {
     holidaysArray.sort((a,b) => new Date(a.date) - new Date(b.date));
 
     showToast('Saving to Google Sheet...', 'normal');
-    google.script.run
-        .withSuccessHandler(res => {
+    
+    // Using POST to send data securely
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+            action: 'savePublicHolidays',
+            data: holidaysArray
+        })
+    })
+    .then(res => res.json())
+    .then(res => {
+        if(res.status === 'success') {
             showToast(`Saved ${res.count} holidays!`, 'success');
-        })
-        .withFailureHandler(err => {
-            console.error(err);
-            showToast('Save failed', 'error');
-        })
-        .savePublicHolidays(holidaysArray);
+        } else {
+            throw new Error(res.message || 'Unknown error');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        showToast('Save failed: ' + err.message, 'error');
+    });
 }
 
 /* ============================================================
