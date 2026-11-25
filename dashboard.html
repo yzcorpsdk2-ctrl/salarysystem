@@ -12,7 +12,6 @@
 --epf-border: #d4e0ee; --epf-border-soft: #e6eef7;
 --epf-text: #1f2d3d; --epf-muted: #64748b; --epf-bg: #f7fafd;
 
-/* NAVBAR VARS */
 --nav-h: 52px;
 --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover: #16345c;
 --nav-text: #cbd9ea; --nav-accent: #4d9fff;
@@ -31,8 +30,8 @@ overflow: hidden;
 }
 
 /* ============================================================
-     NAVBAR STYLES
-     ============================================================ */
+   NAVBAR (保持不变)
+   ============================================================ */
 .navbar {
 position: sticky; top: 0; z-index: 200;
 display: flex; align-items: stretch; flex-wrap: wrap;
@@ -179,127 +178,164 @@ cursor: pointer; transition: 0.15s; white-space: nowrap;
 .url-box button:hover { background: #15406f; }
 
 /* ============================================================
-     MAIN LAYOUT — 单列全宽
-     ============================================================ */
+   MAIN LAYOUT
+   ============================================================ */
 .main-layout {
 display: flex;
 flex-direction: column;
 height: calc(100vh - 120px);
 max-width: 1900px;
 margin: 0 auto;
-padding: 1rem 1.75rem;
+padding: 0.85rem 1.75rem 0.85rem;
 gap: 0.75rem;
 }
 
-/* 工具栏：搜索 + 统计 */
-.toolbar-row {
-display: flex;
-gap: 0.75rem;
-align-items: center;
-flex-wrap: wrap;
+/* ============ 统计仪表盘 ============ */
+.dashboard-stats {
+flex-shrink: 0;
+max-height: 44vh;
+overflow-y: auto;
+padding-right: 4px;
 }
-.search-box { position: relative; flex: 1; min-width: 260px; max-width: 520px; }
+.dashboard-stats::-webkit-scrollbar { width: 8px; }
+.dashboard-stats::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+.stats-section-title {
+display: flex; align-items: center; gap: 0.5rem;
+font-size: 0.72rem; font-weight: 700; color: var(--epf-muted);
+text-transform: uppercase; letter-spacing: 0.08em;
+margin: 0.4rem 0 0.35rem;
+}
+.stats-section-title::after {
+content: ''; flex: 1; height: 1px; background: var(--epf-border-soft);
+}
+
+.stats-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(178px, 1fr));
+gap: 10px;
+}
+.stat-card {
+background: #fff;
+border: 1px solid var(--epf-border);
+border-radius: 10px;
+padding: 11px 13px 10px 16px;
+box-shadow: var(--shadow-sm);
+position: relative;
+overflow: hidden;
+transition: transform 0.12s, box-shadow 0.15s;
+}
+.stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.stat-card::before {
+content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+background: var(--stat-color, var(--epf-blue));
+}
+.stat-card .stat-label {
+font-size: 0.69rem; color: var(--epf-muted); font-weight: 600;
+display: flex; align-items: center; gap: 5px; margin-bottom: 5px;
+line-height: 1.2;
+}
+.stat-card .stat-label i { font-size: 0.72rem; opacity: 0.85; }
+.stat-card .stat-value {
+font-size: 1.22rem; font-weight: 800; color: var(--stat-color, var(--epf-blue));
+font-variant-numeric: tabular-nums; line-height: 1.15;
+word-break: break-all;
+}
+.stat-card .stat-sub {
+font-size: 0.65rem; color: var(--epf-muted); margin-top: 3px;
+white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.stat-card.income   { --stat-color: #0f7a54; }
+.stat-card.deduction{ --stat-color: #dc2626; }
+.stat-card.net      { --stat-color: #1a4f8a; }
+.stat-card.epf      { --stat-color: #7c3aed; }
+.stat-card.socso    { --stat-color: #ea580c; }
+.stat-card.eis      { --stat-color: #0891b2; }
+.stat-card.leave    { --stat-color: #d97706; }
+.stat-card.ot       { --stat-color: #4f46e5; }
+.stat-card.custom   { --stat-color: #db2777; }
+.stat-card.neutral  { --stat-color: #64748b; }
+
+/* ============ 筛选行 ============ */
+.filter-row {
+flex-shrink: 0;
+display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;
+background: #fff; border: 1px solid var(--epf-border); border-radius: 8px;
+padding: 0.55rem 0.75rem; box-shadow: var(--shadow-sm);
+}
+.search-box { position: relative; flex: 1 1 240px; min-width: 200px; max-width: 360px; }
 .search-box input {
-width: 100%; padding: 0.65rem 0.85rem 0.65rem 2.2rem;
+width: 100%; padding: 0.5rem 0.75rem 0.5rem 2rem;
 border: 1px solid var(--epf-border); border-radius: 6px;
-font-size: 0.85rem; font-family: inherit; color: var(--epf-text);
-background: #fff; transition: 0.15s; box-shadow: var(--shadow-sm);
+font-size: 0.82rem; font-family: inherit; color: var(--epf-text);
+background: #fff; transition: 0.15s;
 }
 .search-box input:focus { outline: none; border-color: var(--epf-blue); box-shadow: 0 0 0 2px rgba(26,79,138,0.10); }
-.search-box i { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--epf-muted); font-size: 0.9rem; }
+.search-box i { position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%); color: var(--epf-muted); font-size: 0.82rem; }
 
-.toolbar-stats {
-display: flex; gap: 0.75rem; align-items: center; margin-left: auto;
-font-size: 0.78rem; color: var(--epf-muted);
-background: #fff; border: 1px solid var(--epf-border);
-padding: 0.45rem 0.9rem; border-radius: 6px;
-box-shadow: var(--shadow-sm);
+.group-select {
+padding: 0.5rem 0.75rem; border: 1px solid var(--epf-border);
+border-radius: 6px; font-size: 0.8rem; font-family: inherit;
+color: var(--epf-text); background: #fff; cursor: pointer;
+max-width: 240px; min-width: 160px;
 }
-.toolbar-stats strong { color: var(--epf-blue); font-weight: 800; }
-.toolbar-stats i { font-size: 0.75rem; }
+.group-select:focus { outline: none; border-color: var(--epf-blue); }
 
-/* 超时提醒横幅 */
-.notice-banner {
-display: none;
-background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;
-overflow: hidden; box-shadow: var(--shadow-sm);
+.payment-chips {
+display: flex; flex-wrap: wrap; gap: 5px; align-items: center;
+flex: 1 1 auto;
 }
-.notice-banner.show { display: block; }
-.notice-toggle {
-display: flex; align-items: center; gap: 0.5rem;
-padding: 0.6rem 1rem; width: 100%;
-background: transparent; border: none; cursor: pointer;
-color: #991b1b; font-weight: 700; font-size: 0.82rem;
-font-family: inherit; text-align: left;
+.chips-label {
+font-size: 0.7rem; font-weight: 700; color: var(--epf-muted);
+text-transform: uppercase; letter-spacing: 0.05em; margin-right: 3px;
+white-space: nowrap;
 }
-.notice-toggle:hover { background: #fee2e2; }
-.notice-toggle .icon { font-size: 1rem; }
-.notice-caret { margin-left: auto; transition: transform 0.2s; }
-.notice-banner.expanded .notice-caret { transform: rotate(180deg); }
-.notice-details {
-display: none; padding: 0.6rem 1rem 0.9rem;
-border-top: 1px solid #fecaca;
-max-height: 220px; overflow-y: auto;
-flex-wrap: wrap; gap: 0.5rem;
+.chip {
+padding: 3px 10px; border-radius: 20px;
+border: 1px solid var(--epf-border); background: #fff;
+font-size: 0.7rem; font-family: inherit; font-weight: 600;
+color: var(--epf-muted); cursor: pointer;
+transition: 0.12s; user-select: none; white-space: nowrap;
 }
-.notice-banner.expanded .notice-details { display: flex; }
-.notice-chip {
-background: #fff; border: 1px solid #fecaca; border-left: 3px solid #ef4444;
-border-radius: 4px; padding: 0.45rem 0.7rem; font-size: 0.75rem;
-color: var(--epf-text); min-width: 200px;
-}
-.notice-chip .nc-name { font-weight: 700; color: var(--epf-blue); }
-.notice-chip .nc-code { font-size: 0.68rem; color: var(--epf-muted); margin-left: 4px; }
-.notice-chip .nc-info { font-size: 0.7rem; color: #c53030; margin-top: 2px; }
+.chip:hover { border-color: var(--epf-blue); color: var(--epf-blue); }
+.chip.active { background: var(--epf-blue); color: #fff; border-color: var(--epf-blue); }
 
-/* 表格容器 */
+.filter-stats {
+display: flex; gap: 0.55rem; align-items: center; margin-left: auto;
+font-size: 0.74rem; color: var(--epf-muted);
+white-space: nowrap;
+}
+.filter-stats strong { color: var(--epf-blue); font-weight: 800; }
+
+/* ============ 表格 ============ */
 .table-wrapper {
 flex: 1;
 background: #ffffff;
 border: 1px solid var(--epf-border);
 border-radius: 10px;
 box-shadow: var(--shadow-sm);
-display: flex;
-flex-direction: column;
-overflow: hidden;
-min-height: 0;
+display: flex; flex-direction: column;
+overflow: hidden; min-height: 0;
 }
-.table-scroll {
-flex: 1;
-overflow: auto;
-}
+.table-scroll { flex: 1; overflow: auto; }
 .table-scroll::-webkit-scrollbar { width: 10px; height: 10px; }
 .table-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
 .table-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 5px; border: 2px solid #f1f5f9; }
 .table-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-/* 数据表 */
-.data-table {
-border-collapse: separate;
-border-spacing: 0;
-font-size: 0.78rem;
-width: max-content;
-min-width: 100%;
-}
+.data-table { border-collapse: separate; border-spacing: 0; font-size: 0.78rem; width: max-content; min-width: 100%; }
 .data-table th {
-position: sticky; top: 0; z-index: 3;
-background: #f8fafc;
-padding: 0.6rem 0.7rem;
-text-align: left;
-font-weight: 600;
-color: var(--epf-muted);
+position: sticky; top: 0; z-index: 3; background: #f8fafc;
+padding: 0.55rem 0.7rem; text-align: left;
+font-weight: 600; color: var(--epf-muted);
 border-bottom: 1px solid var(--epf-border);
-white-space: nowrap;
-font-size: 0.74rem;
-letter-spacing: 0.02em;
+white-space: nowrap; font-size: 0.72rem; letter-spacing: 0.02em;
 }
 .data-table th:first-child { padding-left: 1rem; }
 .data-table th:last-child { padding-right: 1rem; }
 .data-table td {
-padding: 0.55rem 0.7rem;
-border-bottom: 1px solid var(--epf-border-soft);
-white-space: nowrap;
-color: var(--epf-text);
+padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--epf-border-soft);
+white-space: nowrap; color: var(--epf-text);
 }
 .data-table td:first-child { padding-left: 1rem; }
 .data-table td:last-child { padding-right: 1rem; }
@@ -308,31 +344,18 @@ color: var(--epf-text);
 .data-table .col-name { font-weight: 600; }
 
 .name-link {
-color: var(--epf-blue);
-text-decoration: none;
-border-bottom: 1px dashed transparent;
-transition: 0.15s;
-cursor: pointer;
+color: var(--epf-blue); text-decoration: none;
+border-bottom: 1px dashed transparent; transition: 0.15s; cursor: pointer;
 }
 .name-link:hover { border-bottom-color: var(--epf-blue); }
 .code-badge {
-display: inline-block;
-background: var(--epf-blue-soft);
-color: var(--epf-muted);
-padding: 1px 6px;
-border-radius: 3px;
-font-size: 0.7rem;
-font-weight: 700;
+display: inline-block; background: var(--epf-blue-soft); color: var(--epf-muted);
+padding: 1px 6px; border-radius: 3px; font-size: 0.7rem; font-weight: 700;
 font-family: 'SFMono-Regular', Consolas, monospace;
 }
 .status-badge {
-display: inline-block;
-padding: 0.15rem 0.6rem;
-border-radius: 20px;
-font-size: 0.66rem;
-font-weight: 700;
-letter-spacing: 0.03em;
-white-space: nowrap;
+display: inline-block; padding: 0.15rem 0.6rem; border-radius: 20px;
+font-size: 0.66rem; font-weight: 700; letter-spacing: 0.03em; white-space: nowrap;
 }
 .status-badge.active { background: #c6f6d5; color: #22543d; }
 .status-badge.pending { background: #fefcbf; color: #975a16; }
@@ -340,28 +363,26 @@ white-space: nowrap;
 .placeholder { color: #a7b7c9; font-style: italic; font-size: 0.72rem; }
 
 /* 空状态 / 加载 */
-.empty-state {
-text-align: center;
-padding: 3rem 1rem;
-color: #a7b7c9;
-font-size: 0.85rem;
-}
-.empty-state .icon { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; }
 .spinner {
 display: inline-block; width: 16px; height: 16px;
-border: 2px solid rgba(26,79,138,0.2);
-border-top: 2px solid var(--epf-blue);
-border-radius: 50%;
-animation: spin 0.8s linear infinite;
+border: 2px solid rgba(26,79,138,0.2); border-top: 2px solid var(--epf-blue);
+border-radius: 50%; animation: spin 0.8s linear infinite;
 margin-right: 6px; vertical-align: middle;
 }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
 /* RESPONSIVE */
+@media (max-width: 1100px) {
+.dashboard-stats { max-height: none; }
+.stats-grid { grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); }
+}
 @media (max-width: 900px) {
 body { overflow: auto; }
 .main-layout { height: auto; padding: 1rem; }
 .table-wrapper { height: 60vh; }
+.filter-row { gap: 0.5rem; }
+.payment-chips { flex: 1 1 100%; }
+.filter-stats { margin-left: 0; width: 100%; justify-content: flex-end; }
 }
 @media (max-width: 768px) {
 .navbar { padding: 0 0.5rem; }
@@ -371,7 +392,8 @@ body { overflow: auto; }
 .nav-chat { padding: 0.45rem 0.75rem; font-size: 0.66rem; }
 .topbar { padding: 0.6rem 1rem; }
 .url-box { max-width: 100%; flex: 1 1 100%; }
-.toolbar-stats { width: 100%; margin-left: 0; justify-content: center; }
+.stats-grid { grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 8px; }
+.stat-card .stat-value { font-size: 1.05rem; }
 }
 </style>
 </head>
@@ -459,27 +481,35 @@ body { overflow: auto; }
 <!-- ================= MAIN ================= -->
 <div class="main-layout">
 
-    <!-- 工具栏：搜索 + 统计 -->
-    <div class="toolbar-row">
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="搜索 姓名 / 编号 / 小组..." oninput="applyFilter()">
+    <!-- 统计仪表盘 -->
+    <div class="dashboard-stats" id="dashboardStats">
+        <div class="stats-section-title"><i class="fas fa-chart-line"></i> 薪资概览</div>
+        <div class="stats-grid" id="statsGridSalary">
+            <div class="stat-card neutral"><div class="stat-label">加载中…</div><div class="stat-value">—</div></div>
         </div>
-        <div class="toolbar-stats">
-            <span><i class="fas fa-users"></i> 共 <strong id="totalCount">0</strong> 人</span>
-            <span style="color:#cbd5e1;">|</span>
-            <span><i class="fas fa-filter"></i> 显示 <strong id="shownCount">0</strong></span>
-        </div>
+
+        <div class="stats-section-title"><i class="fas fa-shield-alt"></i> 缴纳与保障</div>
+        <div class="stats-grid" id="statsGridCaruman"></div>
+
+        <div class="stats-section-title"><i class="fas fa-calendar-check"></i> 假期 / 加班 / 自定义付款</div>
+        <div class="stats-grid" id="statsGridOthers"></div>
     </div>
 
-    <!-- 超时提醒横幅 -->
-    <div class="notice-banner" id="noticeBanner">
-        <button class="notice-toggle" onclick="toggleNoticeDetail()">
-            <span class="icon">⚠️</span>
-            <span id="noticeSummary">0 项超时预设未处理</span>
-            <span class="notice-caret" id="noticeCaret">▾</span>
-        </button>
-        <div class="notice-details" id="noticeDetails"></div>
+    <!-- 筛选行 -->
+    <div class="filter-row">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="搜索 姓名 / 编号（仅过滤表格）" oninput="applyFilter()">
+        </div>
+        <select class="group-select" id="groupFilter" onchange="applyFilter()" title="按 KUMPULAN 筛选（影响统计与表格）">
+            <option value="">全部 KUMPULAN</option>
+        </select>
+        <div class="payment-chips" id="paymentChips"></div>
+        <div class="filter-stats">
+            <span><i class="fas fa-users"></i> 共 <strong id="totalCount">0</strong> 人</span>
+            <span style="color:#cbd5e1;">|</span>
+            <span>显示 <strong id="shownCount">0</strong></span>
+        </div>
     </div>
 
     <!-- 数据表格 -->
@@ -549,15 +579,26 @@ const COUNT_FIELDS = new Set([
     'TimeOTHour','DailyOTDay','UnpaidLeave','AnnualLeaveDays','SickLeaveDays'
 ]);
 
-/* 占位行中保留真实值的字段 */
 const BASIC_FIELDS_KEEP = new Set(['Situation','GroupName','Code','Name','BasicSalary']);
+
+/* 付款类型多选配置 */
+const PAYMENT_TYPES = [
+    { field: 'BasicSalary',   label: '基本薪资' },
+    { field: 'TimeOTAmount',  label: 'OT金额' },
+    { field: 'DailyOTAmount', label: '日OT金额' },
+    { field: 'Allowance2',    label: '津贴2' },
+    { field: 'Commission',    label: '佣金' },
+    { field: 'Incentives',    label: '奖励' }
+];
+let selectedPayments = new Set(PAYMENT_TYPES.map(p => p.field));
 
 /* ============================================================
    状态
    ============================================================ */
 let SCRIPT_URL = '';
-let mergedRows = [];
-let filteredRows = [];
+let mergedRows = [];      // 去重合并后全部行
+let filteredRows = [];    // 应用于表格的行（含搜索）
+let statsRows = [];       // 应用于统计的行（仅 KUMPULAN 筛选）
 let headerInitialized = false;
 
 /* ============================================================
@@ -567,6 +608,26 @@ function num(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
 function escapeHtml(s) {
     if (s === null || s === undefined) return '';
     return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+function pick(obj, keys) {
+    for (const k of keys) {
+        if (obj[k] !== undefined && obj[k] !== null && obj[k] !== '') return obj[k];
+    }
+    return undefined;
+}
+function fmtRM(v) {
+    return 'RM ' + Number(v || 0).toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function fmtNum(v) {
+    return Number(v || 0).toLocaleString('en-MY', { maximumFractionDigits: 2 });
+}
+function fmtDate(v) {
+    if (!v) return '-';
+    try {
+        const d = new Date(v);
+        if (!isNaN(d.getTime())) return d.toLocaleString('zh-CN', { hour12: false });
+    } catch (e) {}
+    return String(v);
 }
 function setSyncBadge(state, text) {
     const badge = document.getElementById('syncBadge');
@@ -600,8 +661,29 @@ function applyUrl() {
 }
 
 /* ============================================================
-   数据加载与合并
+   数据加载
    ============================================================ */
+async function fetchJson(actions) {
+    const list = Array.isArray(actions) ? actions : [actions];
+    for (const action of list) {
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=${action}&_t=${Date.now()}`);
+            if (!res.ok) continue;
+            const json = await res.json();
+            if (json) return json;
+        } catch (e) { /* try next */ }
+    }
+    return null;
+}
+function extractArray(json) {
+    if (!json) return [];
+    if (Array.isArray(json)) return json;
+    if (json.status === 'success' && Array.isArray(json.data)) return json.data;
+    if (json.result === 'success' && Array.isArray(json.data)) return json.data;
+    if (Array.isArray(json.data)) return json.data;
+    return [];
+}
+
 async function loadData() {
     if (!SCRIPT_URL) { showEmptyState(); return; }
 
@@ -610,26 +692,20 @@ async function loadData() {
         `<tr><td colspan="${HEADERS.length}" style="text-align:center;padding:2rem;"><span class="spinner"></span> 加载中...</td></tr>`;
 
     try {
-        // 并行请求 STAFF 与 LISTCALCULATION
-        const [staffResp, calcResp] = await Promise.all([
-            fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`),
-            fetch(`${SCRIPT_URL}?action=getListCalculation&_t=${Date.now()}`).catch(() => null)
+        // 并行请求：STAFF / LISTCALCULATION / ALSLREMAIN / OVERTIME
+        const [staffJson, calcJson, alsJson, otJson] = await Promise.all([
+            fetchJson('getData'),
+            fetchJson('getListCalculation'),
+            fetchJson(['getALSRemain','getALSLeave','getAlsRemain','getAlslRemain','getLeaveRemain']),
+            fetchJson(['getOvertime','getOverTime','getOT'])
         ]);
 
-        const staffJson = await staffResp.json();
-        let staffRaw = [];
-        if (staffJson && staffJson.result === 'success' && Array.isArray(staffJson.data)) staffRaw = staffJson.data;
-        else if (Array.isArray(staffJson)) staffRaw = staffJson;
+        const staffRaw = extractArray(staffJson);
+        const calcRaw  = extractArray(calcJson);
+        const alsRaw   = extractArray(alsJson);
+        const otRaw    = extractArray(otJson);
 
-        let calcData = [];
-        if (calcResp) {
-            try {
-                const calcJson = await calcResp.json();
-                if (calcJson.status === 'success' && Array.isArray(calcJson.data)) calcData = calcJson.data;
-            } catch (e) { console.warn('LISTCALCULATION parse error:', e); }
-        }
-
-        // 只保留 ACTIVE 员工
+        // 仅保留 ACTIVE 员工（STAFF 侧）
         const activeStaff = staffRaw
             .map(r => ({
                 Code: String(r.Code || '').trim(),
@@ -640,14 +716,48 @@ async function loadData() {
             }))
             .filter(s => s.Code && s.Name && s.Situation === 'ACTIVE');
 
-        mergedRows = mergeData(activeStaff, calcData);
+        // ALSLREMAIN 聚合（按 Code 或 Name）
+        const alsMap = {};
+        alsRaw.forEach(r => {
+            const code = String(r.Code || '').trim();
+            const nk = String(r.Name || '').trim().toLowerCase();
+            const key = code || nk;
+            if (!key) return;
+            if (!alsMap[key]) alsMap[key] = { annual: 0, sick: 0 };
+            alsMap[key].annual += num(pick(r, ['AnnualLeaveRemain','AnnualLeave','AnnualLeaveDays','AL','ALDays']));
+            alsMap[key].sick   += num(pick(r, ['SickLeaveRemain','SickLeave','SickLeaveDays','SL','SLDays']));
+        });
+
+        // OVERTIME 聚合（可能多条）
+        const otMap = {};
+        otRaw.forEach(r => {
+            const code = String(r.Code || '').trim();
+            const nk = String(r.Name || '').trim().toLowerCase();
+            const key = code || nk;
+            if (!key) return;
+            if (!otMap[key]) otMap[key] = { hour: 0, amount: 0, day: 0, dayAmount: 0 };
+            otMap[key].hour      += num(pick(r, ['TimeOTHour','OTHour','OTHours','Hours']));
+            otMap[key].amount    += num(pick(r, ['TimeOTAmount','OTAmount','Amount']));
+            otMap[key].day       += num(pick(r, ['DailyOTDay','OTDay','Day']));
+            otMap[key].dayAmount += num(pick(r, ['DailyOTAmount','OTDayAmount','DayAmount']));
+        });
+
+        // 合并去重（Name 为主去重键，LISTCALCULATION 优先）
+        mergedRows = mergeData(activeStaff, calcRaw);
+
+        // 用 ALSLREMAIN / OVERTIME 补充 LISTCALCULATION 中缺失的值
+        mergedRows.forEach(row => enrichRow(row, alsMap, otMap));
 
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedRows)); } catch (e) {}
 
-        filteredRows = [...mergedRows];
-        renderTable();
-        updateStats();
+        // 填充 KUMPULAN 下拉
+        populateGroupFilter();
+
+        // 应用筛选
+        applyFilter();
+
         setSyncBadge('ok', `已加载 ${mergedRows.length} 人`);
+        loadNoticeBoard();
     } catch (err) {
         console.error('Load error:', err);
         setSyncBadge('err', '加载失败');
@@ -660,53 +770,56 @@ async function loadData() {
 }
 
 /**
- * 合并 LISTCALCULATION 与 STAFF 数据。
- * - LISTCALCULATION 中有记录 → 使用完整数据
- * - LISTCALCULATION 中无记录 → 使用 STAFF 的 ACTIVE 资料，非基本字段显示"未创建记录"
+ * 合并 LISTCALCULATION 与 STAFF。
+ * 去重规则：Name（不区分大小写）为优先去重键，同时兼容 Code。
+ * - LISTCALCULATION 中有记录的员工 → 不再从 STAFF 提取
+ * - LISTCALCULATION 缺失的 ACTIVE 员工 → 从 STAFF 补充，标记为占位行
  */
 function mergeData(activeStaff, calcData) {
     const activeByCode = {};
-    activeStaff.forEach(e => { activeByCode[e.Code] = e; });
-
-    const calcByCode = {};
-    calcData.forEach(c => {
-        const code = String(c.Code || '').trim();
-        if (code) calcByCode[code] = c;
+    const activeByName = {};
+    activeStaff.forEach(e => {
+        if (e.Code) activeByCode[e.Code] = e;
+        const nk = e.Name.toLowerCase();
+        if (nk && !activeByName[nk]) activeByName[nk] = e;
     });
 
     const result = [];
-    const seen = new Set();
+    const seenCodes = new Set();
+    const seenNames = new Set();
 
-    // 1) 先处理 LISTCALCULATION 记录
+    // 1) LISTCALCULATION 优先
     calcData.forEach(c => {
         const code = String(c.Code || '').trim();
-        if (!code) return;
-        const emp = activeByCode[code];
+        const nk = String(c.Name || '').trim().toLowerCase();
+        if (!code && !nk) return;
+        if (code && seenCodes.has(code)) return;
+        if (nk && seenNames.has(nk)) return;
+
+        const emp = (code && activeByCode[code]) || (nk && activeByName[nk]) || null;
         const situation = String(c.Situation || (emp ? emp.Situation : '') || '').toUpperCase();
 
-        if (emp) {
+        if (emp || situation === 'ACTIVE') {
             result.push({
-                ...emp,
+                ...(emp || {}),
                 ...c,
-                Situation: situation || emp.Situation,
-                GroupName: c.GroupName || emp.GroupName,
-                Code: code,
-                Name: c.Name || emp.Name,
+                Situation: situation || (emp ? emp.Situation : 'ACTIVE'),
+                GroupName: c.GroupName || (emp ? emp.GroupName : ''),
+                Code: code || (emp ? emp.Code : ''),
+                Name: c.Name || (emp ? emp.Name : ''),
                 BasicSalary: (c.BasicSalary !== undefined && c.BasicSalary !== null && c.BasicSalary !== '')
-                    ? c.BasicSalary : emp.Salary,
-                _placeholder: false
+                    ? c.BasicSalary : (emp ? emp.Salary : 0),
+                _placeholder: !emp
             });
-            seen.add(code);
-        } else if (situation === 'ACTIVE') {
-            // 不在 STAFF 但 LISTCALCULATION 中标记为 ACTIVE
-            result.push({ ...c, _placeholder: false });
-            seen.add(code);
+            if (code) seenCodes.add(code);
+            if (nk) seenNames.add(nk);
         }
     });
 
-    // 2) 补充 LISTCALCULATION 中缺失的 ACTIVE 员工
+    // 2) STAFF 补充（按 Name 去重）
     activeStaff.forEach(emp => {
-        if (seen.has(emp.Code)) return;
+        const nk = emp.Name.toLowerCase();
+        if (seenCodes.has(emp.Code) || seenNames.has(nk)) return;
         result.push({
             Situation: emp.Situation,
             GroupName: emp.GroupName,
@@ -715,9 +828,175 @@ function mergeData(activeStaff, calcData) {
             BasicSalary: emp.Salary,
             _placeholder: true
         });
+        seenCodes.add(emp.Code);
+        seenNames.add(nk);
     });
 
     return result;
+}
+
+/**
+ * 用 ALSLREMAIN / OVERTIME 补充 LISTCALCULATION 中为 0 的字段
+ * （LISTCALCULATION 已计算的值优先）
+ */
+function enrichRow(row, alsMap, otMap) {
+    const code = String(row.Code || '').trim();
+    const nk = String(row.Name || '').trim().toLowerCase();
+    const als = alsMap[code] || alsMap[nk];
+    const ot  = otMap[code]  || otMap[nk];
+
+    if (als) {
+        if (num(row.AnnualLeaveDays) === 0) row.AnnualLeaveDays = als.annual;
+        if (num(row.SickLeaveDays) === 0)   row.SickLeaveDays   = als.sick;
+    }
+    if (ot) {
+        if (num(row.TimeOTHour) === 0)     row.TimeOTHour     = ot.hour;
+        if (num(row.TimeOTAmount) === 0)   row.TimeOTAmount   = ot.amount;
+        if (num(row.DailyOTDay) === 0)     row.DailyOTDay     = ot.day;
+        if (num(row.DailyOTAmount) === 0)  row.DailyOTAmount  = ot.dayAmount;
+    }
+}
+
+/* ============================================================
+   KUMPULAN 下拉
+   ============================================================ */
+function populateGroupFilter() {
+    const sel = document.getElementById('groupFilter');
+    const groups = [...new Set(
+        mergedRows.map(r => String(r.GroupName || '').trim()).filter(Boolean)
+    )].sort();
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">全部 KUMPULAN</option>' +
+        groups.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(g)}</option>`).join('');
+    if (groups.includes(prev)) sel.value = prev;
+}
+
+/* ============================================================
+   筛选（KUMPULAN 影响统计；搜索只影响表格）
+   ============================================================ */
+function applyFilter() {
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
+    const group = document.getElementById('groupFilter').value;
+
+    // 统计行：仅 KUMPULAN 筛选
+    statsRows = group
+        ? mergedRows.filter(r => String(r.GroupName || '') === group)
+        : [...mergedRows];
+
+    // 表格行：KUMPULAN + 搜索
+    filteredRows = q
+        ? statsRows.filter(r =>
+            String(r.Name || '').toLowerCase().includes(q) ||
+            String(r.Code || '').toLowerCase().includes(q))
+        : [...statsRows];
+
+    renderTable();
+    renderDashboard();
+    updateStats();
+}
+
+function updateStats() {
+    document.getElementById('totalCount').textContent = statsRows.length;
+    document.getElementById('shownCount').textContent = filteredRows.length;
+}
+
+/* ============================================================
+   统计仪表盘
+   ============================================================ */
+function computeStats(rows) {
+    const s = {
+        count: rows.length,
+        basic: 0, gross: 0, deduction: 0, net: 0,
+        epfEmp: 0, epfEr: 0, socsoEmp: 0, socsoEr: 0,
+        eisEmp: 0, eisEr: 0, lindung: 0,
+        otHour: 0, otAmount: 0, otDay: 0,
+        annualLeave: 0, sickLeave: 0,
+        customPayment: 0
+    };
+    rows.forEach(r => {
+        s.basic        += num(r.BasicSalary);
+        s.gross        += num(r.TotalGajiKasar);
+        s.deduction    += num(r.TotalPotongan);
+        s.net          += num(r.TotalSalaryPay);
+        s.epfEmp       += num(r.EPF_Employee);
+        s.epfEr        += num(r.EPF_Employer);
+        s.socsoEmp     += num(r.SOCSO_Employee);
+        s.socsoEr      += num(r.SOCSO_Employer);
+        s.eisEmp       += num(r.EIS_Employee);
+        s.eisEr        += num(r.EIS_Employer);
+        s.lindung      += num(r.Lindung24Jam);
+        s.otHour       += num(r.TimeOTHour);
+        s.otAmount     += num(r.TimeOTAmount) + num(r.DailyOTAmount);
+        s.otDay        += num(r.DailyOTDay);
+        s.annualLeave  += num(r.AnnualLeaveDays);
+        s.sickLeave    += num(r.SickLeaveDays);
+
+        selectedPayments.forEach(f => { s.customPayment += num(r[f]); });
+    });
+    return s;
+}
+
+function statCard(label, value, sub, colorClass, icon) {
+    return `<div class="stat-card ${colorClass || 'neutral'}">
+        <div class="stat-label">${icon ? `<i class="fas ${icon}"></i>` : ''}${escapeHtml(label)}</div>
+        <div class="stat-value">${value}</div>
+        ${sub ? `<div class="stat-sub">${escapeHtml(sub)}</div>` : ''}
+    </div>`;
+}
+
+function renderDashboard() {
+    const s = computeStats(statsRows);
+
+    // 薪资概览
+    document.getElementById('statsGridSalary').innerHTML =
+        statCard('员工总数', fmtNum(s.count) + ' 人', '', 'neutral', 'fa-users') +
+        statCard('总基本薪资', fmtRM(s.basic), '', 'income', 'fa-money-bill-wave') +
+        statCard('总毛收入', fmtRM(s.gross), '', 'income', 'fa-wallet') +
+        statCard('总扣除', fmtRM(s.deduction), '', 'deduction', 'fa-minus-circle') +
+        statCard('总净薪资', fmtRM(s.net), '', 'net', 'fa-hand-holding-usd');
+
+    // 缴纳与保障
+    document.getElementById('statsGridCaruman').innerHTML =
+        statCard('EPF 员工', fmtRM(s.epfEmp), '', 'epf', 'fa-piggy-bank') +
+        statCard('EPF 雇主', fmtRM(s.epfEr), '', 'epf', 'fa-building') +
+        statCard('SOCSO 员工', fmtRM(s.socsoEmp), '', 'socso', 'fa-shield-alt') +
+        statCard('SOCSO 雇主', fmtRM(s.socsoEr), '', 'socso', 'fa-building') +
+        statCard('EIS 员工', fmtRM(s.eisEmp), '', 'eis', 'fa-clipboard-check') +
+        statCard('EIS 雇主', fmtRM(s.eisEr), '', 'eis', 'fa-building') +
+        statCard('24小时保障', fmtRM(s.lindung), '', 'neutral', 'fa-clock');
+
+    // 假期 / 加班 / 自定义付款
+    const customLabel = selectedPayments.size === 0
+        ? '（未选择任何付款类型）'
+        : Array.from(selectedPayments)
+            .map(f => PAYMENT_TYPES.find(p => p.field === f).label)
+            .join(' + ');
+
+    document.getElementById('statsGridOthers').innerHTML =
+        statCard('年假总天数', fmtNum(s.annualLeave) + ' 天', '', 'leave', 'fa-calendar-check') +
+        statCard('病假总天数', fmtNum(s.sickLeave) + ' 天', '', 'leave', 'fa-thermometer-half') +
+        statCard('OT 总时数', fmtNum(s.otHour) + ' 小时', s.otDay ? `含日OT ${fmtNum(s.otDay)} 天` : '', 'ot', 'fa-clock') +
+        statCard('OT 总补贴', fmtRM(s.otAmount), '', 'ot', 'fa-bolt') +
+        statCard('自定义付款合计', fmtRM(s.customPayment), customLabel, 'custom', 'fa-layer-group');
+}
+
+/* ============================================================
+   付款类型 chips
+   ============================================================ */
+function renderPaymentChips() {
+    const el = document.getElementById('paymentChips');
+    let html = '<span class="chips-label">付款类型合计:</span>';
+    PAYMENT_TYPES.forEach(p => {
+        const active = selectedPayments.has(p.field) ? 'active' : '';
+        html += `<button type="button" class="chip ${active}" onclick="togglePayment('${p.field}')">${p.label}</button>`;
+    });
+    el.innerHTML = html;
+}
+function togglePayment(field) {
+    if (selectedPayments.has(field)) selectedPayments.delete(field);
+    else selectedPayments.add(field);
+    renderPaymentChips();
+    renderDashboard();
 }
 
 /* ============================================================
@@ -753,7 +1032,6 @@ function formatCell(value, field) {
 
 function renderTable() {
     renderTableHeader();
-
     const tbody = document.getElementById('dataTableBody');
 
     if (filteredRows.length === 0) {
@@ -775,11 +1053,13 @@ function renderTable() {
             if (h === 'Name') {
                 cell = `<a class="name-link" href="javascript:void(0)" data-code="${escapeHtml(emp.Code || '')}">${escapeHtml(emp.Name || '-')}</a>`;
             } else if (h === 'Situation') {
-                const s = String(emp.Situation || '').toUpperCase();
-                const badgeCls = s === 'ACTIVE' ? 'active' : (s === 'PENDING' ? 'pending' : 'inactive');
+                const st = String(emp.Situation || '').toUpperCase();
+                const badgeCls = st === 'ACTIVE' ? 'active' : (st === 'PENDING' ? 'pending' : 'inactive');
                 cell = `<span class="status-badge ${badgeCls}">${escapeHtml(emp.Situation || '-')}</span>`;
             } else if (h === 'Code') {
                 cell = `<span class="code-badge">${escapeHtml(emp.Code || '-')}</span>`;
+            } else if (h === 'LastUpdated') {
+                cell = fmtDate(emp[h]);
             } else if (emp._placeholder && !BASIC_FIELDS_KEEP.has(h)) {
                 cell = '<span class="placeholder">未创建记录</span>';
             } else {
@@ -794,30 +1074,7 @@ function renderTable() {
 }
 
 /* ============================================================
-   搜索 / 统计
-   ============================================================ */
-function applyFilter() {
-    const q = document.getElementById('searchInput').value.trim().toLowerCase();
-    if (!q) {
-        filteredRows = [...mergedRows];
-    } else {
-        filteredRows = mergedRows.filter(r =>
-            String(r.Name || '').toLowerCase().includes(q) ||
-            String(r.Code || '').toLowerCase().includes(q) ||
-            String(r.GroupName || '').toLowerCase().includes(q)
-        );
-    }
-    renderTable();
-    updateStats();
-}
-
-function updateStats() {
-    document.getElementById('totalCount').textContent = mergedRows.length;
-    document.getElementById('shownCount').textContent = filteredRows.length;
-}
-
-/* ============================================================
-   跳转详情页
+   跳转详情
    ============================================================ */
 function openDetail(code) {
     const emp = mergedRows.find(r => String(r.Code) === String(code));
@@ -837,6 +1094,7 @@ async function loadNoticeBoard() {
     const banner = document.getElementById('noticeBanner');
     const details = document.getElementById('noticeDetails');
     const summary = document.getElementById('noticeSummary');
+    if (!banner) return;
 
     if (!SCRIPT_URL) { banner.classList.remove('show'); return; }
 
@@ -870,9 +1128,9 @@ async function loadNoticeBoard() {
         banner.classList.remove('show');
     }
 }
-
 function toggleNoticeDetail() {
-    document.getElementById('noticeBanner').classList.toggle('expanded');
+    const b = document.getElementById('noticeBanner');
+    if (b) b.classList.toggle('expanded');
 }
 
 /* ============================================================
@@ -883,9 +1141,12 @@ function showEmptyState() {
         `<tr><td colspan="${HEADERS.length}" style="text-align:center;padding:2rem;color:#94a3b8;">
             请先在顶部输入 Deploy URL 并点击 Apply。
         </td></tr>`;
+    document.getElementById('statsGridSalary').innerHTML =
+        `<div class="stat-card neutral"><div class="stat-label">尚未连接</div><div class="stat-value">—</div></div>`;
+    document.getElementById('statsGridCaruman').innerHTML = '';
+    document.getElementById('statsGridOthers').innerHTML = '';
     setSyncBadge('err', 'URL belum ditetapkan');
     updateStats();
-    loadNoticeBoard();
 }
 
 /* ============================================================
@@ -926,8 +1187,9 @@ function initNavbar() {
    ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
     initNavbar();
+    renderPaymentChips();
 
-    // 姓名点击跳转（事件委托，避免 XSS / 引号问题）
+    // 姓名点击跳转
     document.getElementById('dataTableBody').addEventListener('click', (e) => {
         const link = e.target.closest('.name-link');
         if (link) {
@@ -937,7 +1199,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 快捷键 Ctrl/Cmd + K 聚焦搜索
+    // Ctrl/Cmd + K 聚焦搜索
     document.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
             e.preventDefault();
