@@ -929,7 +929,10 @@ async function fetchStaffBasics() {
     else throw new Error('Format data tidak dikenali.');
 
     activeStaffList = staffRaw.map(row => {
-      const code = String(row.Code || '').trim();
+      // 【关键修改】确保 Code 是字符串，并清理可能存在的单引号
+      let code = String(row.Code || '').trim();
+      if (code.startsWith("'")) code = code.substring(1);
+      
       const name = String(row.Name || '').trim();
       const group = String(row.GroupName || '').trim();
       const situation = String(row.Situation || 'ACTIVE').toUpperCase();
@@ -1190,7 +1193,9 @@ async function saveAndSync() {
     STATUTORY_FIELDS.forEach(id => { updated[FIELD_MAP[id]] = 0; });
   }
   updated.BasicSalary = updated.Basic;
+  // 确保 Code 是字符串发送给后端
   updated.Code = String(updated.Code).trim();
+  
   updated.TotalGajiKasar = num(el('gajiKasarDisplay').innerText.replace(/[^0-9.\-]/g, ''));
   updated.TotalPotongan = num(el('totalPotonganDisplay').innerText.replace(/[^0-9.\-]/g, ''));
   updated.TotalSalaryPay = num(el('gajiBersihDisplay').innerText.replace(/[^0-9.\-]/g, ''));
