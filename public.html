@@ -7,40 +7,33 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
 /* ============================================================
-   全局变量与基础样式 (复用 Dashboard 风格)
+   全局变量与基础样式
    ============================================================ */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
     --epf-blue: #1a4f8a; --epf-blue-light: #e8f0fa; --epf-blue-soft: #f4f8fd;
     --epf-border: #d4e0ee; --epf-border-soft: #e6eef7;
     --epf-text: #1f2d3d; --epf-muted: #64748b; --epf-bg: #f7fafd;
-
     --nav-h: 52px;
     --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover: #16345c;
     --nav-text: #cbd9ea; --nav-accent: #4d9fff;
     --dropdown-bg: #ffffff;
     --dropdown-shadow: 0 8px 24px rgba(16,32,56,.15);
-
     --shadow-sm: 0 1px 2px rgba(16,32,56,.05), 0 2px 10px rgba(16,32,56,.05);
-    --shadow-md: 0 8px 24px rgba(16,32,56,.10);
     
     /* Calendar Specific Colors */
     --cal-today-bg: #eff6ff;
     --cal-today-border: #3b82f6;
     --cal-holiday-bg: #fef2f2;
     --cal-holiday-text: #991b1b;
-    --cal-selected: #dbeafe;
 }
 body {
     font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     background: var(--epf-bg); color: var(--epf-text);
     min-height: 100vh; line-height: 1.5; font-size: 14px;
-    -webkit-font-smoothing: antialiased;
 }
 
-/* ============================================================
-   NAVBAR (完全保留 Dashboard 样式)
-   ============================================================ */
+/* Navbar Styles (Keep as is) */
 .navbar {
     position: sticky; top: 0; z-index: 200;
     display: flex; align-items: stretch; flex-wrap: wrap;
@@ -54,15 +47,13 @@ body {
     color: #fff; font-weight: 800; font-size: 0.78rem;
     letter-spacing: 0.1em; text-transform: uppercase;
     padding-right: 1.1rem; margin-right: 0.5rem;
-    border-right: 1px solid rgba(255,255,255,0.12);
-    white-space: nowrap;
+    border-right: 1px solid rgba(255,255,255,0.12); white-space: nowrap;
 }
 .navbar .nav-brand .logo {
     width: 28px; height: 28px; border-radius: 7px;
     background: linear-gradient(135deg, #4d9fff, #1a4f8a);
     display: flex; align-items: center; justify-content: center;
     color: #fff; font-size: 0.85rem; font-weight: 800;
-    box-shadow: 0 2px 6px rgba(77,159,255,0.35);
 }
 .nav-links { display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px; position: relative; }
 .nav-item {
@@ -76,69 +67,43 @@ body {
     position: relative;
 }
 .nav-item:hover, .nav-item.active { background: var(--nav-hover); color: #fff; }
-.nav-item::after {
-    content: ''; position: absolute; left: 0.85rem; right: 0.85rem; bottom: 0;
-    height: 2px; background: var(--nav-accent); transform: scaleX(0);
-    transform-origin: left; transition: transform 0.2s;
-}
-.nav-item:hover::after, .nav-item.active::after { transform: scaleX(1); }
-.nav-back {
-    display: inline-flex; align-items: center; justify-content: center;
-    min-width: 44px; padding: 0 0.6rem;
-    color: var(--nav-text);
-    background: transparent; border: none; cursor: pointer;
-    font-size: 1.1rem; transition: background 0.15s, color 0.15s;
-}
-.nav-back:hover { background: var(--nav-hover); color: #fff; }
 .nav-dropdown { position: relative; display: inline-flex; align-items: stretch; }
-.nav-dropdown > .nav-item { padding-right: 0.55rem; }
-.nav-dropdown > .nav-item .fa-caret-down { font-size: 0.6rem; margin-left: 0.2rem; opacity: 0.7; }
 .dropdown-menu {
     display: none; position: absolute; top: 100%; left: 0;
     min-width: 180px; background: var(--dropdown-bg);
     border-radius: 8px; box-shadow: var(--dropdown-shadow);
     padding: 0.4rem 0; z-index: 300; border: 1px solid var(--epf-border);
-    animation: fadeSlide 0.15s ease;
 }
 .nav-dropdown.open .dropdown-menu { display: block; }
-@keyframes fadeSlide { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
 .dropdown-menu a {
     display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem;
     color: var(--epf-text); text-decoration: none; font-size: 0.78rem;
-    font-weight: 500; transition: background 0.12s; white-space: nowrap;
 }
 .dropdown-menu a:hover { background: var(--epf-blue-soft); color: var(--epf-blue); }
-.dropdown-menu .divider { height: 1px; background: var(--epf-border-soft); margin: 0.3rem 0.5rem; }
-
 .nav-chat {
     margin-left: auto; align-self: center;
     display: inline-flex; align-items: center; gap: 0.45rem;
     padding: 0.5rem 1rem; border: none; border-radius: 20px;
     background: linear-gradient(135deg, #2f7fe0 0%, #1a4f8a 100%);
-    color: #fff; font-family: inherit; font-size: 0.73rem;
-    font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-    cursor: pointer; white-space: nowrap;
-    box-shadow: 0 3px 12px rgba(47,127,224,0.4);
-    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
-}
-.nav-chat:hover { filter: brightness(1.12); transform: translateY(-1px); }
-.nav-chat .pulse {
-    width: 7px; height: 7px; border-radius: 50%; background: #6ef0a8;
-    box-shadow: 0 0 0 0 rgba(110,240,168,0.75); animation: pulse 2s infinite;
-}
-@keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(110,240,168,0.7); }
-    70% { box-shadow: 0 0 0 7px rgba(110,240,168,0); }
-    100% { box-shadow: 0 0 0 0 rgba(110,240,168,0); }
+    color: #fff; font-size: 0.73rem; font-weight: 700; cursor: pointer;
 }
 
 /* ============================================================
-   MAIN CONTENT
+   MAIN LAYOUT (Modified for Sidebar)
    ============================================================ */
 .main-container {
-    max-width: 1200px;
+    max-width: 1400px; /* Increased width */
     margin: 1.5rem auto;
     padding: 0 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 320px; /* Calendar takes remaining, Sidebar fixed 320px */
+    gap: 1.5rem;
+    align-items: start;
+}
+
+/* Left Column: Calendar */
+.calendar-section {
+    min-width: 0; /* Prevent overflow */
 }
 
 .page-header {
@@ -153,7 +118,6 @@ body {
     font-size: 0.85rem; color: var(--epf-muted); margin-top: 0.25rem;
 }
 
-/* Controls Bar */
 .controls-bar {
     background: #fff; border: 1px solid var(--epf-border);
     border-radius: 10px; padding: 0.75rem 1rem;
@@ -161,9 +125,7 @@ body {
     box-shadow: var(--shadow-sm); margin-bottom: 1.5rem;
     flex-wrap: wrap; gap: 1rem;
 }
-.month-nav {
-    display: flex; align-items: center; gap: 1rem;
-}
+.month-nav { display: flex; align-items: center; gap: 1rem; }
 .month-nav button {
     background: #fff; border: 1px solid var(--epf-border);
     width: 32px; height: 32px; border-radius: 6px;
@@ -186,8 +148,7 @@ body {
 .btn-secondary {
     background: #fff; color: var(--epf-text);
     border: 1px solid var(--epf-border); padding: 0.5rem 1rem; border-radius: 6px;
-    font-weight: 600; font-size: 0.85rem; cursor: pointer;
-    transition: 0.15s;
+    font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.15s;
 }
 .btn-secondary:hover { background: var(--epf-blue-soft); border-color: var(--epf-blue); }
 
@@ -197,11 +158,8 @@ body {
     padding: 0.4rem 0.8rem; border-radius: 20px;
     font-size: 0.8rem; font-weight: 600; color: var(--epf-blue);
 }
-.stats-pill.warning { background: #fffbeb; border-color: #fcd34d; color: #b45309; }
 
-/* ============================================================
-   CALENDAR GRID
-   ============================================================ */
+/* Calendar Grid */
 .calendar-wrapper {
     background: #fff; border: 1px solid var(--epf-border);
     border-radius: 12px; box-shadow: var(--shadow-sm);
@@ -214,7 +172,7 @@ body {
 .cal-header div {
     padding: 0.75rem; text-align: center;
     font-weight: 700; color: var(--epf-muted);
-    font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;
+    font-size: 0.8rem; text-transform: uppercase;
 }
 .cal-grid {
     display: grid; grid-template-columns: repeat(7, 1fr);
@@ -249,13 +207,99 @@ body {
     border-left: 3px solid #ef4444;
     font-weight: 600;
 }
-.holiday-multiplier {
-    font-size: 0.65rem; opacity: 0.8; margin-left: 4px;
-}
 
 /* ============================================================
-   MODAL (Popup)
+   SIDEBAR LIST (NEW)
    ============================================================ */
+.sidebar-panel {
+    background: #fff;
+    border: 1px solid var(--epf-border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 140px); /* Fixed height relative to viewport */
+    position: sticky;
+    top: 80px;
+}
+.sidebar-head {
+    padding: 1rem;
+    border-bottom: 1px solid var(--epf-border);
+    background: #f8fafc;
+    border-radius: 12px 12px 0 0;
+}
+.sidebar-title {
+    font-weight: 800; color: var(--epf-blue); font-size: 1rem;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+.sidebar-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+.sidebar-empty {
+    text-align: center; color: var(--epf-muted);
+    padding: 2rem 1rem; font-size: 0.9rem;
+}
+
+.holiday-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: #fff;
+    border: 1px solid var(--epf-border-soft);
+    border-radius: 8px;
+    transition: 0.15s;
+}
+.holiday-list-item:hover {
+    border-color: var(--epf-blue);
+    box-shadow: 0 2px 8px rgba(26,79,138,0.08);
+}
+.item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.item-date {
+    font-size: 0.75rem;
+    color: var(--epf-muted);
+    font-weight: 600;
+}
+.item-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--epf-text);
+}
+.item-meta {
+    font-size: 0.75rem;
+    color: var(--epf-blue);
+    background: var(--epf-blue-soft);
+    padding: 1px 6px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-top: 2px;
+    width: fit-content;
+}
+.item-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+.btn-icon {
+    width: 30px; height: 30px;
+    border-radius: 6px;
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: 0.15s;
+}
+.btn-edit { background: var(--epf-blue-soft); color: var(--epf-blue); }
+.btn-edit:hover { background: var(--epf-blue); color: #fff; }
+.btn-delete { background: #fee2e2; color: #ef4444; }
+.btn-delete:hover { background: #ef4444; color: #fff; }
+
+/* Modal & Toast (Keep existing styles) */
 .modal-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(15, 23, 42, 0.6); z-index: 1000;
@@ -264,7 +308,6 @@ body {
 }
 .modal-overlay.open { display: flex; animation: fadeIn 0.2s; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
 .modal-card {
     background: #fff; width: 100%; max-width: 420px;
     border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
@@ -272,45 +315,25 @@ body {
     animation: slideUp 0.25s forwards;
 }
 @keyframes slideUp { to { transform: translateY(0); } }
-
 .modal-head {
     padding: 1rem 1.25rem; border-bottom: 1px solid var(--epf-border);
     display: flex; justify-content: space-between; align-items: center;
     background: #f8fafc;
 }
 .modal-title { font-weight: 800; color: var(--epf-blue); font-size: 1.1rem; }
-.modal-close {
-    background: none; border: none; font-size: 1.2rem; color: var(--epf-muted);
-    cursor: pointer; padding: 0.25rem; transition: 0.15s;
-}
-.modal-close:hover { color: #ef4444; }
-
+.modal-close { background: none; border: none; font-size: 1.2rem; color: var(--epf-muted); cursor: pointer; }
 .modal-body { padding: 1.25rem; }
 .form-group { margin-bottom: 1rem; }
-.form-label {
-    display: block; font-size: 0.8rem; font-weight: 700;
-    color: var(--epf-muted); margin-bottom: 0.4rem;
-    text-transform: uppercase; letter-spacing: 0.03em;
-}
+.form-label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--epf-muted); margin-bottom: 0.4rem; }
 .form-input, .form-select, .form-textarea {
     width: 100%; padding: 0.6rem 0.8rem;
     border: 1px solid var(--epf-border); border-radius: 6px;
     font-size: 0.9rem; font-family: inherit; color: var(--epf-text);
-    transition: 0.15s; background: #fff;
 }
-.form-input:focus, .form-select:focus, .form-textarea:focus {
-    outline: none; border-color: var(--epf-blue);
-    box-shadow: 0 0 0 3px rgba(26,79,138,0.1);
-}
-.form-textarea { resize: vertical; min-height: 60px; }
-
 .modal-footer {
     padding: 1rem 1.25rem; border-top: 1px solid var(--epf-border);
-    display: flex; justify-content: flex-end; gap: 0.75rem;
-    background: #f8fafc;
+    display: flex; justify-content: flex-end; gap: 0.75rem; background: #f8fafc;
 }
-
-/* Loading Spinner */
 .spinner-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(255,255,255,0.8); z-index: 2000;
@@ -324,8 +347,6 @@ body {
     animation: spin 1s linear infinite;
 }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-/* Toast Notification */
 .toast {
     position: fixed; bottom: 2rem; right: 2rem;
     background: #1f2d3d; color: #fff;
@@ -340,24 +361,26 @@ body {
 .toast.success { border-left: 4px solid #22c55e; }
 .toast.error { border-left: 4px solid #ef4444; }
 
+@media (max-width: 1024px) {
+    .main-container { grid-template-columns: 1fr; }
+    .sidebar-panel { height: auto; max-height: 400px; position: static; margin-top: 1.5rem; }
+}
 @media (max-width: 768px) {
     .navbar { padding: 0 0.5rem; }
     .navbar .nav-brand .brand-text { display: none; }
     .nav-item { padding: 0 0.6rem; font-size: 0.68rem; }
     .main-container { padding: 0 0.5rem; margin: 1rem auto; }
     .cal-day { min-height: 60px; padding: 0.25rem; }
-    .holiday-tag { font-size: 0.6rem; padding: 1px 3px; }
 }
 </style>
 </head>
 <body>
 
-<!-- ================= NAVBAR (保留原样) ================= -->
+<!-- NAVBAR -->
 <nav class="navbar">
     <div class="nav-brand"><span class="logo">Y</span><span class="brand-text">YZ Payroll</span></div>
     <div class="nav-links" id="navLinks">
         <button class="nav-back" id="backBtn" title="Kembali">⏎</button>
-
         <div class="nav-dropdown" id="filesDropdown">
             <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
             <div class="dropdown-menu">
@@ -378,12 +401,10 @@ body {
                 <a href="GoogleSheetBackupURL.html">🔗 Google Sheet Backup URL</a>
             </div>
         </div>
-
         <a class="nav-item" href="dashboard.html">DASHBOARD</a>
         <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
         <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
         <a class="nav-item" href="overtime.html">OVERTIME</a>
-
         <div class="nav-dropdown" id="carumanDropdown">
             <button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
             <div class="dropdown-menu">
@@ -393,9 +414,7 @@ body {
                 <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
             </div>
         </div>
-
         <a class="nav-item" href="companysetting.html">SETTING</a>
-
         <div class="nav-dropdown" id="othersDropdown">
             <button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
             <div class="dropdown-menu">
@@ -408,54 +427,69 @@ body {
             </div>
         </div>
     </div>
-
     <button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')">
         <span class="pulse"></span> 💬 Request Chat
     </button>
 </nav>
 
-<!-- ================= MAIN CONTENT ================= -->
+<!-- MAIN CONTENT -->
 <div class="main-container">
     
-    <div class="page-header">
-        <div>
-            <div class="page-title"><i class="fas fa-calendar-alt"></i> Public Holidays</div>
-            <div class="page-subtitle">设置公司公共假期 (默认 X3 倍薪资补贴)</div>
+    <!-- LEFT: Calendar Section -->
+    <div class="calendar-section">
+        <div class="page-header">
+            <div>
+                <div class="page-title"><i class="fas fa-calendar-alt"></i> Public Holidays</div>
+                <div class="page-subtitle">设置公司公共假期 (默认 X3 倍薪资补贴)</div>
+            </div>
+            <div class="stats-pill" id="countPill">
+                <i class="fas fa-info-circle"></i> 加载中...
+            </div>
         </div>
-        <div class="stats-pill" id="countPill">
-            <i class="fas fa-info-circle"></i> 加载中...
+
+        <div class="controls-bar">
+            <div class="month-nav">
+                <button onclick="changeMonth(-1)" title="上个月"><i class="fas fa-chevron-left"></i></button>
+                <div class="current-month-label" id="monthLabel">2026年 11月</div>
+                <button onclick="changeMonth(1)" title="下个月"><i class="fas fa-chevron-right"></i></button>
+                <button class="btn-secondary" style="margin-left:10px; font-size:0.75rem; padding:0.3rem 0.6rem;" onclick="goToToday()">今天</button>
+            </div>
+            <div style="display:flex; gap:0.5rem;">
+                <button class="btn-primary" onclick="openModalForAdd()">
+                    <i class="fas fa-plus"></i> 添加公假
+                </button>
+                <button class="btn-secondary" onclick="loadData()">
+                    <i class="fas fa-sync-alt"></i> 刷新
+                </button>
+            </div>
+        </div>
+
+        <div class="calendar-wrapper">
+            <div class="cal-header">
+                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+            </div>
+            <div class="cal-grid" id="calendarGrid">
+                <!-- JS will populate this -->
+            </div>
         </div>
     </div>
 
-    <div class="controls-bar">
-        <div class="month-nav">
-            <button onclick="changeMonth(-1)" title="上个月"><i class="fas fa-chevron-left"></i></button>
-            <div class="current-month-label" id="monthLabel">2026年 11月</div>
-            <button onclick="changeMonth(1)" title="下个月"><i class="fas fa-chevron-right"></i></button>
-            <button class="btn-secondary" style="margin-left:10px; font-size:0.75rem; padding:0.3rem 0.6rem;" onclick="goToToday()">今天</button>
+    <!-- RIGHT: Sidebar List Section -->
+    <div class="sidebar-panel">
+        <div class="sidebar-head">
+            <div class="sidebar-title">
+                <i class="fas fa-list-ul"></i> 已存假期列表
+            </div>
         </div>
-        <div style="display:flex; gap:0.5rem;">
-            <button class="btn-primary" onclick="openModalForAdd()">
-                <i class="fas fa-plus"></i> 添加公假
-            </button>
-            <button class="btn-secondary" onclick="loadData()">
-                <i class="fas fa-sync-alt"></i> 刷新
-            </button>
-        </div>
-    </div>
-
-    <div class="calendar-wrapper">
-        <div class="cal-header">
-            <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-        </div>
-        <div class="cal-grid" id="calendarGrid">
+        <div class="sidebar-list" id="holidayListContainer">
             <!-- JS will populate this -->
+            <div class="sidebar-empty">暂无数据</div>
         </div>
     </div>
 
 </div>
 
-<!-- ================= MODAL ================= -->
+<!-- MODAL -->
 <div class="modal-overlay" id="holidayModal">
     <div class="modal-card">
         <div class="modal-head">
@@ -464,17 +498,14 @@ body {
         </div>
         <div class="modal-body">
             <input type="hidden" id="editIndex" value="-1">
-            
             <div class="form-group">
                 <label class="form-label">日期 (Date)</label>
                 <input type="date" id="inputDate" class="form-input" required>
             </div>
-            
             <div class="form-group">
                 <label class="form-label">假期名称 (Name)</label>
                 <input type="text" id="inputName" class="form-input" placeholder="例如: Christmas Day" required>
             </div>
-            
             <div class="form-group">
                 <label class="form-label">薪资倍数 (Multiplier)</label>
                 <select id="inputMultiplier" class="form-select">
@@ -484,7 +515,6 @@ body {
                     <option value="3" selected>3.0x (三倍 - 默认)</option>
                 </select>
             </div>
-            
             <div class="form-group">
                 <label class="form-label">备注 (Note)</label>
                 <textarea id="inputNote" class="form-textarea" placeholder="可选填..."></textarea>
@@ -499,7 +529,7 @@ body {
     </div>
 </div>
 
-<!-- ================= LOADING & TOAST ================= -->
+<!-- LOADING & TOAST -->
 <div class="spinner-overlay" id="loadingOverlay">
     <div class="spinner"></div>
     <div style="font-weight:600; color:var(--epf-blue);">正在同步数据...</div>
@@ -513,7 +543,6 @@ body {
 /* ============================================================
    CONFIG & STATE
    ============================================================ */
-// 硬编码的 Public Holidays App Script URL
 const PUBLIC_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzTHXDapmq1-LI1-ta5pgsYQpA55GxBZLmYlxrI5KYrvt_CiD3mP9qIv5mxArgcEPphuA/exec';
 
 let currentYear = new Date().getFullYear();
@@ -540,6 +569,7 @@ async function loadData() {
         if (json.status === 'success') {
             allHolidays = json.data || [];
             renderCalendar();
+            renderSidebarList(); // Render the new sidebar
             updateStats();
         } else {
             showToast('加载失败: ' + json.message, 'error');
@@ -560,7 +590,8 @@ async function saveAllHolidays() {
 
     showLoading(true);
     try {
-        const payload = { holidays: allHolidays };
+        // Send action: saveData in payload
+        const payload = { action: "saveData", holidays: allHolidays };
         const res = await fetch(PUBLIC_SCRIPT_URL, {
             method: 'POST',
             body: JSON.stringify(payload)
@@ -570,10 +601,37 @@ async function saveAllHolidays() {
         if (json.status === 'success') {
             showToast('保存成功！', 'success');
             closeModal();
-            // 重新加载以获取服务器确认的顺序
             await loadData(); 
         } else {
             showToast('保存失败: ' + json.message, 'error');
+        }
+    } catch (e) {
+        showToast('网络错误', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// NEW: Function to delete a single holiday
+async function deleteSingleHoliday(date, name) {
+    if (!confirm(`确定要删除 "${name}" (${date}) 吗？此操作不可恢复。`)) {
+        return;
+    }
+
+    showLoading(true);
+    try {
+        const payload = { action: "deleteHoliday", date: date, name: name };
+        const res = await fetch(PUBLIC_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        
+        if (json.status === 'success') {
+            showToast('删除成功', 'success');
+            await loadData(); // Reload to update both calendar and list
+        } else {
+            showToast('删除失败: ' + json.message, 'error');
         }
     } catch (e) {
         showToast('网络错误', 'error');
@@ -589,7 +647,6 @@ function renderCalendar() {
     const grid = document.getElementById('calendarGrid');
     const label = document.getElementById('monthLabel');
     
-    // Update Label
     const monthNames = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
     label.textContent = `${currentYear}年 ${monthNames[currentMonth]}`;
     
@@ -598,16 +655,14 @@ function renderCalendar() {
     const firstDay = new Date(currentYear, currentMonth, 1);
     const lastDay = new Date(currentYear, currentMonth + 1, 0);
     const daysInMonth = lastDay.getDate();
-    const startDayOfWeek = firstDay.getDay(); // 0 = Sun
+    const startDayOfWeek = firstDay.getDay(); 
     
-    // Previous Month Padding
     const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
     for (let i = startDayOfWeek - 1; i >= 0; i--) {
         const dayDiv = createDayCell(prevMonthLastDay - i, true);
         grid.appendChild(dayDiv);
     }
     
-    // Current Month Days
     const today = new Date();
     for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = formatDateStr(currentYear, currentMonth, d);
@@ -615,7 +670,6 @@ function renderCalendar() {
         
         const dayDiv = createDayCell(d, false, isToday);
         
-        // Find holidays for this day
         const daysHolidays = allHolidays.filter(h => h.date === dateStr);
         daysHolidays.forEach(h => {
             const tag = document.createElement('div');
@@ -628,13 +682,11 @@ function renderCalendar() {
             dayDiv.appendChild(tag);
         });
         
-        // Click to add/edit
         dayDiv.onclick = () => openModalForAdd(dateStr);
         
         grid.appendChild(dayDiv);
     }
     
-    // Next Month Padding to fill grid (optional, usually 35 or 42 cells)
     const totalCells = grid.children.length;
     const remaining = (totalCells <= 35) ? 35 - totalCells : 42 - totalCells;
     for (let i = 1; i <= remaining; i++) {
@@ -670,26 +722,65 @@ function goToToday() {
 }
 
 /* ============================================================
+   SIDEBAR LIST LOGIC (NEW)
+   ============================================================ */
+function renderSidebarList() {
+    const container = document.getElementById('holidayListContainer');
+    container.innerHTML = '';
+
+    if (allHolidays.length === 0) {
+        container.innerHTML = '<div class="sidebar-empty">暂无设置的公共假期<br><small>点击左侧日历或"添加公假"按钮</small></div>';
+        return;
+    }
+
+    // Sort by date for the list view as well
+    const sortedHolidays = [...allHolidays].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    sortedHolidays.forEach(h => {
+        const item = document.createElement('div');
+        item.className = 'holiday-list-item';
+        
+        // Format date nicely for display (e.g., 2026-12-25)
+        const dateObj = new Date(h.date);
+        const dateDisplay = isNaN(dateObj) ? h.date : `${h.date}`; 
+
+        item.innerHTML = `
+            <div class="item-info">
+                <div class="item-date">${dateDisplay}</div>
+                <div class="item-name">${escapeHtml(h.name)}</div>
+                <div class="item-meta">Multiplier: x${h.multiplier}</div>
+            </div>
+            <div class="item-actions">
+                <button class="btn-icon btn-edit" title="编辑" onclick="openModalForEdit('${h.date}')">
+                    <i class="fas fa-pen"></i>
+                </button>
+                <button class="btn-icon btn-delete" title="删除" onclick="deleteSingleHoliday('${h.date}', '${escapeHtml(h.name).replace(/'/g, "\\'")}')">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        `;
+        container.appendChild(item);
+    });
+}
+
+/* ============================================================
    MODAL & FORM LOGIC
    ============================================================ */
 function openModalForAdd(preselectedDate = null) {
     document.getElementById('modalTitle').textContent = '添加公共假期';
-    document.getElementById('editIndex').value = '-1'; // New
+    document.getElementById('editIndex').value = '-1'; 
     
-    // Default to today or preselected
     const defaultDate = preselectedDate || formatDateStr(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
     
     document.getElementById('inputDate').value = defaultDate;
     document.getElementById('inputName').value = '';
-    document.getElementById('inputMultiplier').value = '3'; // Default 3x
+    document.getElementById('inputMultiplier').value = '3'; 
     document.getElementById('inputNote').value = '';
     
     document.getElementById('holidayModal').classList.add('open');
 }
 
 function openModalForEdit(dateStr) {
-    // Find existing holiday(s) for this date. For simplicity, we edit the first one found or allow adding another.
-    // Here we assume unique dates for editing simplicity, or just edit the first match.
     const idx = allHolidays.findIndex(h => h.date === dateStr);
     
     if (idx === -1) {
@@ -728,19 +819,15 @@ function saveHolidayFromModal() {
     const newHoliday = { date, name, multiplier, note };
     
     if (idx === -1) {
-        // Add new
-        // Check limit
         if (allHolidays.length >= 25) {
             showToast('已达到最大限制 (25天)', 'error');
             return;
         }
         allHolidays.push(newHoliday);
     } else {
-        // Update existing
         allHolidays[idx] = newHoliday;
     }
     
-    // Sort by date
     allHolidays.sort((a, b) => new Date(a.date) - new Date(b.date));
     
     saveAllHolidays();
@@ -750,7 +837,6 @@ function saveHolidayFromModal() {
    UTILS & UI HELPERS
    ============================================================ */
 function formatDateStr(y, m, d) {
-    // Returns YYYY-MM-DD
     const mm = String(m + 1).padStart(2, '0');
     const dd = String(d).padStart(2, '0');
     return `${y}-${mm}-${dd}`;
@@ -796,7 +882,6 @@ function showToast(msg, type = 'success') {
     }, 3000);
 }
 
-/* Navbar Logic (Copied from Dashboard) */
 function initNavbar() {
     const backBtn = document.getElementById('backBtn');
     if (backBtn) backBtn.addEventListener('click', function (e) {
