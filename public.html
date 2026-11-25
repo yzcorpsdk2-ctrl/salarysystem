@@ -33,7 +33,7 @@ body {
     min-height: 100vh; line-height: 1.5; font-size: 14px;
 }
 
-/* Navbar Styles (Keep as is) */
+/* Navbar Styles */
 .navbar {
     position: sticky; top: 0; z-index: 200;
     display: flex; align-items: stretch; flex-wrap: wrap;
@@ -88,23 +88,18 @@ body {
     color: #fff; font-size: 0.73rem; font-weight: 700; cursor: pointer;
 }
 
-/* ============================================================
-   MAIN LAYOUT (Modified for Sidebar)
-   ============================================================ */
+/* MAIN LAYOUT */
 .main-container {
-    max-width: 1400px; /* Increased width */
+    max-width: 1400px;
     margin: 1.5rem auto;
     padding: 0 1.5rem;
     display: grid;
-    grid-template-columns: 1fr 320px; /* Calendar takes remaining, Sidebar fixed 320px */
+    grid-template-columns: 1fr 320px;
     gap: 1.5rem;
     align-items: start;
 }
 
-/* Left Column: Calendar */
-.calendar-section {
-    min-width: 0; /* Prevent overflow */
-}
+.calendar-section { min-width: 0; }
 
 .page-header {
     display: flex; justify-content: space-between; align-items: center;
@@ -208,9 +203,7 @@ body {
     font-weight: 600;
 }
 
-/* ============================================================
-   SIDEBAR LIST (NEW)
-   ============================================================ */
+/* SIDEBAR LIST */
 .sidebar-panel {
     background: #fff;
     border: 1px solid var(--epf-border);
@@ -218,7 +211,7 @@ body {
     box-shadow: var(--shadow-sm);
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 140px); /* Fixed height relative to viewport */
+    height: calc(100vh - 140px);
     position: sticky;
     top: 80px;
 }
@@ -299,7 +292,7 @@ body {
 .btn-delete { background: #fee2e2; color: #ef4444; }
 .btn-delete:hover { background: #ef4444; color: #fff; }
 
-/* Modal & Toast (Keep existing styles) */
+/* Modal & Toast */
 .modal-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(15, 23, 42, 0.6); z-index: 1000;
@@ -543,6 +536,7 @@ body {
 /* ============================================================
    CONFIG & STATE
    ============================================================ */
+// 请确保这里的 URL 是你部署后的 Web App URL
 const PUBLIC_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzTHXDapmq1-LI1-ta5pgsYQpA55GxBZLmYlxrI5KYrvt_CiD3mP9qIv5mxArgcEPphuA/exec';
 
 let currentYear = new Date().getFullYear();
@@ -569,14 +563,14 @@ async function loadData() {
         if (json.status === 'success') {
             allHolidays = json.data || [];
             renderCalendar();
-            renderSidebarList(); // Render the new sidebar
+            renderSidebarList();
             updateStats();
         } else {
             showToast('加载失败: ' + json.message, 'error');
         }
     } catch (e) {
         console.error(e);
-        showToast('网络错误，请检查连接', 'error');
+        showToast('网络错误，请检查连接或脚本部署状态', 'error');
     } finally {
         showLoading(false);
     }
@@ -590,7 +584,6 @@ async function saveAllHolidays() {
 
     showLoading(true);
     try {
-        // Send action: saveData in payload
         const payload = { action: "saveData", holidays: allHolidays };
         const res = await fetch(PUBLIC_SCRIPT_URL, {
             method: 'POST',
@@ -612,7 +605,7 @@ async function saveAllHolidays() {
     }
 }
 
-// NEW: Function to delete a single holiday
+// FIXED: Improved delete function with better error handling and no string injection issues
 async function deleteSingleHoliday(date, name) {
     if (!confirm(`确定要删除 "${name}" (${date}) 吗？此操作不可恢复。`)) {
         return;
@@ -620,11 +613,23 @@ async function deleteSingleHoliday(date, name) {
 
     showLoading(true);
     try {
-        const payload = { action: "deleteHoliday", date: date, name: name };
+        const payload = { 
+            action: "deleteHoliday", 
+            date: date, 
+            name: name 
+        };
+        
         const res = await fetch(PUBLIC_SCRIPT_URL, {
             method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Important for GAS POST
             body: JSON.stringify(payload)
         });
+        
+        // Check if response is OK
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
         const json = await res.json();
         
         if (json.status === 'success') {
@@ -632,9 +637,11 @@ async function deleteSingleHoliday(date, name) {
             await loadData(); // Reload to update both calendar and list
         } else {
             showToast('删除失败: ' + json.message, 'error');
+            console.error('Server Error:', json.message);
         }
     } catch (e) {
-        showToast('网络错误', 'error');
+        console.error(e);
+        showToast('网络错误或脚本执行失败: ' + e.message, 'error');
     } finally {
         showLoading(false);
     }
@@ -675,9 +682,12 @@ function renderCalendar() {
             const tag = document.createElement('div');
             tag.className = 'holiday-tag';
             tag.innerHTML = `${escapeHtml(h.name)} <span class="holiday-multiplier">x${h.multiplier}</span>`;
+            // Use data attributes instead of onclick string concatenation to avoid quote issues
+            tag.dataset.date = h.date;
+            tag.dataset.name = h.name;
             tag.onclick = (e) => {
                 e.stopPropagation();
-                openModalForEdit(dateStr);
+                openModalForEdit(h.date);
             };
             dayDiv.appendChild(tag);
         });
@@ -722,7 +732,7 @@ function goToToday() {
 }
 
 /* ============================================================
-   SIDEBAR LIST LOGIC (NEW)
+   SIDEBAR LIST LOGIC (FIXED)
    ============================================================ */
 function renderSidebarList() {
     const container = document.getElementById('holidayListContainer');
@@ -740,10 +750,9 @@ function renderSidebarList() {
         const item = document.createElement('div');
         item.className = 'holiday-list-item';
         
-        // Format date nicely for display (e.g., 2026-12-25)
-        const dateObj = new Date(h.date);
-        const dateDisplay = isNaN(dateObj) ? h.date : `${h.date}`; 
+        const dateDisplay = h.date; 
 
+        // SAFE DELETION: Store data in dataset, not in onclick string
         item.innerHTML = `
             <div class="item-info">
                 <div class="item-date">${dateDisplay}</div>
@@ -751,14 +760,22 @@ function renderSidebarList() {
                 <div class="item-meta">Multiplier: x${h.multiplier}</div>
             </div>
             <div class="item-actions">
-                <button class="btn-icon btn-edit" title="编辑" onclick="openModalForEdit('${h.date}')">
+                <button class="btn-icon btn-edit" title="编辑">
                     <i class="fas fa-pen"></i>
                 </button>
-                <button class="btn-icon btn-delete" title="删除" onclick="deleteSingleHoliday('${h.date}', '${escapeHtml(h.name).replace(/'/g, "\\'")}')">
+                <button class="btn-icon btn-delete" title="删除">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </div>
         `;
+
+        // Attach listeners safely
+        const editBtn = item.querySelector('.btn-edit');
+        editBtn.onclick = () => openModalForEdit(h.date);
+
+        const deleteBtn = item.querySelector('.btn-delete');
+        deleteBtn.onclick = () => deleteSingleHoliday(h.date, h.name);
+
         container.appendChild(item);
     });
 }
