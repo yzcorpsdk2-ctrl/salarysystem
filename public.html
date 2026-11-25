@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
 /* ============================================================
-   复用 Dashboard 的核心样式 (Navbar, Topbar, Variables)
+   Core Styles (Matching Dashboard Theme)
    ============================================================ */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -20,7 +20,6 @@
     --dropdown-bg: #ffffff;
     --dropdown-shadow: 0 8px 24px rgba(16,32,56,.15);
     --shadow-sm: 0 1px 2px rgba(16,32,56,.05), 0 2px 10px rgba(16,32,56,.05);
-    --shadow-md: 0 8px 24px rgba(16,32,56,.10);
 }
 body {
     font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -29,7 +28,7 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* Navbar & Topbar Styles (Same as Dashboard) */
+/* Navbar */
 .navbar {
     position: sticky; top: 0; z-index: 200;
     display: flex; align-items: stretch; flex-wrap: wrap;
@@ -88,8 +87,8 @@ body {
     font-weight: 500; transition: background 0.12s; white-space: nowrap;
 }
 .dropdown-menu a:hover { background: var(--epf-blue-soft); color: var(--epf-blue); }
-.dropdown-menu .divider { height: 1px; background: var(--epf-border-soft); margin: 0.3rem 0.5rem; }
 
+/* Topbar */
 .topbar {
     position: sticky; top: 0; z-index: 100; background: #ffffff;
     border-bottom: 1px solid var(--epf-border); padding: 0.65rem 1.75rem;
@@ -176,7 +175,7 @@ body {
 }
 
 .calendar-day {
-    aspect-ratio: 1 / 1; /* Square cells */
+    aspect-ratio: 1 / 1; 
     border: 1px solid var(--epf-border-soft);
     border-radius: 8px;
     padding: 4px;
@@ -236,7 +235,7 @@ body {
     font-weight: 700;
 }
 
-/* Modal Styles */
+/* Modal */
 .modal-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(15, 23, 42, 0.6);
@@ -253,7 +252,7 @@ body {
     width: 100%;
     max-width: 400px;
     border-radius: 12px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     padding: 1.5rem;
     animation: modalSlide 0.2s ease-out;
 }
@@ -280,7 +279,7 @@ body {
     display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.5rem;
 }
 
-/* Toast Notification */
+/* Toast */
 .toast {
     position: fixed; bottom: 20px; right: 20px;
     background: #1f2d3d; color: #fff;
@@ -300,7 +299,6 @@ body {
     .calendar-grid { gap: 4px; padding: 0.5rem; }
     .calendar-day { padding: 2px; }
     .holiday-indicator { font-size: 0.55rem; }
-    .day-number { font-size: 0.75rem; }
 }
 </style>
 </head>
@@ -315,26 +313,25 @@ body {
         <i class="fas fa-arrow-left"></i>
     </button>
 
-    <!-- Files Dropdown -->
+    <!-- Files Dropdown (Update links to your new deployed URLs) -->
     <div class="nav-dropdown">
         <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
         <div class="dropdown-menu">
-            <a href="dashboard.html">📊 DASHBOARD</a>
-            <a href="staffinfo.html">👥 EMPLOYEES</a>
-            <a href="leave.html">📅 TIMECARD REPORT</a>
-            <a href="overtime.html">⏱️ OVERTIME SHEET</a>
+            <!-- Replace '#' with your actual deployed Web App URLs -->
+            <a href="#">📊 DASHBOARD</a>
+            <a href="#">👥 EMPLOYEES</a>
+            <a href="#">📅 TIMECARD REPORT</a>
             <div class="divider"></div>
-            <a href="epf.html">🏦 EPF</a>
-            <a href="socso.html">🛡️ SOCSO</a>
-            <a href="eis.html">📋 EIS</a>
+            <a href="#">🏦 EPF</a>
+            <a href="#">🛡️ SOCSO</a>
         </div>
     </div>
 
-    <a class="nav-item" href="dashboard.html">DASHBOARD</a>
-    <a class="nav-item" href="companysetting.html">SETTING</a>
+    <a class="nav-item" href="#">DASHBOARD</a>
+    <a class="nav-item" href="#">SETTING</a>
     
     <!-- Active Item -->
-    <a class="nav-item active" href="public.html">PUBLIC HOLIDAYS</a>
+    <a class="nav-item active" href="#">PUBLIC HOLIDAYS</a>
 </div>
 </nav>
 
@@ -455,7 +452,7 @@ function initNavbar() {
 }
 
 /* ============================================================
-   Data Handling
+   Data Handling (Direct Google Script Call)
    ============================================================ */
 function loadData() {
     showToast('Loading data...', 'normal');
