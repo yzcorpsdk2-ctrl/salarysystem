@@ -135,14 +135,16 @@ select.field-input { appearance: none; padding-right: 28px; cursor: pointer; bac
 .basic-input-wrap input[readonly]{ cursor: default; }
 
 /* Panels */
-.columns{ display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:20px; }
+.columns{ display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-bottom:20px; }
 .panel{ display:flex; flex-direction:column; border:1px solid var(--line); border-radius:var(--radius); background:#fff; overflow:hidden; box-shadow:var(--shadow-sm); }
 .panel-head{ display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid var(--line); background:#f7fafd; }
 .panel-icon{ width:26px; height:26px; border-radius:8px; flex-shrink:0; display:grid; place-items:center; font-size:.72rem; color:#fff; }
+.panel-ot .panel-icon{ background:linear-gradient(145deg,#2b5580,#1e3a5f); }
 .panel-income .panel-icon{ background:linear-gradient(145deg,#0f7a4d,#0a5e3b); }
 .panel-deduction .panel-icon{ background:linear-gradient(145deg,#a52222,#7d1717); }
 .panel-cuti .panel-icon{ background:linear-gradient(145deg,#2b5580,#1e3a5f); }
 .panel-head h2{ font-size:.75rem; font-weight:800; letter-spacing:.05em; text-transform:uppercase; }
+.panel-ot .panel-head h2{ color:var(--navy); }
 .panel-income .panel-head h2{ color:#0e6b45; }
 .panel-deduction .panel-head h2{ color:#8f1e1e; }
 .panel-cuti .panel-head h2{ color:var(--navy); }
@@ -158,6 +160,7 @@ select.field-input { appearance: none; padding-right: 28px; cursor: pointer; bac
 .amount input::-webkit-outer-spin-button, .amount input::-webkit-inner-spin-button, .basic-input-wrap input::-webkit-outer-spin-button, .basic-input-wrap input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
 .amount input[type=number], .basic-input-wrap input[type=number]{ -moz-appearance:textfield; }
 .panel-total{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 16px; font-size:.8rem; font-weight:800; letter-spacing:.02em; }
+.panel-ot .panel-total{ background:#eaf0f7; color:var(--navy); border-top:1px solid #d1dbe6; }
 .panel-income .panel-total{ background:var(--green-light); color:#0d6240; border-top:1px solid #c9e6d6; }
 .panel-deduction .panel-total{ background:var(--red-light); color:#8f1e1e; border-top:1px solid #f0cfcf; }
 .panel-cuti .panel-total{ background:#eaf0f7; color:var(--navy); border-top:1px solid #d1dbe6; }
@@ -251,7 +254,8 @@ select.field-input { appearance: none; padding-right: 28px; cursor: pointer; bac
 .modal-hint{ font-size:.72rem; color:var(--ink-3); margin-top:6px; }
 
 /* Responsive */
-@media (max-width: 1100px){ .columns{ grid-template-columns:1fr 1fr; } .panel-cuti{ grid-column: 1 / -1; } .extra-grid{ grid-template-columns:repeat(2, minmax(0,1fr)); } }
+@media (max-width: 1200px){ .columns{ grid-template-columns:1fr 1fr; } }
+@media (max-width: 1100px){ .extra-grid{ grid-template-columns:repeat(2, minmax(0,1fr)); } }
 @media (max-width: 980px){ .meta-grid{ grid-template-columns:1fr; } .extra-grid{ grid-template-columns:1fr 1fr; } }
 @media (max-width: 760px){ .columns{ grid-template-columns:1fr; } .summary{ grid-template-columns:1fr; } .extra-grid{ grid-template-columns:1fr; } .payslip-container{ padding:24px 20px 28px; } .brand h1{ font-size:1.2rem; } }
 @media (max-width: 540px){ body{ padding:14px 10px 40px; } .payslip-container{ padding:20px 14px 24px; border-radius:14px; } .field-grid{ grid-template-columns:1fr; } .payslip-header{ flex-direction:column; } .header-badges{ justify-content:flex-start; } .btn-group{ width:100%; } .btn{ flex:1 1 auto; } .line-item{ flex-wrap:wrap; } .amount{ width:100%; } .extra-card .amount{ width:100%; } }
@@ -401,11 +405,12 @@ body{ background:#fff; padding:0 !important; display:block !important; }
 </div>
 
 <div class="columns">
-<section class="panel panel-income">
+<!-- Panel 1: OVERTIME DETAILS -->
+<section class="panel panel-ot">
 <div class="panel-head">
-    <span class="panel-icon"><i class="fas fa-plus"></i></span>
-    <h2>Pendapatan / Earnings</h2>
-    <button type="button" class="mini-btn" id="resetOTBtn" style="margin-left:auto;" title="Reset OT dari OVERTIME"><i class="fas fa-undo"></i> Reset OT</button>
+    <span class="panel-icon"><i class="fas fa-clock"></i></span>
+    <h2>OVERTIME DETAILS</h2>
+    <button type="button" class="mini-btn" id="resetOTBtn" style="margin-left:auto;" title="Reset OT dari OVERTIME"><i class="fas fa-undo"></i> Reset</button>
 </div>
 <div class="panel-body">
 <div class="line-item">
@@ -436,6 +441,31 @@ body{ background:#fff; padding:0 !important; display:block !important; }
         <button type="button" class="mini-edit-btn" id="btnEditDailyOTAmount" title="Edit manual"><i class="fas fa-pen"></i></button>
     </div>
 </div>
+<div class="line-item">
+    <label for="publicDayOTDay"><i class="fas fa-calendar-check"></i> Public Day OT (Hari)</label>
+    <div style="display:flex; gap:4px; align-items:center;">
+        <div class="amount"><span class="cur">HARI</span><input type="number" step="0.01" id="publicDayOTDay" value="0.00" readonly></div>
+        <button type="button" class="mini-edit-btn" id="btnEditPublicDayOTDay" title="Edit manual"><i class="fas fa-pen"></i></button>
+    </div>
+</div>
+<div class="line-item">
+    <label for="publicDayOTAmount"><i class="fas fa-money-bill-wave"></i> Public Days OT (RM)</label>
+    <div style="display:flex; gap:4px; align-items:center;">
+        <div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="publicDayOTAmount" value="0.00" readonly></div>
+        <button type="button" class="mini-edit-btn" id="btnEditPublicDayOTAmount" title="Edit manual"><i class="fas fa-pen"></i></button>
+    </div>
+</div>
+</div>
+<div class="panel-total"><span><i class="fas fa-calculator"></i> Jumlah OT</span><strong id="totalOTDisplay">RM 0.00</strong></div>
+</section>
+
+<!-- Panel 2: PENDAPATAN / EARNINGS -->
+<section class="panel panel-income">
+<div class="panel-head">
+    <span class="panel-icon"><i class="fas fa-plus"></i></span>
+    <h2>PENDAPATAN / EARNINGS</h2>
+</div>
+<div class="panel-body">
 <div class="line-item"><label for="allowance"><i class="fas fa-hand-holding-usd"></i> Allowance</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="allowance" value="0"></div></div>
 <div class="line-item"><label for="commision"><i class="fas fa-percent"></i> Commission</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="commision" value="0"></div></div>
 <div class="line-item"><label for="incentives"><i class="fas fa-gift"></i> Incentives</label><div class="amount"><span class="cur">RM</span><input type="number" step="0.01" id="incentives" value="0"></div></div>
@@ -443,10 +473,11 @@ body{ background:#fff; padding:0 !important; display:block !important; }
 <div class="panel-total"><span><i class="fas fa-calculator"></i> Jumlah Pendapatan</span><strong id="firstCalcTotal">RM 0.00</strong></div>
 </section>
 
+<!-- Panel 3: POTONGAN / DEDUCTIONS -->
 <section class="panel panel-deduction">
 <div class="panel-head">
     <span class="panel-icon"><i class="fas fa-minus"></i></span>
-    <h2>Potongan / Deductions</h2>
+    <h2>POTONGAN / DEDUCTIONS</h2>
     <button type="button" class="mini-btn" id="resetUnpaidBtn" style="margin-left:auto;" title="Reset Cuti Tanpa Gaji dari SHEET"><i class="fas fa-undo"></i> Reset</button>
 </div>
 <div class="panel-body">
@@ -464,8 +495,9 @@ body{ background:#fff; padding:0 !important; display:block !important; }
 <div class="panel-total"><span><i class="fas fa-calculator"></i> Jumlah Potongan</span><strong id="totalPotongan">RM 0.00</strong></div>
 </section>
 
+<!-- Panel 4: HARI CUTI / LEAVE DAYS -->
 <section class="panel panel-cuti">
-<div class="panel-head"><span class="panel-icon"><i class="fas fa-calendar-alt"></i></span><h2>Hari Cuti / Leave Days</h2></div>
+<div class="panel-head"><span class="panel-icon"><i class="fas fa-calendar-alt"></i></span><h2>HARI CUTI / LEAVE DAYS</h2></div>
 <div class="panel-body">
 <div class="line-item"><label for="annualLeaveDays"><i class="fas fa-umbrella-beach"></i> Cuti Tahunan</label><div class="amount"><span class="cur">HARI</span><input type="number" step="0.5" id="annualLeaveDays" value="0"></div></div>
 <div class="line-item"><label for="sickLeaveDays"><i class="fas fa-notes-medical"></i> Cuti Sakit</label><div class="amount"><span class="cur">HARI</span><input type="number" step="0.5" id="sickLeaveDays" value="0"></div></div>
@@ -619,6 +651,7 @@ const PAPER_KEY = 'payrollPaperSize';
 const FIELD_MAP = {
 timeOTHour: 'TimeOTHour', timeOTAmount: 'TimeOTAmount',
 dailyOTDay: 'DailyOTDay', dailyOTAmount: 'DailyOTAmount',
+publicDayOTDay: 'PublicDaysOT', publicDayOTAmount: 'PublicDaysAmount',
 allowance: 'Allowance2', commision: 'Commission', incentives: 'Incentives',
 unpaidLeave: 'UnpaidLeave', pinjaman: 'Pinjaman', deductionLain: 'Deduction',
 potonganLain2: 'PotonganLain2',
@@ -632,7 +665,7 @@ bankNama: 'SLRBankNama', bankAcc: 'SLRBankAccountNo',
 epfNo: 'SLREPF', socsoNo: 'SLRPERKESO', eisNo: 'SLREIS'
 };
 const TEXT_FIELDS = new Set(['bankNama', 'bankAcc', 'epfNo', 'socsoNo', 'eisNo']);
-const NUM_2DEC_FIELDS = new Set(['unpaidLeave', 'timeOTHour', 'timeOTAmount', 'dailyOTDay', 'dailyOTAmount']);
+const NUM_2DEC_FIELDS = new Set(['unpaidLeave', 'timeOTHour', 'timeOTAmount', 'dailyOTDay', 'dailyOTAmount', 'publicDayOTDay', 'publicDayOTAmount']);
 const STATUTORY_FIELDS = ['epfEmployee','epfEmployer','socsoEmployee','socsoEmployer','eisEmployee','eisEmployer','lindung24jam'];
 
 const el = id => document.getElementById(id);
@@ -643,6 +676,7 @@ let allEmployees = [];
 let allOvertimeData = [];
 let allSheetData = [];
 let allAlslData = [];
+let allPublicDaysOTData = [];
 let activeStaffList = [];
 let SCRIPT_URL = '';
 
@@ -652,6 +686,8 @@ const MANUAL_FIELDS = [
 { inputId: 'timeOTAmount', btnId: 'btnEditTimeOTAmount', rawKey: 'TimeOTAmount' },
 { inputId: 'dailyOTDay', btnId: 'btnEditDailyOTDay', rawKey: 'DailyOTDay' },
 { inputId: 'dailyOTAmount', btnId: 'btnEditDailyOTAmount', rawKey: 'DailyOTAmount' },
+{ inputId: 'publicDayOTDay', btnId: 'btnEditPublicDayOTDay', rawKey: 'PublicDaysOT' },
+{ inputId: 'publicDayOTAmount', btnId: 'btnEditPublicDayOTAmount', rawKey: 'PublicDaysAmount' },
 { inputId: 'bankNama', btnId: 'btnEditBankNama', rawKey: 'SLRBankNama', staffKey: 'BankNama' },
 { inputId: 'bankAcc',  btnId: 'btnEditBankAcc',  rawKey: 'SLRBankAccountNo', staffKey: 'BankAccountNo' },
 { inputId: 'epfNo',    btnId: 'btnEditEpfNo',    rawKey: 'SLREPF', staffKey: 'EPF' },
@@ -662,6 +698,19 @@ const editStates = {};
 const RM_FMT = new Intl.NumberFormat('ms-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 function num(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
 function fmtRM(v) { return 'RM ' + RM_FMT.format(num(v)); }
+
+/* ====== Date Parser for PUBLICDAYSOT ====== */
+function parseDate(dateStr) {
+  if (dateStr instanceof Date) return dateStr;
+  if (typeof dateStr === 'number') return new Date(dateStr);
+  const s = String(dateStr).trim();
+  let m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if (m) return new Date(parseInt(m[3]), parseInt(m[2])-1, parseInt(m[1]));
+  m = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+  if (m) return new Date(parseInt(m[1]), parseInt(m[2])-1, parseInt(m[3]));
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
 
 /* ====== CASH / MECHANTRADE ====== */
 function isCashBankValue(val) {
@@ -702,7 +751,7 @@ function applyBankBasedStatutory() {
   }
 }
 
-/* ====== Paper size (打印时使用 mm + pt 精确定位) ====== */
+/* ====== Paper size ====== */
 function applyPaperSize(size) {
   const s = (size || 'A4').toUpperCase();
   let style = document.getElementById('dynamicPageSize');
@@ -774,7 +823,6 @@ function applyPaperSize(size) {
         .header-badges { justify-content: flex-start !important; }
         .meta-grid { grid-template-columns: 1fr !important; }
         .columns { grid-template-columns: 1fr 1fr !important; }
-        .panel-cuti { grid-column: 1 / -1 !important; }
         .extra-grid { grid-template-columns: 1fr !important; }
         .summary { grid-template-columns: repeat(3, 1fr) !important; gap: 3mm !important; }
         .sum-card { padding: 4mm !important; }
@@ -786,7 +834,7 @@ function applyPaperSize(size) {
 
 function isAllOtZero(raw) {
   if (!raw) return true;
-  return num(raw.TimeOTHour) === 0 && num(raw.TimeOTAmount) === 0 && num(raw.DailyOTDay) === 0 && num(raw.DailyOTAmount) === 0;
+  return num(raw.TimeOTHour) === 0 && num(raw.TimeOTAmount) === 0 && num(raw.DailyOTDay) === 0 && num(raw.DailyOTAmount) === 0 && num(raw.PublicDaysOT) === 0 && num(raw.PublicDaysAmount) === 0;
 }
 function setSyncStatus(msg, type) {
   const s = el('syncStatus');
@@ -842,14 +890,22 @@ async function fetchALSLData() {
     if (data && data.status === 'success' && Array.isArray(data.data)) allAlslData = data.data;
   } catch (e) { console.error('Fetch ALSL error:', e); }
 }
+async function fetchPublicDaysOTData() {
+  if (!SCRIPT_URL) return;
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=getPublicDaysOT&_t=${Date.now()}`);
+    const data = await res.json();
+    if (data && data.status === 'success' && Array.isArray(data.data)) allPublicDaysOTData = data.data;
+  } catch (e) { console.error('Fetch PUBLICDAYSOT error:', e); }
+}
 
 function updateCalc() {
   applyBankBasedStatutory();
   const basic = num(el('inputGajiAsas').value);
   const commission = num(inputs.commision.value);
   const allowance = num(inputs.allowance.value);
-  const otTotal = num(inputs.timeOTAmount.value) + num(inputs.dailyOTAmount.value);
-
+  
+  const otTotal = num(inputs.timeOTAmount.value) + num(inputs.dailyOTAmount.value) + num(inputs.publicDayOTAmount.value);
   const epfBase = basic + commission + allowance;
   const socsoBase = basic + commission + allowance + otTotal;
   const eisBase = basic + commission + allowance + otTotal;
@@ -861,7 +917,7 @@ function updateCalc() {
   inputs.salary24jam.value = lindungBase.toFixed(2);
 
   const income = basic
-    + num(inputs.timeOTAmount.value) + num(inputs.dailyOTAmount.value)
+    + num(inputs.timeOTAmount.value) + num(inputs.dailyOTAmount.value) + num(inputs.publicDayOTAmount.value)
     + allowance + commission
     + num(inputs.incentives.value);
 
@@ -878,6 +934,7 @@ function updateCalc() {
 
   el('infoGajiAsas').innerText = fmtRM(basic);
   el('firstCalcTotal').innerText = fmtRM(income);
+  el('totalOTDisplay').innerText = fmtRM(otTotal);
   el('totalPotongan').innerText = fmtRM(totalPotongan);
   el('totalHariCuti').innerText = totalDays + ' Hari';
   el('gajiKasarDisplay').innerText = fmtRM(totalGajiKasar);
@@ -920,7 +977,7 @@ async function fetchStaffBasics() {
   if (!SCRIPT_URL) { setSyncStatus('URL belum ditetapkan. Sila tetapkan di Dashboard.', 'error'); return; }
   setSyncStatus('Memuatkan data staf...', '');
   try {
-    await Promise.all([fetchOvertimeData(), fetchSheetData(), fetchALSLData()]);
+    await Promise.all([fetchOvertimeData(), fetchSheetData(), fetchALSLData(), fetchPublicDaysOTData()]);
     const res = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
     const data = await res.json();
     let staffRaw = [];
@@ -929,7 +986,6 @@ async function fetchStaffBasics() {
     else throw new Error('Format data tidak dikenali.');
 
     activeStaffList = staffRaw.map(row => {
-      // 【关键修改】确保 Code 是字符串，并清理可能存在的单引号
       let code = String(row.Code || '').trim();
       if (code.startsWith("'")) code = code.substring(1);
       
@@ -1025,7 +1081,7 @@ function switchEmployee(staffObj) {
     const newObj = {
       Code: staffObj.Code, Name: staffObj.Name, GroupName: staffObj.GroupName, Situation: staffObj.Situation,
       BasicSalary: staffObj.Salary, Basic: staffObj.Salary,
-      TimeOTHour: 0, TimeOTAmount: 0, DailyOTDay: 0, DailyOTAmount: 0,
+      TimeOTHour: 0, TimeOTAmount: 0, DailyOTDay: 0, DailyOTAmount: 0, PublicDaysOT: 0, PublicDaysAmount: 0,
       Allowance2: 0, Commission: 0, Incentives: 0,
       UnpaidLeave: 0, Pinjaman: 0, Deduction: 0, PotonganLain2: 0,
       AnnualLeaveDays: 0, SickLeaveDays: 0,
@@ -1054,6 +1110,47 @@ function fillForm(raw) {
     raw.TimeOTAmount = num(otRecord['TIME_OT_AMOUNT']);
     raw.DailyOTDay = num(otRecord['DAILY_OT_DAY']);
     raw.DailyOTAmount = num(otRecord['DAILY_OT_AMOUNT']);
+  }
+
+  // ====== AUTO CALC PUBLIC DAYS OT ======
+  if (allPublicDaysOTData && allPublicDaysOTData.length > 0) {
+    const monthNames = ["JANUARI","FEBRUARI","MAC","APRIL","MEI","JUN","JULAI","OGOS","SEPTEMBER","OKTOBER","NOVEMBER","DISEMBER"];
+    const periodText = document.getElementById('periodBadge').innerText;
+    let currentMonth = -1, currentYear = new Date().getFullYear();
+    if (periodText) {
+      const parts = periodText.trim().split(/\s+/);
+      if (parts.length === 2) {
+        currentMonth = monthNames.indexOf(parts[0].toUpperCase());
+        currentYear = parseInt(parts[1]);
+      }
+    }
+    
+    const records = allPublicDaysOTData.filter(r => {
+      const codeMatch = String(r['ID KOD'] || '').trim() === String(raw.Code).trim();
+      const nameMatch = String(r['NAME'] || '').trim().toUpperCase() === String(raw.Name || '').trim().toUpperCase();
+      if (!codeMatch && !nameMatch) return false;
+      
+      const d = parseDate(r['DATE']);
+      if (!d) return false;
+      
+      if (currentMonth !== -1) {
+        return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+      }
+      return true;
+    });
+
+    const uniqueDates = [...new Set(records.map(r => {
+      const d = parseDate(r['DATE']);
+      return d ? d.toISOString().split('T')[0] : String(r['DATE']);
+    }))];
+    
+    if (uniqueDates.length > 0) {
+      if (num(raw.PublicDaysOT) === 0) raw.PublicDaysOT = uniqueDates.length;
+      const baseSalary = num(raw.Basic);
+      if (num(raw.PublicDaysAmount) === 0 && baseSalary > 0) {
+        raw.PublicDaysAmount = Math.round(((baseSalary / 26) * 3 * uniqueDates.length) * 100) / 100;
+      }
+    }
   }
 
   const targetName = String(raw.Name || '').trim().toUpperCase();
@@ -1152,7 +1249,7 @@ function resetToDefault() {
   const defaultObj = {
     Code: staff.Code, Name: staff.Name, GroupName: staff.GroupName, Situation: staff.Situation,
     BasicSalary: staff.Salary, Basic: staff.Salary,
-    TimeOTHour: 0, TimeOTAmount: 0, DailyOTDay: 0, DailyOTAmount: 0,
+    TimeOTHour: 0, TimeOTAmount: 0, DailyOTDay: 0, DailyOTAmount: 0, PublicDaysOT: 0, PublicDaysAmount: 0,
     Allowance2: 0, Commission: 0, Incentives: 0,
     UnpaidLeave: 0, Pinjaman: 0, Deduction: 0, PotonganLain2: 0,
     AnnualLeaveDays: 0, SickLeaveDays: 0,
@@ -1193,7 +1290,6 @@ async function saveAndSync() {
     STATUTORY_FIELDS.forEach(id => { updated[FIELD_MAP[id]] = 0; });
   }
   updated.BasicSalary = updated.Basic;
-  // 确保 Code 是字符串发送给后端
   updated.Code = String(updated.Code).trim();
   
   updated.TotalGajiKasar = num(el('gajiKasarDisplay').innerText.replace(/[^0-9.\-]/g, ''));
@@ -1263,7 +1359,7 @@ async function syncFromSheet(silent = false) {
   const originalText = btn.innerHTML;
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menarik...'; }
   try {
-    await Promise.all([fetchOvertimeData(), fetchSheetData(), fetchALSLData()]);
+    await Promise.all([fetchOvertimeData(), fetchSheetData(), fetchALSLData(), fetchPublicDaysOTData()]);
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -1394,7 +1490,7 @@ function buildDefaultPrintData(emp) {
   return {
     Code: emp.Code, Name: emp.Name, GroupName: emp.GroupName, Situation: emp.Situation,
     BasicSalary: emp.Salary, Basic: emp.Salary,
-    TimeOTHour: 0, TimeOTAmount: 0, DailyOTDay: 0, DailyOTAmount: 0,
+    TimeOTHour: 0, TimeOTAmount: 0, DailyOTDay: 0, DailyOTAmount: 0, PublicDaysOT: 0, PublicDaysAmount: 0,
     Allowance2: 0, Commission: 0, Incentives: 0,
     UnpaidLeave: 0, Pinjaman: 0, Deduction: 0, PotonganLain2: 0,
     AnnualLeaveDays: 0, SickLeaveDays: 0,
@@ -1580,6 +1676,44 @@ el('resetOTBtn').addEventListener('click', () => {
     setSyncStatus('OT telah direset berdasarkan data OVERTIME terkini', 'success');
   } else {
     alert('⚠️ Tiada data OVERTIME untuk pekerja ini.');
+  }
+
+  // 同时重置 Public Days OT
+  if (allPublicDaysOTData && allPublicDaysOTData.length > 0) {
+    const monthNames = ["JANUARI","FEBRUARI","MAC","APRIL","MEI","JUN","JULAI","OGOS","SEPTEMBER","OKTOBER","NOVEMBER","DISEMBER"];
+    const periodText = document.getElementById('periodBadge').innerText;
+    let currentMonth = -1, currentYear = new Date().getFullYear();
+    if (periodText) {
+      const parts = periodText.trim().split(/\s+/);
+      if (parts.length === 2) {
+        currentMonth = monthNames.indexOf(parts[0].toUpperCase());
+        currentYear = parseInt(parts[1]);
+      }
+    }
+    const records = allPublicDaysOTData.filter(r => {
+      const codeMatch = String(r['ID KOD'] || '').trim() === String(currentRaw.Code).trim();
+      const nameMatch = String(r['NAME'] || '').trim().toUpperCase() === String(currentRaw.Name || '').trim().toUpperCase();
+      if (!codeMatch && !nameMatch) return false;
+      const d = parseDate(r['DATE']);
+      if (!d) return false;
+      if (currentMonth !== -1) return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+      return true;
+    });
+    const uniqueDates = [...new Set(records.map(r => {
+      const d = parseDate(r['DATE']);
+      return d ? d.toISOString().split('T')[0] : String(r['DATE']);
+    }))];
+    if (uniqueDates.length > 0) {
+      currentRaw.PublicDaysOT = uniqueDates.length;
+      const baseSalary = num(currentRaw.Basic);
+      if (baseSalary > 0) {
+        currentRaw.PublicDaysAmount = Math.round(((baseSalary / 26) * 3 * uniqueDates.length) * 100) / 100;
+      }
+      inputs.publicDayOTDay.value = currentRaw.PublicDaysOT.toFixed(2);
+      inputs.publicDayOTAmount.value = currentRaw.PublicDaysAmount.toFixed(2);
+      updateCalc();
+      setSyncStatus('OT & Public Days OT telah direset', 'success');
+    }
   }
 });
 
