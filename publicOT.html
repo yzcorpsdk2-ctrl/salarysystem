@@ -139,14 +139,14 @@ body {
     color: var(--epf-muted); font-size: 0.9rem;
 }
 
-.btn {
-    padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid var(--epf-border);
-    background: #fff; color: var(--epf-text); font-weight: 600; cursor: pointer;
-    display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.15s;
+.filter-group { display: flex; align-items: center; gap: 0.5rem; }
+.filter-group label { font-size: 0.85rem; font-weight: 600; color: var(--epf-text); }
+.form-control {
+    padding: 0.5rem 0.75rem; border: 1px solid var(--epf-border);
+    border-radius: 6px; font-size: 0.9rem; outline: none;
+    background: #fff; color: var(--epf-text); font-weight: 500; cursor: pointer;
 }
-.btn:hover { background: var(--epf-blue-soft); border-color: #b8cfe8; }
-.btn-primary { background: var(--epf-blue); color: #fff; border-color: var(--epf-blue); }
-.btn-primary:hover { background: #15406f; }
+.form-control:focus { border-color: var(--epf-blue); }
 
 /* Table Styles */
 .table-wrapper {
@@ -163,7 +163,7 @@ body {
     padding: 0.75rem 1rem; border-bottom: 1px solid var(--epf-border-soft);
     vertical-align: middle;
 }
-.data-table tbody tr:hover { background: var(--epf-blue-soft); cursor: pointer; }
+.data-table tbody tr:hover { background: var(--epf-blue-soft); }
 .data-table .text-right { text-align: right; font-variant-numeric: tabular-nums; }
 .badge-days {
     background: var(--epf-blue); color: #fff; padding: 2px 8px;
@@ -175,39 +175,6 @@ body {
 .status-dot.ok { background: #22c55e; }
 .status-dot.wait { background: #f59e0b; }
 
-/* Modal */
-.modal-overlay {
-    display: none; position: fixed; inset: 0; z-index: 1000;
-    background: rgba(16,32,56,0.6); backdrop-filter: blur(2px);
-    align-items: center; justify-content: center;
-}
-.modal-overlay.open { display: flex; }
-.modal-box {
-    background: #fff; width: 100%; max-width: 500px; border-radius: 12px;
-    padding: 1.5rem; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-    animation: fadeSlide 0.2s ease;
-}
-.modal-header {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 1.5rem; border-bottom: 1px solid var(--epf-border); padding-bottom: 1rem;
-}
-.modal-title { font-size: 1.1rem; font-weight: 700; color: var(--epf-blue); }
-.form-group { margin-bottom: 1rem; }
-.form-group label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--epf-muted); margin-bottom: 0.4rem; text-transform: uppercase; }
-.form-control {
-    width: 100%; padding: 0.6rem; border: 1px solid var(--epf-border);
-    border-radius: 6px; font-size: 0.9rem; outline: none;
-}
-.form-control:focus { border-color: var(--epf-blue); }
-.form-hint { font-size: 0.75rem; color: var(--epf-muted); margin-top: 0.3rem; }
-.calc-preview {
-    background: var(--epf-blue-soft); padding: 1rem; border-radius: 8px;
-    margin-top: 1rem; border: 1px dashed var(--epf-blue);
-}
-.calc-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.85rem; }
-.calc-total { font-weight: 800; color: var(--epf-blue); font-size: 1.1rem; border-top: 1px solid rgba(26,79,138,0.2); padding-top: 0.5rem; margin-top: 0.5rem; }
-
-/* Responsive */
 @media (max-width: 768px) {
     .navbar { padding: 0 0.5rem; }
     .navbar .nav-brand .brand-text { display: none; }
@@ -250,7 +217,6 @@ body {
     <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
     <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
 
-    <!-- Active Dropdown for Overtime -->
     <div class="nav-dropdown open" id="overtimeDropdown">
         <button class="nav-item active" data-dropdown-toggle="overtime">OVERTIME <i class="fas fa-caret-down"></i></button>
         <div class="dropdown-menu">
@@ -293,9 +259,14 @@ body {
     <div class="page-header">
         <div>
             <div class="page-title"><i class="fas fa-calendar-check"></i> Public Day OT Records</div>
-            <div class="page-subtitle">Manage overtime records for public holidays. Auto-calculated based on Basic Salary / 26 * 3.</div>
+            <div class="page-subtitle">Auto-generated based on Public Holidays and Attendance. Subsidy = (Basic / 26 * 3) - (Basic / 26).</div>
         </div>
-        <button class="btn btn-primary" onclick="openModal()"><i class="fas fa-plus"></i> Add New Record</button>
+        <div class="filter-group">
+            <label>Month:</label>
+            <select id="monthSelect" class="form-control"></select>
+            <label>Year:</label>
+            <select id="yearSelect" class="form-control"></select>
+        </div>
     </div>
 
     <div class="controls-bar">
@@ -304,7 +275,7 @@ body {
             <input type="text" id="searchInput" placeholder="Search by Name or Code...">
         </div>
         <div style="margin-left:auto; font-size:0.85rem; color:var(--epf-muted);">
-            <i class="fas fa-info-circle"></i> Click on a row to edit details.
+            <i class="fas fa-info-circle"></i> Data is automatically synced to PUBLICDAYSOT sheet.
         </div>
     </div>
 
@@ -316,7 +287,7 @@ body {
                     <th>NAME</th>
                     <th class="text-right">BASIC SALARY</th>
                     <th class="text-right">PUBLIC DAYS (Hari)</th>
-                    <th class="text-right">TOTAL AMOUNT (RM)</th>
+                    <th class="text-right">TOTAL SUBSIDY (RM)</th>
                     <th>LATEST DATE</th>
                     <th>STATUS</th>
                 </tr>
@@ -328,67 +299,19 @@ body {
     </div>
 </div>
 
-<!-- ================= MODAL ================= -->
-<div class="modal-overlay" id="editModal">
-    <div class="modal-box">
-        <div class="modal-header">
-            <div class="modal-title">Edit Public Day OT</div>
-            <button class="btn" style="padding:0.3rem 0.6rem;" onclick="closeModal()"><i class="fas fa-times"></i></button>
-        </div>
-        
-        <div class="form-group">
-            <label>Employee</label>
-            <select id="modalEmpSelect" class="form-control" onchange="onEmpChange()">
-                <option value="">Select Employee...</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Date of Work (Public Holiday)</label>
-            <input type="date" id="modalDate" class="form-control">
-            <div class="form-hint">Select the specific public holiday date worked.</div>
-        </div>
-
-        <div class="calc-preview">
-            <div class="calc-row">
-                <span>Basic Salary:</span>
-                <span id="previewBasic">RM 0.00</span>
-            </div>
-            <div class="calc-row">
-                <span>Formula:</span>
-                <span>Basic / 26 × 3</span>
-            </div>
-            <div class="calc-row">
-                <span>Rate per Day:</span>
-                <span id="previewRate">RM 0.00</span>
-            </div>
-            <div class="calc-total">
-                <div class="calc-row">
-                    <span>Total Amount:</span>
-                    <span id="previewTotal">RM 0.00</span>
-                </div>
-            </div>
-        </div>
-
-        <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1.5rem;">
-            <button class="btn" onclick="closeModal()">Cancel</button>
-            <button class="btn btn-primary" onclick="saveRecord()"><i class="fas fa-save"></i> Save Record</button>
-        </div>
-    </div>
-</div>
-
 <script>
 /* ================= CONFIG & STATE ================= */
 const URL_KEY = 'payrollScriptUrl';
 let SCRIPT_URL = '';
-let staffList = []; // Active staff from STAFF LOGIN RECORD
-let publicOtData = []; // Raw data from PUBLICDAYSOT sheet
+let publicOtData = []; // Raw data from backend
 let aggregatedData = []; // Processed data for table
 
 /* ================= INITIALIZATION ================= */
 document.addEventListener('DOMContentLoaded', () => {
     initNavbar();
+    initSelectors();
     loadSavedUrl();
+    
     if (SCRIPT_URL) loadData();
     else alert('Please set Deploy URL in Dashboard first.');
 
@@ -396,6 +319,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('searchInput').addEventListener('input', (e) => {
         renderTable(e.target.value.trim().toLowerCase());
     });
+
+    // Filter Listeners
+    document.getElementById('monthSelect').addEventListener('change', loadData);
+    document.getElementById('yearSelect').addEventListener('change', loadData);
 });
 
 function initNavbar() {
@@ -417,6 +344,33 @@ function initNavbar() {
     });
 }
 
+function initSelectors() {
+    const mSelect = document.getElementById('monthSelect');
+    const ySelect = document.getElementById('yearSelect');
+    const now = new Date();
+    const currM = String(now.getMonth() + 1).padStart(2, '0');
+    const currY = now.getFullYear();
+
+    const months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    
+    months.forEach((m, i) => {
+        const opt = document.createElement('option');
+        opt.value = m;
+        opt.textContent = monthNames[i];
+        if (m === currM) opt.selected = true;
+        mSelect.appendChild(opt);
+    });
+
+    for (let y = currY - 2; y <= currY + 2; y++) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        if (y === currY) opt.selected = true;
+        ySelect.appendChild(opt);
+    }
+}
+
 function loadSavedUrl() {
     try {
         const saved = localStorage.getItem(URL_KEY);
@@ -427,33 +381,23 @@ function loadSavedUrl() {
 /* ================= DATA LOADING ================= */
 async function loadData() {
     const tbody = document.getElementById('tableBody');
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;"><i class="fas fa-spinner fa-spin"></i> Generating...</td></tr>';
+
+    const month = document.getElementById('monthSelect').value;
+    const year = document.getElementById('yearSelect').value;
 
     try {
-        // Fetch Staff Data
-        const staffRes = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
-        const staffJson = await staffRes.json();
-        let rawStaff = [];
-        if (staffJson.result === 'success' && Array.isArray(staffJson.data)) rawStaff = staffJson.data;
+        // 向后端请求生成指定月份的公假OT数据
+        const res = await fetch(`${SCRIPT_URL}?action=getPublicDaysOT&month=${month}&year=${year}&_t=${Date.now()}`);
+        const json = await res.json();
         
-        // Filter Active Staff
-        staffList = rawStaff.map(s => ({
-            Code: String(s.Code || '').trim(),
-            Name: String(s.Name || '').trim(),
-            Salary: parseFloat(s.Salary) || 0
-        })).filter(s => s.Code && s.Name && String(s.Situation || '').toUpperCase() === 'ACTIVE');
-
-        // Fetch Public OT Data
-        const otRes = await fetch(`${SCRIPT_URL}?action=getPublicDaysOT&_t=${Date.now()}`);
-        const otJson = await otRes.json();
-        if (otJson.status === 'success' && Array.isArray(otJson.data)) {
-            publicOtData = otJson.data;
+        if (json.status === 'success' && Array.isArray(json.data)) {
+            publicOtData = json.data;
+            processData();
+            renderTable();
+        } else {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:red;">Error: ' + (json.message || 'Unknown error') + '</td></tr>';
         }
-
-        processData();
-        populateSelect();
-        renderTable();
-
     } catch (err) {
         console.error(err);
         tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:red;">Error loading data. Check Console.</td></tr>';
@@ -462,7 +406,6 @@ async function loadData() {
 
 /* ================= PROCESSING LOGIC ================= */
 function processData() {
-    // Group by Employee Code
     const map = new Map();
 
     publicOtData.forEach(row => {
@@ -470,12 +413,11 @@ function processData() {
         if (!code) return;
 
         if (!map.has(code)) {
-            const emp = staffList.find(s => s.Code === code);
             map.set(code, {
                 code: code,
-                name: emp ? emp.Name : row['NAME'],
-                basic: emp ? emp.Salary : (parseFloat(row['BASICSALARY']) || 0),
-                dates: new Set(), // Use Set to count unique dates
+                name: row['NAME'],
+                basic: parseFloat(row['BASICSALARY']) || 0,
+                dates: new Set(), 
                 totalAmount: 0,
                 lastDate: ''
             });
@@ -483,24 +425,19 @@ function processData() {
 
         const entry = map.get(code);
         const dateStr = String(row['DATE'] || '');
-        if (dateStr) entry.dates.add(dateStr);
         
-        // Update Last Date
+        if (dateStr) entry.dates.add(dateStr);
         if (dateStr > entry.lastDate) entry.lastDate = dateStr;
+        
+        // 累计每天的补贴金额
+        entry.totalAmount += parseFloat(row['AMOUNT']) || 0;
     });
 
     // Calculate Final Values
     aggregatedData = Array.from(map.values()).map(item => {
-        const days = item.dates.size;
-        // Formula: (Basic / 26) * 3 * Days
-        const dailyRate = (item.basic / 26) * 3;
-        const total = dailyRate * days;
-
         return {
             ...item,
-            days: days,
-            dailyRate: dailyRate,
-            totalAmount: total
+            days: item.dates.size
         };
     });
 
@@ -519,13 +456,12 @@ function renderTable(filter = '') {
     );
 
     if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:#94a3b8;">No records found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:#94a3b8;">No records found for this period.</td></tr>';
         return;
     }
 
     filtered.forEach(item => {
         const tr = document.createElement('tr');
-        tr.onclick = () => openModal(item.code);
         
         const statusClass = item.days > 0 ? 'ok' : 'wait';
         const statusText = item.days > 0 ? 'Calculated' : 'No Dates';
@@ -541,133 +477,6 @@ function renderTable(filter = '') {
         `;
         tbody.appendChild(tr);
     });
-}
-
-function populateSelect() {
-    const select = document.getElementById('modalEmpSelect');
-    select.innerHTML = '<option value="">Select Employee...</option>';
-    staffList.forEach(s => {
-        const opt = document.createElement('option');
-        opt.value = s.Code;
-        opt.textContent = `${s.Code} - ${s.Name}`;
-        select.appendChild(opt);
-    });
-}
-
-/* ================= MODAL & SAVING ================= */
-let currentEditingCode = null;
-
-function openModal(code = null) {
-    const modal = document.getElementById('editModal');
-    const select = document.getElementById('modalEmpSelect');
-    const dateInput = document.getElementById('modalDate');
-    
-    modal.classList.add('open');
-    currentEditingCode = code;
-
-    if (code) {
-        select.value = code;
-        // Find latest date for this user to pre-fill? Or just leave empty for new entry
-        const userRec = aggregatedData.find(u => u.code === code);
-        if (userRec && userRec.lastDate) {
-            // Convert YYYY-MM-DD or similar to input value if needed
-            // For simplicity, we leave it blank so they add a NEW date
-        }
-        dateInput.value = ''; 
-    } else {
-        select.value = '';
-        dateInput.value = '';
-    }
-    onEmpChange();
-}
-
-function closeModal() {
-    document.getElementById('editModal').classList.remove('open');
-    currentEditingCode = null;
-}
-
-function onEmpChange() {
-    const code = document.getElementById('modalEmpSelect').value;
-    const emp = staffList.find(s => s.Code === code);
-    
-    if (emp) {
-        document.getElementById('previewBasic').textContent = fmtRM(emp.Salary);
-        const rate = (emp.Salary / 26) * 3;
-        document.getElementById('previewRate').textContent = fmtRM(rate);
-        
-        // If date is selected, calc total
-        calculatePreview(rate);
-    } else {
-        document.getElementById('previewBasic').textContent = 'RM 0.00';
-        document.getElementById('previewRate').textContent = 'RM 0.00';
-        document.getElementById('previewTotal').textContent = 'RM 0.00';
-    }
-}
-
-document.getElementById('modalDate').addEventListener('change', () => {
-    const code = document.getElementById('modalEmpSelect').value;
-    const emp = staffList.find(s => s.Code === code);
-    if (emp) calculatePreview((emp.Salary / 26) * 3);
-});
-
-function calculatePreview(rate) {
-    // Note: This preview only shows cost for ONE day selected in modal.
-    // The actual table shows CUMULATIVE total.
-    const dateVal = document.getElementById('modalDate').value;
-    if (dateVal && rate) {
-        document.getElementById('previewTotal').textContent = fmtRM(rate);
-    } else {
-        document.getElementById('previewTotal').textContent = 'RM 0.00';
-    }
-}
-
-async function saveRecord() {
-    const code = document.getElementById('modalEmpSelect').value;
-    const date = document.getElementById('modalDate').value;
-    
-    if (!code || !date) {
-        alert('Please select an employee and a date.');
-        return;
-    }
-
-    const emp = staffList.find(s => s.Code === code);
-    if (!emp) return;
-
-    const payload = {
-        action: 'savePublicDayOT',
-        code: code,
-        name: emp.Name,
-        date: date,
-        basicSalary: emp.Salary,
-        amount: (emp.Salary / 26) * 3, // Single day amount
-        details: 'Public Holiday Work'
-    };
-
-    const btn = document.querySelector('#editModal .btn-primary');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-    btn.disabled = true;
-
-    try {
-        const res = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        });
-        const result = await res.json();
-        
-        if (result.status === 'success') {
-            alert('Record saved successfully!');
-            closeModal();
-            loadData(); // Refresh table
-        } else {
-            alert('Error: ' + result.message);
-        }
-    } catch (e) {
-        alert('Network error: ' + e.message);
-    } finally {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }
 }
 
 /* ================= UTILS ================= */
