@@ -1,1 +1,679 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Public Day OT · YZ Payroll</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+/* ================= 复用 Dashboard 样式 ================= */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+    --epf-blue: #1a4f8a; --epf-blue-light: #e8f0fa; --epf-blue-soft: #f4f8fd;
+    --epf-border: #d4e0ee; --epf-border-soft: #e6eef7;
+    --epf-text: #1f2d3d; --epf-muted: #64748b; --epf-bg: #f7fafd;
+    --nav-h: 52px;
+    --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover: #16345c;
+    --nav-text: #cbd9ea; --nav-accent: #4d9fff;
+    --dropdown-bg: #ffffff;
+    --dropdown-shadow: 0 8px 24px rgba(16,32,56,.15);
+    --shadow-sm: 0 1px 2px rgba(16,32,56,.05), 0 2px 10px rgba(16,32,56,.05);
+}
+body {
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--epf-bg); color: var(--epf-text);
+    min-height: 100vh; line-height: 1.5; font-size: 14px;
+    display: flex; flex-direction: column;
+}
 
+/* Navbar Styles (Identical to Dashboard) */
+.navbar {
+    position: sticky; top: 0; z-index: 200;
+    display: flex; align-items: stretch; flex-wrap: wrap;
+    background: linear-gradient(90deg, var(--nav-bg-1) 0%, var(--nav-bg-2) 100%);
+    padding: 0 1rem; min-height: var(--nav-h);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    border-bottom: 1px solid rgba(77,159,255,0.18);
+}
+.navbar .nav-brand {
+    display: flex; align-items: center; gap: 0.55rem;
+    color: #fff; font-weight: 800; font-size: 0.78rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding-right: 1.1rem; margin-right: 0.5rem;
+    border-right: 1px solid rgba(255,255,255,0.12); white-space: nowrap;
+}
+.navbar .nav-brand .logo {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: linear-gradient(135deg, #4d9fff, #1a4f8a);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 0.85rem; font-weight: 800;
+    box-shadow: 0 2px 6px rgba(77,159,255,0.35);
+}
+.nav-links { display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px; position: relative; }
+.nav-item {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    padding: 0 0.85rem; min-height: var(--nav-h);
+    color: var(--nav-text); text-decoration: none;
+    font-family: inherit; font-size: 0.73rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    background: transparent; border: none; cursor: pointer;
+    white-space: nowrap; transition: background 0.15s, color 0.15s; position: relative;
+}
+.nav-item:hover, .nav-item.active { background: var(--nav-hover); color: #fff; }
+.nav-item::after {
+    content: ''; position: absolute; left: 0.85rem; right: 0.85rem; bottom: 0;
+    height: 2px; background: var(--nav-accent); transform: scaleX(0);
+    transform-origin: left; transition: transform 0.2s;
+}
+.nav-item:hover::after, .nav-item.active::after { transform: scaleX(1); }
+.nav-back {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 44px; padding: 0 0.6rem; color: var(--nav-text);
+    background: transparent; border: none; cursor: pointer;
+    font-size: 1.1rem; transition: background 0.15s, color 0.15s;
+}
+.nav-back:hover { background: var(--nav-hover); color: #fff; }
+.nav-dropdown { position: relative; display: inline-flex; align-items: stretch; }
+.nav-dropdown > .nav-item { padding-right: 0.55rem; }
+.nav-dropdown > .nav-item .fa-caret-down { font-size: 0.6rem; margin-left: 0.2rem; opacity: 0.7; }
+.dropdown-menu {
+    display: none; position: absolute; top: 100%; left: 0;
+    min-width: 180px; background: var(--dropdown-bg);
+    border-radius: 8px; box-shadow: var(--dropdown-shadow);
+    padding: 0.4rem 0; z-index: 300; border: 1px solid var(--epf-border);
+    animation: fadeSlide 0.15s ease;
+}
+.nav-dropdown.open .dropdown-menu { display: block; }
+@keyframes fadeSlide { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+.dropdown-menu a {
+    display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem;
+    color: var(--epf-text); text-decoration: none; font-size: 0.78rem;
+    font-weight: 500; transition: background 0.12s; white-space: nowrap;
+}
+.dropdown-menu a:hover { background: var(--epf-blue-soft); color: var(--epf-blue); }
+.dropdown-menu .divider { height: 1px; background: var(--epf-border-soft); margin: 0.3rem 0.5rem; }
+.nav-chat {
+    margin-left: auto; align-self: center;
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    padding: 0.5rem 1rem; border: none; border-radius: 20px;
+    background: linear-gradient(135deg, #2f7fe0 0%, #1a4f8a 100%);
+    color: #fff; font-family: inherit; font-size: 0.73rem;
+    font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer; white-space: nowrap;
+    box-shadow: 0 3px 12px rgba(47,127,224,0.4);
+    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+}
+.nav-chat:hover { filter: brightness(1.12); transform: translateY(-1px); }
+
+/* ================= Public OT Specific Styles ================= */
+.main-container {
+    flex: 1; padding: 1.5rem; max-width: 1400px; margin: 0 auto; width: 100%;
+}
+.page-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
+}
+.page-title {
+    font-size: 1.25rem; font-weight: 700; color: var(--epf-blue);
+    display: flex; align-items: center; gap: 0.5rem;
+}
+.page-subtitle { font-size: 0.85rem; color: var(--epf-muted); margin-top: 4px; }
+
+.controls-bar {
+    display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;
+    background: #fff; padding: 1rem; border-radius: 8px;
+    border: 1px solid var(--epf-border); box-shadow: var(--shadow-sm);
+    margin-bottom: 1.5rem;
+}
+.search-box {
+    position: relative; flex: 1; min-width: 200px; max-width: 300px;
+}
+.search-box input {
+    width: 100%; padding: 0.5rem 0.75rem 0.5rem 2.2rem;
+    border: 1px solid var(--epf-border); border-radius: 6px;
+    font-size: 0.85rem; outline: none; transition: 0.15s;
+}
+.search-box input:focus { border-color: var(--epf-blue); box-shadow: 0 0 0 2px rgba(26,79,138,0.1); }
+.search-box i {
+    position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%);
+    color: var(--epf-muted); font-size: 0.9rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid var(--epf-border);
+    background: #fff; color: var(--epf-text); font-weight: 600; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.15s;
+}
+.btn:hover { background: var(--epf-blue-soft); border-color: #b8cfe8; }
+.btn-primary { background: var(--epf-blue); color: #fff; border-color: var(--epf-blue); }
+.btn-primary:hover { background: #15406f; }
+
+/* Table Styles */
+.table-wrapper {
+    background: #fff; border: 1px solid var(--epf-border); border-radius: 8px;
+    box-shadow: var(--shadow-sm); overflow: hidden;
+}
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.data-table th {
+    background: #f8fafc; padding: 0.75rem 1rem; text-align: left;
+    font-weight: 600; color: var(--epf-muted); border-bottom: 1px solid var(--epf-border);
+    white-space: nowrap;
+}
+.data-table td {
+    padding: 0.75rem 1rem; border-bottom: 1px solid var(--epf-border-soft);
+    vertical-align: middle;
+}
+.data-table tbody tr:hover { background: var(--epf-blue-soft); cursor: pointer; }
+.data-table .text-right { text-align: right; font-variant-numeric: tabular-nums; }
+.badge-days {
+    background: var(--epf-blue); color: #fff; padding: 2px 8px;
+    border-radius: 12px; font-size: 0.75rem; font-weight: 700;
+}
+.status-dot {
+    width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px;
+}
+.status-dot.ok { background: #22c55e; }
+.status-dot.wait { background: #f59e0b; }
+
+/* Modal */
+.modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 1000;
+    background: rgba(16,32,56,0.6); backdrop-filter: blur(2px);
+    align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+    background: #fff; width: 100%; max-width: 500px; border-radius: 12px;
+    padding: 1.5rem; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    animation: fadeSlide 0.2s ease;
+}
+.modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1.5rem; border-bottom: 1px solid var(--epf-border); padding-bottom: 1rem;
+}
+.modal-title { font-size: 1.1rem; font-weight: 700; color: var(--epf-blue); }
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--epf-muted); margin-bottom: 0.4rem; text-transform: uppercase; }
+.form-control {
+    width: 100%; padding: 0.6rem; border: 1px solid var(--epf-border);
+    border-radius: 6px; font-size: 0.9rem; outline: none;
+}
+.form-control:focus { border-color: var(--epf-blue); }
+.form-hint { font-size: 0.75rem; color: var(--epf-muted); margin-top: 0.3rem; }
+.calc-preview {
+    background: var(--epf-blue-soft); padding: 1rem; border-radius: 8px;
+    margin-top: 1rem; border: 1px dashed var(--epf-blue);
+}
+.calc-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.85rem; }
+.calc-total { font-weight: 800; color: var(--epf-blue); font-size: 1.1rem; border-top: 1px solid rgba(26,79,138,0.2); padding-top: 0.5rem; margin-top: 0.5rem; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .navbar { padding: 0 0.5rem; }
+    .navbar .nav-brand .brand-text { display: none; }
+    .main-container { padding: 1rem; }
+    .controls-bar { flex-direction: column; align-items: stretch; }
+    .search-box { max-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar">
+<div class="nav-brand"><span class="logo">Y</span><span class="brand-text">YZ Payroll</span></div>
+<div class="nav-links" id="navLinks">
+    <button class="nav-back" id="backBtn" title="Kembali">⏎</button>
+
+    <div class="nav-dropdown" id="filesDropdown">
+        <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
+        <div class="dropdown-menu">
+            <a href="dashboard.html">📊 DASHBOARD</a>
+            <a href="staffinfo.html">👥 EMPLOYEES</a>
+            <a href="leave.html">📅 TIMECARD REPORT</a>
+            <a href="overtime.html">⏱️ OVERTIME SHEET</a>
+            <div class="divider"></div>
+            <a href="epf.html">🏦 EPF</a>
+            <a href="socso.html">🛡️ SOCSO</a>
+            <a href="eis.html">📋 EIS</a>
+            <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+            <div class="divider"></div>
+            <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+            <a href="public.html">📰 Public Days Setting</a>
+            <a href="hrdcorp.html">📓 HRD Corp</a>
+            <a href="salarysumview.html">📊 Salary View</a>
+            <a href="GoogleSheetBackupURL.html">🔗 Google Sheet Backup URL</a>
+        </div>
+    </div>
+
+    <a class="nav-item" href="dashboard.html">DASHBOARD</a>
+    <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
+    <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
+
+    <!-- Active Dropdown for Overtime -->
+    <div class="nav-dropdown open" id="overtimeDropdown">
+        <button class="nav-item active" data-dropdown-toggle="overtime">OVERTIME <i class="fas fa-caret-down"></i></button>
+        <div class="dropdown-menu">
+            <a href="overtime.html">⏱️ TIME / DAILY OT</a>
+            <a href="publicOT.html">📅 PUBLIC OT</a>
+        </div>
+    </div>
+
+    <div class="nav-dropdown" id="carumanDropdown">
+        <button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
+        <div class="dropdown-menu">
+            <a href="epf.html">🏦 EPF</a>
+            <a href="socso.html">🛡️ SOCSO</a>
+            <a href="eis.html">📋 EIS</a>
+            <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
+        </div>
+    </div>
+
+    <a class="nav-item" href="companysetting.html">SETTING</a>
+
+    <div class="nav-dropdown" id="othersDropdown">
+        <button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
+        <div class="dropdown-menu">
+            <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+            <div class="divider"></div>
+            <a href="public.html">📰 Public Days Setting</a>
+            <a href="hrdcorp.html">📓 HRD Corp</a>
+            <a href="salarysumview.html">📊 Salary View</a>
+            <a href="GoogleSheetBackupURL.html">🔗 Google Sheet Backup URL</a>
+        </div>
+    </div>
+</div>
+<button class="nav-chat" type="button" onclick="alert('Request Chat 请前往 salary.html 使用')">
+    <span class="pulse"></span> 💬 Request Chat
+</button>
+</nav>
+
+<!-- ================= MAIN CONTENT ================= -->
+<div class="main-container">
+    <div class="page-header">
+        <div>
+            <div class="page-title"><i class="fas fa-calendar-check"></i> Public Day OT Records</div>
+            <div class="page-subtitle">Manage overtime records for public holidays. Auto-calculated based on Basic Salary / 26 * 3.</div>
+        </div>
+        <button class="btn btn-primary" onclick="openModal()"><i class="fas fa-plus"></i> Add New Record</button>
+    </div>
+
+    <div class="controls-bar">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search by Name or Code...">
+        </div>
+        <div style="margin-left:auto; font-size:0.85rem; color:var(--epf-muted);">
+            <i class="fas fa-info-circle"></i> Click on a row to edit details.
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID KOD</th>
+                    <th>NAME</th>
+                    <th class="text-right">BASIC SALARY</th>
+                    <th class="text-right">PUBLIC DAYS (Hari)</th>
+                    <th class="text-right">TOTAL AMOUNT (RM)</th>
+                    <th>LATEST DATE</th>
+                    <th>STATUS</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="7" style="text-align:center;padding:2rem;color:#94a3b8;">Loading data...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ================= MODAL ================= -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="modal-title">Edit Public Day OT</div>
+            <button class="btn" style="padding:0.3rem 0.6rem;" onclick="closeModal()"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div class="form-group">
+            <label>Employee</label>
+            <select id="modalEmpSelect" class="form-control" onchange="onEmpChange()">
+                <option value="">Select Employee...</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Date of Work (Public Holiday)</label>
+            <input type="date" id="modalDate" class="form-control">
+            <div class="form-hint">Select the specific public holiday date worked.</div>
+        </div>
+
+        <div class="calc-preview">
+            <div class="calc-row">
+                <span>Basic Salary:</span>
+                <span id="previewBasic">RM 0.00</span>
+            </div>
+            <div class="calc-row">
+                <span>Formula:</span>
+                <span>Basic / 26 × 3</span>
+            </div>
+            <div class="calc-row">
+                <span>Rate per Day:</span>
+                <span id="previewRate">RM 0.00</span>
+            </div>
+            <div class="calc-total">
+                <div class="calc-row">
+                    <span>Total Amount:</span>
+                    <span id="previewTotal">RM 0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1.5rem;">
+            <button class="btn" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveRecord()"><i class="fas fa-save"></i> Save Record</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ================= CONFIG & STATE ================= */
+const URL_KEY = 'payrollScriptUrl';
+let SCRIPT_URL = '';
+let staffList = []; // Active staff from STAFF LOGIN RECORD
+let publicOtData = []; // Raw data from PUBLICDAYSOT sheet
+let aggregatedData = []; // Processed data for table
+
+/* ================= INITIALIZATION ================= */
+document.addEventListener('DOMContentLoaded', () => {
+    initNavbar();
+    loadSavedUrl();
+    if (SCRIPT_URL) loadData();
+    else alert('Please set Deploy URL in Dashboard first.');
+
+    // Search Listener
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        renderTable(e.target.value.trim().toLowerCase());
+    });
+});
+
+function initNavbar() {
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) backBtn.addEventListener('click', (e) => { e.preventDefault(); window.history.back(); });
+    
+    document.querySelectorAll('[data-dropdown-toggle]').forEach(toggle => {
+        toggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = toggle.getAttribute('data-dropdown-toggle');
+            document.querySelectorAll('.nav-dropdown.open').forEach(dd => {
+                if (dd.id !== id + 'Dropdown') dd.classList.remove('open');
+            });
+            toggle.closest('.nav-dropdown').classList.toggle('open');
+        });
+    });
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.nav-dropdown')) document.querySelectorAll('.nav-dropdown.open').forEach(d => d.classList.remove('open'));
+    });
+}
+
+function loadSavedUrl() {
+    try {
+        const saved = localStorage.getItem(URL_KEY);
+        if (saved) SCRIPT_URL = saved;
+    } catch (e) {}
+}
+
+/* ================= DATA LOADING ================= */
+async function loadData() {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+
+    try {
+        // Fetch Staff Data
+        const staffRes = await fetch(`${SCRIPT_URL}?action=getData&_t=${Date.now()}`);
+        const staffJson = await staffRes.json();
+        let rawStaff = [];
+        if (staffJson.result === 'success' && Array.isArray(staffJson.data)) rawStaff = staffJson.data;
+        
+        // Filter Active Staff
+        staffList = rawStaff.map(s => ({
+            Code: String(s.Code || '').trim(),
+            Name: String(s.Name || '').trim(),
+            Salary: parseFloat(s.Salary) || 0
+        })).filter(s => s.Code && s.Name && String(s.Situation || '').toUpperCase() === 'ACTIVE');
+
+        // Fetch Public OT Data
+        const otRes = await fetch(`${SCRIPT_URL}?action=getPublicDaysOT&_t=${Date.now()}`);
+        const otJson = await otRes.json();
+        if (otJson.status === 'success' && Array.isArray(otJson.data)) {
+            publicOtData = otJson.data;
+        }
+
+        processData();
+        populateSelect();
+        renderTable();
+
+    } catch (err) {
+        console.error(err);
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:red;">Error loading data. Check Console.</td></tr>';
+    }
+}
+
+/* ================= PROCESSING LOGIC ================= */
+function processData() {
+    // Group by Employee Code
+    const map = new Map();
+
+    publicOtData.forEach(row => {
+        const code = String(row['ID KOD'] || '').trim();
+        if (!code) return;
+
+        if (!map.has(code)) {
+            const emp = staffList.find(s => s.Code === code);
+            map.set(code, {
+                code: code,
+                name: emp ? emp.Name : row['NAME'],
+                basic: emp ? emp.Salary : (parseFloat(row['BASICSALARY']) || 0),
+                dates: new Set(), // Use Set to count unique dates
+                totalAmount: 0,
+                lastDate: ''
+            });
+        }
+
+        const entry = map.get(code);
+        const dateStr = String(row['DATE'] || '');
+        if (dateStr) entry.dates.add(dateStr);
+        
+        // Update Last Date
+        if (dateStr > entry.lastDate) entry.lastDate = dateStr;
+    });
+
+    // Calculate Final Values
+    aggregatedData = Array.from(map.values()).map(item => {
+        const days = item.dates.size;
+        // Formula: (Basic / 26) * 3 * Days
+        const dailyRate = (item.basic / 26) * 3;
+        const total = dailyRate * days;
+
+        return {
+            ...item,
+            days: days,
+            dailyRate: dailyRate,
+            totalAmount: total
+        };
+    });
+
+    // Sort by Name
+    aggregatedData.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/* ================= RENDERING ================= */
+function renderTable(filter = '') {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+
+    const filtered = aggregatedData.filter(item => 
+        item.name.toLowerCase().includes(filter) || 
+        item.code.toLowerCase().includes(filter)
+    );
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:#94a3b8;">No records found.</td></tr>';
+        return;
+    }
+
+    filtered.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.onclick = () => openModal(item.code);
+        
+        const statusClass = item.days > 0 ? 'ok' : 'wait';
+        const statusText = item.days > 0 ? 'Calculated' : 'No Dates';
+
+        tr.innerHTML = `
+            <td><span class="code-badge">${item.code}</span></td>
+            <td style="font-weight:600;">${item.name}</td>
+            <td class="text-right">${fmtRM(item.basic)}</td>
+            <td class="text-right"><span class="badge-days">${item.days}</span></td>
+            <td class="text-right" style="font-weight:700;color:var(--epf-blue);">${fmtRM(item.totalAmount)}</td>
+            <td>${item.lastDate || '-'}</td>
+            <td><span class="status-dot ${statusClass}"></span>${statusText}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function populateSelect() {
+    const select = document.getElementById('modalEmpSelect');
+    select.innerHTML = '<option value="">Select Employee...</option>';
+    staffList.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.Code;
+        opt.textContent = `${s.Code} - ${s.Name}`;
+        select.appendChild(opt);
+    });
+}
+
+/* ================= MODAL & SAVING ================= */
+let currentEditingCode = null;
+
+function openModal(code = null) {
+    const modal = document.getElementById('editModal');
+    const select = document.getElementById('modalEmpSelect');
+    const dateInput = document.getElementById('modalDate');
+    
+    modal.classList.add('open');
+    currentEditingCode = code;
+
+    if (code) {
+        select.value = code;
+        // Find latest date for this user to pre-fill? Or just leave empty for new entry
+        const userRec = aggregatedData.find(u => u.code === code);
+        if (userRec && userRec.lastDate) {
+            // Convert YYYY-MM-DD or similar to input value if needed
+            // For simplicity, we leave it blank so they add a NEW date
+        }
+        dateInput.value = ''; 
+    } else {
+        select.value = '';
+        dateInput.value = '';
+    }
+    onEmpChange();
+}
+
+function closeModal() {
+    document.getElementById('editModal').classList.remove('open');
+    currentEditingCode = null;
+}
+
+function onEmpChange() {
+    const code = document.getElementById('modalEmpSelect').value;
+    const emp = staffList.find(s => s.Code === code);
+    
+    if (emp) {
+        document.getElementById('previewBasic').textContent = fmtRM(emp.Salary);
+        const rate = (emp.Salary / 26) * 3;
+        document.getElementById('previewRate').textContent = fmtRM(rate);
+        
+        // If date is selected, calc total
+        calculatePreview(rate);
+    } else {
+        document.getElementById('previewBasic').textContent = 'RM 0.00';
+        document.getElementById('previewRate').textContent = 'RM 0.00';
+        document.getElementById('previewTotal').textContent = 'RM 0.00';
+    }
+}
+
+document.getElementById('modalDate').addEventListener('change', () => {
+    const code = document.getElementById('modalEmpSelect').value;
+    const emp = staffList.find(s => s.Code === code);
+    if (emp) calculatePreview((emp.Salary / 26) * 3);
+});
+
+function calculatePreview(rate) {
+    // Note: This preview only shows cost for ONE day selected in modal.
+    // The actual table shows CUMULATIVE total.
+    const dateVal = document.getElementById('modalDate').value;
+    if (dateVal && rate) {
+        document.getElementById('previewTotal').textContent = fmtRM(rate);
+    } else {
+        document.getElementById('previewTotal').textContent = 'RM 0.00';
+    }
+}
+
+async function saveRecord() {
+    const code = document.getElementById('modalEmpSelect').value;
+    const date = document.getElementById('modalDate').value;
+    
+    if (!code || !date) {
+        alert('Please select an employee and a date.');
+        return;
+    }
+
+    const emp = staffList.find(s => s.Code === code);
+    if (!emp) return;
+
+    const payload = {
+        action: 'savePublicDayOT',
+        code: code,
+        name: emp.Name,
+        date: date,
+        basicSalary: emp.Salary,
+        amount: (emp.Salary / 26) * 3, // Single day amount
+        details: 'Public Holiday Work'
+    };
+
+    const btn = document.querySelector('#editModal .btn-primary');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    btn.disabled = true;
+
+    try {
+        const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        
+        if (result.status === 'success') {
+            alert('Record saved successfully!');
+            closeModal();
+            loadData(); // Refresh table
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (e) {
+        alert('Network error: ' + e.message);
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
+/* ================= UTILS ================= */
+function fmtRM(v) {
+    return 'RM ' + Number(v || 0).toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+</script>
+</body>
+</html>
