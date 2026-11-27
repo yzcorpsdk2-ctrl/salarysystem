@@ -581,7 +581,15 @@ body { overflow: auto; }
 <a class="nav-item active" href="dashboard.html">DASHBOARD</a>
 <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
 <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
-<a class="nav-item" href="overtime.html">OVERTIME</a>
+
+<!-- MODIFIED: OVERTIME Dropdown -->
+<div class="nav-dropdown" id="overtimeDropdown">
+    <button class="nav-item" data-dropdown-toggle="overtime">OVERTIME <i class="fas fa-caret-down"></i></button>
+    <div class="dropdown-menu">
+        <a href="overtime.html">⏱️ TIME / DAILY OT</a>
+        <a href="publicOT.html">📅 PUBLIC OT</a>
+    </div>
+</div>
 
 <div class="nav-dropdown" id="carumanDropdown">
 <button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
