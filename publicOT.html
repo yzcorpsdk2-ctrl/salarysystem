@@ -148,6 +148,24 @@ body {
 }
 .form-control:focus { border-color: var(--epf-blue); }
 
+/* Action Buttons (Lock/Reset) */
+.action-buttons {
+    display: flex; gap: 0.5rem; margin-left: auto;
+}
+.btn-action {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.5rem 1rem; border: 1px solid var(--epf-border);
+    border-radius: 6px; background: #fff; color: var(--epf-text);
+    font-size: 0.85rem; font-weight: 600; cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-action:hover { background: var(--epf-blue-soft); border-color: var(--epf-blue); color: var(--epf-blue); }
+.btn-action.locked {
+    background: var(--epf-blue); color: #fff; border-color: var(--epf-blue);
+}
+.btn-action.locked:hover { background: #133b66; }
+.btn-action.danger:hover { background: #fee2e2; border-color: #ef4444; color: #ef4444; }
+
 /* Table Styles */
 .table-wrapper {
     background: #fff; border: 1px solid var(--epf-border); border-radius: 8px;
@@ -174,6 +192,7 @@ body {
 }
 .status-dot.ok { background: #22c55e; }
 .status-dot.wait { background: #f59e0b; }
+.status-dot.locked { background: #ef4444; } /* Red for locked state indicator if needed */
 
 @media (max-width: 768px) {
     .navbar { padding: 0 0.5rem; }
@@ -181,6 +200,7 @@ body {
     .main-container { padding: 1rem; }
     .controls-bar { flex-direction: column; align-items: stretch; }
     .search-box { max-width: 100%; }
+    .action-buttons { margin-left: 0; width: 100%; justify-content: space-between; }
 }
 </style>
 </head>
@@ -261,6 +281,17 @@ body {
             <div class="page-title"><i class="fas fa-calendar-check"></i> Public Day OT Records</div>
             <div class="page-subtitle">Auto-generated based on Public Holidays and Attendance. Subsidy = (Basic / 26 * 3) - (Basic / 26).</div>
         </div>
+        
+        <!-- Lock/Reset Controls -->
+        <div class="action-buttons">
+            <button id="lockBtn" class="btn-action" title="Lock current month calculation">
+                <i class="fas fa-lock-open"></i> <span>Lock</span>
+            </button>
+            <button id="resetBtn" class="btn-action danger" title="Clear sheet data & Unlock" style="display:none;">
+                <i class="fas fa-undo"></i> <span>Reset</span>
+            </button>
+        </div>
+
         <div class="filter-group">
             <label>Month:</label>
             <select id="monthSelect" class="form-control"></select>
@@ -275,7 +306,7 @@ body {
             <input type="text" id="searchInput" placeholder="Search by Name or Code...">
         </div>
         <div style="margin-left:auto; font-size:0.85rem; color:var(--epf-muted);">
-            <i class="fas fa-info-circle"></i> Data is automatically synced to PUBLICDAYSOT sheet.
+            <i class="fas fa-info-circle"></i> <span id="statusText">Data is automatically synced.</span>
         </div>
     </div>
 
@@ -305,6 +336,7 @@ const URL_KEY = 'payrollScriptUrl';
 let SCRIPT_URL = '';
 let publicOtData = []; // Raw data from backend
 let aggregatedData = []; // Processed data for table
+let isLocked = false; // Lock state
 
 /* ================= INITIALIZATION ================= */
 document.addEventListener('DOMContentLoaded', () => {
@@ -312,6 +344,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initSelectors();
     loadSavedUrl();
     
+    // Check lock status from LocalStorage for current Month/Year
+    checkLockStatus();
+
     if (SCRIPT_URL) loadData();
     else alert('Please set Deploy URL in Dashboard first.');
 
@@ -321,8 +356,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Filter Listeners
-    document.getElementById('monthSelect').addEventListener('change', loadData);
-    document.getElementById('yearSelect').addEventListener('change', loadData);
+    document.getElementById('monthSelect').addEventListener('change', () => {
+        checkLockStatus(); // Re-check lock when month changes
+        loadData();
+    });
+    document.getElementById('yearSelect').addEventListener('change', () => {
+        checkLockStatus(); // Re-check lock when year changes
+        loadData();
+    });
+
+    // Button Listeners
+    document.getElementById('lockBtn').addEventListener('click', toggleLock);
+    document.getElementById('resetBtn').addEventListener('click', resetData);
 });
 
 function initNavbar() {
@@ -378,6 +423,92 @@ function loadSavedUrl() {
     } catch (e) {}
 }
 
+/* ================= LOCK LOGIC ================= */
+function getLockKey() {
+    const m = document.getElementById('monthSelect').value;
+    const y = document.getElementById('yearSelect').value;
+    return `publicOT_lock_${y}_${m}`;
+}
+
+function checkLockStatus() {
+    const key = getLockKey();
+    const savedState = localStorage.getItem(key);
+    isLocked = (savedState === 'true');
+    updateLockUI();
+}
+
+function toggleLock() {
+    const key = getLockKey();
+    isLocked = !isLocked;
+    localStorage.setItem(key, isLocked ? 'true' : 'false');
+    updateLockUI();
+    
+    // If we just unlocked, we might want to refresh data immediately to show "live" state
+    // But usually user expects to see what was locked until they change filters.
+    // Let's keep the current view but allow next refresh to be dynamic.
+    if (!isLocked) {
+        // Optional: Auto refresh when unlocking? 
+        // For safety, let's wait for user to switch month or manually refresh, 
+        // OR we can just reload current view dynamically.
+        loadData(); 
+    }
+}
+
+function updateLockUI() {
+    const lockBtn = document.getElementById('lockBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const statusText = document.getElementById('statusText');
+
+    if (isLocked) {
+        lockBtn.classList.add('locked');
+        lockBtn.innerHTML = '<i class="fas fa-lock"></i> <span>Locked</span>';
+        resetBtn.style.display = 'inline-flex';
+        statusText.innerHTML = '<i class="fas fa-lock"></i> Data is LOCKED. Switching months will not recalculate.';
+        statusText.style.color = '#ef4444';
+    } else {
+        lockBtn.classList.remove('locked');
+        lockBtn.innerHTML = '<i class="fas fa-lock-open"></i> <span>Lock</span>';
+        resetBtn.style.display = 'none';
+        statusText.innerHTML = '<i class="fas fa-sync"></i> Data is dynamic. Switching months will recalculate.';
+        statusText.style.color = 'var(--epf-muted)';
+    }
+}
+
+async function resetData() {
+    if (!confirm('Are you sure you want to RESET this month? This will delete all Public OT records in the Google Sheet for this period.')) return;
+
+    const btn = document.getElementById('resetBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resetting...';
+    btn.disabled = true;
+
+    const month = document.getElementById('monthSelect').value;
+    const year = document.getElementById('yearSelect').value;
+
+    try {
+        const res = await fetch(`${SCRIPT_URL}?action=resetPublicDaysOT&month=${month}&year=${year}&_t=${Date.now()}`);
+        const json = await res.json();
+        
+        if (json.status === 'success') {
+            // Clear local lock
+            localStorage.removeItem(getLockKey());
+            isLocked = false;
+            updateLockUI();
+            // Reload empty/fresh data
+            loadData();
+            alert('Reset successful! Sheet cleared.');
+        } else {
+            alert('Error resetting: ' + json.message);
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Network error during reset.');
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
 /* ================= DATA LOADING ================= */
 async function loadData() {
     const tbody = document.getElementById('tableBody');
@@ -387,8 +518,8 @@ async function loadData() {
     const year = document.getElementById('yearSelect').value;
 
     try {
-        // 向后端请求生成指定月份的公假OT数据
-        const res = await fetch(`${SCRIPT_URL}?action=getPublicDaysOT&month=${month}&year=${year}&_t=${Date.now()}`);
+        // Pass lockStatus to backend
+        const res = await fetch(`${SCRIPT_URL}?action=getPublicDaysOT&month=${month}&year=${year}&isLocked=${isLocked}&_t=${Date.now()}`);
         const json = await res.json();
         
         if (json.status === 'success' && Array.isArray(json.data)) {
