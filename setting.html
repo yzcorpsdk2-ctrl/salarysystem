@@ -129,6 +129,9 @@ body {
 .page-subtitle { font-size: 0.85rem; color: var(--epf-muted); margin-top: 4px; }
 .page-subtitle strong { color: var(--epf-blue); }
 
+.page-header-right {
+    display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
+}
 .page-selector {
     display: inline-flex; align-items: center; gap: 0.45rem;
     font-size: 0.8rem; color: var(--epf-muted);
@@ -144,6 +147,21 @@ body {
     border-color: var(--epf-blue);
     box-shadow: 0 0 0 2px rgba(26,79,138,0.1);
 }
+
+.api-url-btn {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.42rem 0.8rem; border-radius: 20px;
+    border: 1px solid var(--epf-border); background: #fff;
+    font-family: inherit; font-size: 0.75rem; font-weight: 600;
+    color: var(--epf-muted); cursor: pointer;
+    transition: all 0.15s; max-width: 320px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.api-url-btn:hover { border-color: var(--epf-blue); color: var(--epf-blue); }
+.api-url-btn.ok  { background: #dcfce7; border-color: #86efac; color: #166534; }
+.api-url-btn.err { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+.api-url-btn i { font-size: 0.7rem; }
+.api-url-btn span { overflow: hidden; text-overflow: ellipsis; }
 
 .settings-card {
     background: #fff; border: 1px solid var(--epf-border); border-radius: 10px;
@@ -202,9 +220,6 @@ body {
 .field-input-wrap input:focus {
     border-color: var(--epf-blue); box-shadow: 0 0 0 2px rgba(26,79,138,0.1);
 }
-.field-input-wrap input:disabled {
-    background: #f4f8fd; color: var(--epf-muted); cursor: not-allowed;
-}
 
 .loading-row, .empty-row {
     padding: 2rem; text-align: center; color: var(--epf-muted);
@@ -258,6 +273,8 @@ body {
     .settings-footer { flex-direction: column-reverse; }
     .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
     .field-input-wrap { max-width: 100%; }
+    .page-header-right { width: 100%; }
+    .api-url-btn { max-width: 100%; }
 }
 </style>
 </head>
@@ -341,10 +358,16 @@ body {
                 Manage calculation formulas for <strong id="pageName">—</strong>
             </div>
         </div>
-        <div class="page-selector">
-            <i class="fas fa-file-code"></i>
-            <label for="pageSelect">Page:</label>
-            <select id="pageSelect"></select>
+        <div class="page-header-right">
+            <div class="page-selector">
+                <i class="fas fa-file-code"></i>
+                <label for="pageSelect">Page:</label>
+                <select id="pageSelect"></select>
+            </div>
+            <button type="button" id="apiUrlBtn" class="api-url-btn" title="Click to change Deploy URL">
+                <i class="fas fa-plug"></i>
+                <span id="apiUrlLabel">API: —</span>
+            </button>
         </div>
     </div>
 
@@ -440,9 +463,18 @@ document.addEventListener('DOMContentLoaded', () => {
     initNavbar();
     SCRIPT_URL = getSavedUrl();
     renderPageSelect();
+    refreshApiUrlLabel();
 
     document.getElementById('saveBtn').addEventListener('click', saveSettings);
     document.getElementById('resetBtn').addEventListener('click', resetToDefaults);
+    document.getElementById('apiUrlBtn').addEventListener('click', openUrlEditor);
+
+    // 没有 URL → 引导用户输入
+    if (!SCRIPT_URL) {
+        setTimeout(() => {
+            if (!SCRIPT_URL) openUrlEditor();
+        }, 300);
+    }
 
     const params = new URLSearchParams(window.location.search);
     const pageKey = params.get('page');
@@ -490,6 +522,59 @@ function getSavedUrl() {
     try { return localStorage.getItem(URL_KEY) || ''; } catch (e) { return ''; }
 }
 
+function refreshApiUrlLabel() {
+    const btn   = document.getElementById('apiUrlBtn');
+    const label = document.getElementById('apiUrlLabel');
+    if (!btn || !label) return;
+
+    if (SCRIPT_URL) {
+        const short = SCRIPT_URL.length > 42
+            ? SCRIPT_URL.slice(0, 20) + '…' + SCRIPT_URL.slice(-18)
+            : SCRIPT_URL;
+        label.textContent = 'API: ' + short;
+        btn.classList.remove('err');
+        btn.classList.add('ok');
+        btn.title = SCRIPT_URL + '\n\n(Click to change)';
+    } else {
+        label.textContent = 'API: not set (click to set)';
+        btn.classList.remove('ok');
+        btn.classList.add('err');
+        btn.title = 'Click to enter your Apps Script Deploy URL';
+    }
+}
+
+function openUrlEditor() {
+    const current = SCRIPT_URL || '';
+    const input = prompt(
+        'Paste your Google Apps Script Web App URL (ends with /exec)\n\n' +
+        'Example:\nhttps://script.google.com/macros/s/AKfycb.../exec',
+        current
+    );
+    if (input === null) return;
+
+    const url = input.trim();
+    if (!url) {
+        try { localStorage.removeItem(URL_KEY); } catch (e) {}
+        SCRIPT_URL = '';
+        refreshApiUrlLabel();
+        setStatus('', 'API URL cleared');
+        return;
+    }
+
+    if (!/^https:\/\/script\.google\.com\//.test(url)) {
+        if (!confirm('This does not look like a Google Apps Script URL.\nSave anyway?')) return;
+    }
+
+    try { localStorage.setItem(URL_KEY, url); } catch (e) {}
+    SCRIPT_URL = url;
+    refreshApiUrlLabel();
+    setStatus('', 'API URL saved — reloading…');
+
+    if (currentConfig) {
+        loadSettings();
+    }
+}
+
 function getPrefix(cfg) {
     if (!cfg) return '';
     return (cfg.prefix || cfg.file.replace(/\.html?$/i, '')).toUpperCase();
@@ -518,7 +603,6 @@ function loadPage(pageKey) {
     document.getElementById('sheetNameExample').textContent = prefix + '_1';
     document.getElementById('sheetNameExample2').textContent = prefix + '_2';
 
-    // 先渲染默认值
     currentValues = {};
     currentConfig.fields.forEach(f => { currentValues[f.key] = f.defaultValue; });
     renderFields();
@@ -602,7 +686,7 @@ function setStatus(type, text) {
 async function loadSettings() {
     if (!SCRIPT_URL) {
         setStatus('err', 'No script URL');
-        alert('Please set Deploy URL in Dashboard first.');
+        alert('Please set Deploy URL first (click the API badge at the top).');
         return;
     }
     if (!currentConfig) return;
@@ -647,7 +731,7 @@ async function loadSettings() {
 async function saveSettings() {
     if (isSaving || !currentConfig) return;
     if (!SCRIPT_URL) {
-        alert('Please set Deploy URL in Dashboard first.');
+        alert('Please set Deploy URL first (click the API badge at the top).');
         return;
     }
 
