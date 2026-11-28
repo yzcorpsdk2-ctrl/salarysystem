@@ -13,7 +13,7 @@
     --text: #1f2d3d; --muted: #64748b; --bg: #f7fafd;
     --nav-dark: #1a2b4c; --nav-hover: #243a66;
 
-    /* NAVBAR VARS */
+    /* NAVBAR VARS - Synced with Dashboard */
     --nav-h: 52px;
     --nav-bg-1: #0b1b30; --nav-bg-2: #123153; --nav-hover2: #16345c;
     --nav-text: #cbd9ea; --nav-accent: #4d9fff;
@@ -265,15 +265,16 @@
 </head>
 <body>
 
-<!-- ✅ 顶端导航栏开始 -->
+<!-- ✅ 顶端导航栏开始 (Updated to match Dashboard) -->
 <nav class="navbar">
     <div class="nav-brand">
-        <span class="logo">Y</span>
-        <span class="brand-text">YZ Payroll</span>
+        <span class="logo">G</span>
+        <span class="brand-text">GIN_Hya</span>
     </div>
     <div class="nav-links" id="navLinks">
         <button class="nav-back" id="backBtn" title="返回上一页">⏎</button>
         
+        <!-- FILES Dropdown -->
         <div class="nav-dropdown" id="filesDropdown">
             <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
             <div class="dropdown-menu">
@@ -288,19 +289,27 @@
                 <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
                 <div class="divider"></div>
                 <a href="companysetting.html">⚙️ COMPANY SETTING</a>
-<a href="public.html">📰 Public Days Setting</a>
-<a href="hrdcorp.html">📓 HRD Corp</a>
-<a href="salarysumview.html">📊 Salary View</a>
-<a href="GoogleSheetBackupURL.html">🔗 Google Sheet Backup URL</a>
-</div>
-</div>
+                <a href="public.html">📰 Public Days Setting</a>
+                <a href="hrdcorp.html">📓 HRD Corp</a>
+                <a href="salarysumview.html">📊 Salary View</a>
+                <a href="GoogleSheetBackupURL.html">🔗 Google Sheet Backup URL</a>
+            </div>
+        </div>
 
         <a class="nav-item" href="dashboard.html">DASHBOARD</a>
         <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
-        <!-- ✅ 修复2: 更新导航栏激活状态 -->
         <a class="nav-item active" href="leave.html">TIMECARD REPORT</a>
-        <a class="nav-item" href="overtime.html">OVERTIME</a>
 
+        <!-- OVERTIME Dropdown (Split into two) -->
+        <div class="nav-dropdown" id="overtimeDropdown">
+            <button class="nav-item" data-dropdown-toggle="overtime">OVERTIME <i class="fas fa-caret-down"></i></button>
+            <div class="dropdown-menu">
+                <a href="overtime.html">⏱️ TIME / DAILY OT</a>
+                <a href="publicOT.html">📅 PUBLIC OT</a>
+            </div>
+        </div>
+
+        <!-- CARUMAN Dropdown -->
         <div class="nav-dropdown" id="carumanDropdown">
             <button class="nav-item" data-dropdown-toggle="caruman">CARUMAN <i class="fas fa-caret-down"></i></button>
             <div class="dropdown-menu">
@@ -311,14 +320,21 @@
             </div>
         </div>
 
-        <a class="nav-item" href="companysetting.html">SETTING</a>
+        <!-- SETTING Dropdown (Modified as requested) -->
+        <div class="nav-dropdown" id="settingDropdown">
+            <button class="nav-item" data-dropdown-toggle="setting">SETTING <i class="fas fa-caret-down"></i></button>
+            <div class="dropdown-menu">
+                <a href="javascript:void(0)" onclick="openSettingCenter()">⚙️ COMPANY SETTING</a>
+            </div>
+        </div>
 
+        <!-- OTHERS Dropdown -->
         <div class="nav-dropdown" id="othersDropdown">
             <button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
             <div class="dropdown-menu">
-                <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+                <a href="index.html">📝 Menu</a>
                 <div class="divider"></div>
-<a href="public.html">📰 Public Days Setting</a>
+                <a href="public.html">📰 Public Days Setting</a>
                 <a href="hrdcorp.html">📓 HRD Corp</a>
                 <a href="salarysumview.html">📊 Salary View</a>
                 <a href="GoogleSheetBackupURL.html">🔗 Google Sheet Backup URL</a>
@@ -326,7 +342,7 @@
         </div>
     </div>
 
-    <!-- ✅ 修复3: 绑定 Tips 弹窗函数 -->
+    <!-- Tips Button -->
     <button class="nav-chat" type="button" onclick="openTipsChoice()">
         <span class="pulse"></span> 💬 Tips & Panduan
     </button>
@@ -346,7 +362,7 @@
       <input type="text" id="deployUrlInput" placeholder="Apps Script URL...">
       <button onclick="applyUrl()">🔗 Apply</button>
     </div>
-    <button class="btn-outline" onclick="openSettingCenter()">⚙️ SETTING</button>
+    <!-- Removed standalone SETTING button as it's now in Navbar -->
     <button class="btn-outline btn-primary" id="manualSaveBtn" onclick="manualSave()">💾 Simpan</button>
     <span class="sync-badge" id="syncBadge"><span class="dot"></span><span id="syncText">Sedia</span></span>
     <button class="btn-outline btn-success" onclick="loadData()">🔄 Muat Semula</button>
@@ -767,6 +783,9 @@ function getObfuscatedPass() {
 }
 
 function openSettingCenter() {
+  // Close any open dropdowns first
+  document.querySelectorAll('.nav-dropdown.open').forEach(dd => dd.classList.remove('open'));
+  
   document.getElementById('settingModal').classList.add('show');
   document.getElementById('settingStep1').style.display = 'block';
   document.getElementById('settingStep2').style.display = 'none';
