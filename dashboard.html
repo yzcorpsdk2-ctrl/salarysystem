@@ -257,7 +257,7 @@ white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 /* ---------- 图表卡片 ---------- */
 .charts-grid {
 display: grid;
-grid-template-columns: repeat(2, minmax(0, 1fr));
+grid-template-columns: repeat(2, minmax(0, 1fr)); /* 关键修改：minmax(0,1fr) 防止内容撑破网格 */
 gap: 10px;
 }
 .chart-card {
@@ -1407,11 +1407,23 @@ function showChartFallback() {
     });
 }
 
+// 修改后的 baseScales：启用 autoSkip 和 maxRotation 防止标签重叠
 function baseScales(yCallback) {
     return {
         x: {
             grid: { display: false },
-            ticks: { font: { size: 9 }, maxRotation: 0, autoSkip: false }
+            ticks: { 
+                font: { size: 9 }, 
+                maxRotation: 45,      // 允许标签倾斜45度
+                minRotation: 0,
+                autoSkip: true,       // 自动跳过拥挤的标签
+                autoSkipPadding: 10,  // 标签之间的最小间距
+                callback: function(value, index, values) {
+                    // 如果标签太多，只显示部分
+                    const step = Math.ceil(values.length / 10);
+                    return index % step === 0 ? this.getLabelForValue(value) : '';
+                }
+            }
         },
         y: {
             beginAtZero: true,
@@ -1465,7 +1477,12 @@ function renderExpenseChart(rows) {
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
-                        label: c => `${tipLabel}: ${fmtRM(c.raw)}`
+                        label: c => `${tipLabel}: ${fmtRM(c.raw)}`,
+                        title: ctx => {
+                            // 在tooltip中显示完整名称
+                            const idx = ctx[0].dataIndex;
+                            return labels[idx] || '';
+                        }
                     }
                 }
             },
@@ -1477,7 +1494,12 @@ function renderExpenseChart(rows) {
                 },
                 y: {
                     grid: { display: false },
-                    ticks: { font: { size: 9.5 }, autoSkip: false }
+                    ticks: { 
+                        font: { size: 9.5 }, 
+                        autoSkip: true,
+                        autoSkipPadding: 8,
+                        maxRotation: 0
+                    }
                 }
             }
         }
@@ -1531,7 +1553,13 @@ function renderSalaryChart(rows) {
                     labels: { boxWidth: 8, boxHeight: 8, usePointStyle: true, pointStyle: 'circle', font: { size: 9 } }
                 },
                 tooltip: {
-                    callbacks: { label: c => `${c.dataset.label}: ${fmtRM(c.raw)}` }
+                    callbacks: { 
+                        label: c => `${c.dataset.label}: ${fmtRM(c.raw)}`,
+                        title: ctx => {
+                            const idx = ctx[0].dataIndex;
+                            return labels[idx] || '';
+                        }
+                    }
                 }
             },
             scales: baseScales(shortMoney)
@@ -1576,6 +1604,10 @@ function renderCarumanChart(rows) {
                             return r > 0
                                 ? `${m.label} 合计: ${fmtRM(ctx.raw)}（员工 ${fmtRM(e)} / 雇主 ${fmtRM(r)}）`
                                 : `${m.label}: ${fmtRM(ctx.raw)}`;
+                        },
+                        title: ctx => {
+                            const idx = ctx[0].dataIndex;
+                            return labels[idx] || '';
                         }
                     }
                 }
@@ -1630,13 +1662,30 @@ function renderLeaveChart(rows) {
                             const c = companies[ctx.dataIndex];
                             const avg = c && c.count ? (ctx.raw / c.count) : 0;
                             return `${ctx.dataset.label}: ${fmtNum(ctx.raw)} 天（人均 ${avg.toFixed(2)} 天）`;
+                        },
+                        title: ctx => {
+                            const idx = ctx[0].dataIndex;
+                            return labels[idx] || '';
                         }
                     }
                 }
             },
             scales: {
-                x: { grid: { display: false }, ticks: { font: { size: 9 }, maxRotation: 0, autoSkip: false } },
-                y: { beginAtZero: true, grid: { color: '#eef4fb' }, ticks: { font: { size: 9 } } }
+                x: { 
+                    grid: { display: false }, 
+                    ticks: { 
+                        font: { size: 9 }, 
+                        maxRotation: 45,
+                        minRotation: 0,
+                        autoSkip: true,
+                        autoSkipPadding: 10
+                    } 
+                },
+                y: { 
+                    beginAtZero: true, 
+                    grid: { color: '#eef4fb' }, 
+                    ticks: { font: { size: 9 } } 
+                }
             }
         }
     });
