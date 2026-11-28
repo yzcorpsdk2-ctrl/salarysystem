@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Staff Info · 员工信息</title>
-    <!-- 新增：引入 Font Awesome 以支持下拉箭头图标 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* ==================== 全局变量 ==================== */
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -429,7 +427,7 @@
     <div class="nav-links" id="navLinks">
         <button class="nav-back" id="backBtn" title="Kembali ke halaman sebelumnya">⏎</button>
 
-        <!-- [修改] FILES 下拉菜单：补全了缺失的链接 -->
+        <!-- FILES Dropdown -->
         <div class="nav-dropdown" id="filesDropdown">
             <button class="nav-item" data-dropdown-toggle="files">FILES <i class="fas fa-caret-down"></i></button>
             <div class="dropdown-menu">
@@ -455,7 +453,7 @@
         <a class="nav-item active" href="staffinfo.html">EMPLOYEES</a>
         <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
 
-        <!-- [新增] OVERTIME 下拉菜单 -->
+        <!-- MODIFIED: OVERTIME Dropdown -->
         <div class="nav-dropdown" id="overtimeDropdown">
             <button class="nav-item" data-dropdown-toggle="overtime">OVERTIME <i class="fas fa-caret-down"></i></button>
             <div class="dropdown-menu">
@@ -474,16 +472,20 @@
             </div>
         </div>
 
-        <a class="nav-item" href="companysetting.html">SETTING</a>
+        <!-- REMOVED: Independent SETTING Link -->
+        <!-- <a class="nav-item" href="companysetting.html">SETTING</a> -->
 
+        <!-- MODIFIED: OTHERS Dropdown (Includes Settings) -->
         <div class="nav-dropdown" id="othersDropdown">
             <button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
             <div class="dropdown-menu">
-                 <a href="companysetting.html">⚙️ COMPANY SETTING</a>
-                 <a href="public.html">📰 Public Days Setting</a>
-                 <a href="hrdcorp.html">📓 HRD Corp</a>
-                 <a href="salarysumview.html">📊 Salary View</a>
-                 <a href="GoogleSheetBackupURL.html">🔗 Google Sheet Backup URL</a>
+                <a href="index.html">📝 Menu</a>
+                <div class="divider"></div>
+                <a href="companysetting.html">⚙️ COMPANY SETTING</a>
+                <a href="public.html">📰 Public Days Setting</a>
+                <a href="hrdcorp.html">📓 HRD Corp</a>
+                <a href="salarysumview.html">📊 Salary View</a>
+                <a href="GoogleSheetBackupURL.html">🔗 Google Sheet Backup URL</a>
             </div>
         </div>
     </div>
