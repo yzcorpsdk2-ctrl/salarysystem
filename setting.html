@@ -26,7 +26,7 @@ body {
     display: flex; flex-direction: column;
 }
 
-/* ===== Navbar (与 dashboard 完全一致) ===== */
+/* ===== Navbar（与 dashboard 一致） ===== */
 .navbar {
     position: sticky; top: 0; z-index: 200;
     display: flex; align-items: stretch; flex-wrap: wrap;
@@ -118,13 +118,32 @@ body {
 .main-container {
     flex: 1; padding: 1.75rem; max-width: 960px; margin: 0 auto; width: 100%;
 }
-.page-header { margin-bottom: 1.5rem; }
+.page-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+}
 .page-title {
     font-size: 1.35rem; font-weight: 700; color: var(--epf-blue);
     display: flex; align-items: center; gap: 0.55rem;
 }
 .page-subtitle { font-size: 0.85rem; color: var(--epf-muted); margin-top: 4px; }
 .page-subtitle strong { color: var(--epf-blue); }
+
+.page-selector {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    font-size: 0.8rem; color: var(--epf-muted);
+}
+.page-selector select {
+    padding: 0.45rem 0.7rem;
+    border: 1px solid var(--epf-border); border-radius: 6px;
+    background: #fff; font-family: inherit; font-size: 0.8rem;
+    color: var(--epf-text); cursor: pointer; outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.page-selector select:focus {
+    border-color: var(--epf-blue);
+    box-shadow: 0 0 0 2px rgba(26,79,138,0.1);
+}
 
 .settings-card {
     background: #fff; border: 1px solid var(--epf-border); border-radius: 10px;
@@ -182,6 +201,9 @@ body {
 }
 .field-input-wrap input:focus {
     border-color: var(--epf-blue); box-shadow: 0 0 0 2px rgba(26,79,138,0.1);
+}
+.field-input-wrap input:disabled {
+    background: #f4f8fd; color: var(--epf-muted); cursor: not-allowed;
 }
 
 .loading-row, .empty-row {
@@ -241,7 +263,7 @@ body {
 </head>
 <body>
 
-<!-- ============ NAVBAR (与 dashboard 完全一致) ============ -->
+<!-- ============ NAVBAR（与 dashboard 一致） ============ -->
 <nav class="navbar">
 <div class="nav-brand"><span class="logo">Y</span><span class="brand-text">YZ Payroll</span></div>
 <div class="nav-links" id="navLinks">
@@ -272,8 +294,8 @@ body {
 <a class="nav-item" href="staffinfo.html">EMPLOYEES</a>
 <a class="nav-item" href="leave.html">TIMECARD REPORT</a>
 
-<div class="nav-dropdown open" id="overtimeDropdown">
-    <button class="nav-item active" data-dropdown-toggle="overtime">OVERTIME <i class="fas fa-caret-down"></i></button>
+<div class="nav-dropdown" id="overtimeDropdown">
+    <button class="nav-item" data-dropdown-toggle="overtime">OVERTIME <i class="fas fa-caret-down"></i></button>
     <div class="dropdown-menu">
         <a href="overtime.html">⏱️ TIME / DAILY OT</a>
         <a href="publicOT.html">📅 PUBLIC OT</a>
@@ -290,7 +312,7 @@ body {
 </div>
 </div>
 
-<a class="nav-item" href="setting.html">SETTING</a>
+<a class="nav-item active" href="setting.html">SETTING</a>
 
 <div class="nav-dropdown" id="othersDropdown">
 <button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
@@ -313,9 +335,16 @@ body {
 <!-- ============ MAIN ============ -->
 <div class="main-container">
     <div class="page-header">
-        <div class="page-title"><i class="fas fa-cog"></i> Calculation Settings</div>
-        <div class="page-subtitle">
-            Manage calculation formulas for <strong id="pageName">—</strong>
+        <div>
+            <div class="page-title"><i class="fas fa-cog"></i> Calculation Settings</div>
+            <div class="page-subtitle">
+                Manage calculation formulas for <strong id="pageName">—</strong>
+            </div>
+        </div>
+        <div class="page-selector">
+            <i class="fas fa-file-code"></i>
+            <label for="pageSelect">Page:</label>
+            <select id="pageSelect"></select>
         </div>
     </div>
 
@@ -349,9 +378,9 @@ body {
         <div class="info-card-body">
             <div class="info-card-title">How settings are stored</div>
             <div class="info-card-text">
-                Settings are saved in Google Sheets. Each formula parameter is stored in its own sheet
-                (e.g. <code id="sheetNameExample">PUBLICOT_1</code>, <code>PUBLICOT_2</code>).
-                Changes will be applied to all future calculations immediately.
+                Each formula parameter is saved in its own sheet inside Google Sheets
+                (<code id="sheetNameExample">PUBLICOT_1</code>, <code id="sheetNameExample2">PUBLICOT_2</code>…).
+                Changes apply to all future calculations immediately.
             </div>
         </div>
     </div>
@@ -361,8 +390,11 @@ body {
 /* ============ CONFIG ============ */
 const URL_KEY = 'payrollScriptUrl';
 
-/* 每新增一个 HTML 页面的公式，就在这里新增一个 key
-   prefix 用于 Google Sheet 的 sheet 命名：PREFIX_1, PREFIX_2, ... */
+/* =========================================================
+   每个 HTML 页面新增一个 key：
+   prefix 用于 Google Sheet 命名：PREFIX_1, PREFIX_2, ...
+   （默认从 file 名自动推算，例如 publicOT.html → PUBLICOT）
+   ========================================================= */
 const PAGE_SETTINGS = {
     publicOT: {
         title: 'Public OT',
@@ -387,13 +419,18 @@ const PAGE_SETTINGS = {
             }
         ]
     }
-    // 未来新增，例如:
-    // overtime: { title: 'Overtime', file: 'overtime.html', prefix: 'OVERTIME', fields: [ ... ] }
+    // 未来新增示例：
+    // overtime: {
+    //     title: 'Overtime',
+    //     file: 'overtime.html',
+    //     prefix: 'OVERTIME',
+    //     fields: [ { key: 'normalRate', ... }, ... ]
+    // }
 };
 
 /* ============ STATE ============ */
 let SCRIPT_URL = '';
-let currentPage = '';
+let currentPageKey = '';
 let currentConfig = null;
 let currentValues = {};
 let isSaving = false;
@@ -401,34 +438,33 @@ let isSaving = false;
 /* ============ INIT ============ */
 document.addEventListener('DOMContentLoaded', () => {
     initNavbar();
-    loadSavedUrl();
-
-    const params = new URLSearchParams(window.location.search);
-    currentPage = params.get('page') || '';
-    currentConfig = PAGE_SETTINGS[currentPage];
-
-    if (!currentConfig) {
-        showEmptyState('Unknown page. Append ?page=publicOT to the URL.');
-        return;
-    }
-
-    document.getElementById('pageName').textContent = currentConfig.title;
-    document.title = `${currentConfig.title} Settings · YZ Payroll`;
-    document.getElementById('sheetNameExample').textContent = currentConfig.prefix + '_1';
-
-    // 用默认值先渲染
-    currentConfig.fields.forEach(f => { currentValues[f.key] = f.defaultValue; });
-    renderFields();
+    SCRIPT_URL = getSavedUrl();
+    renderPageSelect();
 
     document.getElementById('saveBtn').addEventListener('click', saveSettings);
     document.getElementById('resetBtn').addEventListener('click', resetToDefaults);
 
-    loadSettings();
+    const params = new URLSearchParams(window.location.search);
+    const pageKey = params.get('page');
+
+    if (pageKey && PAGE_SETTINGS[pageKey]) {
+        document.getElementById('pageSelect').value = pageKey;
+        loadPage(pageKey);
+    } else if (pageKey) {
+        showEmptyState('Unknown page "' + pageKey + '".');
+        setStatus('err', 'Invalid page');
+    } else {
+        showWelcome();
+    }
 });
 
 function initNavbar() {
     const backBtn = document.getElementById('backBtn');
-    if (backBtn) backBtn.addEventListener('click', (e) => { e.preventDefault(); window.history.back(); });
+    if (backBtn) backBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (history.length > 1) history.back();
+        else window.location.href = 'dashboard.html';
+    });
 
     document.querySelectorAll('[data-dropdown-toggle]').forEach(toggle => {
         toggle.addEventListener('click', (e) => {
@@ -450,22 +486,46 @@ function initNavbar() {
     });
 }
 
-function loadSavedUrl() {
-    try {
-        const saved = localStorage.getItem(URL_KEY);
-        if (saved) SCRIPT_URL = saved;
-    } catch (e) {}
+function getSavedUrl() {
+    try { return localStorage.getItem(URL_KEY) || ''; } catch (e) { return ''; }
 }
 
-function setStatus(type, text) {
-    const el = document.getElementById('loadStatus');
-    if (!el) return;
-    el.className = 'badge ' + (type || '');
-    let icon = '';
-    if (type === 'loading') icon = '<i class="fas fa-spinner fa-spin"></i> ';
-    else if (type === 'ok') icon = '<i class="fas fa-check"></i> ';
-    else if (type === 'err') icon = '<i class="fas fa-exclamation-circle"></i> ';
-    el.innerHTML = icon + text;
+function getPrefix(cfg) {
+    if (!cfg) return '';
+    return (cfg.prefix || cfg.file.replace(/\.html?$/i, '')).toUpperCase();
+}
+
+function renderPageSelect() {
+    const sel = document.getElementById('pageSelect');
+    const keys = Object.keys(PAGE_SETTINGS);
+    sel.innerHTML = '<option value="">— Select page —</option>' +
+        keys.map(k => `<option value="${k}">${escapeHtml(PAGE_SETTINGS[k].title)}</option>`).join('');
+    sel.addEventListener('change', () => {
+        const p = sel.value;
+        if (!p) { showWelcome(); return; }
+        history.replaceState(null, '', '?page=' + encodeURIComponent(p));
+        loadPage(p);
+    });
+}
+
+function loadPage(pageKey) {
+    currentPageKey = pageKey;
+    currentConfig = PAGE_SETTINGS[pageKey];
+
+    const prefix = getPrefix(currentConfig);
+    document.getElementById('pageName').textContent = currentConfig.title;
+    document.title = `${currentConfig.title} Settings · YZ Payroll`;
+    document.getElementById('sheetNameExample').textContent = prefix + '_1';
+    document.getElementById('sheetNameExample2').textContent = prefix + '_2';
+
+    // 先渲染默认值
+    currentValues = {};
+    currentConfig.fields.forEach(f => { currentValues[f.key] = f.defaultValue; });
+    renderFields();
+    setStatus('loading', 'Loading...');
+    document.getElementById('saveBtn').disabled = false;
+    document.getElementById('resetBtn').disabled = false;
+    loadSettings();
 }
 
 /* ============ RENDER ============ */
@@ -510,10 +570,32 @@ function onFieldChange(key, value) {
 }
 
 function resetToDefaults() {
+    if (!currentConfig) return;
     if (!confirm('Reset all fields to their default values? (Not saved yet)')) return;
     currentConfig.fields.forEach(f => { currentValues[f.key] = f.defaultValue; });
     renderFields();
     setStatus('', 'Defaults loaded — not saved');
+}
+
+/* ============ API ============ */
+function buildUrl(action, params) {
+    const parts = ['action=' + encodeURIComponent(action)];
+    for (const k in params) {
+        parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
+    }
+    parts.push('_t=' + Date.now());
+    return SCRIPT_URL + (SCRIPT_URL.includes('?') ? '&' : '?') + parts.join('&');
+}
+
+function setStatus(type, text) {
+    const el = document.getElementById('loadStatus');
+    if (!el) return;
+    el.className = 'badge ' + (type || '');
+    let icon = '';
+    if (type === 'loading') icon = '<i class="fas fa-spinner fa-spin"></i> ';
+    else if (type === 'ok') icon = '<i class="fas fa-check"></i> ';
+    else if (type === 'err') icon = '<i class="fas fa-exclamation-circle"></i> ';
+    el.innerHTML = icon + text;
 }
 
 /* ============ LOAD ============ */
@@ -523,11 +605,11 @@ async function loadSettings() {
         alert('Please set Deploy URL in Dashboard first.');
         return;
     }
+    if (!currentConfig) return;
 
-    setStatus('loading', 'Loading...');
-
+    const prefix = getPrefix(currentConfig);
     try {
-        const url = `${SCRIPT_URL}?action=getPageSettings&page=${encodeURIComponent(currentConfig.prefix)}&_t=${Date.now()}`;
+        const url = buildUrl('getPageSettings', { page: prefix });
         const res = await fetch(url);
         const json = await res.json();
 
@@ -535,18 +617,20 @@ async function loadSettings() {
             if (json.data.length === 0) {
                 setStatus('', 'No saved settings — using defaults');
             } else {
+                let loaded = 0;
                 json.data.forEach(item => {
                     if (!item || !item.key) return;
                     const f = currentConfig.fields.find(x => x.key === item.key);
                     if (!f) return;
                     if (f.type === 'number') {
                         const n = parseFloat(item.value);
-                        if (!isNaN(n)) currentValues[item.key] = n;
+                        if (!isNaN(n)) { currentValues[item.key] = n; loaded++; }
                     } else {
                         currentValues[item.key] = item.value;
+                        loaded++;
                     }
                 });
-                setStatus('ok', `Loaded ${json.data.length} setting(s)`);
+                setStatus('ok', `Loaded ${loaded} setting(s)`);
             }
             renderFields();
         } else {
@@ -561,13 +645,12 @@ async function loadSettings() {
 
 /* ============ SAVE ============ */
 async function saveSettings() {
-    if (isSaving) return;
+    if (isSaving || !currentConfig) return;
     if (!SCRIPT_URL) {
         alert('Please set Deploy URL in Dashboard first.');
         return;
     }
 
-    // 校验
     for (const f of currentConfig.fields) {
         const v = currentValues[f.key];
         if (f.type === 'number' && (v === '' || v === null || v === undefined || isNaN(parseFloat(v)))) {
@@ -591,10 +674,11 @@ async function saveSettings() {
     }));
 
     try {
-        const url = `${SCRIPT_URL}?action=savePageSettings`
-            + `&page=${encodeURIComponent(currentConfig.prefix)}`
-            + `&settings=${encodeURIComponent(JSON.stringify(payload))}`
-            + `&_t=${Date.now()}`;
+        const prefix = getPrefix(currentConfig);
+        const url = buildUrl('savePageSettings', {
+            page: prefix,
+            settings: JSON.stringify(payload)
+        });
         const res = await fetch(url);
         const json = await res.json();
 
@@ -618,15 +702,31 @@ async function saveSettings() {
 /* ============ UTILS ============ */
 function escapeHtml(s) {
     if (s === null || s === undefined) return '';
-    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    return String(s).replace(/[&<>"']/g, c => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
 }
 
 function showEmptyState(msg) {
+    currentConfig = null;
+    document.getElementById('pageName').textContent = '—';
     document.getElementById('settingsBody').innerHTML =
         `<div class="empty-row"><i class="fas fa-exclamation-triangle"></i> ${escapeHtml(msg)}</div>`;
     document.getElementById('saveBtn').disabled = true;
     document.getElementById('resetBtn').disabled = true;
     setStatus('err', 'Invalid configuration');
+}
+
+function showWelcome() {
+    currentConfig = null;
+    document.getElementById('pageName').textContent = '—';
+    document.getElementById('settingsBody').innerHTML =
+        `<div class="empty-row"><i class="fas fa-mouse-pointer"></i>
+            Select a page from the dropdown above to manage its calculation settings.
+        </div>`;
+    document.getElementById('saveBtn').disabled = true;
+    document.getElementById('resetBtn').disabled = true;
+    setStatus('', 'No page selected');
 }
 </script>
 </body>
