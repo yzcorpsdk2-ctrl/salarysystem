@@ -26,7 +26,7 @@ body {
     display: flex; flex-direction: column;
 }
 
-/* ===== Navbar（与 dashboard 一致） ===== */
+/* ===== Navbar（与 dashboard 完全一致） ===== */
 .navbar {
     position: sticky; top: 0; z-index: 200;
     display: flex; align-items: stretch; flex-wrap: wrap;
@@ -280,7 +280,7 @@ body {
 </head>
 <body>
 
-<!-- ============ NAVBAR（与 dashboard 一致） ============ -->
+<!-- ============ NAVBAR（与 dashboard 完全一致；SETTING 高亮） ============ -->
 <nav class="navbar">
 <div class="nav-brand"><span class="logo">Y</span><span class="brand-text">YZ Payroll</span></div>
 <div class="nav-links" id="navLinks">
@@ -299,7 +299,7 @@ body {
 <a href="eis.html">📋 EIS</a>
 <a href="24jamlindungan.html">🕒 24 JAM LINDUNGAN</a>
 <div class="divider"></div>
-<a href="companysetting.html">⚙️ COMPANY SETTING</a>
+<a href="setting.html">⚙️ SETTING</a>
 <a href="public.html">📰 Public Days Setting</a>
 <a href="hrdcorp.html">📓 HRD Corp</a>
 <a href="salarysumview.html">📊 Salary View</a>
@@ -334,7 +334,7 @@ body {
 <div class="nav-dropdown" id="othersDropdown">
 <button class="nav-item" data-dropdown-toggle="others">OTHERS <i class="fas fa-caret-down"></i></button>
 <div class="dropdown-menu">
-<a href="companysetting.html">⚙️ COMPANY SETTING</a>
+<a href="setting.html">⚙️ SETTING</a>
 <div class="divider"></div>
 <a href="public.html">📰 Public Days Setting</a>
 <a href="hrdcorp.html">📓 HRD Corp</a>
@@ -403,6 +403,7 @@ body {
             <div class="info-card-text">
                 Each formula parameter is saved in its own sheet inside Google Sheets
                 (<code id="sheetNameExample">PUBLICOT_1</code>, <code id="sheetNameExample2">PUBLICOT_2</code>…).
+                Sheet names are auto-generated from the HTML filename prefix.
                 Changes apply to all future calculations immediately.
             </div>
         </div>
@@ -416,7 +417,6 @@ const URL_KEY = 'payrollScriptUrl';
 /* =========================================================
    每个 HTML 页面新增一个 key：
    prefix 用于 Google Sheet 命名：PREFIX_1, PREFIX_2, ...
-   （默认从 file 名自动推算，例如 publicOT.html → PUBLICOT）
    ========================================================= */
 const PAGE_SETTINGS = {
     publicOT: {
@@ -442,13 +442,6 @@ const PAGE_SETTINGS = {
             }
         ]
     }
-    // 未来新增示例：
-    // overtime: {
-    //     title: 'Overtime',
-    //     file: 'overtime.html',
-    //     prefix: 'OVERTIME',
-    //     fields: [ { key: 'normalRate', ... }, ... ]
-    // }
 };
 
 /* ============ STATE ============ */
@@ -469,7 +462,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('resetBtn').addEventListener('click', resetToDefaults);
     document.getElementById('apiUrlBtn').addEventListener('click', openUrlEditor);
 
-    // 没有 URL → 引导用户输入
     if (!SCRIPT_URL) {
         setTimeout(() => {
             if (!SCRIPT_URL) openUrlEditor();
