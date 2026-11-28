@@ -257,7 +257,7 @@ white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 /* ---------- 图表卡片 ---------- */
 .charts-grid {
 display: grid;
-grid-template-columns: repeat(2, minmax(0, 1fr)); /* 关键修改：minmax(0,1fr) 防止内容撑破网格 */
+grid-template-columns: repeat(2, minmax(0, 1fr));
 gap: 10px;
 }
 .chart-card {
@@ -1407,21 +1407,19 @@ function showChartFallback() {
     });
 }
 
-// 修改后的 baseScales：启用 autoSkip 和 maxRotation 防止标签重叠
 function baseScales(yCallback) {
     return {
         x: {
             grid: { display: false },
             ticks: { 
                 font: { size: 9 }, 
-                maxRotation: 45,      // 允许标签倾斜45度
-                minRotation: 0,
-                autoSkip: true,       // 自动跳过拥挤的标签
-                autoSkipPadding: 10,  // 标签之间的最小间距
-                callback: function(value, index, values) {
-                    // 如果标签太多，只显示部分
-                    const step = Math.ceil(values.length / 10);
-                    return index % step === 0 ? this.getLabelForValue(value) : '';
+                maxRotation: 0, 
+                autoSkip: false,
+                // 【核心修改】启用截断并设置最大宽度
+                callback: function(value, index) {
+                    const label = this.getLabelForValue(value);
+                    const maxWidth = 80; // 每个标签最大像素宽度
+                    return truncateLabel(label, maxWidth);
                 }
             }
         },
@@ -1431,6 +1429,21 @@ function baseScales(yCallback) {
             ticks: { font: { size: 9 }, callback: yCallback || shortMoney }
         }
     };
+}
+
+// 【新增】智能截断函数
+function truncateLabel(label, maxWidth) {
+    if (!label) return '';
+    const ctx = document.createElement('canvas').getContext('2d');
+    ctx.font = '9px "Segoe UI", Roboto, sans-serif';
+    
+    if (ctx.measureText(label).width <= maxWidth) return label;
+    
+    let truncated = label;
+    while (ctx.measureText(truncated + '...').width > maxWidth && truncated.length > 0) {
+        truncated = truncated.slice(0, -1);
+    }
+    return truncated + '...';
 }
 
 /* 图1：开销分布（付款类型 / 银行） */
@@ -1477,12 +1490,12 @@ function renderExpenseChart(rows) {
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
-                        label: c => `${tipLabel}: ${fmtRM(c.raw)}`,
-                        title: ctx => {
-                            // 在tooltip中显示完整名称
-                            const idx = ctx[0].dataIndex;
-                            return labels[idx] || '';
-                        }
+                        // 【核心修改】在Tooltip中显示完整名称
+                        title: function(context) {
+                            const index = context[0].dataIndex;
+                            return labels[index] || '';
+                        },
+                        label: c => `${tipLabel}: ${fmtRM(c.raw)}`
                     }
                 }
             },
@@ -1496,9 +1509,12 @@ function renderExpenseChart(rows) {
                     grid: { display: false },
                     ticks: { 
                         font: { size: 9.5 }, 
-                        autoSkip: true,
-                        autoSkipPadding: 8,
-                        maxRotation: 0
+                        autoSkip: false,
+                        // Y轴标签也应用截断
+                        callback: function(value, index) {
+                            const label = this.getLabelForValue(value);
+                            return truncateLabel(label, 100);
+                        }
                     }
                 }
             }
@@ -1554,11 +1570,12 @@ function renderSalaryChart(rows) {
                 },
                 tooltip: {
                     callbacks: { 
-                        label: c => `${c.dataset.label}: ${fmtRM(c.raw)}`,
-                        title: ctx => {
-                            const idx = ctx[0].dataIndex;
-                            return labels[idx] || '';
-                        }
+                        // 【核心修改】显示完整名称
+                        title: function(context) {
+                            const index = context[0].dataIndex;
+                            return labels[index] || '';
+                        },
+                        label: c => `${c.dataset.label}: ${fmtRM(c.raw)}` 
                     }
                 }
             },
@@ -1597,6 +1614,11 @@ function renderCarumanChart(rows) {
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
+                        // 【核心修改】显示完整名称
+                        title: function(context) {
+                            const index = context[0].dataIndex;
+                            return labels[index] || '';
+                        },
                         label: ctx => {
                             const c = companies[ctx.dataIndex];
                             if (!c) return `${m.label}: ${fmtRM(ctx.raw)}`;
@@ -1604,10 +1626,6 @@ function renderCarumanChart(rows) {
                             return r > 0
                                 ? `${m.label} 合计: ${fmtRM(ctx.raw)}（员工 ${fmtRM(e)} / 雇主 ${fmtRM(r)}）`
                                 : `${m.label}: ${fmtRM(ctx.raw)}`;
-                        },
-                        title: ctx => {
-                            const idx = ctx[0].dataIndex;
-                            return labels[idx] || '';
                         }
                     }
                 }
@@ -1658,14 +1676,15 @@ function renderLeaveChart(rows) {
                 },
                 tooltip: {
                     callbacks: {
+                        // 【核心修改】显示完整名称
+                        title: function(context) {
+                            const index = context[0].dataIndex;
+                            return labels[index] || '';
+                        },
                         label: ctx => {
                             const c = companies[ctx.dataIndex];
                             const avg = c && c.count ? (ctx.raw / c.count) : 0;
                             return `${ctx.dataset.label}: ${fmtNum(ctx.raw)} 天（人均 ${avg.toFixed(2)} 天）`;
-                        },
-                        title: ctx => {
-                            const idx = ctx[0].dataIndex;
-                            return labels[idx] || '';
                         }
                     }
                 }
@@ -1675,17 +1694,16 @@ function renderLeaveChart(rows) {
                     grid: { display: false }, 
                     ticks: { 
                         font: { size: 9 }, 
-                        maxRotation: 45,
-                        minRotation: 0,
-                        autoSkip: true,
-                        autoSkipPadding: 10
+                        maxRotation: 0, 
+                        autoSkip: false,
+                        // X轴标签截断
+                        callback: function(value, index) {
+                            const label = this.getLabelForValue(value);
+                            return truncateLabel(label, 80);
+                        }
                     } 
                 },
-                y: { 
-                    beginAtZero: true, 
-                    grid: { color: '#eef4fb' }, 
-                    ticks: { font: { size: 9 } } 
-                }
+                y: { beginAtZero: true, grid: { color: '#eef4fb' }, ticks: { font: { size: 9 } } }
             }
         }
     });
