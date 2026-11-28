@@ -6,7 +6,6 @@
 <title>Public Day OT · YZ Payroll</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-/* ================= 复用 Dashboard 样式 ================= */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
     --epf-blue: #1a4f8a; --epf-blue-light: #e8f0fa; --epf-blue-soft: #f4f8fd;
@@ -26,7 +25,7 @@ body {
     display: flex; flex-direction: column;
 }
 
-/* Navbar Styles (Identical to Dashboard) */
+/* Navbar (unchanged) */
 .navbar {
     position: sticky; top: 0; z-index: 200;
     display: flex; align-items: stretch; flex-wrap: wrap;
@@ -105,7 +104,7 @@ body {
 }
 .nav-chat:hover { filter: brightness(1.12); transform: translateY(-1px); }
 
-/* ================= Public OT Specific Styles ================= */
+/* Public OT Specific */
 .main-container {
     flex: 1; padding: 1.5rem; max-width: 1400px; margin: 0 auto; width: 100%;
 }
@@ -148,10 +147,7 @@ body {
 }
 .form-control:focus { border-color: var(--epf-blue); }
 
-/* Action Buttons (Lock/Reset) */
-.action-buttons {
-    display: flex; gap: 0.5rem; margin-left: auto;
-}
+.action-buttons { display: flex; gap: 0.5rem; margin-left: auto; flex-wrap: wrap; }
 .btn-action {
     display: inline-flex; align-items: center; gap: 0.4rem;
     padding: 0.5rem 1rem; border: 1px solid var(--epf-border);
@@ -160,13 +156,11 @@ body {
     transition: all 0.2s;
 }
 .btn-action:hover { background: var(--epf-blue-soft); border-color: var(--epf-blue); color: var(--epf-blue); }
-.btn-action.locked {
-    background: var(--epf-blue); color: #fff; border-color: var(--epf-blue);
-}
+.btn-action.locked { background: var(--epf-blue); color: #fff; border-color: var(--epf-blue); }
 .btn-action.locked:hover { background: #133b66; }
 .btn-action.danger:hover { background: #fee2e2; border-color: #ef4444; color: #ef4444; }
+.btn-action.setting-btn { color: var(--epf-blue); }
 
-/* Table Styles */
 .table-wrapper {
     background: #fff; border: 1px solid var(--epf-border); border-radius: 8px;
     box-shadow: var(--shadow-sm); overflow: hidden;
@@ -192,7 +186,57 @@ body {
 }
 .status-dot.ok { background: #22c55e; }
 .status-dot.wait { background: #f59e0b; }
-.status-dot.locked { background: #ef4444; } /* Red for locked state indicator if needed */
+.status-dot.locked { background: #ef4444; }
+
+/* ===== Modal (SETTING) ===== */
+.modal-overlay {
+    position: fixed; inset: 0; background: rgba(16,32,56,0.55);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 500; padding: 1rem;
+    animation: fadeIn 0.15s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-box {
+    background: #fff; border-radius: 10px; width: 100%; max-width: 440px;
+    box-shadow: 0 20px 60px rgba(16,32,56,0.35);
+    animation: fadeSlide 0.2s ease;
+    overflow: hidden;
+}
+.modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 1.25rem; border-bottom: 1px solid var(--epf-border);
+    background: linear-gradient(90deg, #f4f8fd, #ffffff);
+}
+.modal-header h3 {
+    font-size: 1rem; color: var(--epf-blue);
+    display: flex; align-items: center; gap: 0.5rem;
+}
+.modal-close {
+    background: none; border: none; font-size: 1.5rem; cursor: pointer;
+    color: var(--epf-muted); line-height: 1; padding: 0 0.25rem;
+}
+.modal-close:hover { color: #ef4444; }
+.modal-body { padding: 1.25rem; }
+.form-group { margin-bottom: 1.1rem; }
+.form-group:last-child { margin-bottom: 0; }
+.form-group label {
+    display: block; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.85rem;
+}
+.form-group input {
+    width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--epf-border);
+    border-radius: 6px; font-size: 0.9rem; outline: none;
+}
+.form-group input:focus {
+    border-color: var(--epf-blue); box-shadow: 0 0 0 2px rgba(26,79,138,0.1);
+}
+.form-group small {
+    display: block; color: var(--epf-muted); font-size: 0.75rem; margin-top: 0.35rem;
+}
+.modal-footer {
+    display: flex; justify-content: flex-end; gap: 0.5rem;
+    padding: 1rem 1.25rem; border-top: 1px solid var(--epf-border);
+    background: #fafcff;
+}
 
 @media (max-width: 768px) {
     .navbar { padding: 0 0.5rem; }
@@ -206,7 +250,7 @@ body {
 </head>
 <body>
 
-<!-- ================= NAVBAR ================= -->
+<!-- NAVBAR -->
 <nav class="navbar">
 <div class="nav-brand"><span class="logo">Y</span><span class="brand-text">YZ Payroll</span></div>
 <div class="nav-links" id="navLinks">
@@ -274,16 +318,18 @@ body {
 </button>
 </nav>
 
-<!-- ================= MAIN CONTENT ================= -->
+<!-- MAIN CONTENT -->
 <div class="main-container">
     <div class="page-header">
         <div>
             <div class="page-title"><i class="fas fa-calendar-check"></i> Public Day OT Records</div>
-            <div class="page-subtitle">Auto-generated based on Public Holidays and Attendance. Subsidy = (Basic / 26 * 3) - (Basic / 26).</div>
+            <div class="page-subtitle">Subsidy formula: (Basic ÷ DaysPerMonth × Multiplier) − (Basic ÷ DaysPerMonth).</div>
         </div>
-        
-        <!-- Lock/Reset Controls -->
+
         <div class="action-buttons">
+            <button id="settingBtn" class="btn-action setting-btn" title="Calculation Settings">
+                <i class="fas fa-cog"></i> <span>Setting</span>
+            </button>
             <button id="lockBtn" class="btn-action" title="Lock current month calculation">
                 <i class="fas fa-lock-open"></i> <span>Lock</span>
             </button>
@@ -330,50 +376,93 @@ body {
     </div>
 </div>
 
+<!-- SETTING MODAL -->
+<div id="settingsModal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3><i class="fas fa-cog"></i> Calculation Settings</h3>
+            <button id="closeSettingsBtn" class="modal-close" type="button">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="daysPerMonthInput">Days Per Month (日薪分母)</label>
+                <input type="number" id="daysPerMonthInput" min="1" max="31" step="0.5" value="26">
+                <small>公式: 日薪 = 基础薪资 ÷ 此数值。预设 26。</small>
+            </div>
+            <div class="form-group">
+                <label for="defaultMultiplierInput">Default Multiplier (预设公假倍数)</label>
+                <input type="number" id="defaultMultiplierInput" min="1" max="5" step="0.5" value="3">
+                <small>当 PUBLIC 表未指定倍数时使用。预设 3 倍。</small>
+            </div>
+            <div class="form-group" style="background:#f4f8fd;padding:0.75rem;border-radius:6px;border:1px solid var(--epf-border);">
+                <small style="margin:0;color:var(--epf-blue);font-weight:600;">
+                    <i class="fas fa-info-circle"></i>
+                    设置会永久保存（localStorage），下次打开页面仍生效。
+                </small>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="cancelSettingsBtn" class="btn-action" type="button">Cancel</button>
+            <button id="saveSettingsBtn" class="btn-action locked" type="button">
+                <i class="fas fa-save"></i> <span>Save</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
 /* ================= CONFIG & STATE ================= */
 const URL_KEY = 'payrollScriptUrl';
-let SCRIPT_URL = '';
-let publicOtData = []; // Raw data from backend
-let aggregatedData = []; // Processed data for table
-let isLocked = false; // Lock state
+const SETTINGS_KEY = 'publicOT_calc_settings';
+const DEFAULT_SETTINGS = { daysPerMonth: 26, defaultMultiplier: 3 };
 
-/* ================= INITIALIZATION ================= */
+let SCRIPT_URL = '';
+let publicOtData = [];
+let aggregatedData = [];
+let isLocked = false;
+let currentSearch = '';
+
+/* ================= INIT ================= */
 document.addEventListener('DOMContentLoaded', () => {
     initNavbar();
     initSelectors();
     loadSavedUrl();
-    
-    // Check lock status from LocalStorage for current Month/Year
     checkLockStatus();
 
     if (SCRIPT_URL) loadData();
     else alert('Please set Deploy URL in Dashboard first.');
 
-    // Search Listener
     document.getElementById('searchInput').addEventListener('input', (e) => {
-        renderTable(e.target.value.trim().toLowerCase());
+        currentSearch = e.target.value.trim().toLowerCase();
+        renderTable(currentSearch);
     });
 
-    // Filter Listeners
     document.getElementById('monthSelect').addEventListener('change', () => {
-        checkLockStatus(); // Re-check lock when month changes
+        checkLockStatus();
         loadData();
     });
     document.getElementById('yearSelect').addEventListener('change', () => {
-        checkLockStatus(); // Re-check lock when year changes
+        checkLockStatus();
         loadData();
     });
 
-    // Button Listeners
     document.getElementById('lockBtn').addEventListener('click', toggleLock);
     document.getElementById('resetBtn').addEventListener('click', resetData);
+
+    // Settings modal
+    document.getElementById('settingBtn').addEventListener('click', openSettings);
+    document.getElementById('closeSettingsBtn').addEventListener('click', closeSettings);
+    document.getElementById('cancelSettingsBtn').addEventListener('click', closeSettings);
+    document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+    document.getElementById('settingsModal').addEventListener('click', (e) => {
+        if (e.target.id === 'settingsModal') closeSettings();
+    });
 });
 
 function initNavbar() {
     const backBtn = document.getElementById('backBtn');
     if (backBtn) backBtn.addEventListener('click', (e) => { e.preventDefault(); window.history.back(); });
-    
+
     document.querySelectorAll('[data-dropdown-toggle]').forEach(toggle => {
         toggle.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -398,7 +487,7 @@ function initSelectors() {
 
     const months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
     const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    
+
     months.forEach((m, i) => {
         const opt = document.createElement('option');
         opt.value = m;
@@ -423,6 +512,53 @@ function loadSavedUrl() {
     } catch (e) {}
 }
 
+/* ================= SETTINGS ================= */
+function getSettings() {
+    try {
+        const raw = localStorage.getItem(SETTINGS_KEY);
+        if (raw) {
+            const p = JSON.parse(raw);
+            return {
+                daysPerMonth: parseFloat(p.daysPerMonth) > 0 ? parseFloat(p.daysPerMonth) : DEFAULT_SETTINGS.daysPerMonth,
+                defaultMultiplier: parseFloat(p.defaultMultiplier) > 0 ? parseFloat(p.defaultMultiplier) : DEFAULT_SETTINGS.defaultMultiplier
+            };
+        }
+    } catch (e) {}
+    return { ...DEFAULT_SETTINGS };
+}
+
+function openSettings() {
+    const s = getSettings();
+    document.getElementById('daysPerMonthInput').value = s.daysPerMonth;
+    document.getElementById('defaultMultiplierInput').value = s.defaultMultiplier;
+    document.getElementById('settingsModal').style.display = 'flex';
+}
+
+function closeSettings() {
+    document.getElementById('settingsModal').style.display = 'none';
+}
+
+function saveSettings() {
+    const dp = parseFloat(document.getElementById('daysPerMonthInput').value);
+    const dm = parseFloat(document.getElementById('defaultMultiplierInput').value);
+
+    if (!(dp > 0) || !(dm > 0)) {
+        alert('Please enter valid positive numbers.');
+        return;
+    }
+
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({
+        daysPerMonth: dp,
+        defaultMultiplier: dm
+    }));
+
+    closeSettings();
+
+    // 前端立即重新计算显示
+    processData();
+    renderTable(currentSearch);
+}
+
 /* ================= LOCK LOGIC ================= */
 function getLockKey() {
     const m = document.getElementById('monthSelect').value;
@@ -431,27 +567,16 @@ function getLockKey() {
 }
 
 function checkLockStatus() {
-    const key = getLockKey();
-    const savedState = localStorage.getItem(key);
+    const savedState = localStorage.getItem(getLockKey());
     isLocked = (savedState === 'true');
     updateLockUI();
 }
 
 function toggleLock() {
-    const key = getLockKey();
     isLocked = !isLocked;
-    localStorage.setItem(key, isLocked ? 'true' : 'false');
+    localStorage.setItem(getLockKey(), isLocked ? 'true' : 'false');
     updateLockUI();
-    
-    // If we just unlocked, we might want to refresh data immediately to show "live" state
-    // But usually user expects to see what was locked until they change filters.
-    // Let's keep the current view but allow next refresh to be dynamic.
-    if (!isLocked) {
-        // Optional: Auto refresh when unlocking? 
-        // For safety, let's wait for user to switch month or manually refresh, 
-        // OR we can just reload current view dynamically.
-        loadData(); 
-    }
+    loadData();
 }
 
 function updateLockUI() {
@@ -463,13 +588,13 @@ function updateLockUI() {
         lockBtn.classList.add('locked');
         lockBtn.innerHTML = '<i class="fas fa-lock"></i> <span>Locked</span>';
         resetBtn.style.display = 'inline-flex';
-        statusText.innerHTML = '<i class="fas fa-lock"></i> Data is LOCKED. Switching months will not recalculate.';
+        statusText.innerHTML = '<i class="fas fa-lock"></i> Data is LOCKED — read from PUBLICDAYSOT sheet.';
         statusText.style.color = '#ef4444';
     } else {
         lockBtn.classList.remove('locked');
         lockBtn.innerHTML = '<i class="fas fa-lock-open"></i> <span>Lock</span>';
         resetBtn.style.display = 'none';
-        statusText.innerHTML = '<i class="fas fa-sync"></i> Data is dynamic. Switching months will recalculate.';
+        statusText.innerHTML = '<i class="fas fa-sync"></i> Data is dynamic — recalculated from SHEET.';
         statusText.style.color = 'var(--epf-muted)';
     }
 }
@@ -488,17 +613,14 @@ async function resetData() {
     try {
         const res = await fetch(`${SCRIPT_URL}?action=resetPublicDaysOT&month=${month}&year=${year}&_t=${Date.now()}`);
         const json = await res.json();
-        
         if (json.status === 'success') {
-            // Clear local lock
             localStorage.removeItem(getLockKey());
             isLocked = false;
             updateLockUI();
-            // Reload empty/fresh data
             loadData();
             alert('Reset successful! Sheet cleared.');
         } else {
-            alert('Error resetting: ' + json.message);
+            alert('Error resetting: ' + (json.message || 'Unknown'));
         }
     } catch (err) {
         console.error(err);
@@ -512,20 +634,26 @@ async function resetData() {
 /* ================= DATA LOADING ================= */
 async function loadData() {
     const tbody = document.getElementById('tableBody');
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;"><i class="fas fa-spinner fa-spin"></i> Generating...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
 
     const month = document.getElementById('monthSelect').value;
     const year = document.getElementById('yearSelect').value;
+    const s = getSettings();
 
     try {
-        // Pass lockStatus to backend
-        const res = await fetch(`${SCRIPT_URL}?action=getPublicDaysOT&month=${month}&year=${year}&isLocked=${isLocked}&_t=${Date.now()}`);
+        const url = `${SCRIPT_URL}?action=getPublicDaysOT&month=${month}&year=${year}` +
+                    `&isLocked=${isLocked}` +
+                    `&daysPerMonth=${s.daysPerMonth}` +
+                    `&defaultMultiplier=${s.defaultMultiplier}` +
+                    `&_t=${Date.now()}`;
+
+        const res = await fetch(url);
         const json = await res.json();
-        
+
         if (json.status === 'success' && Array.isArray(json.data)) {
             publicOtData = json.data;
             processData();
-            renderTable();
+            renderTable(currentSearch);
         } else {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:red;">Error: ' + (json.message || 'Unknown error') + '</td></tr>';
         }
@@ -535,9 +663,10 @@ async function loadData() {
     }
 }
 
-/* ================= PROCESSING LOGIC ================= */
+/* ================= PROCESSING ================= */
 function processData() {
     const map = new Map();
+    const settings = getSettings();
 
     publicOtData.forEach(row => {
         const code = String(row['ID KOD'] || '').trim();
@@ -548,7 +677,7 @@ function processData() {
                 code: code,
                 name: row['NAME'],
                 basic: parseFloat(row['BASICSALARY']) || 0,
-                dates: new Set(), 
+                dates: new Set(),
                 totalAmount: 0,
                 lastDate: ''
             });
@@ -556,33 +685,33 @@ function processData() {
 
         const entry = map.get(code);
         const dateStr = String(row['DATE'] || '');
-        
         if (dateStr) entry.dates.add(dateStr);
         if (dateStr > entry.lastDate) entry.lastDate = dateStr;
-        
-        // 累计每天的补贴金额
-        entry.totalAmount += parseFloat(row['AMOUNT']) || 0;
+
+        // 前端按 SETTING 重新计算每日补贴
+        const basic = parseFloat(row['BASICSALARY']) || entry.basic || 0;
+        const multiplier = parseFloat(row['MULTIPLIER']) > 0
+            ? parseFloat(row['MULTIPLIER'])
+            : settings.defaultMultiplier;
+        const dailyRate = basic / settings.daysPerMonth;
+        entry.totalAmount += (dailyRate * multiplier) - dailyRate;
     });
 
-    // Calculate Final Values
-    aggregatedData = Array.from(map.values()).map(item => {
-        return {
-            ...item,
-            days: item.dates.size
-        };
-    });
+    aggregatedData = Array.from(map.values()).map(item => ({
+        ...item,
+        days: item.dates.size
+    }));
 
-    // Sort by Name
     aggregatedData.sort((a, b) => a.name.localeCompare(b.name));
 }
 
-/* ================= RENDERING ================= */
+/* ================= RENDER ================= */
 function renderTable(filter = '') {
     const tbody = document.getElementById('tableBody');
     tbody.innerHTML = '';
 
-    const filtered = aggregatedData.filter(item => 
-        item.name.toLowerCase().includes(filter) || 
+    const filtered = aggregatedData.filter(item =>
+        item.name.toLowerCase().includes(filter) ||
         item.code.toLowerCase().includes(filter)
     );
 
@@ -593,9 +722,8 @@ function renderTable(filter = '') {
 
     filtered.forEach(item => {
         const tr = document.createElement('tr');
-        
         const statusClass = item.days > 0 ? 'ok' : 'wait';
-        const statusText = item.days > 0 ? 'Calculated' : 'No Dates';
+        const statusText = item.days > 0 ? (isLocked ? 'Locked' : 'Calculated') : 'No Dates';
 
         tr.innerHTML = `
             <td><span class="code-badge">${item.code}</span></td>
@@ -604,7 +732,7 @@ function renderTable(filter = '') {
             <td class="text-right"><span class="badge-days">${item.days}</span></td>
             <td class="text-right" style="font-weight:700;color:var(--epf-blue);">${fmtRM(item.totalAmount)}</td>
             <td>${item.lastDate || '-'}</td>
-            <td><span class="status-dot ${statusClass}"></span>${statusText}</td>
+            <td><span class="status-dot ${isLocked ? 'locked' : statusClass}"></span>${statusText}</td>
         `;
         tbody.appendChild(tr);
     });
