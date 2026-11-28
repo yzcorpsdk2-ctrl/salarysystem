@@ -544,6 +544,13 @@
                     <option value="Pending">Pending</option>
                 </select>
             </div>
+            
+            <!-- [新增] 搜索框 -->
+            <div class="filter-group">
+                <label for="searchInput">🔍 Cari Nama / Code</label>
+                <input type="text" id="searchInput" placeholder="Taip nama atau code...">
+            </div>
+            
             <div class="filter-group" style="flex:0 1 auto;min-width:80px;">
                 <button class="btn btn-gray" style="width:100%;" onclick="goBackToIndex()">← Kembali</button>
             </div>
@@ -673,6 +680,7 @@
     // DOM Elements
     const branchSelect = document.getElementById('branchSelect');
     const statusSelect = document.getElementById('statusSelect');
+    const searchInput = document.getElementById('searchInput'); // [新增] 获取搜索框元素
     const staffListEl = document.getElementById('staffList');
     const statusBar = document.getElementById('statusBar');
     const otherBranchContainer = document.getElementById('otherBranchContainer');
@@ -1142,9 +1150,23 @@
         }
 
         const selectedStatus = statusSelect.value;
+        // [新增] 获取搜索关键词并转为小写
+        const searchTerm = (searchInput.value || '').toLowerCase().trim();
+
         let filtered = allStaff;
+        
+        // 原有筛选
         if (selectedBranch) filtered = filtered.filter(s => s.GroupName === selectedBranch);
         if (selectedStatus) filtered = filtered.filter(s => s.Situation.toLowerCase() === selectedStatus.toLowerCase());
+        
+        // [新增] 搜索筛选：匹配 Name 或 Code
+        if (searchTerm) {
+            filtered = filtered.filter(s => 
+                (s.Name && s.Name.toLowerCase().includes(searchTerm)) || 
+                (s.Code && s.Code.toLowerCase().includes(searchTerm))
+            );
+        }
+
         filtered.sort((a, b) => a.Name.localeCompare(b.Name));
 
         if (filtered.length === 0) {
@@ -1153,6 +1175,7 @@
                     <span class="icon">📭</span>${t('noData')}
                     ${selectedBranch ? `<br><small style="color:#a0aec0;">Cawangan: ${selectedBranch}</small>` : ''}
                     ${selectedStatus ? `<br><small style="color:#a0aec0;">Status: ${selectedStatus}</small>` : ''}
+                    ${searchTerm ? `<br><small style="color:#a0aec0;">Carian: "${searchTerm}"</small>` : ''}
                 </div>`;
             return;
         }
@@ -1779,6 +1802,9 @@
 
         branchSelect.addEventListener('change', handleBranchChange);
         statusSelect.addEventListener('change', renderStaffList);
+        
+        // [新增] 监听搜索框输入事件
+        searchInput.addEventListener('input', renderStaffList);
 
         // 弹窗外部点击关闭
         const addOverlay = document.getElementById('addStaffOverlay');
